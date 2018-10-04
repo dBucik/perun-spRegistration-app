@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="cz.metacentrum.perun.spRegistration.persistence"/>
+    <context:property-placeholder properties-ref="properties" />
+
+    <bean id="defaultProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="jdbc.driver">org.postgresql.Driver</prop>
+                <prop key="jdbc.url">jdbc:postgresql://cloud69b.cerit-sc.cz/spregistration</prop>
+                <prop key="jdbc.username">spreg</prop>
+                <prop key="jdbc.password">spreg123</prop>
+                <prop key="rpc.url">XYZ</prop>
+                <prop key="rpc.user">XYZ</prop>
+                <prop key="rpc.password">XYZ</prop>
+                <prop key="admins">62692,0,0</prop>
+                <prop key="attributes.idpAttribute">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
+                <prop key="attributes.idpAttributeValue">XYZ</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties" ref="defaultProperties"/>
+        <property name="locations">
+            <list>
+                <value>file:/etc/perun/perun-spRegistration.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="rpcConnector" class="cz.metacentrum.perun.spRegistration.persistence.rpc.impl.PerunConnectorRpc">
+        <property name="perunRpcUrl" value="${rpc.url}"/>
+        <property name="perunRpcUser" value="${rpc.user}"/>
+        <property name="perunRpcPassword" value="${rpc.password}"/>
+    </bean>
+
+    <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="config" class="cz.metacentrum.perun.spRegistration.persistence.models.Config">
+        <constructor-arg name="admins" value="#{'${admins}'.split('\s*,\s*')}" />
+        <constructor-arg name="idpAttribute" value="${attributes.idpAttribute}" />
+        <constructor-arg name="idpAttributeValue" value="${attributes.idpAttributeValue}" />
+    </bean>
+
+</beans>
