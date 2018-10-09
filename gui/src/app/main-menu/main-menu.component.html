@@ -1,0 +1,8 @@
+<div class="container">
+  <div class="row pt-5">
+    <app-menu-button class="col-sm-6 col-md-4 col-lg-3 col-xl-3 mb-5"
+                     *ngFor="let mb of menuButtons"
+                     [icon]="mb.icon" [route]="mb.route" [text]="mb.text">
+    </app-menu-button>
+  </div>
+</div>

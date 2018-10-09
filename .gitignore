@@ -5,6 +5,27 @@
 
 # Compiled class file
 *.class
+/gui/dist
+/gui/tmp
+/gui/out-tsc
+/gui/package-lock.json
+
+# Gui dependencies
+/gui/node_modules
+
+# misc
+/gui/.sass-cache
+/gui/connect.lock
+/gui/coverage
+/gui/libpeerconnection.log
+/gui/npm-debug.log
+/gui/yarn-error.log
+/gui/testem.log
+/gui/typings
+
+# System Files
+/gui/.DS_Store
+/gui/Thumbs.db
 
 # Log file
 *.log

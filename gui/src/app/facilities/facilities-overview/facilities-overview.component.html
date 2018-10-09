@@ -1,0 +1,25 @@
+<div class="container-fluid">
+  <div class="card mt-4">
+    <div class="card-body">
+      <h4 class="card-title">
+        Your facilities
+      </h4>
+        <table class="table" app-sortable-table (sorted)="onSorted($event)">
+          <thead>
+            <tr>
+              <th table-name="{{tableName}}" sortable-column="id" sort-direction="asc">Id</th>
+              <th table-name="{{tableName}}" sortable-column="name">Name</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let facility of facilities">
+              <th>{{facility.id}}</th>
+              <td>{{facility.name}}</td>
+              <td>{{facility.description}}</td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+</div>

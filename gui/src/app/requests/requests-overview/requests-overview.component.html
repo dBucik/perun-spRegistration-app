@@ -1,0 +1,31 @@
+<div class="container-fluid">
+  <div class="card mt-4">
+    <div class="card-body">
+      <h4 class="card-title">
+        Your Requests
+      </h4>
+        <table class="table" app-sortable-table (sorted)="onSorted($event)">
+          <thead>
+            <tr>
+              <th table-name="{{tableName}}" sortable-column="id" sort-direction="asc">Id</th>
+              <th table-name="{{tableName}}" sortable-column="facilityId">Facility ID</th>
+              <th table-name="{{tableName}}" sortable-column="status">Status</th>
+              <th table-name="{{tableName}}" sortable-column="action">Action</th>
+              <th table-name="{{tableName}}" sortable-column="modifiedAt">Modified at</th>
+              <th table-name="{{tableName}}" sortable-column="modifiedBy">Modified by</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let request of requests">
+              <th>{{request.reqId}}</th>
+              <th>{{request.facilityId}}</th>
+              <th>{{request.status}}</th>
+              <th>{{request.action}}</th>
+              <th>{{request.modifiedAt}}</th>
+              <th>{{request.modifiedBy}}</th>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+</div>

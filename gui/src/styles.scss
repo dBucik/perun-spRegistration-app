@@ -1,0 +1,13 @@
+@import "~font-awesome/css/font-awesome.css";
+
+.no-hover-decoration {
+  text-decoration: none !important;
+}
+
+a {
+  color: rgba(0, 0, 0, .65) !important;
+}
+
+a:hover {
+  color: rgba(0, 0, 0, .85) !important;
+}

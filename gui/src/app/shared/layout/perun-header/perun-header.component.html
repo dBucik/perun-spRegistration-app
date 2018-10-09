@@ -1,0 +1,32 @@
+<nav class="navbar navbar-default navbar-expand-lg navbar-light bg-light border-bottom sticky-top perun-navbar">
+  <a class="navbar-brand ml-1 mt-1 mb-1">
+    <img src="assets/img/perun_3.svg" class="perun-logo">
+  </a>
+  <button class="navbar-toggler d-block d-sm-block d-md-none" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
+          aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+    <ul class="navbar-nav d-block d-sm-block d-md-none">
+      <li class="nav-item p-2">
+        <a class="top-menu-link" routerLink="">
+          <fa-icon [icon]="faHome"></fa-icon>
+          Home
+        </a>
+      </li>
+      <li class="nav-item p-2">
+        <a class="top-menu-link" routerLink="requests">
+          <fa-icon [icon]="faRequests"></fa-icon>
+          Requests
+        </a>
+      </li>
+      <li class="nav-item p-2">
+        <a class="top-menu-link" routerLink="facilities">
+          <fa-icon [icon]="faFacilities"></fa-icon>
+          Facilities
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>

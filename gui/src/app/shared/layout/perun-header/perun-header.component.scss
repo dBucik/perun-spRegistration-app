@@ -1,0 +1,24 @@
+.perun-logo {
+  height: 50px;
+  width: auto;
+  max-height: none !important;
+}
+
+.perun-navbar {
+  background: #f8f8f8;
+}
+
+.top-menu-link {
+  display: block;
+}
+
+.top-menu-link:hover {
+  text-decoration: none;
+}
+
+@media (min-width: 768px) {
+
+  .perun-navbar {
+    height: 5rem;
+  }
+}
