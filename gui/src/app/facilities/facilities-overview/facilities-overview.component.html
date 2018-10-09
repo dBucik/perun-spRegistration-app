@@ -1,15 +1,15 @@
-<div class="container-fluid">
-  <div class="card mt-4">
+<div class="container">
+  <div class="card mt-4 shadow">
     <div class="card-body">
       <h4 class="card-title">
-        Your facilities
+        {{'FACILITIES.YOUR_FACILITIES' | translate}}
       </h4>
         <table class="table" app-sortable-table (sorted)="onSorted($event)">
           <thead>
             <tr>
-              <th table-name="{{tableName}}" sortable-column="id" sort-direction="asc">Id</th>
-              <th table-name="{{tableName}}" sortable-column="name">Name</th>
-              <th>Description</th>
+              <th table-name="{{tableName}}" sortable-column="id" sort-direction="asc">{{'FACILITIES.ID' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="name">{{'FACILITIES.NAME' | translate}}</th>
+              <th>{{'FACILITIES.DESCRIPTION' | translate}}</th>
             </tr>
           </thead>
           <tbody>

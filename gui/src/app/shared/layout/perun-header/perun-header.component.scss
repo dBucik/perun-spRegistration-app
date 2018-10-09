@@ -1,12 +1,24 @@
 .perun-logo {
-  height: 50px;
+  height: 2em;
   width: auto;
   max-height: none !important;
 }
 
-.perun-navbar {
-  background: #f8f8f8;
+.nav-item {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 4px !important;
+  margin-bottom: 4px !important;
+  margin-left: 8px;
+  margin-right: 8px;
 }
+
+@media (min-width: 992px) {
+  .active {
+    border-bottom: 3px solid rgba(0, 0, 0, 0.65);
+  }
+}
+
 
 .top-menu-link {
   display: block;
@@ -14,11 +26,4 @@
 
 .top-menu-link:hover {
   text-decoration: none;
-}
-
-@media (min-width: 768px) {
-
-  .perun-navbar {
-    height: 5rem;
-  }
 }
