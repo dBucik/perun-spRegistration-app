@@ -1,18 +1,18 @@
-<div class="container-fluid">
-  <div class="card mt-4">
+<div class="container">
+  <div class="card mt-4 shadow">
     <div class="card-body">
       <h4 class="card-title">
-        Your Requests
+        {{'REQUESTS.YOUR_REQUESTS' | translate}}
       </h4>
         <table class="table" app-sortable-table (sorted)="onSorted($event)">
           <thead>
             <tr>
-              <th table-name="{{tableName}}" sortable-column="id" sort-direction="asc">Id</th>
-              <th table-name="{{tableName}}" sortable-column="facilityId">Facility ID</th>
-              <th table-name="{{tableName}}" sortable-column="status">Status</th>
-              <th table-name="{{tableName}}" sortable-column="action">Action</th>
-              <th table-name="{{tableName}}" sortable-column="modifiedAt">Modified at</th>
-              <th table-name="{{tableName}}" sortable-column="modifiedBy">Modified by</th>
+              <th table-name="{{tableName}}" sortable-column="id" sort-direction="asc">{{'REQUESTS.ID' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="facilityId">{{'REQUESTS.FACILITY_ID' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="status">{{'REQUESTS.STATUS' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="action">{{'REQUESTS.ACTION' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="modifiedAt">{{'REQUESTS.MODIFIED_AT' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="modifiedBy">{{'REQUESTS.MODIFIED_BY' | translate}}</th>
             </tr>
           </thead>
           <tbody>

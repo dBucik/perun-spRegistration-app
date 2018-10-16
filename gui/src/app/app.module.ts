@@ -3,20 +3,21 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { PerunHeaderComponent } from './shared/layout/perun-header/perun-header.component';
 import { CoreModule } from "./core/core.module";
 import { FacilitiesModule } from "./facilities/facilities.module";
 import { MainMenuModule } from "./main-menu/main-menu.module";
-import { PerunSidebarComponent } from './shared/layout/perun-sidebar/perun-sidebar.component';
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { SharedModule } from "./shared/shared.module";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from "@ngx-translate/http-loader";
+
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http);
+}
 
 @NgModule({
   declarations: [
     AppComponent,
-    PerunHeaderComponent,
-    PerunSidebarComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -26,7 +27,13 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
     HttpClientModule,
     MainMenuModule,
     SharedModule,
-    FontAwesomeModule
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]
