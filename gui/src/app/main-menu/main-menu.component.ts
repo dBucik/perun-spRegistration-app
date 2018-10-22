@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {faDatabase, faEnvelopeOpen } from "@fortawesome/free-solid-svg-icons";
+import {faDatabase, faEnvelopeOpen, faPlus} from "@fortawesome/free-solid-svg-icons";
 
 @Component({
   selector: 'app-main-menu',
@@ -10,6 +10,7 @@ export class MainMenuComponent {
 
   requestsIcon = faEnvelopeOpen;
   facilitiesIcon = faDatabase;
+  newRequestIcon = faPlus;
 
   constructor() { }
 
