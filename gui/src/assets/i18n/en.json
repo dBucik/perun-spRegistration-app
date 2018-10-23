@@ -1,0 +1,20 @@
+{
+  "REQUESTS": {
+    "TITLE": "My requests",
+    "YOUR_REQUESTS": "Your requests",
+    "ID": "Id",
+    "FACILITY_ID": "Facility Id",
+    "STATUS": "Status",
+    "ACTION": "Action",
+    "MODIFIED_AT": "Modified at",
+    "MODIFIED_BY": "Modified by",
+    "NEW": "New Request"
+  },
+  "FACILITIES": {
+    "TITLE": "Facilities",
+    "YOUR_FACILITIES": "Your facilities",
+    "ID": "Id",
+    "NAME": "Name",
+    "DESCRIPTION": "Description"
+  }
+}

@@ -1,11 +1,14 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers;
 
+import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
 import cz.metacentrum.perun.spRegistration.rest.ViewData;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.service.impl.AdminServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +21,19 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin(
+		origins = "http://localhost:4200",
+		allowCredentials = "true",
+		allowedHeaders = "origin, content-type, accept, authorization",
+		methods = {
+				RequestMethod.GET,
+				RequestMethod.POST,
+				RequestMethod.PUT,
+				RequestMethod.DELETE,
+				RequestMethod.OPTIONS,
+				RequestMethod.HEAD
+		}
+)
 @RestController
 @SessionAttributes("userId")
 public class AdminController {
@@ -29,7 +45,7 @@ public class AdminController {
 		this.adminService = adminServiceImpl;
 	}
 
-	@RequestMapping(path = "/")
+	@RequestMapping(path = "/api")
 	public void start(HttpServletRequest request) {
 		//TODO: delete method, only for testing purposes
 		request.getSession().setAttribute("userId", 62692L);
@@ -44,6 +60,18 @@ public class AdminController {
 		res.setRequests(adminService.getAllRequests(userId));
 
 		return res;
+	}
+
+	@RequestMapping(path = "/api/allFacilities", method = RequestMethod.GET)
+	public List<Facility> allFacilities(@SessionAttribute("userId") Long userId) throws UnauthorizedActionException {
+
+		return adminService.getAllFacilities(userId);
+	}
+
+	@RequestMapping(path = "/api/allRequests", method = RequestMethod.GET)
+	public List<Request> allRequests(@SessionAttribute("userId") Long userId) throws UnauthorizedActionException {
+
+		return adminService.getAllRequests(userId);
 	}
 
 	@RequestMapping(path = "/api/approve/{requestId}")

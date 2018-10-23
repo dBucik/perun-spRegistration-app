@@ -1,0 +1,25 @@
+<div class="container">
+  <div class="perun-card mt-4 shadow">
+    <div class="card-body">
+      <h4 class="card-title">
+        {{'FACILITIES.YOUR_FACILITIES' | translate}}
+      </h4>
+        <table class="table" app-sortable-table (sorted)="onSorted($event)">
+          <thead>
+            <tr>
+              <th table-name="{{tableName}}" sortable-column="id" sort-direction="asc">{{'FACILITIES.ID' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="name">{{'FACILITIES.NAME' | translate}}</th>
+              <th>{{'FACILITIES.DESCRIPTION' | translate}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let facility of facilities">
+              <th>{{facility.id}}</th>
+              <td>{{facility.name}}</td>
+              <td>{{facility.description}}</td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+</div>

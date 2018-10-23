@@ -1,0 +1,6 @@
+export enum RequestAction {
+  REGISTER_NEW_SP,
+  UPDATE_FACILITY,
+  DELETE_FACILITY,
+  MOVE_TO_PRODUCTION
+}

@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="perun-card mt-4 shadow">
+    <div class="card-body">
+      <h4 class="card-title">
+        {{'REQUESTS.YOUR_REQUESTS' | translate}}
+      </h4>
+        <table class="table" app-sortable-table (sorted)="onSorted($event)">
+          <thead>
+            <tr>
+              <th table-name="{{tableName}}" sortable-column="id" sort-direction="asc">{{'REQUESTS.ID' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="facilityId">{{'REQUESTS.FACILITY_ID' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="status">{{'REQUESTS.STATUS' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="action">{{'REQUESTS.ACTION' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="modifiedAt">{{'REQUESTS.MODIFIED_AT' | translate}}</th>
+              <th table-name="{{tableName}}" sortable-column="modifiedBy">{{'REQUESTS.MODIFIED_BY' | translate}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let request of requests">
+              <th>{{request.reqId}}</th>
+              <th>{{request.facilityId}}</th>
+              <th>{{request.status}}</th>
+              <th>{{request.action}}</th>
+              <th>{{request.modifiedAt}}</th>
+              <th>{{request.modifiedBy}}</th>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+</div>
