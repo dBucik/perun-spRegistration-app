@@ -77,6 +77,6 @@ public interface RequestManager {
 	 * @param facilityIds IDs of associated facilities.
 	 * @return List of found Request objects.
 	 */
-	List<Request> getRequestsByFacilityIds(Set<Long> facilityIds);
+	List<Request> getAllRequestsByFacilityIds(Set<Long> facilityIds);
 
 }

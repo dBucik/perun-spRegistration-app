@@ -1,8 +1,8 @@
 package cz.metacentrum.perun.spRegistration.service;
 
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 
@@ -43,13 +43,13 @@ public interface AdminService {
 	 * Ask requester to make changes to the request.
 	 * @param requestId ID of request.
 	 * @param userId ID of user (ADMIN) asking for changes.
-	 * @param attributes Map (key = attribute name, value = Attribute) of attributes.
+	 * @param attributes Map (key = attribute name, value = PerunAttribute) of attributes.
 	 *                   It contains comments left by ADMIN.
 	 * @return True if everyting went OK.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 * @throws CannotChangeStatusException when status of the request cannot be changed.
 	 */
-	boolean askForChanges(Long requestId, Long userId, Map<String, Attribute> attributes)
+	boolean askForChanges(Long requestId, Long userId, List<PerunAttribute> attributes)
 			throws UnauthorizedActionException, CannotChangeStatusException;
 
 	/**

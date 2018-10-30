@@ -1,9 +1,8 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers;
 
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
-import cz.metacentrum.perun.spRegistration.rest.ViewData;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.service.impl.AdminServiceImpl;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 
 @CrossOrigin(
 		origins = "http://localhost:4200",
@@ -49,17 +47,6 @@ public class AdminController {
 	public void start(HttpServletRequest request) {
 		//TODO: delete method, only for testing purposes
 		request.getSession().setAttribute("userId", 62692L);
-	}
-
-	@RequestMapping(path = "/api/admin", method = RequestMethod.GET)
-	public ViewData adminOverview(@SessionAttribute("userId") Long userId)
-			throws UnauthorizedActionException
-	{
-		ViewData res = new ViewData();
-		res.setFacilities(adminService.getAllFacilities(userId));
-		res.setRequests(adminService.getAllRequests(userId));
-
-		return res;
 	}
 
 	@RequestMapping(path = "/api/allFacilities", method = RequestMethod.GET)
@@ -102,7 +89,7 @@ public class AdminController {
 	@RequestMapping(path = "/api/askForChanges/{requestId}")
 	public String askForChanges(@SessionAttribute("userId") Long userId,
 								@PathVariable("requestId") Long requestId,
-								@RequestBody Map<String, Attribute> attributes)
+								@RequestBody List<PerunAttribute> attributes)
 			throws CannotChangeStatusException, UnauthorizedActionException
 	{
 		if (adminService.askForChanges(requestId, userId, attributes)) {

@@ -2,16 +2,15 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
-import cz.metacentrum.perun.spRegistration.persistence.models.Config;
+import cz.metacentrum.perun.spRegistration.persistence.Config;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.MapAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import cz.metacentrum.perun.spRegistration.service.AdminService;
+import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,9 +25,7 @@ import java.util.Map;
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
 @Service("adminService")
-public class AdminServiceImpl implements cz.metacentrum.perun.spRegistration.service.AdminService {
-
-	private static final Logger log = LoggerFactory.getLogger(AdminServiceImpl.class);
+public class AdminServiceImpl implements AdminService {
 
 	@Autowired
 	private RequestManager requestManager;
@@ -52,7 +49,9 @@ public class AdminServiceImpl implements cz.metacentrum.perun.spRegistration.ser
 			throw new CannotChangeStatusException("Cannot approve request, request not marked as WAITING_FOR_APPROVAL");
 		}
 
-		finishRequestApproved(request);
+		if (! finishRequestApproved(request)) {
+			return false;
+		}
 
 		request.setStatus(RequestStatus.APPROVED);
 		request.setModifiedBy(userId);
@@ -84,7 +83,7 @@ public class AdminServiceImpl implements cz.metacentrum.perun.spRegistration.ser
 	}
 
 	@Override
-	public boolean askForChanges(Long requestId, Long userId, Map<String, Attribute> attributes)
+	public boolean askForChanges(Long requestId, Long userId, List<PerunAttribute> attributes)
 			throws UnauthorizedActionException, CannotChangeStatusException {
 		if (! config.isAdmin(userId)) {
 			throw new UnauthorizedActionException("User is not authorized to ask for changes");
@@ -96,8 +95,9 @@ public class AdminServiceImpl implements cz.metacentrum.perun.spRegistration.ser
 			throw new CannotChangeStatusException("Cannot ask for changes, request not marked as WAITING_FOR_APPROVAL");
 		}
 
+		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, config);
 		request.setStatus(RequestStatus.WFC);
-		request.setAttributes(attributes);
+		request.setAttributes(convertedAttributes);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 		return requestManager.updateRequest(request);
@@ -106,7 +106,7 @@ public class AdminServiceImpl implements cz.metacentrum.perun.spRegistration.ser
 	@Override
 	public List<Request> getAllRequests(Long adminId) throws UnauthorizedActionException {
 		if (! config.isAdmin(adminId)) {
-			throw new UnauthorizedActionException("User cannot list all requests, user not an admin");
+			throw new UnauthorizedActionException("User cannot list all requests, user is not an admin");
 		}
 
 		return requestManager.getAllRequests();
@@ -149,34 +149,32 @@ public class AdminServiceImpl implements cz.metacentrum.perun.spRegistration.ser
 		return true;
 	}
 
-	private void finishRequestApproved(Request request) {
+	private boolean finishRequestApproved(Request request) {
 		switch(request.getAction()) {
 			case REGISTER_NEW_SP:
-				registerNewFacilityToPerun(request);
-				return;
+				return registerNewFacilityToPerun(request);
 			case UPDATE_FACILITY:
-				updateFacilityInPerun(request);
-				return;
+				return updateFacilityInPerun(request);
 			case DELETE_FACILITY:
-				deleteFacilityFromPerun(request);
-				return;
+				return deleteFacilityFromPerun(request);
 			case MOVE_TO_PRODUCTION:
 				//TODO: set facility in Perun as production SP
 		}
+
+		return false;
 	}
 
-	private void deleteFacilityFromPerun(Request request) {
+	private boolean deleteFacilityFromPerun(Request request) {
 		Long facilityId = request.getFacilityId();
-		perunConnector.deleteFacilityFromPerun(facilityId);
+		return perunConnector.deleteFacilityFromPerun(facilityId);
 	}
 
-	private void updateFacilityInPerun(Request request) {
+	private boolean updateFacilityInPerun(Request request) {
 		Facility actualFacility = perunConnector.getFacilityById(request.getFacilityId());
 		perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonForPerun());
-		MapAttribute nameAttr = (MapAttribute) request.getAttributes().get("name");
-		String newName = nameAttr.getNewValue().get("en");
-		MapAttribute descAttr = (MapAttribute) request.getAttributes().get("description");
-		String newDesc = descAttr.getNewValue().get("en");
+
+		String newName = getName(request);
+		String newDesc = getDesc(request);
 
 		boolean changed = false;
 		if (newName != null && !actualFacility.getName().equals(newName)) {
@@ -192,19 +190,32 @@ public class AdminServiceImpl implements cz.metacentrum.perun.spRegistration.ser
 		if (changed) {
 			perunConnector.updateFacilityInPerun(actualFacility.toJsonString());
 		}
+
+		return true;
 	}
 
-	private void registerNewFacilityToPerun(Request request) {
+	private boolean registerNewFacilityToPerun(Request request) {
 		Facility facility = new Facility(null);
-		MapAttribute nameAttr = (MapAttribute) request.getAttributes().get("name");
-		String newName = nameAttr.getNewValue().get("en");
-		MapAttribute descAttr = (MapAttribute) request.getAttributes().get("description");
-		String newDesc = descAttr.getNewValue().get("en");
+		String newName = getName(request);
+		String newDesc = getDesc(request);
+
+		if (newName == null || newDesc == null) {
+			//TODO: maybe exception?
+			return false;
+		}
+
 		facility.setName(newName);
 		facility.setDescription(newDesc);
 		facility = perunConnector.createFacilityInPerun(facility.toJsonString());
 		request.setFacilityId(facility.getId());
-		perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonForPerun());
+		return perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonForPerun());
 	}
 
+	private String getDesc(Request request) {
+		return request.getFacilityDescription();
+	}
+
+	private String getName(Request request) {
+		return request.getFacilityName();
+	}
 }

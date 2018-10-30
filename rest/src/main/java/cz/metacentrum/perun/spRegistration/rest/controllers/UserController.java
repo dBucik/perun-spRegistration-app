@@ -1,9 +1,8 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers;
 
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
-import cz.metacentrum.perun.spRegistration.rest.ViewData;
 import cz.metacentrum.perun.spRegistration.service.UserService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
@@ -44,29 +43,25 @@ public class UserController {
 		this.service = service;
 	}
 
-	@RequestMapping(path = "/api/myFacilities", method = RequestMethod.GET)
-	public List<Facility> myFacilities(@SessionAttribute("userId") Long userid) {
-		return service.getAllFacilitiesWhereUserIsAdmin(userid);
+	@RequestMapping(path = "/api/userFacilities", method = RequestMethod.GET)
+	public List<Facility> userFacilities(@SessionAttribute("userId") Long userId) {
+		return service.getAllFacilitiesWhereUserIsAdmin(userId);
 	}
 
-	@RequestMapping(path = "/api/", method = RequestMethod.GET)
-	public ViewData userOverview(@SessionAttribute("userId") Long userId) {
-		ViewData res = new ViewData();
-		res.setFacilities(service.getAllFacilitiesWhereUserIsAdmin(userId));
-		res.setRequests(service.getAllRequestsUserCanAccess(userId));
-
-		return res;
+	@RequestMapping(path = "/api/userRequests", method = RequestMethod.GET)
+	public List<Request> userRequests(@SessionAttribute("userId") Long userId) {
+		return service.getAllRequestsUserCanAccess(userId);
 	}
 
 	@RequestMapping(path = "/api/register")
 	public Long createRegistrationRequest(@SessionAttribute("userId") Long userId,
-										  @RequestBody Map<String, Attribute> attributes) {
+										  @RequestBody List<PerunAttribute> attributes) {
 		return service.createRegistrationRequest(userId, attributes);
 	}
 
 	@RequestMapping(path = "/api/changeFacility/{facilityId}")
 	public Long createFacilityChangesRequest(@SessionAttribute("userId") Long userId,
-											 @RequestBody Map<String, Attribute> attributes,
+											 @RequestBody List<PerunAttribute> attributes,
 											 @PathVariable("facilityId") Long facilityId)
 			throws UnauthorizedActionException {
 		return service.createFacilityChangesRequest(facilityId, userId, attributes);
@@ -80,7 +75,7 @@ public class UserController {
 
 	@RequestMapping(path = "/api/update/{requestId}")
 	public String updateRequest(@SessionAttribute("userId") Long userId,
-								@RequestBody Map<String, Attribute> attributes,
+								@RequestBody List<PerunAttribute> attributes,
 								@PathVariable("requestId") Long requestId) throws UnauthorizedActionException {
 		if (service.updateRequest(requestId, userId, attributes)) {
 			return "Your request has been updated";

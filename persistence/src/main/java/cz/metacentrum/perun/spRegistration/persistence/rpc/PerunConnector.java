@@ -1,8 +1,9 @@
 package cz.metacentrum.perun.spRegistration.persistence.rpc;
 
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 
 import java.util.List;
@@ -64,14 +65,14 @@ public interface PerunConnector {
 	 * @param attrName Name of the attribute.
 	 * @return Retrieved attribute.
 	 */
-	Attribute getFacilityAttribute(Long facilityId, String attrName);
+	PerunAttribute getFacilityAttribute(Long facilityId, String attrName);
 
 	/**
 	 * Get all attributes of facility.
 	 * @param facilityId ID of facility.
 	 * @return Map (key = attribute name, value = attribute) of facility attributes.
 	 */
-	Map<String, Attribute> getFacilityAttributes(Long facilityId);
+	Map<String, PerunAttribute> getFacilityAttributes(Long facilityId);
 
 	/**
 	 * Get specified attributes for facility.
@@ -79,7 +80,7 @@ public interface PerunConnector {
 	 * @param attrNames Names of attributes to be retrieved.
 	 * @return Map (key = attribute name, value = attribute) of facility attributes.
 	 */
-	Map<String, Attribute> getFacilityAttributes(Long facilityId, List<String> attrNames);
+	Map<String, PerunAttribute> getFacilityAttributes(Long facilityId, List<String> attrNames);
 
 	/**
 	 * Get IDs of facilities where user is admin (manager).
@@ -127,4 +128,10 @@ public interface PerunConnector {
 	 */
 	boolean removeFacilityAdmin(Long facilityId, Long userId);
 
+	/**
+	 * Fetch attribute definition by name.
+	 * @param name Name of the attribute.
+	 * @return Attribute definition
+	 */
+	PerunAttributeDefinition getAttributeDefinition(String name);
 }
