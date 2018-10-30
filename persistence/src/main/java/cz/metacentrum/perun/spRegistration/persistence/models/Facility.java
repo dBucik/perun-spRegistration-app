@@ -1,13 +1,12 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Representation of Perun Facility.
@@ -18,8 +17,7 @@ public class Facility extends PerunEntity {
 
 	private String name;
 	private String description;
-	@JsonProperty private final String beanName = "Facility";
-	@JsonIgnore private Map<String, Attribute> attrs = new HashMap<>();
+	private Map<String, PerunAttribute> attrs = new HashMap<>();
 
 	public Facility(Long id) {
 		super(id);
@@ -47,11 +45,11 @@ public class Facility extends PerunEntity {
 		this.description = description;
 	}
 
-	public Map<String, Attribute> getAttrs() {
+	public Map<String, PerunAttribute> getAttrs() {
 		return attrs;
 	}
 
-	public void setAttrs(Map<String, Attribute> attrs) {
+	public void setAttrs(Map<String, PerunAttribute> attrs) {
 		this.attrs = attrs;
 	}
 
@@ -68,5 +66,24 @@ public class Facility extends PerunEntity {
 			e.printStackTrace();
 		}
 		return "{ \"facility\" : " + json + " }";
+	}
+
+	public static Facility fromPerunJson(JSONObject json) {
+		Long id = json.getLong("id");
+		String name = json.getString("name");
+		String description = json.optString("description", "");
+
+		return new Facility(id, name, description);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (! (o instanceof Facility)) {
+			return false;
+		}
+
+		Facility them = (Facility) o;
+		return Objects.equals(this.getId(), them.getId())
+				&& Objects.equals(this.name, them.name);
 	}
 }

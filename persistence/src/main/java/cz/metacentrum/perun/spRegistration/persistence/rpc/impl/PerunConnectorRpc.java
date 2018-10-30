@@ -4,10 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.Utils;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONPropertyName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -61,8 +65,8 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityJson);
 
-		JsonNode res = makeRpcCall(FACILITIES_MANAGER, "createFacility", params);
-		return Utils.mapFacility(res, false);
+		JSONObject res = makeRpcCallForObject(FACILITIES_MANAGER, "createFacility", params);
+		return Utils.mapFacility(res);
 	}
 
 	@Override
@@ -70,8 +74,8 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityJson);
 
-		JsonNode res = makeRpcCall(FACILITIES_MANAGER, "updateFacility", params);
-		return Utils.mapFacility(res, false);
+		JSONObject res = makeRpcCallForObject(FACILITIES_MANAGER, "updateFacility", params);
+		return Utils.mapFacility(res);
 	}
 
 	@Override
@@ -79,7 +83,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityId);
 
-		makeRpcCall(FACILITIES_MANAGER, "deleteFacility", params);
+		makeRpcCallForObject(FACILITIES_MANAGER, "deleteFacility", params);
 		return true;
 	}
 
@@ -88,8 +92,8 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("id", facilityId);
 
-		JsonNode res = makeRpcCall(FACILITIES_MANAGER, "getFacilityById", params);
-		return Utils.mapFacility(res, false);
+		JSONObject res = makeRpcCallForObject(FACILITIES_MANAGER, "getFacilityById", params);
+		return Utils.mapFacility(res);
 	}
 
 	@Override
@@ -98,9 +102,9 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("attributesWithSearchingValues", attributesWithSearchingValues);
 
-		JsonNode res = makeRpcCall(SEARCHER, "getFacilities", params);
+		JSONArray res = makeRpcCallForArray(SEARCHER, "getFacilities", params);
 		log.debug("response: {}", res);
-		return Utils.mapFacilities(res, false);
+		return Utils.mapFacilities(res);
 	}
 
 	@Override
@@ -108,36 +112,36 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("user", userId);
 
-		JsonNode res = makeRpcCall(FACILITIES_MANAGER, "getFacilities", params);
-		return Utils.mapFacilities(res, false);
+		JSONArray res = makeRpcCallForArray(FACILITIES_MANAGER, "getFacilitiesWhereUserIsAdmin", params);
+		return Utils.mapFacilities(res);
 	}
 
 	@Override
-	public Attribute getFacilityAttribute(Long facilityId, String attrName) {
+	public PerunAttribute getFacilityAttribute(Long facilityId, String attrName) {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityId);
 		params.put("attributeName", attrName);
 
-		JsonNode res = makeRpcCall(ATTRIBUTES_MANAGER, "getAttribute", params);
+		JSONObject res = makeRpcCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
 		return Utils.mapAttribute(res);
 	}
 
 	@Override
-	public Map<String, Attribute> getFacilityAttributes(Long facilityId) {
+	public Map<String, PerunAttribute> getFacilityAttributes(Long facilityId) {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityId);
 
-		JsonNode res = makeRpcCall(ATTRIBUTES_MANAGER, "getAttributes", params);
+		JSONArray res = makeRpcCallForArray(ATTRIBUTES_MANAGER, "getAttributes", params);
 		return Utils.mapAttributes(res);
 	}
 
 	@Override
-	public Map<String, Attribute> getFacilityAttributes(Long facilityId, List<String> attrNames) {
+	public Map<String, PerunAttribute> getFacilityAttributes(Long facilityId, List<String> attrNames) {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityId);
 		params.put("attrNames", attrNames);
 
-		JsonNode res = makeRpcCall(ATTRIBUTES_MANAGER, "getAttributes", params);
+		JSONArray res = makeRpcCallForArray(ATTRIBUTES_MANAGER, "getAttributes", params);
 		return Utils.mapAttributes(res);
 	}
 
@@ -147,7 +151,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("attribute", attrJson);
 
-		makeRpcCall(ATTRIBUTES_MANAGER, "setAttribute", params);
+		makeRpcCallForArray(ATTRIBUTES_MANAGER, "setAttribute", params);
 		return true;
 	}
 
@@ -157,7 +161,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("attributes", attrsJsons);
 
-		makeRpcCall(ATTRIBUTES_MANAGER, "setAttributes", params);
+		makeRpcCallForArray(ATTRIBUTES_MANAGER, "setAttributes", params);
 		return true;
 	}
 
@@ -166,7 +170,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("user", userId);
 
-		JsonNode res = makeRpcCall(USERS_MANAGER, "getRichUser", params);
+		JSONObject res = makeRpcCallForObject(USERS_MANAGER, "getRichUser", params);
 		return Utils.mapUser(res, true);
 	}
 
@@ -176,7 +180,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("user", userId);
 
-		makeRpcCall(FACILITIES_MANAGER, "addAdmin", params);
+		makeRpcCallForObject(FACILITIES_MANAGER, "addAdmin", params);
 		return true;
 	}
 
@@ -186,7 +190,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("user", userId);
 
-		makeRpcCall(FACILITIES_MANAGER, "removeAdmin", params);
+		makeRpcCallForObject(FACILITIES_MANAGER, "removeAdmin", params);
 		return true;
 	}
 
@@ -195,28 +199,49 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("user", userId);
 
-		JsonNode res = makeRpcCall(FACILITIES_MANAGER, "getFacilitiesWhereUserIsAdmin", params);
+		JSONArray res = makeRpcCallForArray(FACILITIES_MANAGER, "getFacilitiesWhereUserIsAdmin", params);
 		Set<Long> ids = new HashSet<>();
 
-		for (int i = 0; i < res.size(); i++) {
-			JsonNode facility = res.get(i);
-			ids.add(facility.get("id").asLong());
+		for (int i = 0; i < res.length(); i++) {
+			JSONObject facility = res.getJSONObject(i);
+			ids.add(facility.getLong("id"));
 		}
 
 		return ids;
 	}
 
-	private JsonNode makeRpcCall(String manager, String method, Map<String, Object> map) {
+	@Override
+	public PerunAttributeDefinition getAttributeDefinition(String name) {
+		Map<String, Object> params = new LinkedHashMap<>();
+		params.put("attributeName", name);
+
+		JSONObject res = makeRpcCallForObject(ATTRIBUTES_MANAGER, "getAttributeDefinition", params);
+
+		return PerunAttributeDefinition.fromPerunJson(res);
+	}
+
+	private JSONObject makeRpcCallForObject(String manager, String method, Map<String, Object> map) {
+		String response = makeRpcCall(manager, method, map);
+		return new JSONObject(response);
+	}
+
+	private JSONArray makeRpcCallForArray(String manager, String method, Map<String, Object> map) {
+		String response = makeRpcCall(manager, method, map);
+		return new JSONArray(response);
+	}
+
+	private String makeRpcCall(String manager, String method, Map<String, Object> map) {
 		//prepare basic auth
 		RestTemplate restTemplate = new RestTemplate();
 		List<ClientHttpRequestInterceptor> interceptors =
 				Collections.singletonList(new BasicAuthorizationInterceptor(perunRpcUser, perunRpcPassword));
 		restTemplate.setRequestFactory(new InterceptingClientHttpRequestFactory(restTemplate.getRequestFactory(), interceptors));
 		String actionUrl = perunRpcUrl + "/json/" + manager + '/' + method;
-		//make the call
 
+		//make the call
 		try {
-			return restTemplate.postForObject(actionUrl, map, JsonNode.class);
+			JsonNode response = restTemplate.postForObject(actionUrl, map, JsonNode.class);
+			return prettyPrintJsonString(response);
 		} catch (HttpClientErrorException ex) {
 			MediaType contentType = ex.getResponseHeaders().getContentType();
 			String body = ex.getResponseBodyAsString();
@@ -224,12 +249,22 @@ public class PerunConnectorRpc implements PerunConnector {
 				try {
 					new ObjectMapper().readValue(body, JsonNode.class).path("message").asText();
 				} catch (IOException e) {
-					log.error("cannot parse error message from JSON",e);
+					log.error("cannot parse error message from JSON", e);
 				}
 			} else {
 				log.error(ex.getMessage());
 			}
-			throw new RuntimeException("cannot connect to Perun RPC",ex);
+			throw new RuntimeException("cannot connect to Perun RPC", ex);
+		} catch (IOException e) {
+			log.error("cannot parse response to String", e);
+			throw new RuntimeException("cannot connect to Perun RPC", e);
 		}
+	}
+
+	private static String prettyPrintJsonString(JsonNode jsonNode) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		Object json = mapper.readValue(jsonNode.toString(), Object.class);
+
+		return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
 	}
 }

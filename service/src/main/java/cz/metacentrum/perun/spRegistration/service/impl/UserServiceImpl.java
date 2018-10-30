@@ -3,10 +3,12 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
+import cz.metacentrum.perun.spRegistration.persistence.Config;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
@@ -15,10 +17,12 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of UserService.
@@ -34,42 +38,22 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private PerunConnector perunConnector;
 
+	@Autowired
+	private Config config;
+
 	@Override
-	public Long createRegistrationRequest(Long userId, Map<String, Attribute> attributes) {
-		Request request = new Request();
-		request.setReqUserId(userId);
-		request.setStatus(RequestStatus.NEW);
-		request.setAction(RequestAction.REGISTER_NEW_SP);
-		request.setAttributes(attributes);
-		request.setModifiedBy(userId);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-
-		Long requestId = requestManager.createRequest(request);
-		request.setReqId(requestId);
-
-		return requestId;
+	public Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes) {
+		return createRequest(null, userId, RequestStatus.NEW, RequestAction.REGISTER_NEW_SP, attributes);
 	}
 
 	@Override
-	public Long createFacilityChangesRequest(Long facilityId, Long userId, Map<String, Attribute> attributes)
+	public Long createFacilityChangesRequest(Long facilityId, Long userId, List<PerunAttribute> attributes)
 			throws UnauthorizedActionException {
 		if (! isFacilityAdmin(facilityId, userId)) {
 			throw new UnauthorizedActionException("User is not registered as facility admin");
 		}
 
-
-		Request request = new Request();
-		request.setFacilityId(facilityId);
-		request.setStatus(RequestStatus.NEW);
-		request.setAction(RequestAction.UPDATE_FACILITY);
-		request.setAttributes(attributes);
-		request.setModifiedBy(userId);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-
-		Long requestId = requestManager.createRequest(request);
-		request.setReqId(requestId);
-
-		return requestId;
+		return createRequest(facilityId, userId, RequestStatus.NEW, RequestAction.UPDATE_FACILITY, attributes);
 	}
 
 	@Override
@@ -78,30 +62,19 @@ public class UserServiceImpl implements UserService {
 			throw new UnauthorizedActionException("User is not registered as facility admin");
 		}
 
-		Request request = new Request();
-		request.setFacilityId(facilityId);
-		request.setStatus(RequestStatus.NEW);
-		request.setAction(RequestAction.DELETE_FACILITY);
-		request.setAttributes(null);
-		request.setModifiedBy(userId);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-
-		Long requestId = requestManager.createRequest(request);
-		request.setReqId(requestId);
-
-		return requestId;
+		return createRequest(facilityId, userId, RequestStatus.NEW, RequestAction.DELETE_FACILITY, null);
 	}
 
 	@Override
-	public boolean updateRequest(Long requestId, Long userId, Map<String, Attribute> attributes)
+	public boolean updateRequest(Long requestId, Long userId, List<PerunAttribute> attributes)
 			throws UnauthorizedActionException {
 		if (! isAdminInRequest(requestId, userId)) {
 			throw new UnauthorizedActionException("User is not registered as admin in request");
 		}
 
 		Request request = requestManager.getRequestByReqId(requestId);
-
-		request.setAttributes(attributes);
+		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, config);
+		request.setAttributes(convertedAttributes);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
@@ -141,7 +114,7 @@ public class UserServiceImpl implements UserService {
 			case APPROVED:
 			case REJECTED:
 			case CANCELED:
-				throw new CannotChangeStatusException("Cannot ask for abort, request already has status "
+				throw new CannotChangeStatusException("Cannot ask for abort, request has got status "
 						+ request.getStatus());
 		}
 
@@ -189,7 +162,7 @@ public class UserServiceImpl implements UserService {
 		if (! isFacilityAdmin(facilityId, userId)) {
 			throw new UnauthorizedActionException("User cannot view facility, user is not an admin");
 		}
-		Map<String, Attribute> attrs = perunConnector.getFacilityAttributes(facilityId);
+		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId);
 		Facility facility = perunConnector.getFacilityById(facilityId);
 		facility.setAttrs(attrs);
 		return facility;
@@ -199,14 +172,36 @@ public class UserServiceImpl implements UserService {
 	public List<Request> getAllRequestsUserCanAccess(Long userId) {
 		List<Request> requests = requestManager.getAllRequestsByUserId(userId);
 		Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
-		requests.addAll(requestManager.getRequestsByFacilityIds(whereAdmin));
+		requests.addAll(requestManager.getAllRequestsByFacilityIds(whereAdmin));
 
 		return new ArrayList<>(new HashSet<>(requests));
 	}
 
 	@Override
 	public List<Facility> getAllFacilitiesWhereUserIsAdmin(Long userId) {
-		return perunConnector.getFacilitiesWhereUserIsAdmin(userId);
+		List<Facility> userFacilities = perunConnector.getFacilitiesWhereUserIsAdmin(userId);
+		Map<String, String> params = new HashMap<>();
+		params.put(config.getIdpAttribute(), config.getIdpAttributeValue());
+		List<Facility> proxyFacilities = perunConnector.getFacilitiesViaSearcher(params);
+
+		return userFacilities.stream().filter(proxyFacilities::contains).collect(Collectors.toList());
+	}
+
+	private Long createRequest(Long facilityId, Long userId, RequestStatus status, RequestAction action, List<PerunAttribute> attributes) {
+		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, config);
+
+		Request request = new Request();
+		request.setFacilityId(facilityId);
+		request.setStatus(status);
+		request.setAction(action);
+		request.setAttributes(convertedAttributes);
+		request.setModifiedBy(userId);
+		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
+
+		Long requestId = requestManager.createRequest(request);
+		request.setReqId(requestId);
+
+		return requestId;
 	}
 
 	private boolean isFacilityAdmin(Long facilityId, Long userId) {

@@ -1,5 +1,7 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,16 +17,9 @@ public class User extends PerunEntity {
 	private String middleName;
 	private String lastName;
 	private String titleAfter;
-
 	private String email;
 	private List<Long> facilitiesWhereAdmin;
 	private boolean isAdmin;
-
-	public User(Long id) {
-		super(id);
-		facilitiesWhereAdmin = new ArrayList<>();
-		isAdmin = false;
-	}
 
 	public User(Long id, String titleBefore, String firstName, String middleName, String lastName, String titleAfter) {
 		super(id);
@@ -101,5 +96,16 @@ public class User extends PerunEntity {
 
 	public String getName() {
 		return firstName + middleName + lastName;
+	}
+
+	public static User fromPerunJson(JSONObject json) {
+		Long id = json.getLong("id");
+		String firstName = json.getString("firstName");
+		String middleName = json.getString("middleName");
+		String lastName = json.getString("lastName");
+		String titleBefore = json.getString("titleBefore");
+		String titleAfter = json.getString("titleAfter");
+
+		return new User(id, firstName, middleName, lastName, titleBefore, titleAfter);
 	}
 }

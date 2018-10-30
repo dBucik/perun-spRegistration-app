@@ -1,15 +1,15 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
+import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 /**
  * Class represents request made by user. It contains all the data that needs to be stored.
@@ -24,7 +24,7 @@ public class Request {
 	private RequestStatus status;
 	private RequestAction action;
 	private Long reqUserId;
-	private Map<String, Attribute> attributes = new HashMap<>();
+	private Map<String, PerunAttribute> attributes = new HashMap<>();
 	private Timestamp modifiedAt;
 	private Long modifiedBy;
 
@@ -68,11 +68,11 @@ public class Request {
 		this.reqUserId = reqUserId;
 	}
 
-	public Map<String, Attribute> getAttributes() {
+	public Map<String, PerunAttribute> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(Map<String, Attribute> attributes) {
+	public void setAttributes(Map<String, PerunAttribute> attributes) {
 		this.attributes = attributes;
 	}
 
@@ -92,40 +92,50 @@ public class Request {
 		this.modifiedBy = modifiedBy;
 	}
 
+	@JsonIgnore
+	public String getFacilityName() {
+		PerunAttribute attr = attributes.get("urn:perun:facility:attribute-def:def:serviceName");
+		Map<String, String> value = attr.valueAsMap(false);
+		return value.get("en");
+	}
+
+	@JsonIgnore
+	public String getFacilityDescription() {
+		PerunAttribute attr = attributes.get("urn:perun:facility:attribute-def:def:serviceDescription");
+		Map<String, String> value = attr.valueAsMap(false);
+		return value.get("en");
+	}
+
 	/**
 	 * Convert attributes to JSON format suitable for storing into DB.
 	 * @return JSON with attributes.
 	 */
+	@JsonIgnore
 	public String getAttributesAsJsonForDb() {
-		if (attributes == null || attributes.isEmpty()) {
-			return null;
+		JSONObject obj = new JSONObject();
+		for (Map.Entry<String ,PerunAttribute> a: attributes.entrySet()) {
+			obj.put(a.getKey(), a.getValue().toJsonForDb());
 		}
 
-		String res = "{ [ ";
-		StringJoiner joiner = new StringJoiner(" , ");
-		for (Attribute a: attributes.values()) {
-			joiner.add(a.toStringAsJsonForDb());
-		}
-		res += joiner.toString();
-		res += " ] }";
-
-		return res;
+		return obj.toString();
 	}
 
 	/**
 	 * Convert attributes to JSON format suitable for storing into Perun.
 	 * @return JSON with attributes.
 	 */
+	@JsonIgnore
 	public List<String> getAttributesAsJsonForPerun() {
 		if (attributes == null || attributes.isEmpty()) {
 			return null;
 		}
 
 		List<String> res = new ArrayList<>();
-		for (Attribute a: attributes.values()) {
-			res.add(a.toStringAsJsonForPerun());
+		for (PerunAttribute a: attributes.values()) {
+			res.add(a.toJsonForPerun().toString());
 		}
 
 		return res;
 	}
+
 }

@@ -1,8 +1,8 @@
 package cz.metacentrum.perun.spRegistration.service;
 
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.attributes.Attribute;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 
@@ -22,7 +22,7 @@ public interface UserService {
 	 * @param attributes Attributes set for SP (key = attribute name, value = attribute).
 	 * @return Generated request ID after storing to the DB.
 	 */
-	Long createRegistrationRequest(Long userId, Map<String, Attribute> attributes);
+	Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes);
 
 	/**
 	 * Create request for changes of SP (which already exists as facility in Perun).
@@ -32,7 +32,7 @@ public interface UserService {
 	 * @return Generated request ID after stroing to the DB.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	Long createFacilityChangesRequest(Long facilityId, Long userId, Map<String, Attribute> attributes)
+	Long createFacilityChangesRequest(Long facilityId, Long userId, List<PerunAttribute> attributes)
 			throws UnauthorizedActionException;
 
 	/**
@@ -53,7 +53,7 @@ public interface UserService {
 	 * @return True if everything went OK.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	boolean updateRequest(Long requestId, Long userId, Map<String, Attribute> attributes)
+	boolean updateRequest(Long requestId, Long userId, List<PerunAttribute> attributes)
 			throws UnauthorizedActionException;
 
 	/**
