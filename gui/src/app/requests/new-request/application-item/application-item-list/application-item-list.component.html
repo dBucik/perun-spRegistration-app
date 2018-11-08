@@ -1,0 +1,30 @@
+<div class="form-group row">
+  <label class="col-sm-3 col-form-label word-break-word">
+    {{applicationItem.displayName}}
+  </label>
+  <div class="col-sm-9">
+    <div *ngFor="let value of values; let i = index; trackBy: customTrackBy" class="d-flex mb-1">
+      <input
+        type="text"
+        class="form-control mr-2"
+        id="{{applicationItem.name}}{{i}}"
+        [(ngModel)] = "values[i]">
+      <button
+        type="button"
+        class="btn btn-danger m-auto btn-sm"
+        (click)="removeValue(i)">
+        <fa-icon [icon]="removeIcon">
+        </fa-icon>
+      </button>
+    </div>
+    <div>
+      <button
+        type="button"
+        class="btn btn-success mt-1"
+        (click)="addValue()">
+        <fa-icon [icon]="addIcon">
+        </fa-icon>
+      </button>
+    </div>
+  </div>
+</div>

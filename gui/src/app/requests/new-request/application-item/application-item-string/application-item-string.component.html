@@ -1,0 +1,16 @@
+<div class="form-group row">
+  <label for="{{applicationItem.name}}"
+         class="col-sm-3 col-form-label word-break-word">
+    {{applicationItem.displayName}}
+    <span *ngIf="applicationItem.required" class="text-danger"> *</span>
+  </label>
+  <div class="col-sm-9">
+    <input
+      [(ngModel)]="value"
+      name="dsf"
+      required
+      type="text"
+      class="form-control"
+      id="{{applicationItem.name}}">
+  </div>
+</div>

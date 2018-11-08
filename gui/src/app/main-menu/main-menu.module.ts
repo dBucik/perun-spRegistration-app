@@ -5,14 +5,12 @@ import { MainMenuRoutingModule } from './main-menu-routing.module';
 import { MainMenuComponent } from './main-menu.component';
 import { SharedModule } from "../shared/shared.module";
 import { MenuButtonComponent } from './menu-button/menu-button.component';
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 
 @NgModule({
   imports: [
     CommonModule,
     MainMenuRoutingModule,
-    SharedModule,
-    FontAwesomeModule
+    SharedModule
   ],
 
   declarations: [MainMenuComponent, MenuButtonComponent]

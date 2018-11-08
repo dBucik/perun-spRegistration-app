@@ -8,19 +8,23 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { PerunHeaderComponent } from "./layout/perun-header/perun-header.component";
 import { PerunSidebarComponent } from "./layout/perun-sidebar/perun-sidebar.component";
 import { RouterModule } from "@angular/router";
+import { PerunLoaderComponent } from './components/perun-loader/perun-loader.component';
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
   imports: [
     RouterModule,
     CommonModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    FormsModule
   ],
   declarations: [
     SortableColumnComponent,
     SortableTableDirective,
     PerunHeaderComponent,
     PerunSidebarComponent,
-    PerunFooterComponent
+    PerunFooterComponent,
+    PerunLoaderComponent
   ],
   exports: [
     FontAwesomeModule,
@@ -29,7 +33,9 @@ import { RouterModule } from "@angular/router";
     TranslateModule,
     PerunHeaderComponent,
     PerunSidebarComponent,
-    PerunFooterComponent
+    PerunFooterComponent,
+    PerunLoaderComponent,
+    FormsModule
   ]
 })
 export class SharedModule { }

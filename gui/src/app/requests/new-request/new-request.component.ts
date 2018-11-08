@@ -1,5 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import {getHostElement} from "@angular/core/src/render3";
+import {Component, OnInit, ViewChildren} from '@angular/core';
+import {ConfigService} from "../../core/services/config.service";
+import {ApplicationItem} from "../../core/models/ApplicationItem";
+import {FormGroup} from "@angular/forms";
+import {RequestsService} from "../../core/services/requests.service";
+import {ApplicationItemComponent} from "./application-item/application-item.component";
 
 @Component({
   selector: 'app-new-request',
@@ -8,13 +12,63 @@ import {getHostElement} from "@angular/core/src/render3";
 })
 export class NewRequestComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private configService: ConfigService,
+    private requestsService: RequestsService) { }
 
-  public isForm1Visible = false;
-  public isForm2Visible = false;
-  public isCardBodyVisible = false;
+  @ViewChildren(ApplicationItemComponent)
+  items: ApplicationItemComponent[];
+
+  isFormVisible = false;
+  isCardBodyVisible = false;
+  oidcEnabled: boolean;
+  loading = true;
+  selected = "";
+
+  applicationItems: ApplicationItem[];
 
   ngOnInit() {
+    this.requestsService.login().subscribe();
+
+    this.configService.isOidcEnabled().subscribe(isEnabled => {
+      this.oidcEnabled = isEnabled;
+      this.loading = false;
+    });
   }
 
+  revealForm() {
+    this.loading = false;
+    this.isCardBodyVisible = true;
+    this.isFormVisible = true;
+  }
+
+  onLoading() {
+    this.loading = true;
+    this.isCardBodyVisible = false;
+  }
+
+  oidcSelected() {
+    this.onLoading();
+    this.selected = "oidc";
+
+    this.configService.getOidcApplicationItems().subscribe(items => {
+      this.applicationItems = items;
+      this.revealForm();
+    });
+  }
+
+  samlSelected() {
+    this.onLoading();
+    this.selected = "saml";
+
+    this.configService.getSamlApplicationItems().subscribe(items => {
+      this.applicationItems = items;
+      this.revealForm();
+    })
+  }
+
+  submitRequest() {
+    console.log(this.items);
+    this.items.forEach(i => console.log(i.getAttribute()));
+  }
 }
