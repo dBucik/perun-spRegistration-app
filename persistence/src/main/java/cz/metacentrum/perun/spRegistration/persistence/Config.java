@@ -3,7 +3,11 @@ package cz.metacentrum.perun.spRegistration.persistence;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +17,10 @@ import java.util.Properties;
 import java.util.Set;
 
 public class Config {
-	
+
+	private	Resource enLang = new ClassPathResource("localization.properties");
+	private Resource csLang = new ClassPathResource("localization_cs.properties");
+
 	private String idpAttribute;
 	private String idpAttributeValue;
 	private Set<Long> admins;
@@ -75,6 +82,15 @@ public class Config {
 	}
 
 	private void initializeAttributes(Properties facilityAttrsProperties) {
+		Properties enProps = new Properties();
+		Properties csProps = new Properties();
+		try (InputStream en = enLang.getInputStream(); InputStream cs = csLang.getInputStream()) {
+			enProps.load(en);
+			csProps.load(cs);
+		} catch (IOException e) {
+			throw new RuntimeException("Cannot load translations");
+		}
+
 		for (String prop: facilityAttrsProperties.stringPropertyNames()) {
 			if (prop.contains("isRequired")) {
 				continue;
@@ -87,7 +103,19 @@ public class Config {
 			PerunAttributeDefinition def = connector.getAttributeDefinition(attrName);
 			perunAttributeDefinitionsMap.put(def.getFullName(), def);
 
-			AttrInput input = new AttrInput(def.getFullName(), def.getDisplayName(), def.getDescription(), def.getType(), required);
+			Map<String, String> name = new HashMap<>();
+			Map<String, String> desc = new HashMap<>();
+
+			String nameKey = attrName.replaceAll(":", ".") + ".name";
+			String descKey = attrName.replaceAll(":", ".") + ".desc";
+
+			name.put("en", enProps.getProperty(nameKey));
+			name.put("cs", csProps.getProperty(nameKey));
+
+			desc.put("en", enProps.getProperty(descKey));
+			desc.put("cs", csProps.getProperty(descKey));
+
+			AttrInput input = new AttrInput(def.getFullName(), name, desc, def.getType(), required);
 			if (SAML_ATTRS.equals(attrName)) {
 				input.setAllowedValues(samlAttributes);
 			} else if (OIDC_SCOPES.equals(attrName)) {
