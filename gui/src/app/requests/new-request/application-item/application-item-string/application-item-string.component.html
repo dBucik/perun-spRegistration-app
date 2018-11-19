@@ -1,10 +1,18 @@
 <div class="form-group row">
-  <label for="{{applicationItem.name}}"
-         class="col-sm-3 col-form-label word-break-word">
-    {{applicationItem.displayName}}
-    <span *ngIf="applicationItem.required" class="text-danger"> *</span>
-  </label>
+  <div class="col-sm-3 d-flex">
+    <fa-icon
+      title="{{applicationItem.description}}"
+      class="mt-2 mr-2 text-secondary fa-sm"
+      [icon]="helpIcon">
+    </fa-icon>
+    <label for="{{applicationItem.name}}"
+           class="col-form-label word-break-word">
+      {{applicationItem.displayName}}
+      <span *ngIf="applicationItem.required" class="text-danger"> *</span>
+    </label>
+  </div>
   <div class="col-sm-9">
+
     <input
       [(ngModel)]="value"
       name="dsf"

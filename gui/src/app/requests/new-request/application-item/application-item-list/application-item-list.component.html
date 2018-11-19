@@ -1,13 +1,20 @@
 <div class="form-group row">
-  <label class="col-sm-3 col-form-label word-break-word">
-    {{applicationItem.displayName}}
-  </label>
+  <div class="col-sm-3 d-flex">
+    <fa-icon
+      title="{{applicationItem.description}}"
+      class="mt-2 mr-2 text-secondary fa-sm"
+      [icon]="helpIcon">
+    </fa-icon>
+    <label class="col-form-label word-break-word">
+      {{applicationItem.displayName}}
+    </label>
+  </div>
   <div class="col-sm-9">
     <div *ngFor="let value of values; let i = index; trackBy: customTrackBy" class="d-flex mb-1">
       <input
         type="text"
         class="form-control mr-2"
-        id="{{applicationItem.name}}{{i}}"
+        id="{{applicationItem.name}}-{{i}}"
         [(ngModel)] = "values[i]">
       <button
         type="button"

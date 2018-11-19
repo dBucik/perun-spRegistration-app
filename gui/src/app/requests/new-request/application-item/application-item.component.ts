@@ -5,6 +5,7 @@ import {Attribute} from "../../../core/models/Attribute";
 import {ApplicationItemStringComponent} from "./application-item-string/application-item-string.component";
 import {ApplicationItemBooleanComponent} from "./application-item-boolean/application-item-boolean.component";
 import {ApplicationItemListComponent} from "./application-item-list/application-item-list.component";
+import {ApplicationItemMapComponent} from "./application-item-map/application-item-map.component";
 
 @Component({
   selector: 'app-application-item',
@@ -24,6 +25,8 @@ export class ApplicationItemComponent implements RequestItem, OnInit, AfterViewI
   booleanItem: RequestItem;
   @ViewChild(ApplicationItemListComponent)
   listItem: RequestItem;
+  @ViewChild(ApplicationItemMapComponent)
+  mapItem: RequestItem;
 
   getAttribute(): Attribute {
     if (this.applicationItem.type === 'java.lang.String') {
@@ -34,6 +37,9 @@ export class ApplicationItemComponent implements RequestItem, OnInit, AfterViewI
     }
     if (this.applicationItem.type === 'java.util.ArrayList') {
       return this.listItem.getAttribute();
+    }
+    if (this.applicationItem.type === 'java.util.LinkedHashMap') {
+      return this.mapItem.getAttribute();
     }
 
     return undefined;

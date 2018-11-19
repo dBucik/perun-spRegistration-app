@@ -2,7 +2,7 @@ import {Component, Input} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
-import {faMinus, faPlus} from "@fortawesome/free-solid-svg-icons";
+import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 
 @Component({
   selector: 'app-application-item-map',
@@ -15,6 +15,7 @@ export class ApplicationItemMapComponent implements RequestItem {
 
   removeIcon = faMinus;
   addIcon = faPlus;
+  helpIcon = faQuestionCircle;
 
   keys : string[] = [];
   values : string[] = [];
@@ -33,6 +34,18 @@ export class ApplicationItemMapComponent implements RequestItem {
   }
 
   getAttribute(): Attribute {
-    return undefined;
+    let map = new Map();
+
+    for (let i = 0; i < this.values.length; i++) {
+      map.set(this.keys[i], this.values[i]);
+    }
+
+    const obj = Array.from(map.entries()).reduce((main, [key, value]) => ({...main, [key]: value}), {});
+
+    return new Attribute(this.applicationItem.name, obj);
+  }
+
+  customTrackBy(index: number, obj: any): any {
+    return index;
   }
 }

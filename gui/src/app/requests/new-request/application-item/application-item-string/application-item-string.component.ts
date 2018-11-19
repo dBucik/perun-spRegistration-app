@@ -2,6 +2,7 @@ import {Component, Input} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
+import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 
 @Component({
   selector: 'app-application-item-string',
@@ -11,6 +12,8 @@ import {Attribute} from "../../../../core/models/Attribute";
 export class ApplicationItemStringComponent implements RequestItem {
 
   constructor() { }
+
+  helpIcon = faQuestionCircle;
 
   @Input()
   applicationItem: ApplicationItem;
