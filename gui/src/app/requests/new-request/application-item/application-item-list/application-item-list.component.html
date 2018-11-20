@@ -1,37 +1,40 @@
 <div class="form-group row">
-  <div class="col-sm-3 d-flex">
-    <fa-icon
-      title="{{applicationItem.description}}"
-      class="mt-2 mr-2 text-secondary fa-sm"
-      [icon]="helpIcon">
-    </fa-icon>
-    <label class="col-form-label word-break-word">
-      {{applicationItem.displayName}}
-    </label>
-  </div>
-  <div class="col-sm-9">
-    <div *ngFor="let value of values; let i = index; trackBy: customTrackBy" class="d-flex mb-1">
-      <input
-        type="text"
-        class="form-control mr-2"
-        id="{{applicationItem.name}}-{{i}}"
-        [(ngModel)] = "values[i]">
+  <div class="col-sm-12 d-flex">
+    <div class="w-100">
+      <label class="col-form-label word-break-word">
+        {{applicationItem.displayName}}
+        <span *ngIf="applicationItem.required" class="text-danger"> *</span>
+      </label>
       <button
         type="button"
-        class="btn btn-danger m-auto btn-sm"
-        (click)="removeValue(i)">
-        <fa-icon [icon]="removeIcon">
-        </fa-icon>
-      </button>
-    </div>
-    <div>
-      <button
-        type="button"
-        class="btn btn-success mt-1"
+        class="btn btn-success btn-sm ml-3"
         (click)="addValue()">
         <fa-icon [icon]="addIcon">
         </fa-icon>
       </button>
+      <fa-icon
+        title="{{applicationItem.description}}"
+        class="m-2 text-secondary fa-sm pull-right"
+        [icon]="helpIcon">
+      </fa-icon>
+      <div class="mr-5">
+        <div *ngFor="let value of values; let i = index; trackBy: customTrackBy" class="d-flex mb-1">
+          <mat-form-field class="w-100 mr-2">
+            <input
+              matInput
+              type="text"
+              id="{{applicationItem.name}}-{{i}}"
+              [(ngModel)] = "values[i]">
+          </mat-form-field>
+          <button
+            type="button"
+            class="btn btn-danger m-auto btn-sm"
+            (click)="removeValue(i)">
+            <fa-icon [icon]="removeIcon">
+            </fa-icon>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -10,13 +10,17 @@ import { PerunSidebarComponent } from "./layout/perun-sidebar/perun-sidebar.comp
 import { RouterModule } from "@angular/router";
 import { PerunLoaderComponent } from './components/perun-loader/perun-loader.component';
 import {FormsModule} from "@angular/forms";
+import {MatCheckboxModule, MatInputModule, MatSelectModule} from "@angular/material";
 
 @NgModule({
   imports: [
     RouterModule,
     CommonModule,
     FontAwesomeModule,
-    FormsModule
+    FormsModule,
+    MatSelectModule,
+    MatInputModule,
+    MatCheckboxModule
   ],
   declarations: [
     SortableColumnComponent,
@@ -35,7 +39,10 @@ import {FormsModule} from "@angular/forms";
     PerunSidebarComponent,
     PerunFooterComponent,
     PerunLoaderComponent,
-    FormsModule
+    FormsModule,
+    MatSelectModule,
+    MatInputModule,
+    MatCheckboxModule
   ]
 })
 export class SharedModule { }

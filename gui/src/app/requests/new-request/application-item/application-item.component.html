@@ -17,10 +17,10 @@
 </app-application-item-list>
 
 <!-- ArrayList with allowed values-->
-<app-application-item-list
+<app-application-item-select
   [applicationItem]="applicationItem"
   *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues !== null">
-</app-application-item-list>
+</app-application-item-select>
 
 <!-- HashMap -->
 <app-application-item-map

@@ -2,7 +2,7 @@
   <app-perun-loader  *ngIf="loading"></app-perun-loader>
 
   <div *ngIf="!loading" class="card mt-4 mb-4 shadow-sm">
-    <div class="card-body">
+    <div class="card-body p-5">
       <div *ngIf="oidcEnabled" class="d-inline">
         <div class="btn-group btn-group-toggle justify-content-center"
              data-toggle="buttons">
@@ -22,22 +22,17 @@
       </div>
 
       <div class="mt-4" *ngIf="this.isCardBodyVisible || !oidcEnabled">
-<!--        <form
-          #requestForm="ngForm"
-          (ngSubmit)="submitRequest()"
-        >-->
           <app-application-item
             *ngFor="let appItem of applicationItems"
             [applicationItem]="appItem">
           </app-application-item>
 
-          <button role="button" class="btn btn-danger mr-2" [routerLink]="">
+          <button role="button" class="btn mr-2 btn-danger">
             {{"REQUESTS.REQUEST_GO_BACK" | translate}}
           </button>
-          <button type="submit" class="btn btn-success">
+          <button type="submit" class="btn btn-success" (click)="submitRequest()">
             {{"REQUESTS.REQUEST_SUBMIT" | translate}}
           </button>
-        <!--</form>-->
       </div>
     </div>
   </div>

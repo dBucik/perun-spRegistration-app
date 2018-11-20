@@ -17,25 +17,12 @@ export class ApplicationItemSelectComponent implements RequestItem {
   addIcon = faPlus;
   helpIcon = faQuestionCircle;
 
-  values : string[] = [];
+  values = [];
 
   @Input()
   applicationItem: ApplicationItem;
 
-  removeValue(index : number) {
-    this.values.splice(index, 1);
-  }
-
-  addValue() {
-    this.values.push("");
-  }
-
   getAttribute(): Attribute {
     return new Attribute(this.applicationItem.name, this.values);
   }
-
-  customTrackBy(index: number, obj: any): any {
-    return index;
-  }
-
 }

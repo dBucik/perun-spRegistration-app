@@ -13,7 +13,9 @@
     "SAML": "SAML",
     "SELECT_SP_TYPE": "Select the sp type",
     "REQUEST_SUBMIT": "Submit",
-    "REQUEST_GO_BACK": "Cancel"
+    "REQUEST_GO_BACK": "Cancel",
+    "MAP_KEY": "Key",
+    "MAP_VALUE": "Value"
   },
   "FACILITIES": {
     "TITLE": "Facilities",

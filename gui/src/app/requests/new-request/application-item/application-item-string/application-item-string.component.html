@@ -1,26 +1,22 @@
 <div class="form-group row">
   <form class="d-flex w-100" #form="ngForm">
-    <div class="col-sm-3 d-flex">
+    <div class="col-sm-12 d-flex">
+      <mat-form-field class="w-100">
+        <input
+          matInput
+          placeholder="{{applicationItem.displayName}}"
+          [(ngModel)]="value"
+          name="dsf"
+          required
+          type="text"
+          class=""
+          id="{{applicationItem.name}}">
+      </mat-form-field>
       <fa-icon
         title="{{applicationItem.description}}"
-        class="mt-2 mr-2 text-secondary fa-sm"
+        class="m-2 text-secondary fa-sm"
         [icon]="helpIcon">
       </fa-icon>
-      <label for="{{applicationItem.name}}"
-             class="col-form-label word-break-word">
-        {{applicationItem.displayName}}
-        <span *ngIf="applicationItem.required" class="text-danger"> *</span>
-      </label>
-    </div>
-    <div class="col-sm-9">
-
-      <input
-        [(ngModel)]="value"
-        name="dsf"
-        required
-        type="text"
-        class="form-control"
-        id="{{applicationItem.name}}">
     </div>
   </form>
 </div>

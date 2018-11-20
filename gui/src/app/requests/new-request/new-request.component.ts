@@ -52,7 +52,7 @@ export class NewRequestComponent implements OnInit {
     this.selected = "oidc";
 
     this.configService.getOidcApplicationItems().subscribe(items => {
-      this.applicationItems = items;
+      this.applicationItems = NewRequestComponent.sortItems(items);
       this.revealForm();
     });
   }
@@ -62,7 +62,7 @@ export class NewRequestComponent implements OnInit {
     this.selected = "saml";
 
     this.configService.getSamlApplicationItems().subscribe(items => {
-      this.applicationItems = items;
+      this.applicationItems = NewRequestComponent.sortItems(items);
       this.revealForm();
     })
   }
@@ -70,5 +70,41 @@ export class NewRequestComponent implements OnInit {
   submitRequest() {
     console.log(this.items);
     this.items.forEach(i => console.log(i.getAttribute()));
+  }
+
+  private static getItemOrderValue(item : ApplicationItem) : number {
+    let value;
+
+    switch (item.type) {
+      case 'java.lang.String':
+        value = 0;
+        break;
+      case 'java.util.ArrayList':
+        if (item.allowedValues !== null) {
+          value = 1;
+        } else {
+          value = 2;
+        }
+        break;
+      case 'java.util.LinkedHashMap':
+        value = 3;
+        break;
+      case 'java.lang.Boolean':
+        value = 4;
+        break;
+      default:
+        value = 5;
+    }
+
+    return value;
+  }
+
+  private static sortItems(items : ApplicationItem[]) : ApplicationItem[] {
+    return items.sort(((a, b) => {
+      let aValue = NewRequestComponent.getItemOrderValue(a);
+      let bValue = NewRequestComponent.getItemOrderValue(b);
+
+      return aValue - bValue;
+    }))
   }
 }
