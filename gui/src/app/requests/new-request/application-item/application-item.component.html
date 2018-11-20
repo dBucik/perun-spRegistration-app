@@ -10,10 +10,16 @@
   *ngIf="applicationItem.type === 'java.lang.Boolean'">
 </app-application-item-boolean>
 
-<!-- ArrayList -->
+<!-- ArrayList without allowed values-->
 <app-application-item-list
   [applicationItem]="applicationItem"
-  *ngIf="applicationItem.type === 'java.util.ArrayList'">
+  *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues === null">
+</app-application-item-list>
+
+<!-- ArrayList with allowed values-->
+<app-application-item-list
+  [applicationItem]="applicationItem"
+  *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues !== null">
 </app-application-item-list>
 
 <!-- HashMap -->

@@ -6,13 +6,14 @@ import {ApplicationItemStringComponent} from "./application-item-string/applicat
 import {ApplicationItemBooleanComponent} from "./application-item-boolean/application-item-boolean.component";
 import {ApplicationItemListComponent} from "./application-item-list/application-item-list.component";
 import {ApplicationItemMapComponent} from "./application-item-map/application-item-map.component";
+import {ApplicationItemSelectComponent} from "./application-item-select/application-item-select.component";
 
 @Component({
   selector: 'app-application-item',
   templateUrl: './application-item.component.html',
   styleUrls: ['./application-item.component.scss']
 })
-export class ApplicationItemComponent implements RequestItem, OnInit, AfterViewInit {
+export class ApplicationItemComponent implements RequestItem {
 
   constructor() { }
 
@@ -27,6 +28,8 @@ export class ApplicationItemComponent implements RequestItem, OnInit, AfterViewI
   listItem: RequestItem;
   @ViewChild(ApplicationItemMapComponent)
   mapItem: RequestItem;
+  @ViewChild(ApplicationItemSelectComponent)
+  selectItem: RequestItem;
 
   getAttribute(): Attribute {
     if (this.applicationItem.type === 'java.lang.String') {
@@ -35,21 +38,16 @@ export class ApplicationItemComponent implements RequestItem, OnInit, AfterViewI
     if (this.applicationItem.type === 'java.lang.Boolean') {
       return this.booleanItem.getAttribute();
     }
-    if (this.applicationItem.type === 'java.util.ArrayList') {
+    if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues === null) {
       return this.listItem.getAttribute();
+    }
+    if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues !== null) {
+      return this.selectItem.getAttribute();
     }
     if (this.applicationItem.type === 'java.util.LinkedHashMap') {
       return this.mapItem.getAttribute();
     }
 
     return undefined;
-  }
-
-  ngOnInit(): void {
-  }
-
-
-  ngAfterViewInit(): void {
-
   }
 }

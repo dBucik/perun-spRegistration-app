@@ -1,0 +1,41 @@
+import {Component, Input} from '@angular/core';
+import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
+import {ApplicationItem} from "../../../../core/models/ApplicationItem";
+import {Attribute} from "../../../../core/models/Attribute";
+import {RequestItem} from "../../RequestItem";
+
+@Component({
+  selector: 'app-application-item-select',
+  templateUrl: './application-item-select.component.html',
+  styleUrls: ['./application-item-select.component.scss']
+})
+export class ApplicationItemSelectComponent implements RequestItem {
+
+  constructor() { }
+
+  removeIcon = faMinus;
+  addIcon = faPlus;
+  helpIcon = faQuestionCircle;
+
+  values : string[] = [];
+
+  @Input()
+  applicationItem: ApplicationItem;
+
+  removeValue(index : number) {
+    this.values.splice(index, 1);
+  }
+
+  addValue() {
+    this.values.push("");
+  }
+
+  getAttribute(): Attribute {
+    return new Attribute(this.applicationItem.name, this.values);
+  }
+
+  customTrackBy(index: number, obj: any): any {
+    return index;
+  }
+
+}

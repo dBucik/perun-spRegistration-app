@@ -10,6 +10,7 @@ import { ApplicationItemStringComponent } from './new-request/application-item/a
 import { ApplicationItemBooleanComponent } from './new-request/application-item/application-item-boolean/application-item-boolean.component';
 import { ApplicationItemListComponent } from './new-request/application-item/application-item-list/application-item-list.component';
 import { ApplicationItemMapComponent } from './new-request/application-item/application-item-map/application-item-map.component';
+import { ApplicationItemSelectComponent } from './new-request/application-item/application-item-select/application-item-select.component';
 
 @NgModule({
   imports: [
@@ -24,7 +25,8 @@ import { ApplicationItemMapComponent } from './new-request/application-item/appl
     ApplicationItemStringComponent,
     ApplicationItemBooleanComponent,
     ApplicationItemListComponent,
-    ApplicationItemMapComponent
+    ApplicationItemMapComponent,
+    ApplicationItemSelectComponent
   ]
 })
 export class RequestsModule { }

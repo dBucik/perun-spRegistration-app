@@ -22,10 +22,10 @@
       </div>
 
       <div class="mt-4" *ngIf="this.isCardBodyVisible || !oidcEnabled">
-        <form
+<!--        <form
           #requestForm="ngForm"
           (ngSubmit)="submitRequest()"
-        >
+        >-->
           <app-application-item
             *ngFor="let appItem of applicationItems"
             [applicationItem]="appItem">
@@ -34,10 +34,10 @@
           <button role="button" class="btn btn-danger mr-2" [routerLink]="">
             {{"REQUESTS.REQUEST_GO_BACK" | translate}}
           </button>
-          <button type="submit" class="btn btn-success" [disabled]="!requestForm.form.valid">
+          <button type="submit" class="btn btn-success">
             {{"REQUESTS.REQUEST_SUBMIT" | translate}}
           </button>
-        </form>
+        <!--</form>-->
       </div>
     </div>
   </div>
