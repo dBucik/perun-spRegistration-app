@@ -37,4 +37,18 @@ export class ApplicationItemListComponent implements RequestItem {
   customTrackBy(index: number, obj: any): any {
     return index;
   }
+
+  hasCorrectValue(): boolean {
+    if (!this.applicationItem.required) {
+      return true;
+    }
+
+    for (let i = 0; i < this.values.length; i++) {
+      if (this.values[i].trim().length === 0) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }

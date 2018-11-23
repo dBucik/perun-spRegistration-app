@@ -1,7 +1,11 @@
 <div class="form-group row">
   <div class="col-sm-12 d-flex">
     <mat-form-field class="w-100">
-      <mat-select multiple [(ngModel)]="values" placeholder="{{applicationItem.displayName}}">
+      <mat-select multiple
+                  [(ngModel)]="values"
+                  placeholder="{{applicationItem.displayName}}"
+                  [required]="applicationItem.required">
+
         <mat-option *ngFor="let value of applicationItem.allowedValues" [value]="value">{{value}}</mat-option>
       </mat-select>
     </mat-form-field>

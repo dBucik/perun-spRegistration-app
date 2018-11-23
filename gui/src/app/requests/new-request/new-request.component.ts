@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChildren} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {ConfigService} from "../../core/services/config.service";
 import {ApplicationItem} from "../../core/models/ApplicationItem";
 import {FormGroup} from "@angular/forms";
@@ -17,7 +17,7 @@ export class NewRequestComponent implements OnInit {
     private requestsService: RequestsService) { }
 
   @ViewChildren(ApplicationItemComponent)
-  items: ApplicationItemComponent[];
+  items: QueryList<ApplicationItemComponent>;
 
   isFormVisible = false;
   isCardBodyVisible = false;
@@ -67,9 +67,26 @@ export class NewRequestComponent implements OnInit {
     })
   }
 
+  attributesHasCorrectValues() : boolean {
+
+    let attributeItems = this.items.toArray();
+
+    for (const i of attributeItems) {
+      if (!i.hasCorrectValue()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   submitRequest() {
-    console.log(this.items);
-    this.items.forEach(i => console.log(i.getAttribute()));
+    if (!this.attributesHasCorrectValues()) {
+      console.log("ERR");
+      return;
+    }
+
+    console.log("PASSED");
   }
 
   private static getItemOrderValue(item : ApplicationItem) : number {

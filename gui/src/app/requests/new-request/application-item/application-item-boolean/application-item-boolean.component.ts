@@ -26,4 +26,8 @@ export class ApplicationItemBooleanComponent implements OnInit, RequestItem {
   getAttribute(): Attribute {
     return new Attribute(this.applicationItem.name, this.value);
   }
+
+  hasCorrectValue(): boolean {
+    return true;
+  }
 }

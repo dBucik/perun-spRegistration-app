@@ -25,4 +25,12 @@ export class ApplicationItemSelectComponent implements RequestItem {
   getAttribute(): Attribute {
     return new Attribute(this.applicationItem.name, this.values);
   }
+
+  hasCorrectValue(): boolean {
+    if (!this.applicationItem.required) {
+      return true;
+    }
+
+    return this.values.length > 0;
+  }
 }

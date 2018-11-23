@@ -48,4 +48,21 @@ export class ApplicationItemMapComponent implements RequestItem {
   customTrackBy(index: number, obj: any): any {
     return index;
   }
+
+  hasCorrectValue(): boolean {
+    if (!this.applicationItem.required) {
+      return true;
+    }
+
+    for (let i = 0; i < this.values.length; i++) {
+      let value = this.values[i];
+      let key = this.keys[i];
+
+      if (value.trim().length === 0 || key.trim().length === 0) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }

@@ -50,4 +50,25 @@ export class ApplicationItemComponent implements RequestItem {
 
     return undefined;
   }
+
+  hasCorrectValue(): boolean {
+
+    if (this.applicationItem.type === 'java.lang.String') {
+      return this.stringItem.hasCorrectValue();
+    }
+    if (this.applicationItem.type === 'java.lang.Boolean') {
+      return this.booleanItem.hasCorrectValue();
+    }
+    if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues === null) {
+      return this.listItem.hasCorrectValue();
+    }
+    if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues !== null) {
+      return this.selectItem.hasCorrectValue();
+    }
+    if (this.applicationItem.type === 'java.util.LinkedHashMap') {
+      return this.mapItem.hasCorrectValue();
+    }
+
+    return true;
+  }
 }

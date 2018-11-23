@@ -18,9 +18,17 @@ export class ApplicationItemStringComponent implements RequestItem {
   @Input()
   applicationItem: ApplicationItem;
 
-  value: string;
+  value: string = "";
 
   getAttribute(): Attribute {
     return new Attribute(this.applicationItem.name, this.value);
+  }
+
+  hasCorrectValue(): boolean {
+    if (!this.applicationItem.required) {
+      return true;
+    }
+
+    return this.value.trim().length > 0;
   }
 }
