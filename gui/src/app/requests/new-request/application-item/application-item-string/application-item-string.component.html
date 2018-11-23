@@ -13,8 +13,9 @@
           id="{{applicationItem.name}}">
       </mat-form-field>
       <fa-icon
-        title="{{applicationItem.description}}"
-        class="m-2 text-secondary fa-sm"
+        matTooltip="{{applicationItem.description}}"
+        [matTooltipPosition]="'above'"
+        class="m-2 text-secondary fa-lg"
         [icon]="helpIcon">
       </fa-icon>
     </div>

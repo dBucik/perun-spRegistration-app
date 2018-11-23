@@ -1,6 +1,6 @@
 import {Component, Input, ViewChild} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
-import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
+import {faMinus, faPlus, faPlusCircle, faQuestion, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
 import {MatFormField} from "@angular/material";
@@ -17,7 +17,7 @@ export class ApplicationItemListComponent implements RequestItem {
 
   removeIcon = faMinus;
   addIcon = faPlus;
-  helpIcon = faQuestionCircle;
+  helpIcon = faQuestion;
   error = false;
 
   values : string[] = [];
@@ -70,6 +70,7 @@ export class ApplicationItemListComponent implements RequestItem {
         if (value.trim().length === 0) {
           this.form.form.controls['value-' + i].markAsTouched();
           this.form.form.controls['value-' + i].setErrors({'incorrect' : true});
+          this.form.form.controls['value-' + i].updateValueAndValidity();
         }
       }
     }

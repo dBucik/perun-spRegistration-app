@@ -19,6 +19,8 @@ export class NewRequestComponent implements OnInit {
   @ViewChildren(ApplicationItemComponent)
   items: QueryList<ApplicationItemComponent>;
 
+  serviceSelected : string;
+
   isFormVisible = false;
   isCardBodyVisible = false;
   oidcEnabled: boolean;

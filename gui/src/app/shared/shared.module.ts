@@ -8,9 +8,15 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { PerunHeaderComponent } from "./layout/perun-header/perun-header.component";
 import { PerunSidebarComponent } from "./layout/perun-sidebar/perun-sidebar.component";
 import { RouterModule } from "@angular/router";
-import { PerunLoaderComponent } from './components/perun-loader/perun-loader.component';
 import {FormsModule} from "@angular/forms";
-import {MatCheckboxModule, MatInputModule, MatSelectModule} from "@angular/material";
+import {
+  MatButtonModule,
+  MatCheckboxModule,
+  MatInputModule,
+  MatProgressSpinnerModule,
+  MatRadioModule,
+  MatSelectModule, MatToolbarModule, MatTooltipModule
+} from "@angular/material";
 
 @NgModule({
   imports: [
@@ -20,15 +26,19 @@ import {MatCheckboxModule, MatInputModule, MatSelectModule} from "@angular/mater
     FormsModule,
     MatSelectModule,
     MatInputModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
+    MatRadioModule,
+    MatTooltipModule,
+    MatButtonModule,
+    MatToolbarModule
   ],
   declarations: [
     SortableColumnComponent,
     SortableTableDirective,
     PerunHeaderComponent,
     PerunSidebarComponent,
-    PerunFooterComponent,
-    PerunLoaderComponent
+    PerunFooterComponent
   ],
   exports: [
     FontAwesomeModule,
@@ -38,11 +48,15 @@ import {MatCheckboxModule, MatInputModule, MatSelectModule} from "@angular/mater
     PerunHeaderComponent,
     PerunSidebarComponent,
     PerunFooterComponent,
-    PerunLoaderComponent,
     FormsModule,
     MatSelectModule,
     MatInputModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
+    MatRadioModule,
+    MatTooltipModule,
+    MatButtonModule,
+    MatToolbarModule
   ]
 })
 export class SharedModule { }

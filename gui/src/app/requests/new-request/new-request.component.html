@@ -1,38 +1,48 @@
 <div class="container">
-  <app-perun-loader  *ngIf="loading"></app-perun-loader>
+  <mat-spinner class="ml-auto mr-auto mt-3" *ngIf="loading" color=""></mat-spinner>
 
   <div *ngIf="!loading" class="card mt-4 mb-4 shadow-sm">
     <div class="card-body p-5">
-      <div *ngIf="oidcEnabled" class="d-inline">
-        <div class="btn-group btn-group-toggle justify-content-center"
-             data-toggle="buttons">
-          <label class="btn btn-primary"
-                 (click)="oidcSelected()"
-                 [class.selected]="selected === 'oidc'">
-            <input type="radio" name="options" id="option1" autocomplete="off" checked>
-            {{'REQUESTS.OIDC' | translate}}
-          </label>
-          <label class="btn btn-primary"
-                 (click)="samlSelected()"
-                 [class.selected]="selected === 'saml'">
-            <input type="radio" name="options" id="option2" autocomplete="off" checked>
-            {{'REQUESTS.SAML' | translate}}
-          </label>
-        </div>
-      </div>
+      <h1 class="mb-3">{{'REQUESTS.NEW_TITLE' | translate}}</h1>
 
-      <div class="mt-4" *ngIf="this.isCardBodyVisible || !oidcEnabled">
+      <mat-form-field>
+        <mat-select placeholder=" {{'REQUESTS.NEW_SELECT_TYPE' | translate}}" [(ngModel)]="serviceSelected">
+          <mat-option *ngIf="oidcEnabled" (click)="oidcSelected()" [value]="'oidc'">
+            {{'REQUESTS.OIDC' | translate}}
+          </mat-option>
+          <mat-option (click)="samlSelected()" [value]="'saml'">
+            {{'REQUESTS.SAML' | translate}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="mt-4" *ngIf="this.isCardBodyVisible">
+          <h3>{{'REQUESTS.NEW_FILL_ATTRS' | translate}}</h3>
           <app-application-item
             *ngFor="let appItem of applicationItems"
             [applicationItem]="appItem">
           </app-application-item>
 
-          <button role="button" class="btn mr-2 btn-danger">
-            {{"REQUESTS.REQUEST_GO_BACK" | translate}}
-          </button>
-          <button type="submit" class="btn btn-success" (click)="submitRequest()">
-            {{"REQUESTS.REQUEST_SUBMIT" | translate}}
-          </button>
+      </div>
+      <div>
+
+        <button
+          role="button"
+          mat-raised-button
+          color="link"
+          [routerLink]="'/'">
+          {{"REQUESTS.REQUEST_GO_BACK" | translate}}
+        </button>
+
+        <button *ngIf="this.isCardBodyVisible"
+                class="pull-right"
+                type="submit"
+                mat-raised-button
+                color="primary"
+                (click)="submitRequest()">
+
+          {{"REQUESTS.REQUEST_SUBMIT" | translate}}
+        </button>
       </div>
     </div>
   </div>

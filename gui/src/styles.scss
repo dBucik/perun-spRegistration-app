@@ -12,8 +12,8 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$service-creation-primary: mat-palette($mat-indigo);
-$service-creation-accent: mat-palette($mat-pink, A200, A100, A400);
+$service-creation-primary: mat-palette($mat-indigo, 500);
+$service-creation-accent: mat-palette($mat-teal, 700);
 
 // The warn palette is optional (defaults to red).
 $service-creation-warn: mat-palette($mat-red);
@@ -40,17 +40,26 @@ a:hover {
   color: rgba(0, 0, 0, .85) !important;
 }
 
-.perun-card {
-  background: #f8f8f8;
-  padding: 1em;
-}
-
 .center-text {
   text-align: center;
 }
 
 .word-break-word {
   word-break: break-word;
+}
+
+.perun-small-btn {
+  height: auto;
+  min-width: 1% !important;
+  min-height: 1% !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400 !important;
+}
+
+th {
+  font-weight: 400 !important;
 }
 
 html, body { height: 100%; }

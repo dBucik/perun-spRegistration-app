@@ -16,7 +16,10 @@
     "REQUEST_GO_BACK": "Cancel",
     "MAP_KEY": "Key",
     "MAP_VALUE": "Value",
-    "LIST_VALUE": "Value"
+    "LIST_VALUE": "Value",
+    "NEW_TITLE": "Submit new request",
+    "NEW_SELECT_TYPE": "Select service type:",
+    "NEW_FILL_ATTRS": "Fill information:"
   },
   "FACILITIES": {
     "TITLE": "Facilities",
