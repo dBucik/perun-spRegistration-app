@@ -1,8 +1,9 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ViewChild} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
 import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
+import {NgForm} from "@angular/forms";
 
 @Component({
   selector: 'app-application-item-map',
@@ -22,6 +23,9 @@ export class ApplicationItemMapComponent implements RequestItem {
 
   @Input()
   applicationItem: ApplicationItem;
+
+  @ViewChild('form')
+  form : NgForm;
 
   removeValue(index : number) {
     this.values.splice(index, 1);
@@ -52,6 +56,10 @@ export class ApplicationItemMapComponent implements RequestItem {
   hasCorrectValue(): boolean {
     if (!this.applicationItem.required) {
       return true;
+    } else {
+      if (this.values.length === 0) {
+        return false;
+      }
     }
 
     for (let i = 0; i < this.values.length; i++) {
@@ -64,5 +72,24 @@ export class ApplicationItemMapComponent implements RequestItem {
     }
 
     return true;
+  }
+
+  onFormSubmitted(): void {
+    if (!this.hasCorrectValue()) {
+      for (let i = 0; i < this.values.length; i++) {
+        let value = this.values[i];
+        let key = this.keys[i];
+
+        if (value.trim().length === 0) {
+          this.form.form.controls['value-' + i].markAsTouched();
+          this.form.form.controls['value-' + i].setErrors({'incorrect' : true});
+        }
+
+        if (key.trim().length === 0) {
+          this.form.form.controls['key-' + i].markAsTouched();
+          this.form.form.controls['key-' + i].setErrors({'incorrect' : true});
+        }
+      }
+    }
   }
 }

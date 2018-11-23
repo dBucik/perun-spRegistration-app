@@ -30,4 +30,8 @@ export class ApplicationItemBooleanComponent implements OnInit, RequestItem {
   hasCorrectValue(): boolean {
     return true;
   }
+
+  onFormSubmitted(): void {
+    // nothing to do
+  }
 }

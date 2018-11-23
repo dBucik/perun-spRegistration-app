@@ -81,6 +81,8 @@ export class NewRequestComponent implements OnInit {
   }
 
   submitRequest() {
+    this.items.forEach(i => i.onFormSubmitted());
+
     if (!this.attributesHasCorrectValues()) {
       console.log("ERR");
       return;

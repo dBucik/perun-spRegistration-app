@@ -1,40 +1,45 @@
 <div class="form-group row">
-  <div class="col-sm-12 d-flex">
-    <div class="w-100">
-      <label class="col-form-label word-break-word">
-        {{applicationItem.displayName}}
-        <span *ngIf="applicationItem.required" class="text-danger"> *</span>
-      </label>
-      <button
-        type="button"
-        class="btn btn-success btn-sm ml-3"
-        (click)="addValue()">
-        <fa-icon [icon]="addIcon">
+  <form class="d-flex w-100" #form="ngForm">
+    <div class="col-sm-12 d-flex">
+      <div class="w-100">
+        <label class="col-form-label word-break-word">
+          {{applicationItem.displayName}}
+          <span *ngIf="applicationItem.required"> *</span>
+        </label>
+        <button
+          type="button"
+          class="btn btn-success btn-sm ml-3"
+          (click)="addValue()">
+          <fa-icon [icon]="addIcon">
+          </fa-icon>
+        </button>
+        <fa-icon
+          title="{{applicationItem.description}}"
+          class="m-2 text-secondary fa-sm pull-right"
+          [icon]="helpIcon">
         </fa-icon>
-      </button>
-      <fa-icon
-        title="{{applicationItem.description}}"
-        class="m-2 text-secondary fa-sm pull-right"
-        [icon]="helpIcon">
-      </fa-icon>
-      <div class="mr-5">
-        <div *ngFor="let value of values; let i = index; trackBy: customTrackBy" class="d-flex mb-1">
-          <mat-form-field class="w-100 mr-2">
-            <input
-              matInput
-              type="text"
-              id="{{applicationItem.name}}-{{i}}"
-              [(ngModel)] = "values[i]">
-          </mat-form-field>
-          <button
-            type="button"
-            class="btn btn-danger m-auto btn-sm"
-            (click)="removeValue(i)">
-            <fa-icon [icon]="removeIcon">
-            </fa-icon>
-          </button>
+        <div class="mr-5">
+          <div *ngFor="let value of values; let i = index; trackBy: customTrackBy" class="d-flex mb-1">
+            <mat-form-field class="w-100 mr-2">
+              <input
+                required
+                placeholder="{{'REQUESTS.LIST_VALUE' | translate}}"
+                matInput
+                type="text"
+                name="value-{{i}}"
+                id="{{applicationItem.name}}-{{i}}"
+                [(ngModel)] = "values[i]">
+            </mat-form-field>
+            <button
+              type="button"
+              class="btn btn-danger m-auto btn-sm"
+              (click)="removeValue(i)">
+              <fa-icon [icon]="removeIcon">
+              </fa-icon>
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </form>
 </div>

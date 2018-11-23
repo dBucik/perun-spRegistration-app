@@ -13,7 +13,7 @@ import {ApplicationItemSelectComponent} from "./application-item-select/applicat
   templateUrl: './application-item.component.html',
   styleUrls: ['./application-item.component.scss']
 })
-export class ApplicationItemComponent implements RequestItem {
+export class ApplicationItemComponent implements RequestItem, AfterViewInit {
 
   constructor() { }
 
@@ -31,44 +31,35 @@ export class ApplicationItemComponent implements RequestItem {
   @ViewChild(ApplicationItemSelectComponent)
   selectItem: RequestItem;
 
-  getAttribute(): Attribute {
-    if (this.applicationItem.type === 'java.lang.String') {
-      return this.stringItem.getAttribute();
-    }
-    if (this.applicationItem.type === 'java.lang.Boolean') {
-      return this.booleanItem.getAttribute();
-    }
-    if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues === null) {
-      return this.listItem.getAttribute();
-    }
-    if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues !== null) {
-      return this.selectItem.getAttribute();
-    }
-    if (this.applicationItem.type === 'java.util.LinkedHashMap') {
-      return this.mapItem.getAttribute();
-    }
+  item : RequestItem;
 
-    return undefined;
+  getAttribute(): Attribute {
+    return this.item.getAttribute();
   }
 
   hasCorrectValue(): boolean {
+    return this.item.hasCorrectValue();
+  }
 
+  ngAfterViewInit(): void {
     if (this.applicationItem.type === 'java.lang.String') {
-      return this.stringItem.hasCorrectValue();
+      this.item = this.stringItem;
     }
     if (this.applicationItem.type === 'java.lang.Boolean') {
-      return this.booleanItem.hasCorrectValue();
+      this.item = this.booleanItem;
     }
     if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues === null) {
-      return this.listItem.hasCorrectValue();
+      this.item = this.listItem;
     }
     if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues !== null) {
-      return this.selectItem.hasCorrectValue();
+      this.item = this.selectItem;
     }
     if (this.applicationItem.type === 'java.util.LinkedHashMap') {
-      return this.mapItem.hasCorrectValue();
+      this.item = this.mapItem;
     }
+  }
 
-    return true;
+  onFormSubmitted(): void {
+    this.item.onFormSubmitted();
   }
 }

@@ -15,7 +15,8 @@
     "REQUEST_SUBMIT": "Submit",
     "REQUEST_GO_BACK": "Cancel",
     "MAP_KEY": "Key",
-    "MAP_VALUE": "Value"
+    "MAP_VALUE": "Value",
+    "LIST_VALUE": "Value"
   },
   "FACILITIES": {
     "TITLE": "Facilities",

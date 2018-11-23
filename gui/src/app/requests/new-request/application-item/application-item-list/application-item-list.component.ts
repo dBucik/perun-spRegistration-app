@@ -1,8 +1,10 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ViewChild} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
+import {MatFormField} from "@angular/material";
+import {NgForm} from "@angular/forms";
 
 @Component({
   selector: 'app-application-item-list',
@@ -16,11 +18,15 @@ export class ApplicationItemListComponent implements RequestItem {
   removeIcon = faMinus;
   addIcon = faPlus;
   helpIcon = faQuestionCircle;
+  error = false;
 
   values : string[] = [];
 
   @Input()
   applicationItem: ApplicationItem;
+
+  @ViewChild('form')
+  form : NgForm;
 
   removeValue(index : number) {
     this.values.splice(index, 1);
@@ -41,6 +47,10 @@ export class ApplicationItemListComponent implements RequestItem {
   hasCorrectValue(): boolean {
     if (!this.applicationItem.required) {
       return true;
+    } else {
+      if (this.values.length === 0) {
+        return false;
+      }
     }
 
     for (let i = 0; i < this.values.length; i++) {
@@ -50,5 +60,18 @@ export class ApplicationItemListComponent implements RequestItem {
     }
 
     return true;
+  }
+
+  onFormSubmitted(): void {
+    if (!this.hasCorrectValue()) {
+      for (let i = 0; i < this.values.length; i++) {
+        let value = this.values[i];
+
+        if (value.trim().length === 0) {
+          this.form.form.controls['value-' + i].markAsTouched();
+          this.form.form.controls['value-' + i].setErrors({'incorrect' : true});
+        }
+      }
+    }
   }
 }
