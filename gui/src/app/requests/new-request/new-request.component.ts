@@ -4,6 +4,8 @@ import {ApplicationItem} from "../../core/models/ApplicationItem";
 import {FormGroup} from "@angular/forms";
 import {RequestsService} from "../../core/services/requests.service";
 import {ApplicationItemComponent} from "./application-item/application-item.component";
+import {MatSnackBar} from "@angular/material";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-new-request',
@@ -14,7 +16,9 @@ export class NewRequestComponent implements OnInit {
 
   constructor(
     private configService: ConfigService,
-    private requestsService: RequestsService) { }
+    private requestsService: RequestsService,
+    private snackBar: MatSnackBar,
+    private translate: TranslateService) { }
 
   @ViewChildren(ApplicationItemComponent)
   items: QueryList<ApplicationItemComponent>;
@@ -26,6 +30,8 @@ export class NewRequestComponent implements OnInit {
   oidcEnabled: boolean;
   loading = true;
   selected = "";
+  errorText : string;
+  errorActionText : string;
 
   applicationItems: ApplicationItem[];
 
@@ -36,6 +42,9 @@ export class NewRequestComponent implements OnInit {
       this.oidcEnabled = isEnabled;
       this.loading = false;
     });
+
+    this.translate.get('REQUESTS.NEW_VALUES_ERROR_MESSAGE').subscribe(value => this.errorText = value);
+    this.translate.get('REQUESTS.NEW_VALUES_ERROR_ACTION').subscribe(value => this.errorActionText = value);
   }
 
   revealForm() {
@@ -86,7 +95,7 @@ export class NewRequestComponent implements OnInit {
     this.items.forEach(i => i.onFormSubmitted());
 
     if (!this.attributesHasCorrectValues()) {
-      console.log("ERR");
+      this.snackBar.open(this.errorText, this.errorActionText, {duration: 4000});
       return;
     }
 

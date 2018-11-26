@@ -20,6 +20,7 @@ export class ApplicationItemMapComponent implements RequestItem {
 
   keys : string[] = [];
   values : string[] = [];
+  noItemError = false;
 
   @Input()
   applicationItem: ApplicationItem;
@@ -30,11 +31,15 @@ export class ApplicationItemMapComponent implements RequestItem {
   removeValue(index : number) {
     this.values.splice(index, 1);
     this.keys.splice(index, 1);
+    if (this.values.length === 0) {
+      this.noItemError = true;
+    }
   }
 
   addValue() {
     this.values.push("");
     this.keys.push("");
+    this.noItemError = false;
   }
 
   getAttribute(): Attribute {
@@ -76,6 +81,10 @@ export class ApplicationItemMapComponent implements RequestItem {
 
   onFormSubmitted(): void {
     if (!this.hasCorrectValue()) {
+      if (this.values.length === 0) {
+        this.noItemError = true;
+      }
+
       for (let i = 0; i < this.values.length; i++) {
         let value = this.values[i];
         let key = this.keys[i];

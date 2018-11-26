@@ -4,7 +4,8 @@
       <mat-checkbox [(ngModel)]="value">{{applicationItem.displayName}}</mat-checkbox>
     </div>
     <fa-icon
-      title="{{applicationItem.description}}"
+      matTooltip="{{applicationItem.description}}"
+      [matTooltipPosition]="'above'"
       class="m-2 text-secondary fa-lg"
       [icon]="helpIcon">
     </fa-icon>

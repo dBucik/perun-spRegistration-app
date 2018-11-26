@@ -1,9 +1,8 @@
 import {Component, Input, ViewChild} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
-import {faMinus, faPlus, faPlusCircle, faQuestion, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
+import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
-import {MatFormField} from "@angular/material";
 import {NgForm} from "@angular/forms";
 
 @Component({
@@ -17,8 +16,9 @@ export class ApplicationItemListComponent implements RequestItem {
 
   removeIcon = faMinus;
   addIcon = faPlus;
-  helpIcon = faQuestion;
+  helpIcon = faQuestionCircle;
   error = false;
+  noItemError = false;
 
   values : string[] = [];
 
@@ -30,10 +30,14 @@ export class ApplicationItemListComponent implements RequestItem {
 
   removeValue(index : number) {
     this.values.splice(index, 1);
+    if (this.values.length === 0) {
+      this.noItemError = true;
+    }
   }
 
   addValue() {
     this.values.push("");
+    this.noItemError = false;
   }
 
   getAttribute(): Attribute {
@@ -64,6 +68,9 @@ export class ApplicationItemListComponent implements RequestItem {
 
   onFormSubmitted(): void {
     if (!this.hasCorrectValue()) {
+      if (this.values.length === 0) {
+        this.noItemError = true;
+      }
       for (let i = 0; i < this.values.length; i++) {
         let value = this.values[i];
 

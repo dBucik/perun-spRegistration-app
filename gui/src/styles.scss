@@ -13,7 +13,7 @@
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
 $service-creation-primary: mat-palette($mat-indigo, 500);
-$service-creation-accent: mat-palette($mat-teal, 700);
+$service-creation-accent: mat-palette($mat-green, A400);
 
 // The warn palette is optional (defaults to red).
 $service-creation-warn: mat-palette($mat-red);
@@ -38,6 +38,10 @@ a {
 
 a:hover {
   color: rgba(0, 0, 0, .85) !important;
+}
+
+.perun-warn {
+  color: #f44336;
 }
 
 .center-text {
