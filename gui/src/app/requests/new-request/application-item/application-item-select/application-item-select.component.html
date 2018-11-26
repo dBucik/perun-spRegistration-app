@@ -5,14 +5,14 @@
         <mat-select multiple
                     [(ngModel)]="values"
                     name="{{applicationItem.name}}"
-                    placeholder="{{applicationItem.displayName}}"
+                    placeholder="{{translatedName}}"
                     [required]="applicationItem.required">
 
           <mat-option *ngFor="let value of applicationItem.allowedValues" [value]="value">{{value}}</mat-option>
         </mat-select>
       </mat-form-field>
       <fa-icon
-        matTooltip="{{applicationItem.description}}"
+        matTooltip="{{translatedDescription}}"
         [matTooltipPosition]="'above'"
         class="m-2 text-secondary fa-lg"
         [icon]="helpIcon">

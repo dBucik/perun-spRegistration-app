@@ -4,7 +4,7 @@
       <mat-form-field class="w-100">
         <input
           matInput
-          placeholder="{{applicationItem.displayName}}"
+          placeholder="{{translatedName}}"
           [(ngModel)]="value"
           name="{{applicationItem.name}}"
           required
@@ -13,7 +13,7 @@
           id="{{applicationItem.name}}">
       </mat-form-field>
       <fa-icon
-        matTooltip="{{applicationItem.description}}"
+        matTooltip="{{translatedDescription}}"
         [matTooltipPosition]="'above'"
         class="m-2 text-secondary fa-lg"
         [icon]="helpIcon">

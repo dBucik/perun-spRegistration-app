@@ -1,24 +1,27 @@
-import {Component, Input, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {Attribute} from "../../../../core/models/Attribute";
 import {RequestItem} from "../../RequestItem";
 import {NgForm} from "@angular/forms";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-application-item-select',
   templateUrl: './application-item-select.component.html',
   styleUrls: ['./application-item-select.component.scss']
 })
-export class ApplicationItemSelectComponent implements RequestItem {
+export class ApplicationItemSelectComponent implements RequestItem, OnInit {
 
-  constructor() { }
+  constructor(private translate: TranslateService) { }
 
   removeIcon = faMinus;
   addIcon = faPlus;
   helpIcon = faQuestionCircle;
 
   values = [];
+  translatedName: string;
+  translatedDescription: string;
 
   @Input()
   applicationItem: ApplicationItem;
@@ -43,5 +46,14 @@ export class ApplicationItemSelectComponent implements RequestItem {
       this.form.form.controls[this.applicationItem.name].markAsTouched();
       this.form.form.controls[this.applicationItem.name].setErrors({'incorrect' : true});
     }
+  }
+
+  ngOnInit(): void {
+    let browserLang = this.translate.getBrowserLang();
+    //TODO remove
+    browserLang = 'en';
+    console.log(browserLang);
+    this.translatedDescription = this.applicationItem.description[browserLang];
+    this.translatedName = this.applicationItem.displayName[browserLang];
   }
 }

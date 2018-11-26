@@ -3,7 +3,7 @@
     <div class="col-sm-12 d-flex">
       <div class="w-100">
         <label class="col-form-label word-break-word" [class.perun-warn]="this.noItemError">
-          {{applicationItem.displayName}}
+          {{translatedName}}
           <span *ngIf="applicationItem.required"> *</span>
         </label>
         <button
@@ -14,7 +14,7 @@
           </fa-icon>
         </button>
         <fa-icon
-          matTooltip="{{applicationItem.description}}"
+          matTooltip="{{translatedDescription}}"
           [matTooltipPosition]="'above'"
           class="m-2 text-secondary fa-lg pull-right"
           [icon]="helpIcon">

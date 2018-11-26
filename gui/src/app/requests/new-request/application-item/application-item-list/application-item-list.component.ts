@@ -4,6 +4,7 @@ import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-ico
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
 import {NgForm} from "@angular/forms";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-application-item-list',
@@ -12,13 +13,15 @@ import {NgForm} from "@angular/forms";
 })
 export class ApplicationItemListComponent implements RequestItem {
 
-  constructor() { }
+  constructor(private translate: TranslateService) { }
 
   removeIcon = faMinus;
   addIcon = faPlus;
   helpIcon = faQuestionCircle;
   error = false;
   noItemError = false;
+  translatedName: string;
+  translatedDescription: string;
 
   values : string[] = [];
 
@@ -64,6 +67,15 @@ export class ApplicationItemListComponent implements RequestItem {
     }
 
     return true;
+  }
+
+  ngOnInit(): void {
+    let browserLang = this.translate.getBrowserLang();
+    //TODO remove
+    browserLang = 'en';
+    console.log(browserLang);
+    this.translatedDescription = this.applicationItem.description[browserLang];
+    this.translatedName = this.applicationItem.displayName[browserLang];
   }
 
   onFormSubmitted(): void {

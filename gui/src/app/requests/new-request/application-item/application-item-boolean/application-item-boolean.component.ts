@@ -3,6 +3,7 @@ import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
 import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-application-item-boolean',
@@ -11,7 +12,7 @@ import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 })
 export class ApplicationItemBooleanComponent implements OnInit, RequestItem {
 
-  constructor() { }
+  constructor(private translate: TranslateService) { }
 
   helpIcon = faQuestionCircle;
 
@@ -19,9 +20,8 @@ export class ApplicationItemBooleanComponent implements OnInit, RequestItem {
   applicationItem: ApplicationItem;
 
   value: boolean = false;
-
-  ngOnInit() {
-  }
+  translatedName: string;
+  translatedDescription: string;
 
   getAttribute(): Attribute {
     return new Attribute(this.applicationItem.name, this.value);
@@ -33,5 +33,14 @@ export class ApplicationItemBooleanComponent implements OnInit, RequestItem {
 
   onFormSubmitted(): void {
     // nothing to do
+  }
+
+  ngOnInit(): void {
+    let browserLang = this.translate.getBrowserLang();
+    //TODO remove
+    browserLang = 'en';
+    console.log(browserLang);
+    this.translatedDescription = this.applicationItem.description[browserLang];
+    this.translatedName = this.applicationItem.displayName[browserLang];
   }
 }
