@@ -1,8 +1,8 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { Facility } from "../../core/models/Facility";
-import { ColumnSortedEvent } from "../../core/services/sort.service";
 import { FacilitiesService } from "../../core/services/facilities.service";
 import { Subscription } from "rxjs";
+import {MatSort, MatTableDataSource} from "@angular/material";
 
 @Component({
   selector: 'app-facilities-overview',
@@ -35,39 +35,24 @@ export class FacilitiesOverviewComponent implements OnInit, OnDestroy {
     }
   ];
 
-  tableName = "facilitiesMainOverview";
+  @ViewChild(MatSort) sort: MatSort;
+
+  displayedColumns: string[] = ['id', 'name'];
+  dataSource: MatTableDataSource<Facility>;
+  loading = true;
 
   private facilitiesSubscription: Subscription;
 
   ngOnInit() {
     this.facilitiesSubscription = this.facilitiesService.getMyFacilities().subscribe(facilities => {
-      this.facilities = facilities;
+      // this.facilities = facilities;
+      this.dataSource = new MatTableDataSource<Facility>(this.facilities);
+      this.dataSource.sort = this.sort;
+      this.loading = false;
     });
   }
 
   ngOnDestroy() {
     this.facilitiesSubscription.unsubscribe();
-  }
-
-  onSorted($event: ColumnSortedEvent) {
-    if ($event.tableName != this.tableName) {
-      return;
-    }
-    this.facilities = this.facilities.sort((f1, f2) => {
-      if ($event.sortColumn === 'id') {
-        if ($event.sortDirection === 'asc') {
-          return f1.id - f2.id;
-        } else {
-          return f2.id - f1.id;
-        }
-      }
-      if ($event.sortColumn === 'name') {
-        if ($event.sortDirection === 'asc') {
-          return f1.name > f2.name ? 1 : -1;
-        } else {
-          return f2.name > f1.name ? 1 : -1;
-        }
-      }
-    });
   }
 }

@@ -15,7 +15,7 @@ import {
   MatInputModule,
   MatProgressSpinnerModule,
   MatRadioModule,
-  MatSelectModule, MatSnackBarModule, MatToolbarModule, MatTooltipModule
+  MatSelectModule, MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatTooltipModule
 } from "@angular/material";
 
 @NgModule({
@@ -33,7 +33,9 @@ import {
     MatButtonModule,
     MatToolbarModule,
     MatSnackBarModule,
-    MatIconModule
+    MatIconModule,
+    MatTableModule,
+    MatSortModule
   ],
   declarations: [
     SortableColumnComponent,
@@ -60,7 +62,9 @@ import {
     MatButtonModule,
     MatToolbarModule,
     MatSnackBarModule,
-    MatIconModule
+    MatIconModule,
+    MatTableModule,
+    MatSortModule
   ]
 })
 export class SharedModule { }
