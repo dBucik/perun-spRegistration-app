@@ -73,7 +73,6 @@ export class ApplicationItemListComponent implements RequestItem {
     let browserLang = this.translate.getBrowserLang();
     //TODO remove
     browserLang = 'en';
-    console.log(browserLang);
     this.translatedDescription = this.applicationItem.description[browserLang];
     this.translatedName = this.applicationItem.displayName[browserLang];
   }
