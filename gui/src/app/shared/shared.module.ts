@@ -11,7 +11,7 @@ import { RouterModule } from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {
   MatButtonModule,
-  MatCheckboxModule,
+  MatCheckboxModule, MatIconModule,
   MatInputModule,
   MatProgressSpinnerModule,
   MatRadioModule,
@@ -32,7 +32,8 @@ import {
     MatTooltipModule,
     MatButtonModule,
     MatToolbarModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatIconModule
   ],
   declarations: [
     SortableColumnComponent,
@@ -58,7 +59,8 @@ import {
     MatTooltipModule,
     MatButtonModule,
     MatToolbarModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatIconModule
   ]
 })
 export class SharedModule { }

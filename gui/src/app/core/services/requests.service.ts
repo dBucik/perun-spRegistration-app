@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ApiService } from "./api.service";
 import { Observable } from "rxjs";
 import { Request } from "../models/Request";
+import {PerunAttribute} from "../models/PerunAttribute";
 
 @Injectable({
   providedIn: 'root'
@@ -19,5 +20,9 @@ export class RequestsService {
 
   getAllRequests(): Observable<Request[]> {
     return this.apiService.get('/allRequests');
+  }
+
+  createRegistrationRequest(perunAttributes: PerunAttribute[]): Observable<number> {
+    return this.apiService.post('/register', perunAttributes);
   }
 }

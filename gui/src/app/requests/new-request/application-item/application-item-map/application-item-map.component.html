@@ -7,11 +7,12 @@
           <span *ngIf="applicationItem.required"> *</span>
         </label>
         <button
-          type="button"
-          class="btn btn-success btn-sm ml-3"
+          mat-icon-button
+          color="accent"
           (click)="addValue()">
-          <fa-icon [icon]="addIcon">
-          </fa-icon>
+          <mat-icon>
+            add_box
+          </mat-icon>
         </button>
         <fa-icon
           matTooltip="{{translatedDescription}}"
@@ -42,11 +43,12 @@
                 [(ngModel)] = "values[i]">
             </mat-form-field>
             <button
-              type="button"
-              class="btn btn-danger m-auto btn-sm"
+              mat-icon-button
+              color="warn"
               (click)="removeValue(i)">
-              <fa-icon [icon]="removeIcon">
-              </fa-icon>
+              <mat-icon>
+                indeterminate_check_box
+              </mat-icon>
             </button>
           </div>
         </div>

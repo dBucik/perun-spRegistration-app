@@ -19,19 +19,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-@CrossOrigin(
-		origins = "http://localhost:4200",
-		allowCredentials = "true",
-		allowedHeaders = "origin, content-type, accept, authorization",
-		methods = {
-				RequestMethod.GET,
-				RequestMethod.POST,
-				RequestMethod.PUT,
-				RequestMethod.DELETE,
-				RequestMethod.OPTIONS,
-				RequestMethod.HEAD
-		}
-)
 @RestController
 @SessionAttributes("userId")
 public class AdminController {

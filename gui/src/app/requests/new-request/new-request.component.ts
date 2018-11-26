@@ -6,6 +6,7 @@ import {RequestsService} from "../../core/services/requests.service";
 import {ApplicationItemComponent} from "./application-item/application-item.component";
 import {MatSnackBar} from "@angular/material";
 import {TranslateService} from "@ngx-translate/core";
+import {PerunAttribute} from "../../core/models/PerunAttribute";
 
 @Component({
   selector: 'app-new-request',
@@ -63,7 +64,9 @@ export class NewRequestComponent implements OnInit {
     this.selected = "oidc";
 
     this.configService.getOidcApplicationItems().subscribe(items => {
+      console.log(items);
       this.applicationItems = NewRequestComponent.sortItems(items);
+      console.log(this.applicationItems);
       this.revealForm();
     });
   }
@@ -100,6 +103,21 @@ export class NewRequestComponent implements OnInit {
     }
 
     console.log("PASSED");
+
+    let perunAttributes : PerunAttribute[] = [];
+
+    this.items.forEach(i => {
+      let attr = i.getAttribute();
+      let perunAttr = new PerunAttribute(attr.value, attr.urn);
+      perunAttributes.push(perunAttr);
+    });
+
+    this.requestsService.createRegistrationRequest(perunAttributes).subscribe(requestId => {
+      console.log("Successly submitted.")
+    }, error => {
+      console.log("Error");
+      console.log(error);
+    })
   }
 
   private static getItemOrderValue(item : ApplicationItem) : number {

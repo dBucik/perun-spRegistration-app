@@ -10,19 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@CrossOrigin(
-		origins = "http://localhost:4200",
-		allowCredentials = "true",
-		allowedHeaders = "origin, content-type, accept, authorization",
-		methods = {
-				RequestMethod.GET,
-				RequestMethod.POST,
-				RequestMethod.PUT,
-				RequestMethod.DELETE,
-				RequestMethod.OPTIONS,
-				RequestMethod.HEAD
-		}
-)
 @RestController
 public class GeneralController {
 
