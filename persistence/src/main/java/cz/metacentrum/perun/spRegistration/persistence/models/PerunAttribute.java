@@ -25,8 +25,6 @@ public class PerunAttribute {
 	private Object value;
 	private Object oldValue;
 	private String comment;
-
-	@JsonIgnore
 	private String fullName;
 
 	public PerunAttribute() { }
@@ -179,21 +177,29 @@ public class PerunAttribute {
 			case ARRAY_TYPE:
 			case LARGE_ARRAY_LIST_TYPE:
 				List<String> arrValue = valueAsArray(isOldValue);
-				JSONArray arr = new JSONArray();
-				for (String sub: arrValue) {
-					arr.put(sub);
+				if (arrValue == null) {
+					json.put(key, JSONObject.NULL);
+				} else {
+					JSONArray arr = new JSONArray();
+					for (String sub: arrValue) {
+						arr.put(sub);
+					}
+					json.put(key, arr);
 				}
 
-				json.put(key, arr);
 				break;
 			case MAP_TYPE:
 				Map<String, String> mapValue = valueAsMap(isOldValue);
-				JSONObject obj = new JSONObject();
-				for (Map.Entry<String, String> sub: mapValue.entrySet()) {
-					obj.put(sub.getKey(), sub.getValue());
+				if (mapValue == null) {
+					json.put(key, JSONObject.NULL);
+				} else {
+					JSONObject obj = new JSONObject();
+					for (Map.Entry<String, String> sub: mapValue.entrySet()) {
+						obj.put(sub.getKey(), sub.getValue());
+					}
+					json.put(key, obj);
 				}
 
-				json.put(key, obj);
 				break;
 		}
 	}
@@ -298,5 +304,16 @@ public class PerunAttribute {
 		}
 
 		return null;
+	}
+
+	@Override
+	public String toString() {
+		return "PerunAttribute{" +
+				"definition=" + definition +
+				", value=" + value +
+				", oldValue=" + oldValue +
+				", comment='" + comment + '\'' +
+				", fullName='" + fullName + '\'' +
+				'}';
 	}
 }

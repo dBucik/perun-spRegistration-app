@@ -61,7 +61,7 @@ public class RequestManagerImpl implements RequestManager {
 		params.addValue("modified_by", request.getModifiedBy());
 		params.addValue("modified_at", request.getModifiedAt());
 
-		jdbcTemplate.update(query, params, key);
+		jdbcTemplate.update(query, params, key, new String[] { "id" });
 		return (Long) key.getKey();
 	}
 

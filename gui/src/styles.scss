@@ -52,6 +52,17 @@ a:hover {
   word-break: break-word;
 }
 
+.hover-dark {
+  transition:all 0.25s ease;
+}
+
+.hover-dark:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.clickable {
+  cursor: pointer;
+}
 .perun-small-btn {
   height: auto;
   min-width: 1% !important;

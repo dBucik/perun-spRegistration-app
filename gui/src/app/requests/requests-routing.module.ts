@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import {RequestsOverviewComponent} from "./requests-overview/requests-overview.component";
 import {NewRequestComponent} from "./new-request/new-request.component";
+import {RequestDetailComponent} from "./request-detail/request-detail.component";
 
 const routes: Routes = [
   {
@@ -11,6 +12,10 @@ const routes: Routes = [
   {
     path: 'new',
     component: NewRequestComponent
+  },
+  {
+    path: 'detail/:id',
+    component: RequestDetailComponent
   }
 ];
 

@@ -5,7 +5,7 @@ import { RequestStatus } from "../../core/models/RequestStatus";
 import { RequestAction } from "../../core/models/RequestAction";
 import { RequestsService } from "../../core/services/requests.service";
 import { Subscription } from "rxjs";
-import {MatSort, MatTableDataSource} from "@angular/material";
+import {MatRow, MatSort, MatTableDataSource} from "@angular/material";
 
 @Component({
   selector: 'app-requests-overview',
