@@ -163,44 +163,46 @@ public class PerunAttribute {
 	}
 
 	private void putValue(JSONObject json, String key, String type, boolean isOldValue) {
+		Object value = null;
 		switch (type) {
 			case STRING_TYPE:
 			case LARGE_STRING_TYPE:
-				json.put(key, valueAsString(isOldValue));
+				value = valueAsString(isOldValue);
 				break;
 			case INTEGER_TYPE:
-				json.put(key, valueAsLong(isOldValue));
+				value = valueAsLong(isOldValue);
 				break;
 			case BOOLEAN_TYPE:
-				json.put(key, valueAsBoolean(isOldValue));
+				value = valueAsBoolean(isOldValue);
 				break;
 			case ARRAY_TYPE:
 			case LARGE_ARRAY_LIST_TYPE:
 				List<String> arrValue = valueAsArray(isOldValue);
-				if (arrValue == null) {
-					json.put(key, JSONObject.NULL);
-				} else {
+				if (arrValue != null) {
 					JSONArray arr = new JSONArray();
 					for (String sub: arrValue) {
 						arr.put(sub);
 					}
-					json.put(key, arr);
+					value = arr;
 				}
 
 				break;
 			case MAP_TYPE:
 				Map<String, String> mapValue = valueAsMap(isOldValue);
-				if (mapValue == null) {
-					json.put(key, JSONObject.NULL);
-				} else {
+				if (mapValue != null) {
 					JSONObject obj = new JSONObject();
 					for (Map.Entry<String, String> sub: mapValue.entrySet()) {
 						obj.put(sub.getKey(), sub.getValue());
 					}
-					json.put(key, obj);
+					value = obj;
 				}
-
 				break;
+		}
+
+		if (value == null) {
+			json.put(key, JSONObject.NULL);
+		} else {
+			json.put(key, value);
 		}
 	}
 

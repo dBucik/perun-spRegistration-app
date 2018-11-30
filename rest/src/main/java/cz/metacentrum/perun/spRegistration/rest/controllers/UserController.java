@@ -46,6 +46,20 @@ public class UserController {
 		return service.createRegistrationRequest(userId, attributes);
 	}
 
+	@RequestMapping(path = "/api/registerAndSubmit")
+	public Long createAndSubmitRegistrationRequest(@SessionAttribute("userId") Long userId,
+	                                               @RequestBody List<PerunAttribute> attributes)
+			throws CannotChangeStatusException, UnauthorizedActionException {
+
+		Long requestId = service.createRegistrationRequest(userId, attributes);
+		if (service.askForApproval(requestId, userId)) {
+			return requestId;
+		}
+
+		// TODO
+		throw new RuntimeException();
+	}
+
 	@RequestMapping(path = "/api/changeFacility/{facilityId}")
 	public Long createFacilityChangesRequest(@SessionAttribute("userId") Long userId,
 											 @RequestBody List<PerunAttribute> attributes,
