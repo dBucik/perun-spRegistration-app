@@ -21,7 +21,8 @@
     "NEW_SELECT_TYPE": "Select service type:",
     "NEW_FILL_ATTRS": "Fill information:",
     "NEW_VALUES_ERROR_MESSAGE": "Please, fill out all of the required fields.",
-    "NEW_VALUES_ERROR_ACTION": "OK"
+    "REQUEST_SAVE": "Save",
+    "SUCCESSFULLY_SUBMITTED_MESSAGE": "Request has been submitted."
   },
   "FACILITIES": {
     "TITLE": "Facilities",

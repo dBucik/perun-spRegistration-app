@@ -25,4 +25,6 @@ export class RequestsService {
   createRegistrationRequest(perunAttributes: PerunAttribute[]): Observable<number> {
     return this.apiService.post('/register', perunAttributes);
   }
+
+
 }

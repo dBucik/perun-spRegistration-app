@@ -26,6 +26,7 @@
       </div>
       <div>
 
+
         <button
           role="button"
           mat-raised-button
@@ -34,15 +35,24 @@
           {{"REQUESTS.REQUEST_GO_BACK" | translate}}
         </button>
 
-        <button *ngIf="this.isCardBodyVisible"
-                class="pull-right"
-                type="submit"
-                mat-raised-button
-                color="primary"
-                (click)="submitRequest()">
+        <div class="pull-right" *ngIf="this.isCardBodyVisible">
+          <button
+            role="button"
+            mat-raised-button
+            color="accent"
+            (click)="saveRequest()">
+            {{"REQUESTS.REQUEST_SAVE" | translate}}
+          </button>
+          <button
+            class="ml-2"
+            type="submit"
+            mat-raised-button
+            color="primary"
+            (click)="submitRequest()">
+            {{"REQUESTS.REQUEST_SUBMIT" | translate}}
+          </button>
+        </div>
 
-          {{"REQUESTS.REQUEST_SUBMIT" | translate}}
-        </button>
       </div>
     </div>
   </div>

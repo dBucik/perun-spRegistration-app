@@ -31,8 +31,10 @@ export class NewRequestComponent implements OnInit {
   oidcEnabled: boolean;
   loading = true;
   selected = "";
+
+  // translations
   errorText : string;
-  errorActionText : string;
+  successfullySubmittedText: string;
 
   applicationItems: ApplicationItem[];
 
@@ -45,7 +47,8 @@ export class NewRequestComponent implements OnInit {
     });
 
     this.translate.get('REQUESTS.NEW_VALUES_ERROR_MESSAGE').subscribe(value => this.errorText = value);
-    this.translate.get('REQUESTS.NEW_VALUES_ERROR_ACTION').subscribe(value => this.errorActionText = value);
+    this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED_MESSAGE')
+      .subscribe(value => this.successfullySubmittedText = value);
   }
 
   revealForm() {
@@ -94,15 +97,17 @@ export class NewRequestComponent implements OnInit {
     return true;
   }
 
+  saveRequest() {
+
+  }
+
   submitRequest() {
     this.items.forEach(i => i.onFormSubmitted());
 
     if (!this.attributesHasCorrectValues()) {
-      this.snackBar.open(this.errorText, this.errorActionText, {duration: 4000});
+      this.snackBar.open(this.errorText, null, {duration: 40000, horizontalPosition: 'end', verticalPosition: 'top'});
       return;
     }
-
-    console.log("PASSED");
 
     let perunAttributes : PerunAttribute[] = [];
 
@@ -113,7 +118,7 @@ export class NewRequestComponent implements OnInit {
     });
 
     this.requestsService.createRegistrationRequest(perunAttributes).subscribe(requestId => {
-      console.log("Successly submitted.")
+      this.snackBar.open(this.successfullySubmittedText, null, {duration: 3000, horizontalPosition: 'start'});
     }, error => {
       console.log("Error");
       console.log(error);
