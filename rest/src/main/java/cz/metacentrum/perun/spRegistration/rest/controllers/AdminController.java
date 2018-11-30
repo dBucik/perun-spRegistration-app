@@ -7,7 +7,6 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatus
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.service.impl.AdminServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
