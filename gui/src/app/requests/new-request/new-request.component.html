@@ -1,39 +1,59 @@
 <div class="container">
-  <div class="btn-group btn-group-toggle choiceButton justify-content-center" style="margin-top: 20px"
-       data-toggle="buttons">
-    <label class="btn btn-light choice-button"
-           (click)="this.isForm1Visible = true; this.isForm2Visible = false; this.isCardBodyVisible = true">
-      <input type="radio" name="options" id="option1" autocomplete="off" checked> type1
-    </label>
-    <label class="btn btn-light choice-button"
-           (click)="this.isForm1Visible = false; this.isForm2Visible = true; this.isCardBodyVisible = true">
-      <input type="radio" name="options" id="option2" autocomplete="off" checked> type2
-    </label>
-  </div>
-  <div class="card mt-4 shadow" *ngIf="this.isCardBodyVisible">
-    <div class="card-body">
-      <form id="form1" *ngIf="this.isForm1Visible">
-        <div class="form-group">
-          <label for="requestName">Name</label>
-          <input type="text" class="form-control" id="requestName" placeholder="Enter Name" required>
-          <small id="emailHelp" class="form-text text-muted">Lorem Ipsum</small>
+  <mat-spinner class="ml-auto mr-auto mt-3" *ngIf="loading" color=""></mat-spinner>
+
+  <div *ngIf="!loading" class="card mt-4 mb-4 shadow-sm">
+    <div class="card-body p-5">
+      <h1 class="mb-3">{{'REQUESTS.NEW_TITLE' | translate}}</h1>
+
+      <mat-form-field>
+        <mat-select placeholder=" {{'REQUESTS.NEW_SELECT_TYPE' | translate}}" [(ngModel)]="serviceSelected">
+          <mat-option *ngIf="oidcEnabled" (click)="oidcSelected()" [value]="'oidc'">
+            {{'REQUESTS.OIDC' | translate}}
+          </mat-option>
+          <mat-option (click)="samlSelected()" [value]="'saml'">
+            {{'REQUESTS.SAML' | translate}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="mt-4" *ngIf="this.isCardBodyVisible">
+          <h3>{{'REQUESTS.NEW_FILL_ATTRS' | translate}}</h3>
+          <app-application-item
+            *ngFor="let appItem of applicationItems"
+            [applicationItem]="appItem">
+          </app-application-item>
+
+      </div>
+      <div>
+
+
+        <button
+          role="button"
+          mat-raised-button
+          color="link"
+          [routerLink]="'/'">
+          {{"REQUESTS.REQUEST_GO_BACK" | translate}}
+        </button>
+
+        <div class="pull-right" *ngIf="this.isCardBodyVisible">
+          <button
+            role="button"
+            mat-raised-button
+            color="accent"
+            (click)="saveRequest()">
+            {{"REQUESTS.REQUEST_SAVE" | translate}}
+          </button>
+          <button
+            class="ml-2"
+            type="submit"
+            mat-raised-button
+            color="primary"
+            (click)="submitRequest()">
+            {{"REQUESTS.REQUEST_SUBMIT" | translate}}
+          </button>
         </div>
-        <div class="form-group">
-          <label for="requestDescription">Description</label>
-          <input type="text" class="form-control" id="requestDescription" placeholder="Description" required>
-        </div>
-        <div class="form-group form-check">
-          <input type="checkbox" class="form-check-input" id="exampleCheck1">
-          <label class="form-check-label" for="exampleCheck1">Check me out</label>
-        </div>
-        <button type="submit" class="btn btn-success" style="margin-right: 15px">Submit</button>
-        <a routerLink="/">
-          <button type="button" class="btn btn-danger" routerLink="{'requests'}">Go back without submiting</button>
-        </a>
-      </form>
-      <form id="form2" *ngIf="this.isForm2Visible">
-        <label>form2</label>
-      </form>
+
+      </div>
     </div>
   </div>
 </div>

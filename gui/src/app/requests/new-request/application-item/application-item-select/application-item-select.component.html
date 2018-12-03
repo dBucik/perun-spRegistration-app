@@ -1,0 +1,22 @@
+<div class="form-group row">
+  <form class="d-flex w-100" #form="ngForm">
+    <div class="col-sm-12 d-flex">
+      <mat-form-field class="w-100">
+        <mat-select multiple
+                    [(ngModel)]="values"
+                    name="{{applicationItem.name}}"
+                    placeholder="{{translatedName}}"
+                    [required]="applicationItem.required">
+
+          <mat-option *ngFor="let value of applicationItem.allowedValues" [value]="value">{{value}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <fa-icon
+        matTooltip="{{translatedDescription}}"
+        [matTooltipPosition]="'above'"
+        class="m-2 text-secondary fa-lg"
+        [icon]="helpIcon">
+      </fa-icon>
+    </div>
+  </form>
+</div>

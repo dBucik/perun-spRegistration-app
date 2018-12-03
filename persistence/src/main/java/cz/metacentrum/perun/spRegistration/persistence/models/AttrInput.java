@@ -1,17 +1,19 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
 import java.util.List;
+import java.util.Map;
 
 public class AttrInput {
 
 	private String name;
-	private String displayName;
-	private String description;
+	private Map<String, String> displayName;
+	private Map<String, String> description;
 	private boolean required;
 	private String type;
 	private List<String> allowedValues;
 
-	public AttrInput(String name, String displayName, String description, String type, boolean required) {
+	public AttrInput(String name, Map<String, String> displayName, Map<String, String> description,
+					 String type, boolean required) {
 		this.name = name;
 		this.displayName = displayName;
 		this.description = description;
@@ -27,16 +29,20 @@ public class AttrInput {
 		this.name = name;
 	}
 
-	public String getDisplayName() {
+	public Map<String, String> getDisplayName() {
 		return displayName;
 	}
 
-	public void setDisplayName(String displayName) {
+	public void setDisplayName(Map<String, String> displayName) {
 		this.displayName = displayName;
 	}
 
-	public String getDescription() {
+	public Map<String, String> getDescription() {
 		return description;
+	}
+
+	public void setDescription(Map<String, String> description) {
+		this.description = description;
 	}
 
 	public boolean isRequired() {

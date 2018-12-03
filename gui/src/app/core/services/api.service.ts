@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { environment } from "../../../environments/environment";
 import { catchError } from "rxjs/operators";
@@ -30,9 +30,11 @@ export class ApiService {
   }
 
   post(path: string, body: Object = {}): Observable<any> {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
     return this.http.post(
       `${environment.api_url}${path}`,
-      JSON.stringify(body)
+      JSON.stringify(body),
+      {headers: headers}
     ).pipe(catchError(this.formatErrors));
   }
 

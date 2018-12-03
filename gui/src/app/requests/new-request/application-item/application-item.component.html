@@ -1,0 +1,30 @@
+<!-- String -->
+<app-application-item-string
+  [applicationItem]="applicationItem"
+  *ngIf="applicationItem.type === 'java.lang.String'">
+</app-application-item-string>
+
+<!-- Boolean -->
+<app-application-item-boolean
+  [applicationItem]="applicationItem"
+  *ngIf="applicationItem.type === 'java.lang.Boolean'">
+</app-application-item-boolean>
+
+<!-- ArrayList without allowed values-->
+<app-application-item-list
+  [applicationItem]="applicationItem"
+  *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues === null">
+</app-application-item-list>
+
+<!-- ArrayList with allowed values-->
+<app-application-item-select
+  [applicationItem]="applicationItem"
+  *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues !== null">
+</app-application-item-select>
+
+<!-- HashMap -->
+<app-application-item-map
+  [applicationItem]="applicationItem"
+  *ngIf="applicationItem.type === 'java.util.LinkedHashMap'">
+</app-application-item-map>
+

@@ -7,7 +7,6 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatus
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.service.impl.AdminServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,19 +18,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-@CrossOrigin(
-		origins = "http://localhost:4200",
-		allowCredentials = "true",
-		allowedHeaders = "origin, content-type, accept, authorization",
-		methods = {
-				RequestMethod.GET,
-				RequestMethod.POST,
-				RequestMethod.PUT,
-				RequestMethod.DELETE,
-				RequestMethod.OPTIONS,
-				RequestMethod.HEAD
-		}
-)
 @RestController
 @SessionAttributes("userId")
 public class AdminController {

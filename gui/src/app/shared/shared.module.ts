@@ -8,12 +8,34 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { PerunHeaderComponent } from "./layout/perun-header/perun-header.component";
 import { PerunSidebarComponent } from "./layout/perun-sidebar/perun-sidebar.component";
 import { RouterModule } from "@angular/router";
+import {FormsModule} from "@angular/forms";
+import {
+  MatButtonModule,
+  MatCheckboxModule, MatIconModule,
+  MatInputModule,
+  MatProgressSpinnerModule,
+  MatRadioModule,
+  MatSelectModule, MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatTooltipModule
+} from "@angular/material";
 
 @NgModule({
   imports: [
     RouterModule,
     CommonModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    FormsModule,
+    MatSelectModule,
+    MatInputModule,
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
+    MatRadioModule,
+    MatTooltipModule,
+    MatButtonModule,
+    MatToolbarModule,
+    MatSnackBarModule,
+    MatIconModule,
+    MatTableModule,
+    MatSortModule
   ],
   declarations: [
     SortableColumnComponent,
@@ -29,7 +51,20 @@ import { RouterModule } from "@angular/router";
     TranslateModule,
     PerunHeaderComponent,
     PerunSidebarComponent,
-    PerunFooterComponent
+    PerunFooterComponent,
+    FormsModule,
+    MatSelectModule,
+    MatInputModule,
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
+    MatRadioModule,
+    MatTooltipModule,
+    MatButtonModule,
+    MatToolbarModule,
+    MatSnackBarModule,
+    MatIconModule,
+    MatTableModule,
+    MatSortModule
   ]
 })
 export class SharedModule { }

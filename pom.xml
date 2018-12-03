@@ -13,6 +13,7 @@
         <module>persistence</module>
         <module>service</module>
         <module>rest</module>
+        <module>gui</module>
     </modules>
 
     <parent>
@@ -22,6 +23,9 @@
     </parent>
 
     <properties>
+        <frontend-plugin.version>1.6</frontend-plugin.version>
+        <node.version>v8.4.0</node.version>
+        <npm.version>5.3.0</npm.version>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

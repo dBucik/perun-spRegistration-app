@@ -195,6 +195,7 @@ public class UserServiceImpl implements UserService {
 		request.setStatus(status);
 		request.setAction(action);
 		request.setAttributes(convertedAttributes);
+		request.setReqUserId(userId);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
