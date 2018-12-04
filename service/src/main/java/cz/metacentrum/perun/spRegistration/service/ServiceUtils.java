@@ -14,6 +14,10 @@ public class ServiceUtils {
 		Map<String, PerunAttribute> convertedAttributes = new HashMap<>();
 		for (PerunAttribute a: attributes) {
 			PerunAttributeDefinition def = config.getAttrDefinition(a.getFullName());
+			if (def == null) {
+				System.out.println(a.getFullName());
+				System.out.println(a);
+			}
 			a.setDefinition(def);
 			convertedAttributes.put(a.getFullName(), a);
 		}

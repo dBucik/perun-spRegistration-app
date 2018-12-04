@@ -1,0 +1,23 @@
+<div class="form-group row">
+  <form class="d-flex w-100" #form="ngForm">
+    <div class="col-sm-12 d-flex">
+      <mat-form-field class="w-100">
+        <input
+          matInput
+          placeholder="{{translatedName}}"
+          [(ngModel)]="value"
+          name="{{applicationItem.name}}"
+          required
+          type="text"
+          class=""
+          id="{{applicationItem.name}}">
+      </mat-form-field>
+      <fa-icon
+        matTooltip="{{translatedDescription}}"
+        [matTooltipPosition]="'above'"
+        class="m-2 text-secondary fa-lg"
+        [icon]="helpIcon">
+      </fa-icon>
+    </div>
+  </form>
+</div>

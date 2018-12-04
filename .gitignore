@@ -8,10 +8,10 @@
 /gui/dist
 /gui/tmp
 /gui/out-tsc
-/gui/package-lock.json
 
 # Gui dependencies
 /gui/node_modules
+/gui/node
 
 # misc
 /gui/.sass-cache

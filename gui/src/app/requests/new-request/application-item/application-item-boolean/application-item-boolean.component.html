@@ -1,0 +1,13 @@
+<div class="form-group row">
+  <div class="col-sm-12 d-flex">
+    <div class="w-100">
+      <mat-checkbox [(ngModel)]="value">{{translatedName}}</mat-checkbox>
+    </div>
+    <fa-icon
+      matTooltip="{{translatedDescription}}"
+      [matTooltipPosition]="'above'"
+      class="m-2 text-secondary fa-lg"
+      [icon]="helpIcon">
+    </fa-icon>
+  </div>
+</div>

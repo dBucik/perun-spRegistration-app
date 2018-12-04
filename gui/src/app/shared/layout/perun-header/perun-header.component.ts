@@ -12,7 +12,6 @@ export class PerunHeaderComponent implements OnInit {
   constructor(private router: Router) {
     router.events.subscribe((_: NavigationEnd) => {
       this.currentUrl = this.router.url;
-      console.log(this.currentUrl);
     });
   }
 

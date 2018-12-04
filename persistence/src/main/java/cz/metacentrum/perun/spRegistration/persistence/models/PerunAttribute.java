@@ -25,8 +25,6 @@ public class PerunAttribute {
 	private Object value;
 	private Object oldValue;
 	private String comment;
-
-	@JsonIgnore
 	private String fullName;
 
 	public PerunAttribute() { }
@@ -165,36 +163,46 @@ public class PerunAttribute {
 	}
 
 	private void putValue(JSONObject json, String key, String type, boolean isOldValue) {
+		Object value = null;
 		switch (type) {
 			case STRING_TYPE:
 			case LARGE_STRING_TYPE:
-				json.put(key, valueAsString(isOldValue));
+				value = valueAsString(isOldValue);
 				break;
 			case INTEGER_TYPE:
-				json.put(key, valueAsLong(isOldValue));
+				value = valueAsLong(isOldValue);
 				break;
 			case BOOLEAN_TYPE:
-				json.put(key, valueAsBoolean(isOldValue));
+				value = valueAsBoolean(isOldValue);
 				break;
 			case ARRAY_TYPE:
 			case LARGE_ARRAY_LIST_TYPE:
 				List<String> arrValue = valueAsArray(isOldValue);
-				JSONArray arr = new JSONArray();
-				for (String sub: arrValue) {
-					arr.put(sub);
+				if (arrValue != null) {
+					JSONArray arr = new JSONArray();
+					for (String sub: arrValue) {
+						arr.put(sub);
+					}
+					value = arr;
 				}
 
-				json.put(key, arr);
 				break;
 			case MAP_TYPE:
 				Map<String, String> mapValue = valueAsMap(isOldValue);
-				JSONObject obj = new JSONObject();
-				for (Map.Entry<String, String> sub: mapValue.entrySet()) {
-					obj.put(sub.getKey(), sub.getValue());
+				if (mapValue != null) {
+					JSONObject obj = new JSONObject();
+					for (Map.Entry<String, String> sub: mapValue.entrySet()) {
+						obj.put(sub.getKey(), sub.getValue());
+					}
+					value = obj;
 				}
-
-				json.put(key, obj);
 				break;
+		}
+
+		if (value == null) {
+			json.put(key, JSONObject.NULL);
+		} else {
+			json.put(key, value);
 		}
 	}
 
@@ -298,5 +306,16 @@ public class PerunAttribute {
 		}
 
 		return null;
+	}
+
+	@Override
+	public String toString() {
+		return "PerunAttribute{" +
+				"definition=" + definition +
+				", value=" + value +
+				", oldValue=" + oldValue +
+				", comment='" + comment + '\'' +
+				", fullName='" + fullName + '\'' +
+				'}';
 	}
 }

@@ -3,31 +3,20 @@ package cz.metacentrum.perun.spRegistration.rest.controllers;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.Config;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@CrossOrigin(
-		origins = "http://localhost:4200",
-		allowCredentials = "true",
-		allowedHeaders = "origin, content-type, accept, authorization",
-		methods = {
-				RequestMethod.GET,
-				RequestMethod.POST,
-				RequestMethod.PUT,
-				RequestMethod.DELETE,
-				RequestMethod.OPTIONS,
-				RequestMethod.HEAD
-		}
-)
 @RestController
 public class GeneralController {
 
+	private final Config config;
+
 	@Autowired
-	private Config config;
+	public GeneralController(Config config) {
+		this.config = config;
+	}
 
 	@RequestMapping(path = "/api/config/oidcInputs")
 	public List<AttrInput> getInputsForOidc() {

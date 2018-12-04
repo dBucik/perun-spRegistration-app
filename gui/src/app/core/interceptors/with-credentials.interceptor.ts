@@ -7,8 +7,6 @@ import {Observable} from "rxjs";
 export class WithCredentialsInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-    console.log("HERE");
-
     req = req.clone({
       withCredentials: true
     });

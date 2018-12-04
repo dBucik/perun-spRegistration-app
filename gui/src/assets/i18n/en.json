@@ -8,7 +8,21 @@
     "ACTION": "Action",
     "MODIFIED_AT": "Modified at",
     "MODIFIED_BY": "Modified by",
-    "NEW": "New Request"
+    "NEW": "New Request",
+    "OIDC": "OIDC",
+    "SAML": "SAML",
+    "SELECT_SP_TYPE": "Select the sp type",
+    "REQUEST_SUBMIT": "Submit",
+    "REQUEST_GO_BACK": "Cancel",
+    "MAP_KEY": "Key",
+    "MAP_VALUE": "Value",
+    "LIST_VALUE": "Value",
+    "NEW_TITLE": "Submit new request",
+    "NEW_SELECT_TYPE": "Select service type:",
+    "NEW_FILL_ATTRS": "Fill information:",
+    "NEW_VALUES_ERROR_MESSAGE": "Please, fill out all of the required fields.",
+    "REQUEST_SAVE": "Save",
+    "SUCCESSFULLY_SUBMITTED_MESSAGE": "Request has been submitted."
   },
   "FACILITIES": {
     "TITLE": "Facilities",

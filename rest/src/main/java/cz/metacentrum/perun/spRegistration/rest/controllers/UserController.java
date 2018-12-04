@@ -7,7 +7,6 @@ import cz.metacentrum.perun.spRegistration.service.UserService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,21 +16,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.util.List;
-import java.util.Map;
 
-@CrossOrigin(
-		origins = "http://localhost:4200",
-		allowCredentials = "true",
-		allowedHeaders = "origin, content-type, accept, authorization",
-		methods = {
-				RequestMethod.GET,
-				RequestMethod.POST,
-				RequestMethod.PUT,
-				RequestMethod.DELETE,
-				RequestMethod.OPTIONS,
-				RequestMethod.HEAD
-		}
-)
 @RestController
 @SessionAttributes("userId")
 public class UserController {
@@ -57,6 +42,20 @@ public class UserController {
 	public Long createRegistrationRequest(@SessionAttribute("userId") Long userId,
 										  @RequestBody List<PerunAttribute> attributes) {
 		return service.createRegistrationRequest(userId, attributes);
+	}
+
+	@RequestMapping(path = "/api/registerAndSubmit")
+	public Long createAndSubmitRegistrationRequest(@SessionAttribute("userId") Long userId,
+	                                               @RequestBody List<PerunAttribute> attributes)
+			throws CannotChangeStatusException, UnauthorizedActionException {
+
+		Long requestId = service.createRegistrationRequest(userId, attributes);
+		if (service.askForApproval(requestId, userId)) {
+			return requestId;
+		}
+
+		// TODO
+		throw new RuntimeException();
 	}
 
 	@RequestMapping(path = "/api/changeFacility/{facilityId}")
