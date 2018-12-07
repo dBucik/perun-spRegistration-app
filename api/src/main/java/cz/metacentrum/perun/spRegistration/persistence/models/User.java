@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * Representation of Perun User.
@@ -107,5 +108,26 @@ public class User extends PerunEntity {
 		String titleAfter = json.getString("titleAfter");
 
 		return new User(id, firstName, middleName, lastName, titleBefore, titleAfter);
+	}
+
+	public String getFullName() {
+		StringJoiner joiner = new StringJoiner("");
+		if (titleBefore != null && !titleBefore.isEmpty()) {
+			joiner.add(titleBefore);
+		}
+		if (firstName != null && !firstName.isEmpty()) {
+			joiner.add(firstName);
+		}
+		if (middleName != null && !middleName.isEmpty()) {
+			joiner.add(middleName);
+		}
+		if (lastName != null && !lastName.isEmpty()) {
+			joiner.add(middleName);
+		}
+		if (titleAfter != null && !titleAfter.isEmpty()) {
+			joiner.add(titleAfter);
+		}
+
+		return joiner.toString();
 	}
 }

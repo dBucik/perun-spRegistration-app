@@ -3,10 +3,9 @@ package cz.metacentrum.perun.spRegistration.rest.controllers;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.RequestApproval;
 import cz.metacentrum.perun.spRegistration.service.AdminService;
-import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
-import cz.metacentrum.perun.spRegistration.service.impl.AdminServiceImpl;
+import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,78 +36,80 @@ public class AdminController {
 	}
 
 	@RequestMapping(path = "/api/allFacilities", method = RequestMethod.GET)
-	public List<Facility> allFacilities(@SessionAttribute("userId") Long userId) throws UnauthorizedActionException {
-
-		return adminService.getAllFacilities(userId);
+	public List<Facility> allFacilities(@SessionAttribute("userId") Long userId) throws SpRegistrationApiException {
+		try {
+			return adminService.getAllFacilities(userId);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
+		}
 	}
 
 	@RequestMapping(path = "/api/allRequests", method = RequestMethod.GET)
-	public List<Request> allRequests(@SessionAttribute("userId") Long userId) throws UnauthorizedActionException {
-
-		return adminService.getAllRequests(userId);
+	public List<Request> allRequests(@SessionAttribute("userId") Long userId) throws SpRegistrationApiException {
+		try {
+			return adminService.getAllRequests(userId);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
+		}
 	}
 
 	@RequestMapping(path = "/api/approve/{requestId}")
-	public String approveRequest(@SessionAttribute("userId") Long userId,
-							   @PathVariable("requestId") Long requestId)
-			throws CannotChangeStatusException, UnauthorizedActionException
-	{
-		if (adminService.approveRequest(requestId, userId)) {
-			return "The request has been approved";
+	public boolean approveRequest(@SessionAttribute("userId") Long userId,
+							   @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+		try {
+			return adminService.approveRequest(requestId, userId);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
 		}
-
-		return "Error has occurred";
 	}
 
 	@RequestMapping(path = "/api/reject/{requestId}")
-	public String rejectRequest(@SessionAttribute("userId") Long userId,
-								@PathVariable("requestId") Long requestId,
-								@RequestBody String message)
-			throws CannotChangeStatusException, UnauthorizedActionException
-	{
-		if (adminService.rejectRequest(requestId, userId, message)) {
-			return "The request has been rejected";
+	public boolean rejectRequest(@SessionAttribute("userId") Long userId, @PathVariable("requestId") Long requestId,
+								@RequestBody String message) throws SpRegistrationApiException {
+		try {
+			return adminService.rejectRequest(requestId, userId, message);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
 		}
-
-		return "Error has occurred";
 	}
 
 	@RequestMapping(path = "/api/askForChanges/{requestId}")
-	public String askForChanges(@SessionAttribute("userId") Long userId,
-								@PathVariable("requestId") Long requestId,
-								@RequestBody List<PerunAttribute> attributes)
-			throws CannotChangeStatusException, UnauthorizedActionException
-	{
-		if (adminService.askForChanges(requestId, userId, attributes)) {
-			return "Changes have been requested";
+	public boolean askForChanges(@SessionAttribute("userId") Long userId, @PathVariable("requestId") Long requestId,
+								@RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
+		try {
+			return adminService.askForChanges(requestId, userId, attributes);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
 		}
+	}
 
-		return "Error has occurred";
+	@RequestMapping(path = "/api/viewApprovals/{requestId}")
+	public List<RequestApproval> getApprovals(@SessionAttribute("userId") Long userId,
+											  @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+		try {
+			return adminService.getApprovalsOfProductionTransfer(requestId, userId);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
+		}
 	}
 
 	@RequestMapping(path = "/api/addAdmins/{facilityId}")
-	public String addAdmins(@SessionAttribute("userId") Long userId,
-							@PathVariable("facilityId") Long facilityId,
-							@RequestBody List<Long> admins)
-			throws UnauthorizedActionException
-	{
-		if (adminService.addAdmins(userId, facilityId, admins)) {
-			return "Admins were successfully added";
+	public boolean addAdmins(@SessionAttribute("userId") Long userId, @PathVariable("facilityId") Long facilityId,
+							@RequestBody List<Long> admins) throws SpRegistrationApiException {
+		try {
+			return adminService.addAdmins(userId, facilityId, admins);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
 		}
-
-		return "Error has occurred";
 	}
 
 	@RequestMapping(path = "/api/removeAdmins/{facilityId}")
-	public String removeAdmins(@SessionAttribute("userId") Long userId,
-							   @PathVariable("facilityId") Long facilityId,
-							   @RequestBody List<Long> admins)
-			throws UnauthorizedActionException
-	{
-		if (adminService.removeAdmins(userId, facilityId, admins)) {
-			return "Admins were successfully removed";
+	public boolean removeAdmins(@SessionAttribute("userId") Long userId, @PathVariable("facilityId") Long facilityId,
+							   @RequestBody List<Long> admins) throws SpRegistrationApiException {
+		try {
+			return adminService.removeAdmins(userId, facilityId, admins);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
 		}
-
-		return "Error has occurred";
 	}
 }

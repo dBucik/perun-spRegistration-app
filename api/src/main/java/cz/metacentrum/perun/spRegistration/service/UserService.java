@@ -1,9 +1,11 @@
 package cz.metacentrum.perun.spRegistration.service;
 
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 
 import java.util.List;
@@ -32,7 +34,7 @@ public interface UserService {
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	Long createFacilityChangesRequest(Long facilityId, Long userId, List<PerunAttribute> attributes)
-			throws UnauthorizedActionException;
+			throws UnauthorizedActionException, RPCException;
 
 	/**
 	 * Create request for removal of SP (which already exists as facility in Perun).
@@ -42,7 +44,7 @@ public interface UserService {
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	Long createRemovalRequest(Long userId, Long facilityId)
-			throws UnauthorizedActionException;
+			throws UnauthorizedActionException, RPCException;
 
 	/**
 	 * Update existing request in DB with new data.
@@ -53,7 +55,7 @@ public interface UserService {
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	boolean updateRequest(Long requestId, Long userId, List<PerunAttribute> attributes)
-			throws UnauthorizedActionException;
+			throws UnauthorizedActionException, InternalErrorException;
 
 	/**
 	 * Ask for approval of the request from Admin.
@@ -64,7 +66,7 @@ public interface UserService {
 	 * @throws CannotChangeStatusException when status of the request cannot be changed.
 	 */
 	boolean askForApproval(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException;
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException;
 
 	/**
 	 * Cancel pending request.
@@ -92,24 +94,36 @@ public interface UserService {
 	 * Ask for moving the service to the production environment.
 	 * @param facilityId ID of facility in Perun.
 	 * @param userId ID of requesting user.
-	 * @return True if everyting went OK.
+	 * @param authorities List of authority emails that should approve the transfer
+	 * @return Id of created request
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	boolean moveToProduction(Long facilityId, Long userId) throws UnauthorizedActionException; //TODO
+	Long moveToProduction(Long facilityId, Long userId, List<String> authorities) throws UnauthorizedActionException, InternalErrorException, RPCException;
+
+	/**
+	 * Sign transfer to the production
+	 * @param requestId id of request for transfer
+	 * @param userId id of signer
+	 * @param approvalName name entered by signer
+	 * @return True if all went OK.
+	 * @throws InternalErrorException
+	 * @throws RPCException in case of problems with RPC.
+	 */
+	boolean signTransferToProduction(Long requestId, Long userId, String approvalName) throws InternalErrorException, RPCException;
 
 	/**
 	 * Get all facilities from Perun where user is admin (manager).
 	 * @param userId ID of user.
 	 * @return List of facilities.
 	 */
-	List<Facility> getAllFacilitiesWhereUserIsAdmin(Long userId);
+	List<Facility> getAllFacilitiesWhereUserIsAdmin(Long userId) throws RPCException;
 
 	/**
 	 * Get all requests user can access (is requester or admin(manager) of facility)
 	 * @param userId ID of user.
 	 * @return List of requests.
 	 */
-	List<Request> getAllRequestsUserCanAccess(Long userId);
+	List<Request> getAllRequestsUserCanAccess(Long userId) throws RPCException;
 
 	/**
 	 * Get detailed request.
@@ -118,7 +132,7 @@ public interface UserService {
 	 * @return Found request.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	Request getDetailedRequest(Long requestId, Long userId) throws UnauthorizedActionException;
+	Request getDetailedRequest(Long requestId, Long userId) throws UnauthorizedActionException, InternalErrorException;
 
 	/**
 	 * Get detailed facility.
@@ -127,6 +141,6 @@ public interface UserService {
 	 * @return Found facility.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	Facility getDetailedFacility(Long facilityId, Long userId) throws UnauthorizedActionException;
+	Facility getDetailedFacility(Long facilityId, Long userId) throws UnauthorizedActionException, RPCException, InternalErrorException;
 
 }

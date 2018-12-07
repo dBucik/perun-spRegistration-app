@@ -184,6 +184,7 @@
     <bean id="messagesProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
+                <prop key="admins.emails">admins@test.com,adminsMailingList@test.com</prop>
                 <prop key="host">localhost</prop>
                 <prop key="from">test@mail.com</prop>
                 <prop key="footer">Best regards, \n test.mail.com \n service registration</prop>
@@ -191,8 +192,12 @@
                 <prop key="crate.message">Your request for registering the service %SERVICE_NAME% has been created with id: %REQUEST_ID%</prop>
                 <prop key="update.subject">Updated status of request %REQUEST_ID%</prop>
                 <prop key="update.message">Status has been updated to %NEW_STATUS%</prop>
-                <prop key="approval.header">Request for approval of service: %SERVICE_NAME%</prop>
-                <prop key="approval.text">Test message approval: %SERVICE_NAME%, %APPROVAL_LINK%</prop>
+                <prop key="production.user.subject">Request for transfer to production of service: %SERVICE_NAME%</prop>
+                <prop key="production.user.message">Moving to production: %SERVICE_NAME%</prop>
+                <prop key="approval.subject">New request for approval %REQUEST_ID%</prop>
+                <prop key="approval.message">User %USER_INFO% has asked for approval of request %REQUEST_ID%</prop>
+                <prop key="production.authorities.subject">Approve transfer to production: %SERVICE_NAME%</prop>
+                <prop key="production.authorities.message">For approval of moving service %SERVICE_NAME% to production visit %APPROVAL_LINK%</prop>
             </props>
         </property>
         <property name="locations">

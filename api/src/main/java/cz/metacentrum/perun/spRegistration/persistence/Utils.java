@@ -1,6 +1,7 @@
 package cz.metacentrum.perun.spRegistration.persistence;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
@@ -22,7 +23,7 @@ public class Utils {
 	private final static String ALLOWED_KEYS = "allowedKeys";
 	private final static String POSITION = "position";
 
-	public static List<AttrInput> initializeAttributes(PerunConnector connector, AppConfig appConfig, Properties props) {
+	public static List<AttrInput> initializeAttributes(PerunConnector connector, AppConfig appConfig, Properties props) throws RPCException {
 		List<AttrInput> inputs = new ArrayList<>();
 		Properties en = appConfig.getEnLocale();
 		Properties cs = appConfig.getCsLocale();

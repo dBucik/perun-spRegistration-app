@@ -1,9 +1,12 @@
 package cz.metacentrum.perun.spRegistration.service;
 
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.RequestApproval;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 
 import java.util.List;
@@ -25,7 +28,7 @@ public interface AdminService {
 	 * @throws CannotChangeStatusException when status of the request cannot be changed.
 	 */
 	boolean approveRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException;
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, RPCException;
 
 	/**
 	 * Reject request.
@@ -37,7 +40,7 @@ public interface AdminService {
 	 * @throws CannotChangeStatusException when status of the request cannot be changed.
 	 */
 	boolean rejectRequest(Long requestId, Long userId, String message)
-			throws UnauthorizedActionException, CannotChangeStatusException;
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException;
 
 	/**
 	 * Ask requester to make changes to the request.
@@ -50,7 +53,23 @@ public interface AdminService {
 	 * @throws CannotChangeStatusException when status of the request cannot be changed.
 	 */
 	boolean askForChanges(Long requestId, Long userId, List<PerunAttribute> attributes)
-			throws UnauthorizedActionException, CannotChangeStatusException;
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException;
+
+	/**
+	 * Mark request of transfer to the production environment as approved.
+	 * @param requestId id of request for transfer
+	 * @param userId ID of user (ADMIN) approving the request.
+	 * @return True if everything went OK.
+	 */
+	boolean approveTransferToProduction(Long requestId, Long userId) throws InternalErrorException, UnauthorizedActionException;
+
+	/**
+	 * Get approvals for request to transfer to production.
+	 * @param requestId ID of request.
+	 * @param userId ID of user (ADMIN) displaying the approvals.
+	 * @return List of approvals.
+	 */
+	List<RequestApproval> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException;
 
 	/**
 	 * Get all requests stored in system.
@@ -66,7 +85,7 @@ public interface AdminService {
 	 * @return List of found facilities.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	List<Facility> getAllFacilities(Long adminId) throws UnauthorizedActionException;
+	List<Facility> getAllFacilities(Long adminId) throws UnauthorizedActionException, RPCException;
 
 	/**
 	 * Add users as admins (managers) for facility in Perun
@@ -76,7 +95,7 @@ public interface AdminService {
 	 * @return True if everything went OK.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	boolean addAdmins(Long userId, Long facilityId, List<Long> admins) throws UnauthorizedActionException;
+	boolean addAdmins(Long userId, Long facilityId, List<Long> admins) throws UnauthorizedActionException, RPCException;
 
 	/**
 	 * Remove users from admins (managers) of facility in Perun.
@@ -86,6 +105,6 @@ public interface AdminService {
 	 * @return True if everything went OK.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	boolean removeAdmins(Long userId, Long facilityId, List<Long> admins) throws UnauthorizedActionException;
+	boolean removeAdmins(Long userId, Long facilityId, List<Long> admins) throws UnauthorizedActionException, RPCException;
 
 }

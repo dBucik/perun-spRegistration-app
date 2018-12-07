@@ -22,6 +22,15 @@ import java.util.Map;
  */
 public class RequestMapper implements RowMapper<Request> {
 
+	private static final String ATTRIBUTES_KEY = "attributes";
+	private static final String ID_KEY = "id";
+	private static final String FACILITY_ID_KEY = "facility_id";
+	private static final String STATUS_KEY = "status";
+	private static final String ACTION_KEY = "action";
+	private static final String REQUESTING_USER_ID_KEY = "requestin_user_id";
+	private static final String MODIFIED_BY_KEY = "modified_by";
+	private static final String MODIFIED_AT_KEY = "modified_at";
+
 	@Autowired
 	private AppConfig appConfig;
 
@@ -31,21 +40,20 @@ public class RequestMapper implements RowMapper<Request> {
 
 	@Override
 	public Request mapRow(ResultSet resultSet, int i) throws SQLException {
-		String attrsJsonStr = resultSet.getString("attributes");
-		Map<String, PerunAttribute> attrs = mapAttributes(attrsJsonStr);
-
 		Request request = new Request();
-		request.setReqId(resultSet.getLong("id"));
-		request.setFacilityId(resultSet.getLong("facility_id"));
+		request.setReqId(resultSet.getLong(ID_KEY));
+		request.setFacilityId(resultSet.getLong(FACILITY_ID_KEY));
 		if (resultSet.wasNull()) {
 			request.setFacilityId(null);
 		}
-		request.setStatus(RequestStatus.resolve(resultSet.getInt("status")));
-		request.setAction(RequestAction.resolve(resultSet.getInt("action")));
-		request.setReqUserId(resultSet.getLong("req_user_id"));
+		request.setStatus(RequestStatus.resolve(resultSet.getInt(STATUS_KEY)));
+		request.setAction(RequestAction.resolve(resultSet.getInt(ACTION_KEY)));
+		request.setReqUserId(resultSet.getLong(REQUESTING_USER_ID_KEY));
+		String attrsJsonStr = resultSet.getString(ATTRIBUTES_KEY);
+		Map<String, PerunAttribute> attrs = mapAttributes(attrsJsonStr);
 		request.setAttributes(attrs);
-		request.setModifiedAt(resultSet.getTimestamp("modified_at"));
-		request.setModifiedBy(resultSet.getLong("modified_by"));
+		request.setModifiedAt(resultSet.getTimestamp(MODIFIED_AT_KEY));
+		request.setModifiedBy(resultSet.getLong(MODIFIED_BY_KEY));
 
 		return request;
 	}

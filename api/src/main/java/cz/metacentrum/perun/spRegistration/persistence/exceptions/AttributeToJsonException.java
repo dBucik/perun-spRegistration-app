@@ -1,7 +1,7 @@
 package cz.metacentrum.perun.spRegistration.persistence.exceptions;
 
 /**
- * Exeption representing problem while parsing Perun attribute to/from JSON format.
+ * Exception representing problem while parsing Perun attribute to/from JSON format.
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */

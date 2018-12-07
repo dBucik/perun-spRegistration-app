@@ -57,7 +57,7 @@ public interface PerunConnector {
 	 * @param userId ID of user.
 	 * @return List of found facilities.
 	 */
-	List<Facility> getFacilitiesWhereUserIsAdmin(Long userId);
+	List<Facility> getFacilitiesWhereUserIsAdmin(Long userId) throws RPCException;
 
 	/**
 	 * Get attribute of facility.
@@ -65,14 +65,14 @@ public interface PerunConnector {
 	 * @param attrName Name of the attribute.
 	 * @return Retrieved attribute.
 	 */
-	PerunAttribute getFacilityAttribute(Long facilityId, String attrName);
+	PerunAttribute getFacilityAttribute(Long facilityId, String attrName) throws RPCException;
 
 	/**
 	 * Get all attributes of facility.
 	 * @param facilityId ID of facility.
 	 * @return Map (key = attribute name, value = attribute) of facility attributes.
 	 */
-	Map<String, PerunAttribute> getFacilityAttributes(Long facilityId);
+	Map<String, PerunAttribute> getFacilityAttributes(Long facilityId) throws RPCException;
 
 	/**
 	 * Get specified attributes for facility.
@@ -80,14 +80,14 @@ public interface PerunConnector {
 	 * @param attrNames Names of attributes to be retrieved.
 	 * @return Map (key = attribute name, value = attribute) of facility attributes.
 	 */
-	Map<String, PerunAttribute> getFacilityAttributes(Long facilityId, List<String> attrNames);
+	Map<String, PerunAttribute> getFacilityAttributes(Long facilityId, List<String> attrNames) throws RPCException;
 
 	/**
 	 * Get IDs of facilities where user is admin (manager).
 	 * @param userId ID of user.
 	 * @return Set of facility IDs.
 	 */
-	Set<Long> getFacilityIdsWhereUserIsAdmin(Long userId);
+	Set<Long> getFacilityIdsWhereUserIsAdmin(Long userId) throws RPCException;
 
 	/**
 	 * Set attribute for facility in Perun.
@@ -95,7 +95,7 @@ public interface PerunConnector {
 	 * @param attrJson JSON representation of attribute.
 	 * @return True if everything went OK.
 	 */
-	boolean setFacilityAttribute(Long facilityId, String attrJson);
+	boolean setFacilityAttribute(Long facilityId, String attrJson) throws RPCException;
 
 	/**
 	 * Set attributes for facility in Perun.
@@ -103,14 +103,14 @@ public interface PerunConnector {
 	 * @param attrsJsons List of JSON representations of attributes.
 	 * @return True if everything went OK.
 	 */
-	boolean setFacilityAttributes(Long facilityId, List<String> attrsJsons);
+	boolean setFacilityAttributes(Long facilityId, List<String> attrsJsons) throws RPCException;
 
 	/**
 	 * Get user from Perun.
 	 * @param userId ID of user.
 	 * @return Retrieved user object.
 	 */
-	User getRichUser(Long userId);
+	User getRichUser(Long userId) throws RPCException;
 
 	/**
 	 * Add user as an admin (manager) of facility.
@@ -118,7 +118,7 @@ public interface PerunConnector {
 	 * @param userId ID of user.
 	 * @return True if everything went OK.
 	 */
-	boolean addFacilityAdmin(Long facilityId, Long userId);
+	boolean addFacilityAdmin(Long facilityId, Long userId) throws RPCException;
 
 	/**
 	 * Remove user from admins (managers) of facility.
@@ -126,12 +126,12 @@ public interface PerunConnector {
 	 * @param userId ID of user.
 	 * @return True if everything went OK.
 	 */
-	boolean removeFacilityAdmin(Long facilityId, Long userId);
+	boolean removeFacilityAdmin(Long facilityId, Long userId) throws RPCException;
 
 	/**
 	 * Fetch attribute definition by name.
 	 * @param name Name of the attribute.
 	 * @return Attribute definition
 	 */
-	PerunAttributeDefinition getAttributeDefinition(String name);
+	PerunAttributeDefinition getAttributeDefinition(String name) throws RPCException;
 }

@@ -5,7 +5,7 @@ package cz.metacentrum.perun.spRegistration.persistence.exceptions;
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
-public class RPCException extends RuntimeException {
+public class RPCException extends Exception {
 
 	public RPCException() {
 		super();

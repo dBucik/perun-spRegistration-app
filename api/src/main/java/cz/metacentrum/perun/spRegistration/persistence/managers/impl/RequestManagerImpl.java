@@ -1,11 +1,13 @@
 package cz.metacentrum.perun.spRegistration.persistence.managers.impl;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.DatabaseException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
+import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestApprovalMapper;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestMapper;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.RequestApproval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,19 +24,19 @@ import java.util.Set;
 public class RequestManagerImpl implements RequestManager {
 
 	private static final Logger log = LoggerFactory.getLogger(RequestManagerImpl.class);
-	private static final String REQUESTS_TABLE = " spregistration.requests ";
+	private static final String REQUESTS_TABLE = " requests ";
+	private static final String APPROVALS_TABLE = " approvals ";
 
-	private RequestMapper mapper;
+	private RequestMapper requestMapper;
+	private RequestApprovalMapper requestApprovalMapper;
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
-	public RequestManagerImpl() { }
-
-	public RequestMapper getMapper() {
-		return mapper;
+	public RequestManagerImpl() {
+		requestApprovalMapper = new RequestApprovalMapper();
 	}
 
 	public void setAppConfig(AppConfig config) {
-		mapper = new RequestMapper(config);
+		requestMapper = new RequestMapper(config);
 	}
 
 	@Override
@@ -50,10 +52,10 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
-	public Long createRequest(Request request) throws DatabaseException {
+	public Long createRequest(Request request) {
 		String query = "INSERT INTO" + REQUESTS_TABLE +
-				"(facility_id, status, action, req_user_id, attributes, modified_by, modified_at) " +
-				"VALUES (:fac_id, :status, :action, :req_user_id, :attributes, :modified_by, :modified_at)";
+				"(facility_id, status, action, requesting_user_id, attributes, modified_by) " +
+				"VALUES (:fac_id, :status, :action, :req_user_id, :attributes, :modified_by)";
 
 		KeyHolder key = new GeneratedKeyHolder();
 		MapSqlParameterSource params = new MapSqlParameterSource();
@@ -63,18 +65,17 @@ public class RequestManagerImpl implements RequestManager {
 		params.addValue("req_user_id", request.getReqUserId());
 		params.addValue("attributes", request.getAttributesAsJsonForDb());
 		params.addValue("modified_by", request.getModifiedBy());
-		params.addValue("modified_at", request.getModifiedAt());
 
 		jdbcTemplate.update(query, params, key, new String[] { "id" });
 		return (Long) key.getKey();
 	}
 
 	@Override
-	public boolean updateRequest(Request request) throws DatabaseException {
+	public boolean updateRequest(Request request) {
 		String query = "UPDATE" + REQUESTS_TABLE +
-				"SET facility_id = :fac_id, status = :status, action = :action, req_user_id = :req_user_id, " +
-				"attributes = :attributes, modified_by = :modified_by, modified_at = :modified_at " +
-				"WHERE req_id = :req_id";
+				"SET facility_id = :fac_id, status = :status, action = :action, requesting_user_id = :req_user_id, " +
+				"attributes = :attributes, modified_by = :modified_by, modified_at = NOW()" +
+				"WHERE id = :req_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("fac_id", request.getFacilityId());
@@ -83,7 +84,6 @@ public class RequestManagerImpl implements RequestManager {
 		params.addValue("req_user_id", request.getReqUserId());
 		params.addValue("attributes", request.getAttributesAsJsonForDb());
 		params.addValue("modified_by", request.getModifiedBy());
-		params.addValue("modified_at", request.getModifiedAt());
 		params.addValue("req_id", request.getReqId());
 
 		jdbcTemplate.update(query, params);
@@ -91,9 +91,9 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
-	public boolean deleteRequest(Long reqId) throws DatabaseException {
+	public boolean deleteRequest(Long reqId) {
 		String query = "DELETE FROM" + REQUESTS_TABLE +
-				"WHERE req_id = :req_id";
+				"WHERE id = :req_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_id", reqId);
@@ -105,52 +105,63 @@ public class RequestManagerImpl implements RequestManager {
 	@Override
 	public Request getRequestByReqId(Long reqId) {
 		String query = "SELECT * FROM" + REQUESTS_TABLE +
-				"WHERE req_id = :req_id";
+				"WHERE id = :req_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_id", reqId);
 
-		return jdbcTemplate.queryForObject(query, params, mapper);
+		return jdbcTemplate.queryForObject(query, params, requestMapper);
 	}
 
 	@Override
 	public List<Request> getAllRequests() {
 		String query = "SELECT * FROM" + REQUESTS_TABLE;
 
-		return jdbcTemplate.query(query, mapper);
+		return jdbcTemplate.query(query, requestMapper);
 	}
 
 	@Override
-	public List<Request> getAllRequestsByUserId(Long userId) throws DatabaseException {
+	public List<Request> getAllRequestsByUserId(Long userId) {
 		String query = "SELECT * FROM" + REQUESTS_TABLE +
-				"WHERE req_user_id = :req_user_id";
+				"WHERE requesting_user_id = :req_user_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_user_id", userId);
 
-		return jdbcTemplate.query(query, params, mapper);
+		return jdbcTemplate.query(query, params, requestMapper);
 	}
 
 	@Override
-	public List<Request> getAllRequestsByStatus(RequestStatus status) throws DatabaseException {
+	public List<Request> getAllRequestsByStatus(RequestStatus status) {
 		String query = "SELECT * FROM" + REQUESTS_TABLE +
 				"WHERE status = :status";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("status", status.getAsInt());
 
-		return jdbcTemplate.query(query, params, mapper);
+		return jdbcTemplate.query(query, params, requestMapper);
 	}
 
 	@Override
-	public Request getRequestByFacilityId(Long facilityId) throws DatabaseException {
+	public List<Request> getAllRequestsByAction(RequestAction action) {
+		String query = "SELECT * FROM" + REQUESTS_TABLE +
+				"WHERE action = :action";
+
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("action", action.getAsInt());
+
+		return jdbcTemplate.query(query, params, requestMapper);
+	}
+
+	@Override
+	public Request getRequestByFacilityId(Long facilityId) {
 		String query = "SELECT * FROM" + REQUESTS_TABLE +
 				"WHERE facility_id = :fac_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("fac_id", facilityId);
 
-		return jdbcTemplate.queryForObject(query, params, mapper);
+		return jdbcTemplate.queryForObject(query, params, requestMapper);
 	}
 
 	@Override
@@ -161,6 +172,31 @@ public class RequestManagerImpl implements RequestManager {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("ids", new ArrayList(facilityIds));
 
-		return jdbcTemplate.query(query, params, mapper);
+		return jdbcTemplate.query(query, params, requestMapper);
+	}
+
+	@Override
+	public boolean addSignature(Long requestId, Long userId, String fullName, String approvalName) {
+		String query = "INSERT INTO" + APPROVALS_TABLE +
+				"(request_id, signer_id, signer_name, signer_input) " +
+				"VALUES (:req_id, :signer_id, :signer_name, :signer_input)";
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("req_id", requestId);
+		params.addValue("signer_id", userId);
+		params.addValue("signer_name", fullName);
+		params.addValue("signer_input", approvalName);
+
+		jdbcTemplate.update(query, params);
+		return true;
+	}
+
+	@Override
+	public List<RequestApproval> getApprovalsForRequest(Long requestId) {
+		String query = "SELECT * FROM" + APPROVALS_TABLE +
+				"WHERE request_id = :req_id";
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("req_id", requestId);
+
+		return jdbcTemplate.query(query, params, requestApprovalMapper);
 	}
 }

@@ -3,15 +3,18 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,52 +53,61 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes) {
-		String identifierAttrName = appConfig.getIdpAttribute();
-		String value = appConfig.getIdpAttributeValue();
-		PerunAttribute identifierAttr = new PerunAttribute();
-		identifierAttr.setFullName(identifierAttrName);
-		identifierAttr.setValue(Collections.singletonList(value));
-		attributes.add(identifierAttr);
+		if (userId == null || attributes == null) {
+			throw new IllegalArgumentException("Illegal input - userId: " + userId + ", attributes: " + attributes);
+		}
 
-		Request req = createRequest(null, userId, RequestAction.REGISTER_NEW_SP, attributes);
-		Mails.createRequestMail(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		addProxyIdentifierAttr(attributes);
+
+		Request req = createRequest(null, userId, attributes);
+		Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
 
 		return req.getReqId();
 	}
 
 	@Override
 	public Long createFacilityChangesRequest(Long facilityId, Long userId, List<PerunAttribute> attributes)
-			throws UnauthorizedActionException {
-		if (! isFacilityAdmin(facilityId, userId)) {
-			throw new UnauthorizedActionException("User is not registered as facility admin");
+			throws UnauthorizedActionException, RPCException {
+		if (facilityId == null || userId == null || attributes == null) {
+			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", userId: " + userId + ", attributes: " + attributes);
+		} else if (! isFacilityAdmin(facilityId, userId)) {
+			throw new UnauthorizedActionException("User is not registered as facility admin, cannot create request");
 		}
 
-		Request req = createRequest(facilityId, userId, RequestAction.REGISTER_NEW_SP, attributes);
-		Mails.createRequestMail(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		Request req = createRequest(facilityId, userId, attributes);
+		Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
 
 		return req.getReqId();
 	}
 
 	@Override
-	public Long createRemovalRequest(Long userId, Long facilityId) throws UnauthorizedActionException {
-		if (! isFacilityAdmin(facilityId, userId)) {
-			throw new UnauthorizedActionException("User is not registered as facility admin");
+	public Long createRemovalRequest(Long userId, Long facilityId) throws UnauthorizedActionException, RPCException {
+		if (facilityId == null || userId == null) {
+			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", userId: " + userId);
+		} else if (! isFacilityAdmin(facilityId, userId)) {
+			throw new UnauthorizedActionException("User is not registered as facility admin, cannot create request");
 		}
 
-		Request req = createRequest(facilityId, userId, RequestAction.REGISTER_NEW_SP, new ArrayList<>());
-		Mails.createRequestMail(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		Request req = createRequest(facilityId, userId, new ArrayList<>());
+		Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
 
 		return req.getReqId();
 	}
 
 	@Override
 	public boolean updateRequest(Long requestId, Long userId, List<PerunAttribute> attributes)
-			throws UnauthorizedActionException {
-		if (! isAdminInRequest(requestId, userId)) {
-			throw new UnauthorizedActionException("User is not registered as admin in request");
+			throws UnauthorizedActionException, InternalErrorException {
+		if (requestId == null || userId == null || attributes == null) {
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId + ", attributes: " + attributes);
+		} else if (! isAdminInRequest(requestId, userId)) {
+			throw new UnauthorizedActionException("User is not registered as admin in request, cannot update it");
 		}
 
 		Request request = requestManager.getRequestByReqId(requestId);
+		if (request == null) {
+			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
+		}
+
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
 		request.setAttributes(convertedAttributes);
 		request.setModifiedBy(userId);
@@ -106,13 +118,17 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public boolean askForApproval(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException {
-		if (! isAdminInRequest(requestId, userId)) {
-			throw new UnauthorizedActionException("User is not registered as admin in request");
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException {
+		if (requestId == null || userId == null) {
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
+		} else if (! isAdminInRequest(requestId, userId)) {
+			throw new UnauthorizedActionException("User is not registered as admin in request, cannot ask for approval");
 		}
 
 		Request request = requestManager.getRequestByReqId(requestId);
-		if (! RequestStatus.NEW.equals(request.getStatus()) ||
+		if (request == null) {
+			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
+		} else if (! RequestStatus.NEW.equals(request.getStatus()) ||
 			! RequestStatus.WFC.equals(request.getStatus())) {
 			throw new CannotChangeStatusException("Cannot ask for approval, request not marked as NEW nor WAITING_FOR_CHANGES");
 		}
@@ -122,8 +138,9 @@ public class UserServiceImpl implements UserService {
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 		boolean res = requestManager.updateRequest(request);
 
-		Mails.updateStatusMail(requestId, RequestStatus.WFA,
+		Mails.requestStatusUpdateUserNotify(requestId, RequestStatus.WFA,
 				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		Mails.requestApprovalAdminNotify(userId, requestId, messagesProperties);
 
 		return res;
 	}
@@ -131,8 +148,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean cancelRequest(Long requestId, Long userId)
 			throws UnauthorizedActionException, CannotChangeStatusException {
-		if (! isAdminInRequest(requestId, userId)) {
-			throw new UnauthorizedActionException("User is not registered as admin in request");
+		if (requestId == null || userId == null) {
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
+		} else if (! isAdminInRequest(requestId, userId)) {
+			throw new UnauthorizedActionException("User is not registered as admin in request, cannot cancel it");
 		}
 
 		Request request = requestManager.getRequestByReqId(requestId);
@@ -149,7 +168,7 @@ public class UserServiceImpl implements UserService {
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 		boolean res = requestManager.updateRequest(request);
 
-		Mails.updateStatusMail(requestId, RequestStatus.CANCELED,
+		Mails.requestStatusUpdateUserNotify(requestId, RequestStatus.CANCELED,
 				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
 
 		return res;
@@ -158,8 +177,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean renewRequest(Long requestId, Long userId)
 			throws UnauthorizedActionException, CannotChangeStatusException {
-		if (! isAdminInRequest(requestId, userId)) {
-			throw new UnauthorizedActionException("User is not registered as admin in request");
+		if (requestId == null || userId == null) {
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
+		} else if (! isAdminInRequest(requestId, userId)) {
+			throw new UnauthorizedActionException("User is not registered as admin in request, cannot renew it");
 		}
 
 		Request request = requestManager.getRequestByReqId(requestId);
@@ -173,15 +194,27 @@ public class UserServiceImpl implements UserService {
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 		boolean res = requestManager.updateRequest(request);
 
-		Mails.updateStatusMail(requestId, RequestStatus.NEW,
+		Mails.requestStatusUpdateUserNotify(requestId, RequestStatus.NEW,
 				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
 
 		return res;
 	}
 
 	@Override
-	public boolean moveToProduction(Long facilityId, Long userId) throws UnauthorizedActionException {
+	public Long moveToProduction(Long facilityId, Long userId, List<String> authorities)
+			throws UnauthorizedActionException, InternalErrorException, RPCException {
+
+		if (facilityId == null || userId == null) {
+			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", userId: " + userId);
+		} else if (! isFacilityAdmin(facilityId, userId)) {
+			throw new UnauthorizedActionException("User is not registered as admin for facility, cannot ask for moving to production");
+		}
+
 		Facility fac = getDetailedFacility(facilityId, userId);
+		if (fac == null) {
+			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
+		}
+
 		Map<String, PerunAttribute> attributes = fac.getAttrs();
 		String listAttrName = appConfig.getShowOnServicesListAttribute();
 		String testSpAttrName = appConfig.getTestSpAttribute();
@@ -194,32 +227,73 @@ public class UserServiceImpl implements UserService {
 		listAttr.setOldValue(testSpAttr.getValue());
 		listAttr.setValue(false);
 
-		createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, fac.getAttrs());
-		//TODO: notification
-		return true;
+		Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, fac.getAttrs());
+		Mails.transferToProductionUserNotify(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		//TODO: generate approval link
+		Mails.authoritiesApproveProductionTransferNotify(null, req.getFacilityName(), authorities, messagesProperties);
+
+		return req.getReqId();
 	}
 
 	@Override
-	public Request getDetailedRequest(Long requestId, Long userId) throws UnauthorizedActionException {
-		if (! isAdminInRequest(requestId, userId)) {
+	public boolean signTransferToProduction(Long requestId, Long userId, String approvalName) throws InternalErrorException, RPCException {
+		if (requestId == null || userId == null) {
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
+		}
+
+		Request request = requestManager.getRequestByReqId(requestId);
+		if (request == null) {
+			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
+		}
+
+		User signer = perunConnector.getRichUser(userId);
+		if (signer == null) {
+			throw new InternalErrorException("Could not find user in Perun for id: " + userId);
+		}
+
+		return requestManager.addSignature(requestId, userId, signer.getFullName(), approvalName);
+	}
+
+	@Override
+	public Request getDetailedRequest(Long requestId, Long userId)
+			throws UnauthorizedActionException, InternalErrorException {
+		if (requestId == null || userId == null) {
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
+		} else if (! isAdminInRequest(requestId, userId)) {
 			throw new UnauthorizedActionException("User cannot view request, user is not a requester");
 		}
-		return requestManager.getRequestByReqId(requestId);
+
+		Request request = requestManager.getRequestByReqId(requestId);
+		if (request == null) {
+			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
+		}
+
+		return request;
 	}
 
 	@Override
-	public Facility getDetailedFacility(Long facilityId, Long userId) throws UnauthorizedActionException {
+	public Facility getDetailedFacility(Long facilityId, Long userId)
+			throws UnauthorizedActionException, RPCException, InternalErrorException {
+
 		if (! isFacilityAdmin(facilityId, userId)) {
 			throw new UnauthorizedActionException("User cannot view facility, user is not an admin");
 		}
-		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId);
+
 		Facility facility = perunConnector.getFacilityById(facilityId);
+		if (facility == null) {
+			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
+		}
+
+		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId);
 		facility.setAttrs(attrs);
 		return facility;
 	}
 
 	@Override
-	public List<Request> getAllRequestsUserCanAccess(Long userId) {
+	public List<Request> getAllRequestsUserCanAccess(Long userId) throws RPCException {
+		if (userId == null) {
+			throw new IllegalArgumentException("userId is null");
+		}
 		List<Request> requests = requestManager.getAllRequestsByUserId(userId);
 		Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
 		requests.addAll(requestManager.getAllRequestsByFacilityIds(whereAdmin));
@@ -228,7 +302,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<Facility> getAllFacilitiesWhereUserIsAdmin(Long userId) {
+	public List<Facility> getAllFacilitiesWhereUserIsAdmin(Long userId) throws RPCException {
+		if (userId == null) {
+			throw new IllegalArgumentException("userId is null");
+		}
 		List<Facility> userFacilities = perunConnector.getFacilitiesWhereUserIsAdmin(userId);
 		Map<String, String> params = new HashMap<>();
 		params.put(appConfig.getIdpAttribute(), appConfig.getIdpAttributeValue());
@@ -237,9 +314,9 @@ public class UserServiceImpl implements UserService {
 		return userFacilities.stream().filter(proxyFacilities::contains).collect(Collectors.toList());
 	}
 
-	private Request createRequest(Long facilityId, Long userId, RequestAction action, List<PerunAttribute> attributes) {
+	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes) {
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
-		return createRequest(facilityId, userId, action, convertedAttributes);
+		return createRequest(facilityId, userId, RequestAction.REGISTER_NEW_SP, convertedAttributes);
 	}
 
 	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes) {
@@ -258,7 +335,7 @@ public class UserServiceImpl implements UserService {
 		return request;
 	}
 
-	private boolean isFacilityAdmin(Long facilityId, Long userId) {
+	private boolean isFacilityAdmin(Long facilityId, Long userId) throws RPCException {
 		Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
 
 		if (whereAdmin == null || whereAdmin.isEmpty()) {
@@ -270,5 +347,16 @@ public class UserServiceImpl implements UserService {
 
 	private boolean isAdminInRequest(Long reqUserId, Long userId) {
 		return reqUserId.equals(userId);
+	}
+
+	private void addProxyIdentifierAttr(List<PerunAttribute> attributes) {
+		String identifierAttrName = appConfig.getIdpAttribute();
+		String value = appConfig.getIdpAttributeValue();
+
+		PerunAttribute identifierAttr = new PerunAttribute();
+		identifierAttr.setFullName(identifierAttrName);
+		identifierAttr.setValue(Collections.singletonList(value));
+
+		attributes.add(identifierAttr);
 	}
 }
