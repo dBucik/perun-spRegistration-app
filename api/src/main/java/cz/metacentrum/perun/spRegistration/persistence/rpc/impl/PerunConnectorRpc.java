@@ -244,8 +244,6 @@ public class PerunConnectorRpc implements PerunConnector {
 		} catch (HttpClientErrorException ex) {
 			MediaType contentType = ex.getResponseHeaders().getContentType();
 			String body = ex.getResponseBodyAsString();
-			//TODO: delete
-			System.err.println(body);
 			if ("json".equals(contentType.getSubtype())) {
 				try {
 					new ObjectMapper().readValue(body, JsonNode.class).path("message").asText();

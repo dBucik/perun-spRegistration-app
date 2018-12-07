@@ -8,17 +8,18 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.AdminService;
+import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Implementation of AdminService.
@@ -31,12 +32,14 @@ public class AdminServiceImpl implements AdminService {
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
+	private final Properties messagesProperties;
 
 	@Autowired
-	public AdminServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig) {
+	public AdminServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
+		this.messagesProperties = messagesProperties;
 	}
 
 	@Override
@@ -59,9 +62,12 @@ public class AdminServiceImpl implements AdminService {
 		request.setStatus(RequestStatus.APPROVED);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		requestManager.updateRequest(request);
+		boolean res = requestManager.updateRequest(request);
 
-		return true;
+		Mails.updateStatusMail(requestId, RequestStatus.APPROVED,
+				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+
+		return res;
 	}
 
 	@Override
@@ -80,9 +86,12 @@ public class AdminServiceImpl implements AdminService {
 		request.setStatus(RequestStatus.REJECTED);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		requestManager.updateRequest(request);
+		boolean res = requestManager.updateRequest(request);
 
-		return true;
+		Mails.updateStatusMail(requestId, RequestStatus.REJECTED,
+				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+
+		return res;
 	}
 
 	@Override
@@ -103,7 +112,12 @@ public class AdminServiceImpl implements AdminService {
 		request.setAttributes(convertedAttributes);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		return requestManager.updateRequest(request);
+		boolean res = requestManager.updateRequest(request);
+
+		Mails.updateStatusMail(requestId, RequestStatus.WFC,
+				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+
+		return res;
 	}
 
 	@Override

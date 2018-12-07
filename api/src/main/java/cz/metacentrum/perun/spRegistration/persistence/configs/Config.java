@@ -3,6 +3,7 @@ package cz.metacentrum.perun.spRegistration.persistence.configs;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 
 import java.util.List;
+import java.util.Properties;
 
 public class Config {
 
@@ -12,6 +13,7 @@ public class Config {
 	private AttrsConfig facilityMembershipConfig;
 	private AttrsConfig facilityOidcConfig;
 	private AttrsConfig facilitySamlConfig;
+	private Properties messagesConfig;
 
 	public void setAppConfig(AppConfig appConfig) {
 		this.appConfig = appConfig;
@@ -39,6 +41,14 @@ public class Config {
 
 	public void setFacilitySamlConfig(AttrsConfig samlConfig) {
 		this.facilitySamlConfig = samlConfig;
+	}
+
+	public void setMessagesConfig(Properties messagesConfig) {
+		this.messagesConfig = messagesConfig;
+	}
+
+	public Properties getMessagesConfig() {
+		return messagesConfig;
 	}
 
 	public List<AttrInput> getServiceInputs() {

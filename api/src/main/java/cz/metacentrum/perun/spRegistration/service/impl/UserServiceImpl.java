@@ -8,6 +8,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,12 +38,14 @@ public class UserServiceImpl implements UserService {
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
+	private final Properties messagesProperties;
 
 	@Autowired
-	public UserServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig) {
+	public UserServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
+		this.messagesProperties = messagesProperties;
 	}
 
 	@Override
@@ -53,7 +57,10 @@ public class UserServiceImpl implements UserService {
 		identifierAttr.setValue(Collections.singletonList(value));
 		attributes.add(identifierAttr);
 
-		return createRequest(null, userId, RequestAction.REGISTER_NEW_SP, attributes);
+		Request req = createRequest(null, userId, RequestAction.REGISTER_NEW_SP, attributes);
+		Mails.createRequestMail(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+
+		return req.getReqId();
 	}
 
 	@Override
@@ -63,7 +70,10 @@ public class UserServiceImpl implements UserService {
 			throw new UnauthorizedActionException("User is not registered as facility admin");
 		}
 
-		return createRequest(facilityId, userId, RequestAction.UPDATE_FACILITY, attributes);
+		Request req = createRequest(facilityId, userId, RequestAction.REGISTER_NEW_SP, attributes);
+		Mails.createRequestMail(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+
+		return req.getReqId();
 	}
 
 	@Override
@@ -72,7 +82,10 @@ public class UserServiceImpl implements UserService {
 			throw new UnauthorizedActionException("User is not registered as facility admin");
 		}
 
-		return createRequest(facilityId, userId, RequestAction.DELETE_FACILITY, new ArrayList<>());
+		Request req = createRequest(facilityId, userId, RequestAction.REGISTER_NEW_SP, new ArrayList<>());
+		Mails.createRequestMail(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+
+		return req.getReqId();
 	}
 
 	@Override
@@ -107,9 +120,12 @@ public class UserServiceImpl implements UserService {
 		request.setStatus(RequestStatus.WFA);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		requestManager.updateRequest(request);
+		boolean res = requestManager.updateRequest(request);
 
-		return true;
+		Mails.updateStatusMail(requestId, RequestStatus.WFA,
+				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+
+		return res;
 	}
 
 	@Override
@@ -131,7 +147,12 @@ public class UserServiceImpl implements UserService {
 		request.setStatus(RequestStatus.WFC);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		return requestManager.updateRequest(request);
+		boolean res = requestManager.updateRequest(request);
+
+		Mails.updateStatusMail(requestId, RequestStatus.CANCELED,
+				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+
+		return res;
 	}
 
 	@Override
@@ -150,7 +171,12 @@ public class UserServiceImpl implements UserService {
 		request.setStatus(RequestStatus.NEW);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		return requestManager.updateRequest(request);
+		boolean res = requestManager.updateRequest(request);
+
+		Mails.updateStatusMail(requestId, RequestStatus.NEW,
+				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+
+		return res;
 	}
 
 	@Override
@@ -169,6 +195,7 @@ public class UserServiceImpl implements UserService {
 		listAttr.setValue(false);
 
 		createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, fac.getAttrs());
+		//TODO: notification
 		return true;
 	}
 
@@ -210,12 +237,12 @@ public class UserServiceImpl implements UserService {
 		return userFacilities.stream().filter(proxyFacilities::contains).collect(Collectors.toList());
 	}
 
-	private Long createRequest(Long facilityId, Long userId, RequestAction action, List<PerunAttribute> attributes) {
+	private Request createRequest(Long facilityId, Long userId, RequestAction action, List<PerunAttribute> attributes) {
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
 		return createRequest(facilityId, userId, action, convertedAttributes);
 	}
 
-	private Long createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes) {
+	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes) {
 		Request request = new Request();
 		request.setFacilityId(facilityId);
 		request.setStatus(RequestStatus.NEW);
@@ -228,7 +255,7 @@ public class UserServiceImpl implements UserService {
 		Long requestId = requestManager.createRequest(request);
 		request.setReqId(requestId);
 
-		return requestId;
+		return request;
 	}
 
 	private boolean isFacilityAdmin(Long facilityId, Long userId) {

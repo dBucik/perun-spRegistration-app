@@ -23,6 +23,7 @@
                 <prop key="attr.idpAttribute.value">XYZ</prop>
                 <prop key="attr.testSp.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
                 <prop key="attr.showOnServicesList.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
+                <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
                 <prop key="oidc.isEnabled">true</prop>
                 <prop key="langs">en,cs</prop>
             </props>
@@ -180,6 +181,28 @@
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
+    <bean id="messagesProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="host">localhost</prop>
+                <prop key="from">test@mail.com</prop>
+                <prop key="footer">Best regards, \n test.mail.com \n service registration</prop>
+                <prop key="create.subject">Crreated service registration request %REQUEST_ID%</prop>
+                <prop key="crate.message">Your request for registering the service %SERVICE_NAME% has been created with id: %REQUEST_ID%</prop>
+                <prop key="update.subject">Updated status of request %REQUEST_ID%</prop>
+                <prop key="update.message">Status has been updated to %NEW_STATUS%</prop>
+                <prop key="approval.header">Request for approval of service: %SERVICE_NAME%</prop>
+                <prop key="approval.text">Test message approval: %SERVICE_NAME%, %APPROVAL_LINK%</prop>
+            </props>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:/etc/perun-spRegistration/messagesProperties.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${jdbc.driver}"/>
         <property name="url" value="${jdbc.url}"/>
@@ -209,6 +232,7 @@
         <property name="idpAttributeValue" value="${attr.idpAttribute.value}" />
         <property name="testSpAttribute" value="${attr.testSp.name}" />
         <property name="showOnServicesListAttribute" value="${attr.showOnServicesList.name}" />
+        <property name="adminsAttr" value="${attr.facilityAdmins.name}" />
         <property name="oidcEnabled" value="${oidc.isEnabled}" />
         <property name="langs" value="#{'${langs}'.split('\s*,\s*')}" />
     </bean>
@@ -250,6 +274,7 @@
         <property name="facilityMembershipConfig" ref="facilityMembershipConfig" />
         <property name="facilityOidcConfig" ref="facilityOidcConfig" />
         <property name="facilitySamlConfig" ref="facilitySamlConfig" />
+        <property name="messagesConfig" ref="messagesProperties" />
     </bean>
 
 </beans>

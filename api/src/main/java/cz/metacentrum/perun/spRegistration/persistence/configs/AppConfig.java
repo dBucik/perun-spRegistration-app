@@ -20,6 +20,7 @@ public class AppConfig {
 	private String idpAttribute;
 	private String idpAttributeValue;
 	private String testSpAttribute;
+	private String adminsAttr;
 	private Set<Long> admins;
 	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
 	private boolean oidcEnabled;
@@ -132,4 +133,11 @@ public class AppConfig {
 		return admins.contains(userId);
 	}
 
+	public void setAdminsAttr(String adminsAttr) {
+		this.adminsAttr = adminsAttr;
+	}
+
+	public String getAdminsAttr() {
+		return adminsAttr;
+	}
 }

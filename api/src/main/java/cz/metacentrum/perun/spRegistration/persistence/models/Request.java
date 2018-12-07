@@ -138,4 +138,7 @@ public class Request {
 		return res;
 	}
 
+	public List<String> getAdmins(String attrKey) {
+		return attributes.get(attrKey).valueAsArray(false);
+	}
 }
