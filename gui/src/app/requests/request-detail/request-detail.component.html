@@ -1,6 +1,6 @@
-<div class="container-fluid">
-  <mat-spinner class="ml-auto mr-auto mt-3" *ngIf="loading" color=""></mat-spinner>
-  <div *ngIf="!loading" class="card mt-4 mb-4 shadow-sm">
+<div class="container-fluid p-lg-5">
+  <mat-spinner class="ml-auto mr-auto" *ngIf="loading" color=""></mat-spinner>
+  <div *ngIf="!loading" class="card mb-4 p-2 shadow-sm">
     <div class="card-body">
       <h2 class="card-title">
         {{'REQUESTS.REQUEST_DETAIL_TITLE' | translate}}{{request.id}}
@@ -17,7 +17,7 @@
         </ng-container>
         <ng-container matColumnDef="value">
           <th mat-header-cell *matHeaderCellDef>{{'REQUESTS.REQUEST_DETAIL_ITEM_VALUE' | translate}}</th>
-          <td mat-cell *matCellDef="let item">{{item.value}}</td>
+          <td mat-cell *matCellDef="let item">{{item.value | requestItemValue}}</td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

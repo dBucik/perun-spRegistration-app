@@ -12,6 +12,7 @@ import { ApplicationItemListComponent } from './new-request/application-item/app
 import { ApplicationItemMapComponent } from './new-request/application-item/application-item-map/application-item-map.component';
 import { ApplicationItemSelectComponent } from './new-request/application-item/application-item-select/application-item-select.component';
 import { RequestDetailComponent } from './request-detail/request-detail.component';
+import { RequestItemValuePipe } from './request-item-value.pipe';
 
 @NgModule({
   imports: [
@@ -28,7 +29,8 @@ import { RequestDetailComponent } from './request-detail/request-detail.componen
     ApplicationItemListComponent,
     ApplicationItemMapComponent,
     ApplicationItemSelectComponent,
-    RequestDetailComponent
+    RequestDetailComponent,
+    RequestItemValuePipe
   ]
 })
 export class RequestsModule { }

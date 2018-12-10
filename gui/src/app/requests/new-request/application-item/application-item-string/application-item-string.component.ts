@@ -3,7 +3,7 @@ import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
 import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
-import {NgForm} from "@angular/forms";
+import {NgForm, NgModel} from "@angular/forms";
 import {TranslateService} from "@ngx-translate/core";
 
 @Component({
@@ -27,16 +27,15 @@ export class ApplicationItemStringComponent implements RequestItem, OnInit {
   @ViewChild('form')
   form : NgForm;
 
+  @ViewChild('input')
+  inputField: NgModel;
+
   getAttribute(): Attribute {
     return new Attribute(this.applicationItem.name, this.value);
   }
 
   hasCorrectValue(): boolean {
-    if (!this.applicationItem.required) {
-      return true;
-    }
-
-    return this.value.trim().length > 0;
+    return this.inputField.valid;
   }
 
   onFormSubmitted(): void {
