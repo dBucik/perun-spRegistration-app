@@ -42,20 +42,22 @@ export class ApplicationItemComponent implements RequestItem, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if (this.applicationItem.type === 'java.lang.String') {
+    if (this.applicationItem.type === 'java.lang.String' || this.applicationItem.type === 'java.lang.LargeString') {
       this.item = this.stringItem;
     }
-    if (this.applicationItem.type === 'java.lang.Boolean') {
+    else if (this.applicationItem.type === 'java.lang.Boolean') {
       this.item = this.booleanItem;
     }
-    if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues === null) {
+    else if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues === null) {
       this.item = this.listItem;
     }
-    if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues !== null) {
+    else if (this.applicationItem.type === 'java.util.ArrayList' && this.applicationItem.allowedValues !== null) {
       this.item = this.selectItem;
     }
-    if (this.applicationItem.type === 'java.util.LinkedHashMap') {
+    else if (this.applicationItem.type === 'java.util.LinkedHashMap') {
       this.item = this.mapItem;
+    } else {
+      console.log("Did not find item", this.applicationItem);
     }
   }
 

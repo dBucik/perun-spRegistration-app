@@ -112,7 +112,7 @@ export class NewRequestComponent implements OnInit {
       perunAttributes.push(perunAttr);
     });
 
-    this.requestsService.createRegistrationRequest(perunAttributes).subscribe(requestId => {
+    this.requestsService.registerAndSubmit(perunAttributes).subscribe(requestId => {
       this.snackBar.open(this.successfullySubmittedText, null, {duration: 6000});
     }, error => {
       console.log("Error");

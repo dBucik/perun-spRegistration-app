@@ -1,11 +1,14 @@
-<div class="container-fluid p-lg-5">
+<div class="container-fluid pt-5 p-lg-5">
   <mat-spinner class="ml-auto mr-auto" *ngIf="loading" color=""></mat-spinner>
-  <div *ngIf="!loading" class="card mb-4 p-2 shadow-sm">
-    <div class="card-body">
+  <div *ngIf="!loading" class="card mb-4 shadow-sm">
+    <div class="card-body p-5">
       <h2 class="card-title">
         {{'REQUESTS.REQUEST_DETAIL_TITLE' | translate}}{{request.id}}
       </h2>
-      {{'REQUESTS.REQUEST_DETAIL_STATUS' | translate}}{{request.status}}
+      {{'REQUESTS.REQUEST_DETAIL_STATUS' | translate}}
+      <span class="perun-accent-color">
+        {{request.status}}
+      </span>
       <br/>
       {{'REQUESTS.REQUEST_DETAIL_EDITED' | translate}}{{request.modifiedAt | date}}
       <h4 class="mt-4">{{'REQUESTS.REQUEST_DETAIL_ITEMS' | translate}}</h4>

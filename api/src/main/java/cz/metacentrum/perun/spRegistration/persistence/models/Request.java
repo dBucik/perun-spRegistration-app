@@ -138,6 +138,7 @@ public class Request {
 		return res;
 	}
 
+<<<<<<< HEAD:api/src/main/java/cz/metacentrum/perun/spRegistration/persistence/models/Request.java
 	public List<String> getAdmins(String attrKey) {
 		return attributes.get(attrKey).valueAsArray(false);
 	}
@@ -146,6 +147,12 @@ public class Request {
 	public String toString() {
 		return "Request{" +
 				"reqId=" + reqId +
+=======
+	@Override
+	public String toString() {
+		return "Request{" +
+				"id=" + id +
+>>>>>>> TODO:persistence/src/main/java/cz/metacentrum/perun/spRegistration/persistence/models/Request.java
 				", facilityId=" + facilityId +
 				", status=" + status +
 				", action=" + action +

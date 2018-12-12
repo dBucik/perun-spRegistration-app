@@ -68,6 +68,10 @@ a:hover {
   outline: none;
 }
 
+.perun-accent-color {
+  color: mat-color($service-creation-accent);
+}
+
 .perun-small-btn {
   height: auto;
   min-width: 1% !important;

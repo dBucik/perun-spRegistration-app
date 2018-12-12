@@ -1,58 +1,62 @@
-<div class="container-fluid p-lg-5">
+<div class="container-fluid pt-5 p-lg-5">
   <mat-spinner class="ml-auto mr-auto" *ngIf="loading" color=""></mat-spinner>
 
-  <div *ngIf="!loading" class="card mb-4 shadow-sm">
-    <div class="card-body p-5">
-      <h1 class="mb-3">{{'REQUESTS.NEW_TITLE' | translate}}</h1>
+  <div class="row">
+    <div class="col-12">
+      <div *ngIf="!loading" class="card mb-4 shadow-sm">
+        <div class="card-body p-5">
+          <h1 class="mb-3">{{'REQUESTS.NEW_TITLE' | translate}}</h1>
 
-      <mat-form-field>
-        <mat-select placeholder=" {{'REQUESTS.NEW_SELECT_TYPE' | translate}}" [(ngModel)]="serviceSelected">
-          <mat-option *ngIf="oidcEnabled" (click)="oidcSelected()" [value]="'oidc'">
-            {{'REQUESTS.OIDC' | translate}}
-          </mat-option>
-          <mat-option (click)="samlSelected()" [value]="'saml'">
-            {{'REQUESTS.SAML' | translate}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+          <mat-form-field>
+            <mat-select placeholder=" {{'REQUESTS.NEW_SELECT_TYPE' | translate}}" [(ngModel)]="serviceSelected">
+              <mat-option *ngIf="oidcEnabled" (click)="oidcSelected()" [value]="'oidc'">
+                {{'REQUESTS.OIDC' | translate}}
+              </mat-option>
+              <mat-option (click)="samlSelected()" [value]="'saml'">
+                {{'REQUESTS.SAML' | translate}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
 
-      <div class="mt-4" *ngIf="this.isCardBodyVisible">
-          <h3>{{'REQUESTS.NEW_FILL_ATTRS' | translate}}</h3>
-          <app-application-item
-            *ngFor="let appItem of applicationItems"
-            [applicationItem]="appItem">
-          </app-application-item>
+          <div class="mt-4" *ngIf="this.isCardBodyVisible">
+              <h3>{{'REQUESTS.NEW_FILL_ATTRS' | translate}}</h3>
+              <app-application-item
+                *ngFor="let appItem of applicationItems"
+                [applicationItem]="appItem">
+              </app-application-item>
 
-      </div>
-      <div>
+          </div>
+          <div>
 
 
-        <button
-          role="button"
-          mat-raised-button
-          color="link"
-          [routerLink]="'/'">
-          {{"REQUESTS.REQUEST_GO_BACK" | translate}}
-        </button>
+            <button
+              role="button"
+              mat-raised-button
+              color="link"
+              [routerLink]="'/'">
+              {{"REQUESTS.REQUEST_GO_BACK" | translate}}
+            </button>
 
-        <div class="pull-right" *ngIf="this.isCardBodyVisible">
-         <!-- <button
-            role="button"
-            mat-raised-button
-            color="accent"
-            (click)="saveRequest()">
-            {{"REQUESTS.REQUEST_SAVE" | translate}}
-          </button>-->
-          <button
-            class="ml-2"
-            type="submit"
-            mat-raised-button
-            color="primary"
-            (click)="submitRequest()">
-            {{"REQUESTS.REQUEST_SUBMIT" | translate}}
-          </button>
+            <div class="pull-right" *ngIf="this.isCardBodyVisible">
+             <!-- <button
+                role="button"
+                mat-raised-button
+                color="accent"
+                (click)="saveRequest()">
+                {{"REQUESTS.REQUEST_SAVE" | translate}}
+              </button>-->
+              <button
+                class="ml-2"
+                type="submit"
+                mat-raised-button
+                color="primary"
+                (click)="submitRequest()">
+                {{"REQUESTS.REQUEST_SUBMIT" | translate}}
+              </button>
+            </div>
+
+          </div>
         </div>
-
       </div>
     </div>
   </div>
