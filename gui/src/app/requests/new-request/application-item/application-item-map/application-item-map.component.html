@@ -1,8 +1,8 @@
 <div class="form-group row">
-  <form class="d-flex w-100" #form="ngForm">
-    <div class="col-sm-12 d-flex">
+  <div class="col-sm-12 d-flex">
+    <form class="d-flex w-100" #form="ngForm">
       <div class="w-100">
-        <label class="col-form-label word-break-word" [class.perun-warn]="this.noItemError">
+        <label class="col-form-label word-break-word" [class.perun-warn]="this.noItemError || this.duplicitKeysError">
           {{translatedName}}
           <span *ngIf="applicationItem.required"> *</span>
         </label>
@@ -51,6 +51,9 @@
           </div>
         </div>
       </div>
+    </form>
     </div>
-  </form>
+    <div class="col-12 d-flex perun-warn" *ngIf="duplicitKeysError">
+      {{'REQUESTS.NEW_DUPLICIT_KEYS_ERROR' | translate}}
+    </div>
 </div>

@@ -89,9 +89,9 @@ export class NewRequestComponent implements OnInit {
 
     for (const i of attributeItems) {
       if (!i.hasCorrectValue()) {
-        return false;
       }
     }
+        return false;
 
     return true;
   }

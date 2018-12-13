@@ -2,7 +2,6 @@ import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
-import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 import {NgForm} from "@angular/forms";
 import {TranslateService} from "@ngx-translate/core";
 
@@ -13,15 +12,18 @@ import {TranslateService} from "@ngx-translate/core";
 })
 export class ApplicationItemMapComponent implements RequestItem, OnInit {
 
-  constructor(private translate: TranslateService) { }
+  constructor(private translate: TranslateService) {
+  }
 
-  removeIcon = faMinus;
-  addIcon = faPlus;
-  helpIcon = faQuestionCircle;
+  keys: string[] = [];
+  values: string[] = [];
+  indexes: number[] = [];
 
-  keys : string[] = [];
-  values : string[] = [];
+  private index = 0;
+
   noItemError = false;
+  duplicitKeysError = false;
+
   translatedName: string;
   translatedDescription: string;
 
@@ -29,11 +31,13 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   applicationItem: ApplicationItem;
 
   @ViewChild('form')
-  form : NgForm;
+  form: NgForm;
 
-  removeValue(index : number) {
+  removeValue(index: number) {
     this.values.splice(index, 1);
     this.keys.splice(index, 1);
+    this.indexes.splice(index, 1);
+
     if (this.values.length === 0) {
       this.noItemError = true;
     }
@@ -42,6 +46,7 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   addValue() {
     this.values.push("");
     this.keys.push("");
+    this.indexes.push(this.index++);
     this.noItemError = false;
   }
 
@@ -62,7 +67,7 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   }
 
   hasCorrectValue(): boolean {
-    if (!this.applicationItem.required) {
+    if (!this.applicationItem.required && this.values.length === 0) {
       return true;
     } else {
       if (this.values.length === 0) {
@@ -70,16 +75,49 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
       }
     }
 
-    for (let i = 0; i < this.values.length; i++) {
-      let value = this.values[i];
-      let key = this.keys[i];
+    // reset error
+    this.duplicitKeysError = false;
 
-      if (value.trim().length === 0 || key.trim().length === 0) {
+    let keysWithIndexes = new Map<string, number>();
+
+    for (let i = 0; i < this.values.length; i++) {
+      let keys = Array.from(keysWithIndexes.keys());
+
+      let value = this.values[i].trim();
+      let key = this.keys[i].trim();
+
+      if (keys.includes(key)) {
+        this.duplicitKeysError = true;
+        this.showErredKey(keysWithIndexes.get(key));
+        this.showErredKey(i);
+
         return false;
       }
+
+      if (value.length === 0 || key.length === 0) {
+        return false;
+      }
+
+      keysWithIndexes.set(key, i);
     }
 
     return true;
+  }
+
+  showErredKey(orderNumber: number) {
+    let index = this.indexes[orderNumber];
+    let input = this.form.form.controls['key-' + index];
+
+    input.markAsTouched();
+    input.setErrors({'incorrect': true});
+  }
+
+  showErredValue(orderNumber: number) {
+    let index = this.indexes[orderNumber];
+    let input = this.form.form.controls['value-' + index];
+
+    input.markAsTouched();
+    input.setErrors({'incorrect': true});
   }
 
   ngOnInit(): void {
@@ -94,21 +132,6 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     if (!this.hasCorrectValue()) {
       if (this.values.length === 0) {
         this.noItemError = true;
-      }
-
-      for (let i = 0; i < this.values.length; i++) {
-        let value = this.values[i];
-        let key = this.keys[i];
-
-        if (value.trim().length === 0) {
-          this.form.form.controls['value-' + i].markAsTouched();
-          this.form.form.controls['value-' + i].setErrors({'incorrect' : true});
-        }
-
-        if (key.trim().length === 0) {
-          this.form.form.controls['key-' + i].markAsTouched();
-          this.form.form.controls['key-' + i].setErrors({'incorrect' : true});
-        }
       }
     }
   }
