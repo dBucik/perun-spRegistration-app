@@ -70,6 +70,7 @@
                 <prop key="privacyPolicyURL.position">6</prop>
                 <prop key="administratorContact.attrName">urn:perun:facility:attribute-def:def:administratorContact</prop>
                 <prop key="administratorContact.position">7</prop>
+                <prop key="administratorContact.regex">^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,64}$</prop>
             </props>
         </property>
         <property name="locations">

@@ -22,6 +22,7 @@ public class Utils {
 	private final static String ALLOWED_VALUES = "allowedValues";
 	private final static String ALLOWED_KEYS = "allowedKeys";
 	private final static String POSITION = "position";
+	private static final String REGEX = "regex" ;
 
 	public static List<AttrInput> initializeAttributes(PerunConnector connector, AppConfig appConfig, Properties props) throws RPCException {
 		List<AttrInput> inputs = new ArrayList<>();
@@ -99,5 +100,10 @@ public class Utils {
 			input.setDisplayPosition(val);
 		}
 
+		String regexProp = prop.replaceAll(ATTR_NAME, REGEX);
+		if (props.containsKey(regexProp)) {
+			String val = props.getProperty(regexProp);
+			input.setRegex(val);
+		}
 	}
 }

@@ -12,8 +12,6 @@ create table requests
 	modified_at timestamp default now()
 );
 
-alter table requests owner to spreg_access;
-
 create unique index requests_id_uindex
 	on requests (id);
 
@@ -30,5 +28,3 @@ create table approvals
 	signer_input varchar not null,
 	signed_at timestamp default now() not null
 );
-
-alter table approvals owner to spreg_access;

@@ -14,6 +14,7 @@ public class AttrInput {
 	private String type;
 	private List<String> allowedValues;
 	private int displayPosition;
+	private String regex;
 	private List<String> allowedKeys; // only if the type is Map
 
 	public AttrInput(String name, Map<String, String> displayName, Map<String, String> description,
@@ -102,5 +103,13 @@ public class AttrInput {
 
 	public void setDisplayPosition(int displayPosition) {
 		this.displayPosition = displayPosition;
+	}
+
+	public String getRegex() {
+		return regex;
+	}
+
+	public void setRegex(String regex) {
+		this.regex = regex;
 	}
 }
