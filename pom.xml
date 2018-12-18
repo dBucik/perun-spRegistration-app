@@ -10,9 +10,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>persistence</module>
-        <module>service</module>
-        <module>rest</module>
+        <module>api</module>
         <module>gui</module>
     </modules>
 

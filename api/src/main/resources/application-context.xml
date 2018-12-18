@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="cz.metacentrum.perun.spRegistration"/>
+    <context:property-placeholder properties-ref="properties" />
+
+    <bean id="defaultProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="jdbc.driver">org.postgresql.Driver</prop>
+                <prop key="jdbc.url">jdbc:postgresql://cloud69b.cerit-sc.cz/spregistration</prop>
+                <prop key="jdbc.username">spreg</prop>
+                <prop key="jdbc.password">spreg123</prop>
+                <prop key="rpc.url">XYZ</prop>
+                <prop key="rpc.user">XYZ</prop>
+                <prop key="rpc.password">XYZ</prop>
+                <prop key="admins">62692,0,0</prop>
+                <prop key="attr.idpAttribute.name">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
+                <prop key="attr.idpAttribute.value">XYZ</prop>
+                <prop key="attr.testSp.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
+                <prop key="attr.showOnServicesList.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
+                <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
+                <prop key="oidc.isEnabled">true</prop>
+                <prop key="langs">en,cs</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties" ref="defaultProperties"/>
+        <property name="locations">
+            <list>
+                <value>file:/etc/perun-spRegistration/appConfig.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="facilityServiceAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <!--DO NOT DISPLAY-->
+                <prop key="proxyIdentifiers.attrName">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
+                <prop key="proxyIdentifiers.isDisplayed">false</prop>
+                <prop key="proxyIdentifiers.isEditable">false</prop>
+                <prop key="showOnServicesList.attrName">urn:perun:facility:attribute-def:def:showOnServiceList</prop>
+                <prop key="showOnServicesList.isDisplayed">false</prop>
+                <prop key="showOnServicesList.isEditable">false</prop>
+                <prop key="isTestSp.attrName">urn:perun:facility:attribute-def:def:isTestSp</prop>
+                <prop key="isTestSp.isDisplayed">false</prop>
+                <prop key="isTestSp.isEditable">false</prop>
+                <!-- SERVICE ATTRIBUTES -->
+                <prop key="serviceName.attrName">urn:perun:facility:attribute-def:def:serviceName</prop>
+                <prop key="serviceName.allowedKeys">en,cs</prop>
+                <prop key="serviceName.position">1</prop>
+                <prop key="serviceDescription.attrName">urn:perun:facility:attribute-def:def:serviceDescription</prop>
+                <prop key="serviceDescription.allowedKeys">en,cs</prop>
+                <prop key="serviceDescription.position">2</prop>
+                <prop key="informationURL.attrName">urn:perun:facility:attribute-def:def:informationURL</prop>
+                <prop key="informationURL.position">3</prop>
+                <prop key="loginURL.attrName">urn:perun:facility:attribute-def:def:loginURL</prop>
+                <prop key="loginURL.position">4</prop>
+                <prop key="RaS.attrName">urn:perun:facility:attribute-def:def:RaS</prop>
+                <prop key="RaS.position">5</prop>
+                <prop key="privacyPolicyURL.attrName">urn:perun:facility:attribute-def:def:privacyPolicyURL</prop>
+                <prop key="privacyPolicyURL.position">6</prop>
+                <prop key="administratorContact.attrName">urn:perun:facility:attribute-def:def:administratorContact</prop>
+                <prop key="administratorContact.position">7</prop>
+                <prop key="administratorContact.regex">^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,64}$</prop>
+            </props>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:/etc/perun-spRegistration/serviceAttrs.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="facilityOrganizationAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <!-- ORGANIZATION ATTRIBUTES -->
+                <prop key="organizationName.attrName">urn:perun:facility:attribute-def:def:organizationName</prop>
+                <prop key="organizationName.position">1</prop>
+                <prop key="organizationURL.attrName">urn:perun:facility:attribute-def:def:organizationURL</prop>
+                <prop key="organizationURL.position">2</prop>
+                <prop key="CoCo.attrName">urn:perun:facility:attribute-def:def:CoCo</prop>
+                <prop key="CoCo.position">3</prop>
+            </props>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:/etc/perun-spRegistration/organizationAttrs.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="facilitySamlAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="entityID.attrName">urn:perun:facility:attribute-def:def:entityID</prop>
+                <prop key="entityID.position">1</prop>
+                <prop key="assertionConsumerService.attrName">urn:perun:facility:attribute-def:def:assertionConsumerService</prop>
+                <prop key="assertionConsumerService.position">2</prop>
+                <prop key="singleLogoutService.attrName">urn:perun:facility:attribute-def:def:singleLogoutService</prop>
+                <prop key="singleLogoutService.isRequired">false</prop>
+                <prop key="singleLogoutService.position">3</prop>
+                <prop key="requiredAttributes.attrName">urn:perun:facility:attribute-def:def:requiredAttributes</prop>
+                <prop key="requiredAttributes.position">4</prop>
+                <prop key="requiredAttributes.allowedValues">eduPersonPrincipalName,eduPersonUniqueID,displayName,mail,schacHomeOrganisation,eduPersonScopedAffiliation,forwardedScopedAffiliation,eduPersonEntitlement,bonaFideStatus,eduPersonORCID,country</prop>
+                <prop key="certData.attrName">urn:perun:facility:attribute-def:def:certData</prop>
+                <prop key="certData.position">5</prop>
+                <prop key="metadataURL.attrName">urn:perun:facility:attribute-def:def:metadataURL</prop>
+                <prop key="metadataURL.position">6</prop>
+            </props>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:/etc/perun-spRegistration/samlAttrs.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="facilityOidcAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="oidcClientId.attrName">urn:perun:facility:attribute-def:def:OIDCClientID</prop>
+                <prop key="oidcClientId.isEditable">false</prop>
+                <prop key="oidcClientId.position">1</prop>
+                <prop key="oidcClientSecret.attrName">urn:perun:facility:attribute-def:def:OIDCClientSecret</prop>
+                <prop key="oidcClientSecret.isEditable">false</prop>
+                <prop key="oidcClientSecret.position">2</prop>
+                <prop key="oidcRedirectUris.attrName">urn:perun:facility:attribute-def:def:OIDCRedirectURIs</prop>
+                <prop key="oidcRedirectUris.position">3</prop>
+                <prop key="oidcGrantTypes.attrName">urn:perun:facility:attribute-def:def:OIDCGrantTypes</prop>
+                <prop key="oidcGrantTypes.position">4</prop>
+                <prop key="oidcResponseTypes.attrName">urn:perun:facility:attribute-def:def:OIDCResponseTypes</prop>
+                <prop key="oidcResponseTypes.position">5</prop>
+                <prop key="oidcAllowIntrospection.attrName">urn:perun:facility:attribute-def:def:OIDCAllowIntrospection</prop>
+                <prop key="oidcAllowIntrospection.position">6</prop>
+                <prop key="oidcRequiredScopes.attrName">urn:perun:facility:attribute-def:def:requiredScopes</prop>
+                <prop key="oidcRequiredScopes.position">7</prop>
+                <prop key="oidcRequiredScopes.allowedValues">openid,profile,email,address,phone,offline_access,perun_api,groupNames,permissions_ega,forwardedScopedAffiliations,bona_fide_status,country,eduPersonEntitlement</prop>
+                <prop key="oidcLogoUrl.attrName">urn:perun:facility:attribute-def:def:OIDCLogoUrl</prop>
+                <prop key="oidcLogoUrl.position">8</prop>
+                <prop key="oidcLogoUrl.isRequired">false</prop>
+            </props>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:/etc/perun-spRegistration/oidcAttrs.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="facilityMembershipAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="checkGroupMembership.attrName">urn:perun:facility:attribute-def:def:checkGroupMembership</prop>
+                <prop key="checkGroupMembership.position">1</prop>
+                <prop key="allowRegistration.attrName">urn:perun:facility:attribute-def:def:allowRegistration</prop>
+                <prop key="allowRegistration.position">2</prop>
+                <prop key="dynamicRegistration.attrName">urn:perun:facility:attribute-def:def:dynamicRegistration</prop>
+                <prop key="dynamicRegistration.position">3</prop>
+                <prop key="registrationURL.attrName">urn:perun:facility:attribute-def:def:registrationURL</prop>
+                <prop key="registrationURL.position">4</prop>
+            </props>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:/etc/perun-spRegistration/membershipAttrs.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="messagesProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="admins.emails">admins@test.com,adminsMailingList@test.com</prop>
+                <prop key="host">localhost</prop>
+                <prop key="from">test@mail.com</prop>
+                <prop key="footer">Best regards, \n test.mail.com \n service registration</prop>
+                <prop key="create.subject">Crreated service registration request %REQUEST_ID%</prop>
+                <prop key="crate.message">Your request for registering the service %SERVICE_NAME% has been created with id: %REQUEST_ID%</prop>
+                <prop key="update.subject">Updated status of request %REQUEST_ID%</prop>
+                <prop key="update.message">Status has been updated to %NEW_STATUS%</prop>
+                <prop key="production.user.subject">Request for transfer to production of service: %SERVICE_NAME%</prop>
+                <prop key="production.user.message">Moving to production: %SERVICE_NAME%</prop>
+                <prop key="approval.subject">New request for approval %REQUEST_ID%</prop>
+                <prop key="approval.message">User %USER_INFO% has asked for approval of request %REQUEST_ID%</prop>
+                <prop key="production.authorities.subject">Approve transfer to production: %SERVICE_NAME%</prop>
+                <prop key="production.authorities.message">For approval of moving service %SERVICE_NAME% to production visit %APPROVAL_LINK%</prop>
+            </props>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:/etc/perun-spRegistration/messagesProperties.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="connector" class="cz.metacentrum.perun.spRegistration.persistence.rpc.impl.PerunConnectorRpc">
+        <property name="perunRpcUrl" value="${rpc.url}"/>
+        <property name="perunRpcUser" value="${rpc.user}"/>
+        <property name="perunRpcPassword" value="${rpc.password}"/>
+    </bean>
+
+    <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
+        <property name="appConfig" ref="appConfig" />
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig">
+        <property name="connector" ref="connector" />
+        <property name="admins" value="#{'${admins}'.split('\s*,\s*')}" />
+        <property name="idpAttribute" value="${attr.idpAttribute.name}" />
+        <property name="idpAttributeValue" value="${attr.idpAttribute.value}" />
+        <property name="testSpAttribute" value="${attr.testSp.name}" />
+        <property name="showOnServicesListAttribute" value="${attr.showOnServicesList.name}" />
+        <property name="adminsAttr" value="${attr.facilityAdmins.name}" />
+        <property name="oidcEnabled" value="${oidc.isEnabled}" />
+        <property name="langs" value="#{'${langs}'.split('\s*,\s*')}" />
+    </bean>
+
+    <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+        <constructor-arg name="attrsProps" ref="facilityServiceAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="connector" ref="connector" />
+    </bean>
+
+    <bean id="facilityOrganizationConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+        <constructor-arg name="attrsProps" ref="facilityOrganizationAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="connector" ref="connector" />
+    </bean>
+
+    <bean id="facilitySamlConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+        <constructor-arg name="attrsProps" ref="facilitySamlAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="connector" ref="connector" />
+    </bean>
+
+    <bean id="facilityOidcConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+        <constructor-arg name="attrsProps" ref="facilityOidcAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="connector" ref="connector" />
+    </bean>
+
+    <bean id="facilityMembershipConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+        <constructor-arg name="attrsProps" ref="facilityMembershipAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="connector" ref="connector" />
+    </bean>
+
+    <bean id="config" class="cz.metacentrum.perun.spRegistration.persistence.configs.Config">
+        <property name="appConfig" ref="appConfig" />
+        <property name="facilityServiceConfig" ref="facilityServiceConfig" />
+        <property name="facilityOrganizationConfig" ref="facilityOrganizationConfig" />
+        <property name="facilityMembershipConfig" ref="facilityMembershipConfig" />
+        <property name="facilityOidcConfig" ref="facilityOidcConfig" />
+        <property name="facilitySamlConfig" ref="facilitySamlConfig" />
+        <property name="messagesConfig" ref="messagesProperties" />
+    </bean>
+
+</beans>
