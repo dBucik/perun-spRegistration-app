@@ -21,4 +21,10 @@ public abstract class PerunEntity {
 		this.id = id;
 	}
 
+	@Override
+	public String toString() {
+		return "PerunEntity{" +
+				"id=" + id +
+				'}';
+	}
 }

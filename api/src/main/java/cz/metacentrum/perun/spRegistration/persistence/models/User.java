@@ -130,4 +130,19 @@ public class User extends PerunEntity {
 
 		return joiner.toString();
 	}
+
+	@Override
+	public String toString() {
+		return "User{" +
+				super.toString() +
+				", titleBefore='" + titleBefore + '\'' +
+				", firstName='" + firstName + '\'' +
+				", middleName='" + middleName + '\'' +
+				", lastName='" + lastName + '\'' +
+				", titleAfter='" + titleAfter + '\'' +
+				", email='" + email + '\'' +
+				", facilitiesWhereAdmin=" + facilitiesWhereAdmin +
+				", isAdmin=" + isAdmin +
+				'}';
+	}
 }

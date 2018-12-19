@@ -39,4 +39,13 @@ public class ArrayAttribute extends Attribute {
 	public void setNewValue(List<String> newValue) {
 		this.newValue = newValue;
 	}
+
+	@Override
+	public String toString() {
+		return "ArrayAttribute{" +
+				super.toString() +
+				", oldValue=" + oldValue +
+				", newValue=" + newValue +
+				'}';
+	}
 }

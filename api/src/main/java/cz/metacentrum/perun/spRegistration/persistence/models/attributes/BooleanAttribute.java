@@ -38,4 +38,13 @@ public class BooleanAttribute extends Attribute {
 	public void setNewValue(Boolean newValue) {
 		this.newValue = newValue;
 	}
+
+	@Override
+	public String toString() {
+		return "BooleanAttribute{" +
+				super.toString() +
+				", oldValue=" + oldValue +
+				", newValue=" + newValue +
+				'}';
+	}
 }

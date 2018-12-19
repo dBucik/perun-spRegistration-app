@@ -189,7 +189,7 @@
                 <prop key="host">localhost</prop>
                 <prop key="from">test@mail.com</prop>
                 <prop key="footer">Best regards, \n test.mail.com \n service registration</prop>
-                <prop key="create.subject">Crreated service registration request %REQUEST_ID%</prop>
+                <prop key="create.subject">Created service registration request %REQUEST_ID%</prop>
                 <prop key="crate.message">Your request for registering the service %SERVICE_NAME% has been created with id: %REQUEST_ID%</prop>
                 <prop key="update.subject">Updated status of request %REQUEST_ID%</prop>
                 <prop key="update.message">Status has been updated to %NEW_STATUS%</prop>

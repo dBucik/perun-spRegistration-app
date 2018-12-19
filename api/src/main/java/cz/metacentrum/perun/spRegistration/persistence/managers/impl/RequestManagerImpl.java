@@ -53,6 +53,7 @@ public class RequestManagerImpl implements RequestManager {
 
 	@Override
 	public Long createRequest(Request request) {
+		log.debug("createRequest({})", request);
 		String query = "INSERT INTO" + REQUESTS_TABLE +
 				"(facility_id, status, action, requesting_user_id, attributes, modified_by) " +
 				"VALUES (:fac_id, :status, :action, :req_user_id, :attributes, :modified_by)";
@@ -67,11 +68,15 @@ public class RequestManagerImpl implements RequestManager {
 		params.addValue("modified_by", request.getModifiedBy());
 
 		jdbcTemplate.update(query, params, key, new String[] { "id" });
-		return (Long) key.getKey();
+		Long result = (Long) key.getKey();
+
+		log.debug("createRequest returns: {}", result);
+		return result;
 	}
 
 	@Override
 	public boolean updateRequest(Request request) {
+		log.debug("updateRequest({})", request);
 		String query = "UPDATE" + REQUESTS_TABLE +
 				"SET facility_id = :fac_id, status = :status, action = :action, requesting_user_id = :req_user_id, " +
 				"attributes = :attributes, modified_by = :modified_by, modified_at = NOW()" +
@@ -87,96 +92,123 @@ public class RequestManagerImpl implements RequestManager {
 		params.addValue("req_id", request.getReqId());
 
 		jdbcTemplate.update(query, params);
+
+		log.debug("updateRequest returns: {}", true);
 		return true;
 	}
 
 	@Override
 	public boolean deleteRequest(Long reqId) {
-		String query = "DELETE FROM" + REQUESTS_TABLE +
-				"WHERE id = :req_id";
+		log.debug("deleteRequest({})", reqId);
+		String query = "DELETE FROM" + REQUESTS_TABLE + "WHERE id = :req_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_id", reqId);
 
 		jdbcTemplate.update(query, params);
+
+		log.debug("deleteRequest returns: {}", true);
 		return true;
 	}
 
 	@Override
 	public Request getRequestByReqId(Long reqId) {
-		String query = "SELECT * FROM" + REQUESTS_TABLE +
-				"WHERE id = :req_id";
+		log.debug("getRequestByReqId({})", reqId);
+		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE id = :req_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_id", reqId);
 
-		return jdbcTemplate.queryForObject(query, params, requestMapper);
+		Request request = jdbcTemplate.queryForObject(query, params, requestMapper);
+
+		log.debug("getRequestByReqId returns: {}", request);
+		return request;
 	}
 
 	@Override
 	public List<Request> getAllRequests() {
+		log.debug("getAllRequests()");
 		String query = "SELECT * FROM" + REQUESTS_TABLE;
 
-		return jdbcTemplate.query(query, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, requestMapper);
+
+		log.debug("getAllRequests returns: {}", requests);
+		return requests;
 	}
 
 	@Override
 	public List<Request> getAllRequestsByUserId(Long userId) {
-		String query = "SELECT * FROM" + REQUESTS_TABLE +
-				"WHERE requesting_user_id = :req_user_id";
+		log.debug("getAllRequestsByUserId({})", userId);
+		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE requesting_user_id = :req_user_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_user_id", userId);
 
-		return jdbcTemplate.query(query, params, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, requestMapper);
+
+		log.debug("getAllRequestsByUserId returns: {}", requests);
+		return requests;
 	}
 
 	@Override
 	public List<Request> getAllRequestsByStatus(RequestStatus status) {
-		String query = "SELECT * FROM" + REQUESTS_TABLE +
-				"WHERE status = :status";
+		log.debug("getAllRequestsByStatus({})", status);
+		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE status = :status";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("status", status.getAsInt());
 
-		return jdbcTemplate.query(query, params, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, requestMapper);
+
+		log.debug("getAllRequestsByStatus returns: {}", requests);
+		return requests;
 	}
 
 	@Override
 	public List<Request> getAllRequestsByAction(RequestAction action) {
-		String query = "SELECT * FROM" + REQUESTS_TABLE +
-				"WHERE action = :action";
+		log.debug("getAllRequestsByAction({})", action);
+		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE action = :action";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("action", action.getAsInt());
 
-		return jdbcTemplate.query(query, params, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, requestMapper);
+
+		log.debug("getAllRequestsByAction returns: {}", requests);
+		return requests;
 	}
 
 	@Override
 	public Request getRequestByFacilityId(Long facilityId) {
-		String query = "SELECT * FROM" + REQUESTS_TABLE +
-				"WHERE facility_id = :fac_id";
+		log.debug("getRequestByFacilityId({})", facilityId);
+		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE facility_id = :fac_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("fac_id", facilityId);
 
-		return jdbcTemplate.queryForObject(query, params, requestMapper);
+		Request request = jdbcTemplate.queryForObject(query, params, requestMapper);
+
+		log.debug("getRequestByFacilityId returns: {}", request);
+		return request;
 	}
 
 	@Override
 	public List<Request> getAllRequestsByFacilityIds(Set<Long> facilityIds) {
-		String query = "SELECT * FROM" + REQUESTS_TABLE +
-				"WHERE facility_id IN (:ids)";
+		log.debug("getAllRequestsByFacilityIds({})", facilityIds);
+		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE facility_id IN (:ids)";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("ids", new ArrayList(facilityIds));
 
-		return jdbcTemplate.query(query, params, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, requestMapper);
+
+		log.debug("getAllRequestsByFacilityIds returns: {}", requests);
+		return requests;
 	}
 
 	@Override
 	public boolean addSignature(Long requestId, Long userId, String fullName, String approvalName) {
+		log.debug("addSignature(requestId: {}, userId: {}, fullName: {}, approvalName: {})");
 		String query = "INSERT INTO" + APPROVALS_TABLE +
 				"(request_id, signer_id, signer_name, signer_input) " +
 				"VALUES (:req_id, :signer_id, :signer_name, :signer_input)";
@@ -187,16 +219,21 @@ public class RequestManagerImpl implements RequestManager {
 		params.addValue("signer_input", approvalName);
 
 		jdbcTemplate.update(query, params);
+
+		log.debug("addSignature returns: {}", true);
 		return true;
 	}
 
 	@Override
 	public List<RequestApproval> getApprovalsForRequest(Long requestId) {
-		String query = "SELECT * FROM" + APPROVALS_TABLE +
-				"WHERE request_id = :req_id";
+		log.debug("getApprovalsForRequest({})", requestId);
+		String query = "SELECT * FROM" + APPROVALS_TABLE + "WHERE request_id = :req_id";
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_id", requestId);
 
-		return jdbcTemplate.query(query, params, requestApprovalMapper);
+		List<RequestApproval> approvals = jdbcTemplate.query(query, params, requestApprovalMapper);
+
+		log.debug("getApprovalsForRequest returns: {}", approvals);
+		return approvals;
 	}
 }

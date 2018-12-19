@@ -41,4 +41,13 @@ public class MapAttribute extends Attribute {
 		this.newValue = newValue;
 	}
 
+	@Override
+	public String toString() {
+		return "MapAttribute{" +
+				super.toString() +
+				", oldValue=" + oldValue +
+				", newValue=" + newValue +
+				'}';
+	}
+
 }

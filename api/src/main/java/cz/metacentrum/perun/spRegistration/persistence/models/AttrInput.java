@@ -112,4 +112,21 @@ public class AttrInput {
 	public void setRegex(String regex) {
 		this.regex = regex;
 	}
+
+	@Override
+	public String toString() {
+		return "AttrInput{" +
+				"name='" + name + '\'' +
+				", displayName=" + displayName +
+				", description=" + description +
+				", required=" + required +
+				", displayed=" + displayed +
+				", editable=" + editable +
+				", type='" + type + '\'' +
+				", allowedValues=" + allowedValues +
+				", displayPosition=" + displayPosition +
+				", regex='" + regex + '\'' +
+				", allowedKeys=" + allowedKeys +
+				'}';
+	}
 }
