@@ -141,4 +141,18 @@ public class Request {
 	public List<String> getAdmins(String attrKey) {
 		return attributes.get(attrKey).valueAsArray(false);
 	}
+
+	@Override
+	public String toString() {
+		return "Request{" +
+				"reqId=" + reqId +
+				", facilityId=" + facilityId +
+				", status=" + status +
+				", action=" + action +
+				", reqUserId=" + reqUserId +
+				", attributes=" + attributes +
+				", modifiedAt=" + modifiedAt +
+				", modifiedBy=" + modifiedBy +
+				'}';
+	}
 }

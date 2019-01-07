@@ -38,4 +38,13 @@ public class IntegerAttribute extends Attribute {
 	public void setNewValue(Integer newValue) {
 		this.newValue = newValue;
 	}
+
+	@Override
+	public String toString() {
+		return "IntegerAttribute{" +
+				super.toString() +
+				", oldValue=" + oldValue +
+				", newValue=" + newValue +
+				'}';
+	}
 }

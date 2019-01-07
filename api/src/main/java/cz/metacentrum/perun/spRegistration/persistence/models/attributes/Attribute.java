@@ -249,4 +249,13 @@ public abstract class Attribute {
 			throw new AttributeToJsonException("Error when mapping attribute to json", e);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "Attribute{" +
+				"definition=" + definition +
+				", comment='" + comment + '\'' +
+				", type=" + type +
+				'}';
+	}
 }

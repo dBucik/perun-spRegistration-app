@@ -1,11 +1,15 @@
 package cz.metacentrum.perun.spRegistration.persistence.configs;
 
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Properties;
 
 public class Config {
+
+	private static final Logger log = LoggerFactory.getLogger(Config.class);
 
 	private AppConfig appConfig;
 	private AttrsConfig facilityServiceConfig;
@@ -16,6 +20,7 @@ public class Config {
 	private Properties messagesConfig;
 
 	public void setAppConfig(AppConfig appConfig) {
+		log.debug("setting app config: {}", appConfig);
 		this.appConfig = appConfig;
 	}
 
@@ -24,26 +29,32 @@ public class Config {
 	}
 
 	public void setFacilityServiceConfig(AttrsConfig facilityServiceConfig) {
+		log.debug("setting facility service config: {}", facilityServiceConfig);
 		this.facilityServiceConfig = facilityServiceConfig;
 	}
 
 	public void setFacilityOrganizationConfig(AttrsConfig facilityOrganizationConfig) {
+		log.debug("setting facility organization config: {}", facilityOrganizationConfig);
 		this.facilityOrganizationConfig = facilityOrganizationConfig;
 	}
 
 	public void setFacilityMembershipConfig(AttrsConfig facilityMembershipConfig) {
+		log.debug("setting facility membership config: {}", facilityMembershipConfig);
 		this.facilityMembershipConfig = facilityMembershipConfig;
 	}
 
 	public void setFacilityOidcConfig(AttrsConfig facilityOidcConfig) {
+		log.debug("setting facility oidc config: {}", facilityOidcConfig);
 		this.facilityOidcConfig = facilityOidcConfig;
 	}
 
-	public void setFacilitySamlConfig(AttrsConfig samlConfig) {
-		this.facilitySamlConfig = samlConfig;
+	public void setFacilitySamlConfig(AttrsConfig facilitySamlConfig) {
+		log.debug("setting facility saml config: {}", facilitySamlConfig);
+		this.facilitySamlConfig = facilitySamlConfig;
 	}
 
 	public void setMessagesConfig(Properties messagesConfig) {
+		log.debug("setting messages config: {}", messagesConfig);
 		this.messagesConfig = messagesConfig;
 	}
 

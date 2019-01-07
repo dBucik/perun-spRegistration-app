@@ -23,4 +23,11 @@ public class AttrsConfig {
 	public void setInputs(List<AttrInput> inputs) {
 		this.inputs = inputs;
 	}
+
+	@Override
+	public String toString() {
+		return "AttrsConfig{" +
+				"inputs=" + inputs +
+				'}';
+	}
 }

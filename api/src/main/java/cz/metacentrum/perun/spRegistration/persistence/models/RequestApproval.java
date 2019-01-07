@@ -54,4 +54,15 @@ public class RequestApproval {
 	public void setSignedAt(Timestamp signedAt) {
 		this.signedAt = signedAt;
 	}
+
+	@Override
+	public String toString() {
+		return "RequestApproval{" +
+				"requestId=" + requestId +
+				", signerId=" + signerId +
+				", signerName='" + signerName + '\'' +
+				", signerInput='" + signerInput + '\'' +
+				", signedAt=" + signedAt +
+				'}';
+	}
 }

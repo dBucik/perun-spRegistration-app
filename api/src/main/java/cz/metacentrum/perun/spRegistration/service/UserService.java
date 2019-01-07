@@ -23,7 +23,7 @@ public interface UserService {
 	 * @param attributes Attributes set for SP (key = attribute name, value = attribute).
 	 * @return Generated request ID after storing to the DB.
 	 */
-	Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes);
+	Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes) throws InternalErrorException;
 
 	/**
 	 * Create request for changes of SP (which already exists as facility in Perun).
@@ -34,7 +34,7 @@ public interface UserService {
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	Long createFacilityChangesRequest(Long facilityId, Long userId, List<PerunAttribute> attributes)
-			throws UnauthorizedActionException, RPCException;
+			throws UnauthorizedActionException, RPCException, InternalErrorException;
 
 	/**
 	 * Create request for removal of SP (which already exists as facility in Perun).
@@ -44,7 +44,7 @@ public interface UserService {
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	Long createRemovalRequest(Long userId, Long facilityId)
-			throws UnauthorizedActionException, RPCException;
+			throws UnauthorizedActionException, RPCException, InternalErrorException;
 
 	/**
 	 * Update existing request in DB with new data.
@@ -77,7 +77,7 @@ public interface UserService {
 	 * @throws CannotChangeStatusException when status of the request cannot be changed.
 	 */
 	boolean cancelRequest(Long requestId, Long userId)
-	throws UnauthorizedActionException, CannotChangeStatusException;
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException;
 
 	/**
 	 * Renew canceled request.
@@ -88,7 +88,7 @@ public interface UserService {
 	 * @throws CannotChangeStatusException when status of the request cannot be changed.
 	 */
 	boolean renewRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException;
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException;
 
 	/**
 	 * Ask for moving the service to the production environment.

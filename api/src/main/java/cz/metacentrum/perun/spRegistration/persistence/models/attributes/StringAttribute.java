@@ -38,4 +38,13 @@ public class StringAttribute extends Attribute {
 	public void setNewValue(String newValue) {
 		this.newValue = newValue;
 	}
+
+	@Override
+	public String toString() {
+		return "StringAttribute{" +
+				super.toString() +
+				", oldValue=" + oldValue +
+				", newValue=" + newValue +
+				'}';
+	}
 }

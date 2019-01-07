@@ -41,7 +41,13 @@ public class Mails {
 	private static final String APPROVAL_LINK_FIELD = "%APPROVAL_LINK%";
 	private static final String USER_INFO_FIELD = "%USER_INFO%";
 
-	public static boolean requestStatusUpdateUserNotify(Long requestId, RequestStatus status, List<String> recipients, Properties props) {
+	public static boolean requestStatusUpdateUserNotify(Long requestId, RequestStatus status, List<String> recipients,
+														Properties props) {
+		return requestStatusUpdateUserNotify(requestId, status, recipients, null, props);
+	}
+
+	public static boolean requestStatusUpdateUserNotify(Long requestId, RequestStatus status, List<String> recipients,
+														String additionalMessage, Properties props) {
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
@@ -57,6 +63,10 @@ public class Mails {
 		if (message.contains(NEW_STATUS_FIELD)) {
 			message = message.replaceAll(NEW_STATUS_FIELD, status.toString());
 		}
+		if (additionalMessage != null && !additionalMessage.isEmpty()) {
+			message = message.concat("\n").concat(additionalMessage);
+		}
+
 		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
 
 		return sendMail(host, from, recipients, subject, message);

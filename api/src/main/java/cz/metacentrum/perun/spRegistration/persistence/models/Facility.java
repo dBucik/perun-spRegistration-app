@@ -86,4 +86,14 @@ public class Facility extends PerunEntity {
 		return Objects.equals(this.getId(), them.getId())
 				&& Objects.equals(this.name, them.name);
 	}
+
+	@Override
+	public String toString() {
+		return "Facility{" +
+				super.toString() +
+				", name='" + name + '\'' +
+				", description='" + description + '\'' +
+				", attrs=" + attrs +
+				'}';
+	}
 }

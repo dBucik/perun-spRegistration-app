@@ -115,6 +115,24 @@ public class AppConfig {
 		this.perunAttributeDefinitionsMap = perunAttributeDefinitionsMap;
 	}
 
+	@Override
+	public String toString() {
+		return "AppConfig{" +
+				"idpAttribute='" + idpAttribute + '\'' +
+				", idpAttributeValue='" + idpAttributeValue + '\'' +
+				", testSpAttribute='" + testSpAttribute + '\'' +
+				", adminsAttr='" + adminsAttr + '\'' +
+				", admins=" + admins +
+				", perunAttributeDefinitionsMap=" + perunAttributeDefinitionsMap +
+				", oidcEnabled=" + oidcEnabled +
+				", langs=" + langs +
+				", enLocale=" + enLocale +
+				", csLocale=" + csLocale +
+				", connector=" + connector +
+				", showOnServicesListAttribute='" + showOnServicesListAttribute + '\'' +
+				'}';
+	}
+
 	// custom methods
 
 	public Properties getEnLocale() {

@@ -61,6 +61,7 @@ public class PerunConnectorRpc implements PerunConnector {
 
 	@Override
 	public Facility createFacilityInPerun(String facilityJson) throws RPCException {
+		log.debug("createFacilityInPerun({})", facilityJson);
 		if (facilityJson == null) {
 			throw new IllegalArgumentException("facilityJson is null");
 		}
@@ -68,11 +69,15 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityJson);
 
 		JSONObject res = makeRpcCallForObject(FACILITIES_MANAGER, "createFacility", params);
-		return MapperUtils.mapFacility(res);
+		Facility facility = MapperUtils.mapFacility(res);
+
+		log.debug("createFacilityInPerun returns: {}", facility);
+		return facility;
 	}
 
 	@Override
 	public Facility updateFacilityInPerun(String facilityJson) throws RPCException {
+		log.debug("updateFacilityInPerun({})", facilityJson);
 		if (facilityJson == null) {
 			throw new IllegalArgumentException("facilityJson is null");
 		}
@@ -80,11 +85,15 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityJson);
 
 		JSONObject res = makeRpcCallForObject(FACILITIES_MANAGER, "updateFacility", params);
-		return MapperUtils.mapFacility(res);
+		Facility facility = MapperUtils.mapFacility(res);
+
+		log.debug("updateFacilityInPerun returns: {}", facility);
+		return facility;
 	}
 
 	@Override
 	public boolean deleteFacilityFromPerun(Long facilityId) throws RPCException {
+		log.debug("deleteFacilityFromPerun({})", facilityId);
 		if (facilityId == null) {
 			throw new IllegalArgumentException("facilityId is null");
 		}
@@ -92,11 +101,14 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 
 		makeRpcCallForObject(FACILITIES_MANAGER, "deleteFacility", params);
+
+		log.debug("deleteFacilityFromPerun returns: {}", true);
 		return true;
 	}
 
 	@Override
 	public Facility getFacilityById(Long facilityId) throws RPCException {
+		log.debug("getFacilityById({})", facilityId);
 		if (facilityId == null) {
 			throw new IllegalArgumentException("facilityId is null");
 		}
@@ -104,11 +116,15 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("id", facilityId);
 
 		JSONObject res = makeRpcCallForObject(FACILITIES_MANAGER, "getFacilityById", params);
-		return MapperUtils.mapFacility(res);
+		Facility facility = MapperUtils.mapFacility(res);
+
+		log.debug("getFacilityById returns: {}", facility);
+		return facility;
 	}
 
 	@Override
 	public List<Facility> getFacilitiesViaSearcher(Map<String, String> attributesWithSearchingValues) throws RPCException {
+		log.debug("getFacilitiesViaSearcher({})", attributesWithSearchingValues);
 		if (attributesWithSearchingValues == null) {
 			throw new IllegalArgumentException("attriutesWithSearchinValues is null");
 		}
@@ -116,11 +132,15 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("attributesWithSearchingValues", attributesWithSearchingValues);
 
 		JSONArray res = makeRpcCallForArray(SEARCHER, "getFacilities", params);
-		return MapperUtils.mapFacilities(res);
+		List<Facility> facilities = MapperUtils.mapFacilities(res);
+
+		log.debug("getFacilitiesViaSearcher returns: {}", facilities);
+		return facilities;
 	}
 
 	@Override
 	public List<Facility> getFacilitiesWhereUserIsAdmin(Long userId) throws RPCException {
+		log.debug("getFacilitiesWhereUserIsAdmin({})", userId);
 		if (userId == null) {
 			throw new IllegalArgumentException("userId is null");
 		}
@@ -128,11 +148,15 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("user", userId);
 
 		JSONArray res = makeRpcCallForArray(FACILITIES_MANAGER, "getFacilitiesWhereUserIsAdmin", params);
-		return MapperUtils.mapFacilities(res);
+		List<Facility> facilities = MapperUtils.mapFacilities(res);
+
+		log.debug("getFacilitiesWhereUserIsAdmin returns: {}", facilities);
+		return facilities;
 	}
 
 	@Override
 	public PerunAttribute getFacilityAttribute(Long facilityId, String attrName) throws RPCException {
+		log.debug("getFacilityAttribute(facilityId: {}, attrName: {})", facilityId, attrName);
 		if (facilityId == null || attrName == null) {
 			throw new IllegalArgumentException("Illegal input: facilityId: " + facilityId + ", attrName: " + attrName);
 		}
@@ -141,11 +165,15 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("attributeName", attrName);
 
 		JSONObject res = makeRpcCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
-		return MapperUtils.mapAttribute(res);
+		PerunAttribute attribute = MapperUtils.mapAttribute(res);
+
+		log.debug("getFacilityAttribute returns: {}", attribute);
+		return attribute;
 	}
 
 	@Override
 	public Map<String, PerunAttribute> getFacilityAttributes(Long facilityId) throws RPCException {
+		log.debug("getFacilityAttributes({})", facilityId);
 		if (facilityId == null) {
 			throw new IllegalArgumentException("facilityId is null");
 		}
@@ -153,11 +181,15 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 
 		JSONArray res = makeRpcCallForArray(ATTRIBUTES_MANAGER, "getAttributes", params);
-		return MapperUtils.mapAttributes(res);
+		Map<String, PerunAttribute> attributeMap = MapperUtils.mapAttributes(res);
+
+		log.debug("getFacilityAttributes returns: {}", attributeMap);
+		return attributeMap;
 	}
 
 	@Override
 	public Map<String, PerunAttribute> getFacilityAttributes(Long facilityId, List<String> attrNames) throws RPCException {
+		log.debug("getFacilityAttributes(facilityId: {}, attrNames: {})", facilityId, attrNames);
 		if (facilityId == null || attrNames == null) {
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", attrNames" + attrNames);
 		}
@@ -166,11 +198,15 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("attrNames", attrNames);
 
 		JSONArray res = makeRpcCallForArray(ATTRIBUTES_MANAGER, "getAttributes", params);
-		return MapperUtils.mapAttributes(res);
+		Map<String, PerunAttribute> attributeMap = MapperUtils.mapAttributes(res);
+
+		log.debug("getFacilityAttributes returns: {}", attributeMap);
+		return attributeMap;
 	}
 
 	@Override
 	public boolean setFacilityAttribute(Long facilityId, String attrJson) throws RPCException {
+		log.debug("setFacilityAttribute(facilityId: {}, attrJson: {})", facilityId, attrJson);
 		if (facilityId == null || attrJson == null) {
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", attrJson" + attrJson);
 		}
@@ -179,11 +215,14 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("attribute", attrJson);
 
 		makeRpcCallForArray(ATTRIBUTES_MANAGER, "setAttribute", params);
+
+		log.debug("setFacilityAttribute returns: {}", true);
 		return true;
 	}
 
 	@Override
 	public boolean setFacilityAttributes(Long facilityId, List<String> attrsJsons) throws RPCException {
+		log.debug("setFacilityAttributes(facilityId: {}, attrsJsons: {})", facilityId, attrsJsons);
 		if (facilityId == null || attrsJsons == null) {
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", attrJsons" + attrsJsons);
 		}
@@ -192,11 +231,14 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("attributes", attrsJsons);
 
 		makeRpcCallForArray(ATTRIBUTES_MANAGER, "setAttributes", params);
+
+		log.debug("setFacilityAttributes returns: {}", true);
 		return true;
 	}
 
 	@Override
 	public User getRichUser(Long userId) throws RPCException {
+		log.debug("getRichUser({})", userId);
 		if (userId == null) {
 			throw new IllegalArgumentException("userId is null");
 		}
@@ -204,39 +246,53 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("user", userId);
 
 		JSONObject res = makeRpcCallForObject(USERS_MANAGER, "getRichUser", params);
-		return MapperUtils.mapUser(res, true);
+		User user = MapperUtils.mapUser(res, true);
+
+		log.debug("getRichUser returns: {}", user);
+		return user;
 	}
 
 	@Override
 	public boolean addFacilityAdmin(Long facilityId, Long userId) throws RPCException {
+		log.debug("addFacilityAdmin(facilityId: {}, userId:{})", facilityId, userId);
 		if (facilityId == null || userId == null) {
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", userId: " + userId);
 		}
-		return addRemoveFacilityAdmin(facilityId, userId, true);
+		boolean result = addRemoveFacilityAdmin(facilityId, userId, true);
+
+		log.debug("addFacilityAdmin returns: {}", result);
+		return result;
 	}
 
 	@Override
 	public boolean removeFacilityAdmin(Long facilityId, Long userId) throws RPCException {
+		log.debug("removeFacilityAdmin(facilityId: {}, userId:{})", facilityId, userId);
 		if (facilityId == null || userId == null) {
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", userId: " + userId);
 		}
-		return addRemoveFacilityAdmin(facilityId, userId, false);
+		boolean result = addRemoveFacilityAdmin(facilityId, userId, false);
+
+		log.debug("removeFacilityAdmin returns: {}", result);
+		return result;
 	}
 
 	@Override
 	public Set<Long> getFacilityIdsWhereUserIsAdmin(Long userId) throws RPCException {
+		log.debug("getFacilityIdsWhereUserIsAdmin({})", userId);
 		if (userId == null) {
 			throw new IllegalArgumentException("userId is null");
 		}
 		List<Facility> facilities = getFacilitiesWhereUserIsAdmin(userId);
 		Set<Long> ids = new HashSet<>();
-
 		facilities.forEach(f -> ids.add(f.getId()));
+
+		log.debug("getFacilityIdsWhereUserIsAdmin returns: {}", ids);
 		return ids;
 	}
 
 	@Override
 	public PerunAttributeDefinition getAttributeDefinition(String attributeName) throws RPCException {
+		log.debug("getAttributeDefinition({})", attributeName);
 		if (attributeName == null) {
 			throw new IllegalArgumentException("attributeName is null");
 		}
@@ -244,17 +300,28 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("attributeName", attributeName);
 
 		JSONObject res = makeRpcCallForObject(ATTRIBUTES_MANAGER, "getAttributeDefinition", params);
-		return PerunAttributeDefinition.fromPerunJson(res);
+		PerunAttributeDefinition definition = PerunAttributeDefinition.fromPerunJson(res);
+
+		log.debug("getAttributeDefinition returns: {}", definition);
+		return definition;
 	}
 
 	private JSONObject makeRpcCallForObject(String manager, String method, Map<String, Object> map) throws RPCException {
+		log.debug("makeRpcCallForObject(manager: {}, method: {}, map: {}", manager, method, map);
 		String response = makeRpcCall(manager, method, map);
-		return new JSONObject(response);
+		JSONObject result = new JSONObject(response);
+
+		log.debug("makeRpcCallForObject returns: {}",result);
+		return result;
 	}
 
 	private JSONArray makeRpcCallForArray(String manager, String method, Map<String, Object> map) throws RPCException {
+		log.debug("makeRpcCallForArray(manager: {}, method: {}, map: {}", manager, method, map);
 		String response = makeRpcCall(manager, method, map);
-		return new JSONArray(response);
+		JSONArray result = new JSONArray(response);
+
+		log.debug("makeRpcCallForArray returns: {}",result);
+		return result;
 	}
 
 	private String makeRpcCall(String manager, String method, Map<String, Object> map) throws RPCException {

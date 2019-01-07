@@ -125,4 +125,19 @@ public class PerunAttributeDefinition extends PerunEntity {
 	public String getFullName() {
 		return this.namespace + ':' + this.friendlyName;
 	}
+
+	@Override
+	public String toString() {
+		return "PerunAttributeDefinition{" +
+				super.toString() +
+				", friendlyName='" + friendlyName + '\'' +
+				", namespace='" + namespace + '\'' +
+				", description='" + description + '\'' +
+				", type='" + type + '\'' +
+				", displayName='" + displayName + '\'' +
+				", writable=" + writable +
+				", entity='" + entity + '\'' +
+				", beanName='" + beanName + '\'' +
+				'}';
+	}
 }
