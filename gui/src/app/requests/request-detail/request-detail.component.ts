@@ -43,6 +43,9 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
         this.request = request;
         this.loading = false;
         this.mapAttributes();
+      }, error => {
+        this.loading = false;
+        console.log(error);
       });
     });
   }

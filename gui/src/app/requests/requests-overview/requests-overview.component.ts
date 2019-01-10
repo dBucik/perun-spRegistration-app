@@ -41,6 +41,9 @@ export class RequestsOverviewComponent implements OnInit, OnDestroy {
       this.loading = false;
       this.requests = requests;
       this.dataSource = new MatTableDataSource<Request>(requests);
+    }, error => {
+      this.loading = false;
+      console.log(error);
     });
   }
 

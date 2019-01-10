@@ -44,6 +44,9 @@ export class NewRequestComponent implements OnInit {
     this.configService.isOidcEnabled().subscribe(isEnabled => {
       this.oidcEnabled = isEnabled;
       this.loading = false;
+    },error => {
+      this.loading = false;
+      console.log(error);
     });
 
     this.translate.get('REQUESTS.NEW_VALUES_ERROR_MESSAGE')

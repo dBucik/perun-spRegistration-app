@@ -60,6 +60,9 @@ export class FacilitiesOverviewComponent implements OnInit, OnDestroy {
       this.dataSource = new MatTableDataSource<Facility>(this.facilities);
       this.dataSource.sort = this.sort;
       this.loading = false;
+    }, error => {
+      this.loading = false;
+      console.log(error);
     });
   }
 
