@@ -41,13 +41,8 @@ public class RequestMapper implements RowMapper<Request> {
 	@Override
 	public Request mapRow(ResultSet resultSet, int i) throws SQLException {
 		Request request = new Request();
-<<<<<<< HEAD:api/src/main/java/cz/metacentrum/perun/spRegistration/persistence/mappers/RequestMapper.java
 		request.setReqId(resultSet.getLong(ID_KEY));
 		request.setFacilityId(resultSet.getLong(FACILITY_ID_KEY));
-=======
-		request.setId(resultSet.getLong("id"));
-		request.setFacilityId(resultSet.getLong("facility_id"));
->>>>>>> TODO:persistence/src/main/java/cz/metacentrum/perun/spRegistration/persistence/mappers/RequestMapper.java
 		if (resultSet.wasNull()) {
 			request.setFacilityId(null);
 		}

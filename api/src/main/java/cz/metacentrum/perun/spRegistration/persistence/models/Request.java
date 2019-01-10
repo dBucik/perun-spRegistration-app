@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class Request {
 
-	private Long id;
+	private Long reqId;
 	private Long facilityId;
 	private RequestStatus status;
 	private RequestAction action;
@@ -28,12 +28,12 @@ public class Request {
 	private Timestamp modifiedAt;
 	private Long modifiedBy;
 
-	public Long getId() {
-		return id;
+	public Long getReqId() {
+		return reqId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setReqId(Long reqId) {
+		this.reqId = reqId;
 	}
 
 	public Long getFacilityId() {
@@ -138,7 +138,6 @@ public class Request {
 		return res;
 	}
 
-<<<<<<< HEAD:api/src/main/java/cz/metacentrum/perun/spRegistration/persistence/models/Request.java
 	public List<String> getAdmins(String attrKey) {
 		return attributes.get(attrKey).valueAsArray(false);
 	}
@@ -147,12 +146,6 @@ public class Request {
 	public String toString() {
 		return "Request{" +
 				"reqId=" + reqId +
-=======
-	@Override
-	public String toString() {
-		return "Request{" +
-				"id=" + id +
->>>>>>> TODO:persistence/src/main/java/cz/metacentrum/perun/spRegistration/persistence/models/Request.java
 				", facilityId=" + facilityId +
 				", status=" + status +
 				", action=" + action +
