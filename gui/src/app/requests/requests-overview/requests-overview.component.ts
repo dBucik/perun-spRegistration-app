@@ -27,7 +27,7 @@ export class RequestsOverviewComponent implements OnInit, OnDestroy {
 
   loading = true;
 
-  displayedColumns: string[] = ['id', 'facilityId', 'status', 'action'];
+  displayedColumns: string[] = ['reqId', 'facilityId', 'status', 'action'];
   dataSource: MatTableDataSource<Request>;
 
   setDataSource() {
@@ -37,7 +37,7 @@ export class RequestsOverviewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.requestsSubscription = this.requestsService.getAllRequests().subscribe(requests => {
+    this.requestsSubscription = this.requestsService.getUserRequests().subscribe(requests => {
       this.loading = false;
       this.requests = requests;
       this.dataSource = new MatTableDataSource<Request>(requests);

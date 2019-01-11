@@ -3,7 +3,7 @@ import {RequestAction} from "./RequestAction";
 import {PerunAttribute} from "./PerunAttribute";
 
 export interface Request {
-  id: number;
+  reqId: number;
   facilityId: number;
   status: RequestStatus;
   action: RequestAction;

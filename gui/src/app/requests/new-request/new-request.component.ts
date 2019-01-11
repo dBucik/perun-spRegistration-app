@@ -1,12 +1,11 @@
 import {Component, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {ConfigService} from "../../core/services/config.service";
 import {ApplicationItem} from "../../core/models/ApplicationItem";
-import {FormGroup} from "@angular/forms";
 import {RequestsService} from "../../core/services/requests.service";
-import {ApplicationItemComponent} from "./application-item/application-item.component";
 import {MatSnackBar} from "@angular/material";
 import {TranslateService} from "@ngx-translate/core";
 import {PerunAttribute} from "../../core/models/PerunAttribute";
+import {RequestCreationStepComponent} from "./request-creation-step/request-creation-step.component";
 
 @Component({
   selector: 'app-new-request',
@@ -21,8 +20,8 @@ export class NewRequestComponent implements OnInit {
     private snackBar: MatSnackBar,
     private translate: TranslateService) { }
 
-  @ViewChildren(ApplicationItemComponent)
-  items: QueryList<ApplicationItemComponent>;
+  @ViewChildren(RequestCreationStepComponent)
+  steps: QueryList<RequestCreationStepComponent>;
 
   serviceSelected : string;
 
@@ -36,7 +35,7 @@ export class NewRequestComponent implements OnInit {
   errorText : string;
   successfullySubmittedText: string;
 
-  applicationItems: ApplicationItem[];
+  applicationItemGroups: ApplicationItem[][];
 
   ngOnInit() {
     this.requestsService.login().subscribe();
@@ -71,7 +70,7 @@ export class NewRequestComponent implements OnInit {
     this.selected = "oidc";
 
     this.configService.getOidcApplicationItems().subscribe(items => {
-      this.applicationItems = NewRequestComponent.sortItems(items);
+      this.applicationItemGroups = NewRequestComponent.sortItems(items);
       this.revealForm();
     });
   }
@@ -81,41 +80,20 @@ export class NewRequestComponent implements OnInit {
     this.selected = "saml";
 
     this.configService.getSamlApplicationItems().subscribe(items => {
-      this.applicationItems = NewRequestComponent.sortItems(items);
+      this.applicationItemGroups = NewRequestComponent.sortItems(items);
       this.revealForm();
     })
   }
 
-  attributesHasCorrectValues() : boolean {
-
-    let attributeItems = this.items.toArray();
-
-    for (const i of attributeItems) {
-      if (!i.hasCorrectValue()) {
-      }
-    }
-        return false;
-
-    return true;
-  }
-
   submitRequest() {
-    this.items.forEach(i => i.onFormSubmitted());
-
-    if (!this.attributesHasCorrectValues()) {
-      this.snackBar.open(this.errorText, null, {duration: 6000});
-      return;
-    }
 
     let perunAttributes : PerunAttribute[] = [];
 
-    this.items.forEach(i => {
-      let attr = i.getAttribute();
-      let perunAttr = new PerunAttribute(attr.value, attr.urn);
-      perunAttributes.push(perunAttr);
-    });
+    this.steps.forEach(step => perunAttributes = perunAttributes.concat(step.getPerunAttributes()));
 
-    this.requestsService.registerAndSubmit(perunAttributes).subscribe(requestId => {
+    console.log(perunAttributes);
+
+    this.requestsService.createRegistrationRequest(perunAttributes).subscribe(requestId => {
       this.snackBar.open(this.successfullySubmittedText, null, {duration: 6000});
     }, error => {
       console.log("Error");
@@ -123,39 +101,15 @@ export class NewRequestComponent implements OnInit {
     })
   }
 
-  private static getItemOrderValue(item : ApplicationItem) : number {
-    let value;
+  private static sortItems(items : ApplicationItem[][]) : ApplicationItem[][] {
+    let sortedItems : ApplicationItem[][] = [];
 
-    switch (item.type) {
-      case 'java.lang.String':
-        value = 0;
-        break;
-      case 'java.util.ArrayList':
-        if (item.allowedValues !== null) {
-          value = 1;
-        } else {
-          value = 2;
-        }
-        break;
-      case 'java.util.LinkedHashMap':
-        value = 3;
-        break;
-      case 'java.lang.Boolean':
-        value = 4;
-        break;
-      default:
-        value = 5;
-    }
+    items.forEach(itemsGroup => {
+      sortedItems.push(itemsGroup.sort(((a, b) => {
+        return a.displayPosition - b.displayPosition;
+      })))
+    });
 
-    return value;
-  }
-
-  private static sortItems(items : ApplicationItem[]) : ApplicationItem[] {
-    return items.sort(((a, b) => {
-      let aValue = NewRequestComponent.getItemOrderValue(a);
-      let bValue = NewRequestComponent.getItemOrderValue(b);
-
-      return aValue - bValue;
-    }))
+    return sortedItems;
   }
 }

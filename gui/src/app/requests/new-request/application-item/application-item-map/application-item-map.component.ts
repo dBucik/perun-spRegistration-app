@@ -23,9 +23,12 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
 
   noItemError = false;
   duplicitKeysError = false;
+  noValueError = false;
 
   translatedName: string;
   translatedDescription: string;
+
+  disableCustomKeys = false;
 
   @Input()
   applicationItem: ApplicationItem;
@@ -66,17 +69,34 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     return index;
   }
 
+  private isFilledAtLeastOneValue(): boolean {
+    for (const value of this.values) {
+      if (value.trim().length > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   hasCorrectValue(): boolean {
+    // reset errors
+    this.duplicitKeysError = false;
+    this.noValueError = false;
+
+    console.log(this.values);
+
     if (!this.applicationItem.required && this.values.length === 0) {
       return true;
     } else {
+      if (this.disableCustomKeys && !this.isFilledAtLeastOneValue()) {
+        this.noValueError = true;
+        return false;
+      }
       if (this.values.length === 0) {
         return false;
       }
     }
-
-    // reset error
-    this.duplicitKeysError = false;
 
     let keysWithIndexes = new Map<string, number>();
 
@@ -126,11 +146,23 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     browserLang = 'en';
     this.translatedDescription = this.applicationItem.description[browserLang];
     this.translatedName = this.applicationItem.displayName[browserLang];
+
+    if (this.applicationItem.allowedKeys != undefined && this.applicationItem.allowedKeys.length > 0) {
+      this.disableCustomKeys = true;
+
+      this.keys = this.applicationItem.allowedKeys;
+      for (let i = 0; i < this.keys.length; i++) {
+        this.values.push("");
+        this.indexes.push(this.index++);
+      }
+      this.noItemError = false;
+    }
   }
 
   onFormSubmitted(): void {
     if (!this.hasCorrectValue()) {
       if (this.values.length === 0) {
+        console.log("ERRED: " + this.applicationItem.displayName);
         this.noItemError = true;
       }
     }

@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,7 +140,7 @@ public class Request {
 	}
 
 	public List<String> getAdmins(String attrKey) {
-		return attributes.get(attrKey).valueAsArray(false);
+		return Collections.singletonList(attributes.get(attrKey).valueAsString(false));
 	}
 
 	@Override

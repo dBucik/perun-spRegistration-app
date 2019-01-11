@@ -4,7 +4,7 @@
       <mat-form-field class="w-100">
         <input
           #input="ngModel"
-          pattern="[a-zA-Z]*"
+          [pattern]="((applicationItem.regex != undefined) && (applicationItem.regex.length > 0)) ? applicationItem.regex : null"
           matInput
           placeholder="{{translatedName}}"
           [(ngModel)]="value"

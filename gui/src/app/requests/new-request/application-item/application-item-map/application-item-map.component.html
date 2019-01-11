@@ -2,11 +2,12 @@
   <div class="col-sm-12 d-flex">
     <form class="d-flex w-100" #form="ngForm">
       <div class="w-100">
-        <label class="col-form-label word-break-word" [class.perun-warn]="this.noItemError || this.duplicitKeysError">
+        <label class="col-form-label word-break-word" [class.perun-warn]="this.noItemError || this.duplicitKeysError || this.noValueError">
           {{translatedName}}
           <span *ngIf="applicationItem.required"> *</span>
         </label>
         <button
+          *ngIf="!disableCustomKeys"
           mat-icon-button
           color="accent"
           (click)="addValue()">
@@ -20,9 +21,10 @@
         </div>
         <div class="mr-5">
           <div *ngFor="let value of values; let i = index; trackBy: customTrackBy" class="d-flex mb-1">
-            <mat-form-field class="w-100 mr-2">
+            <mat-form-field class="w-100 ml-3 mr-2">
               <input
                 matInput
+                [disabled]="disableCustomKeys"
                 required
                 placeholder="{{'REQUESTS.MAP_KEY' | translate}}"
                 type="text"
@@ -33,7 +35,7 @@
             <mat-form-field class="w-100 mr-2 ml-2">
               <input
                 matInput
-                required
+                [required]="!disableCustomKeys"
                 placeholder="{{'REQUESTS.MAP_VALUE' | translate}}"
                 type="text"
                 name="value-{{i}}"
@@ -41,6 +43,7 @@
                 [(ngModel)] = "values[i]">
             </mat-form-field>
             <button
+              *ngIf="!disableCustomKeys"
               mat-icon-button
               color="warn"
               (click)="removeValue(i)">
@@ -55,5 +58,8 @@
     </div>
     <div class="col-12 d-flex perun-warn" *ngIf="duplicitKeysError">
       {{'REQUESTS.NEW_DUPLICIT_KEYS_ERROR' | translate}}
+    </div>
+    <div class="col-12 d-flex perun-warn" *ngIf="noValueError">
+      {{'REQUESTS.NEW_NO_VALUE_ERROR' | translate}}
     </div>
 </div>

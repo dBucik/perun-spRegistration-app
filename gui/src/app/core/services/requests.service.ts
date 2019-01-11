@@ -22,6 +22,10 @@ export class RequestsService {
     return this.apiService.get('/allRequests');
   }
 
+  getUserRequests(): Observable<Request[]> {
+    return this.apiService.get('/userRequests');
+  }
+
   createRegistrationRequest(perunAttributes: PerunAttribute[]): Observable<number> {
     return this.apiService.post('/register', perunAttributes);
   }

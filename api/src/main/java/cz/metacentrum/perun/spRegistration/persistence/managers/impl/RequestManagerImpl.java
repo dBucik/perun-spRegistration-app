@@ -144,7 +144,7 @@ public class RequestManagerImpl implements RequestManager {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_user_id", userId);
 
-		List<Request> requests = jdbcTemplate.query(query, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, params, requestMapper);
 
 		log.debug("getAllRequestsByUserId returns: {}", requests);
 		return requests;
@@ -158,7 +158,7 @@ public class RequestManagerImpl implements RequestManager {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("status", status.getAsInt());
 
-		List<Request> requests = jdbcTemplate.query(query, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, params, requestMapper);
 
 		log.debug("getAllRequestsByStatus returns: {}", requests);
 		return requests;
@@ -172,7 +172,7 @@ public class RequestManagerImpl implements RequestManager {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("action", action.getAsInt());
 
-		List<Request> requests = jdbcTemplate.query(query, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, params, requestMapper);
 
 		log.debug("getAllRequestsByAction returns: {}", requests);
 		return requests;
@@ -198,9 +198,9 @@ public class RequestManagerImpl implements RequestManager {
 		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE facility_id IN (:ids)";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("ids", new ArrayList(facilityIds));
+		params.addValue("ids", new ArrayList<>(facilityIds));
 
-		List<Request> requests = jdbcTemplate.query(query, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, params, requestMapper);
 
 		log.debug("getAllRequestsByFacilityIds returns: {}", requests);
 		return requests;

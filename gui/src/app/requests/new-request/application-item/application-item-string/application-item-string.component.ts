@@ -2,7 +2,6 @@ import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {RequestItem} from "../../RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
-import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 import {NgForm, NgModel} from "@angular/forms";
 import {TranslateService} from "@ngx-translate/core";
 
@@ -14,8 +13,6 @@ import {TranslateService} from "@ngx-translate/core";
 export class ApplicationItemStringComponent implements RequestItem, OnInit {
 
   constructor(private translate: TranslateService) { }
-
-  helpIcon = faQuestionCircle;
 
   @Input()
   applicationItem: ApplicationItem;

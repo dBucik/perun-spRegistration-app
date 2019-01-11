@@ -1,0 +1,12 @@
+<app-application-item
+  *ngFor="let appItem of applicationItems"
+  [applicationItem]="appItem">
+</app-application-item>
+<div class="mt-5">
+  <button mat-raised-button [disabled]="stepper != undefined && stepper.selectedIndex === 0" (click)="previousStep()">
+    {{"REQUESTS.NEW_PREVIOUS_STEP" | translate}}
+  </button>
+  <button mat-raised-button color="primary" class="ml-2" (click)="nextStep()">
+    {{"REQUESTS.NEW_NEXT_STEP" | translate}}
+  </button>
+</div>

@@ -355,20 +355,22 @@ public class UserServiceImpl implements UserService {
 	public Request getDetailedRequest(Long requestId, Long userId)
 			throws UnauthorizedActionException, InternalErrorException {
 		log.debug("getDetailedRequest(requestId: {}, userId: {})", requestId, userId);
-		if (requestId == null || userId == null) {
-			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
-			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
-		} else if (! isAdminInRequest(requestId, userId)) {
-			log.error("User cannot view request, user is not a requester");
-			throw new UnauthorizedActionException("User cannot view request, user is not a requester");
-		}
 
-		log.debug("fetching request from DB with id: {}", requestId);
 		Request request = requestManager.getRequestByReqId(requestId);
+		log.debug("fetching request from DB with id: {}", requestId);
 		if (request == null) {
 			log.error("Could not retrieve request for id: {}", requestId);
 			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
 		}
+
+		if (requestId == null || userId == null) {
+			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
+		} else if (!isAdminInRequest(request.getReqUserId(), userId)) {
+			log.error("User cannot view request, user is not a requester");
+			throw new UnauthorizedActionException("User cannot view request, user is not a requester");
+		}
+
 
 		log.debug("getDetailedRequest returns: {}", request);
 		return request;
