@@ -16,11 +16,11 @@ export class ConfigService {
     return this.apiService.get('/config/oidcEnabled');
   }
 
-  getSamlApplicationItems() : Observable<ApplicationItem[]> {
+  getSamlApplicationItems() : Observable<ApplicationItem[][]> {
     return this.apiService.get('/config/samlInputs');
   }
 
-  getOidcApplicationItems() : Observable<ApplicationItem[]> {
+  getOidcApplicationItems() : Observable<ApplicationItem[][]> {
     return this.apiService.get('/config/oidcInputs');
   }
 }

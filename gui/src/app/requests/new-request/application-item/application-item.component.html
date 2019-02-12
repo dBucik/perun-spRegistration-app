@@ -1,7 +1,7 @@
 <!-- String -->
 <app-application-item-string
   [applicationItem]="applicationItem"
-  *ngIf="applicationItem.type === 'java.lang.String'">
+  *ngIf="applicationItem.type === 'java.lang.String' || applicationItem.type === 'java.lang.LargeString'">
 </app-application-item-string>
 
 <!-- Boolean -->

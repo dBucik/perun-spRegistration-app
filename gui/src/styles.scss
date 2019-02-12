@@ -63,6 +63,15 @@ a:hover {
 .clickable {
   cursor: pointer;
 }
+
+.no-focus-outline:focus {
+  outline: none;
+}
+
+.perun-accent-color {
+  color: mat-color($service-creation-accent);
+}
+
 .perun-small-btn {
   height: auto;
   min-width: 1% !important;
@@ -79,3 +88,21 @@ th {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+// HACK to disable stepper navigation by clicking header items
+.mat-horizontal-stepper-header{
+  pointer-events: none !important;
+}
+
+.mat-horizontal-content-container {
+  padding: 0 !important;
+}
+
+.mat-horizontal-stepper-header-container {
+  .mat-step-header:first-child {
+    padding-left: 0 !important;
+  }
+  .mat-step-header:last-child {
+    padding-right: 0 !important;
+  }
+}

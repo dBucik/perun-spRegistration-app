@@ -27,7 +27,7 @@ public class RequestMapper implements RowMapper<Request> {
 	private static final String FACILITY_ID_KEY = "facility_id";
 	private static final String STATUS_KEY = "status";
 	private static final String ACTION_KEY = "action";
-	private static final String REQUESTING_USER_ID_KEY = "requestin_user_id";
+	private static final String REQUESTING_USER_ID_KEY = "requesting_user_id";
 	private static final String MODIFIED_BY_KEY = "modified_by";
 	private static final String MODIFIED_AT_KEY = "modified_at";
 
