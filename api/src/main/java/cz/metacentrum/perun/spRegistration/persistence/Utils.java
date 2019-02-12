@@ -28,7 +28,7 @@ public class Utils {
 		List<AttrInput> inputs = new ArrayList<>();
 		Properties en = appConfig.getEnLocale();
 		Properties cs = appConfig.getCsLocale();
-		boolean isCsEnabled = cs.isEmpty();
+		boolean isCsDisabled = cs.isEmpty();
 
 		for (String prop: props.stringPropertyNames()) {
 			if (! prop.contains(ATTR_NAME)) {
@@ -49,7 +49,7 @@ public class Utils {
 			name.put("en", en.getProperty(nameKey));
 			desc.put("en", en.getProperty(descKey));
 
-			if (isCsEnabled) {
+			if (! isCsDisabled) {
 				name.put("cs", cs.getProperty(nameKey));
 				desc.put("cs", cs.getProperty(descKey));
 			}

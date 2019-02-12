@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,5 +55,11 @@ public class GeneralController {
 	public List<String> getLangs() {
 		log.debug("getLangs()");
 		return config.getAppConfig().getLangs();
+	}
+
+	@RequestMapping(path = "/api/config/isUserAdmin")
+	public boolean isUserAdmin(@SessionAttribute("userId") Long userId) {
+		log.debug("isUserAdmin()");
+		return config.getAppConfig().isAdmin(userId);
 	}
 }
