@@ -14,6 +14,7 @@ import { ApplicationItemSelectComponent } from './new-request/application-item/a
 import { RequestDetailComponent } from './request-detail/request-detail.component';
 import { RequestItemValuePipe } from './request-item-value.pipe';
 import { RequestCreationStepComponent } from './new-request/request-creation-step/request-creation-step.component';
+import { AllRequestsComponent } from './all-requests/all-requests.component';
 
 @NgModule({
   imports: [
@@ -32,7 +33,8 @@ import { RequestCreationStepComponent } from './new-request/request-creation-ste
     ApplicationItemSelectComponent,
     RequestDetailComponent,
     RequestItemValuePipe,
-    RequestCreationStepComponent
+    RequestCreationStepComponent,
+    AllRequestsComponent
   ]
 })
 export class RequestsModule { }

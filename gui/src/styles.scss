@@ -95,9 +95,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .mat-horizontal-content-container {
-  padding: 0 !important;
+  //padding: 0 !important;
 }
 
+// HACK to reduce whitespace in request form
 .mat-horizontal-stepper-header-container {
   .mat-step-header:first-child {
     padding-left: 0 !important;
