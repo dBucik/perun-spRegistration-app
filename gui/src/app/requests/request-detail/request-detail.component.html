@@ -6,7 +6,7 @@
         {{'REQUESTS.REQUEST_DETAIL_TITLE' | translate}}{{request.reqId}}
       </h2>
       {{'REQUESTS.REQUEST_DETAIL_STATUS' | translate}}
-      <span class="perun-accent-color">
+      <span [className]="request.status === 'NEW' ? 'new-request' : ''">
         {{request.status}}
       </span>
       <br/>
@@ -27,6 +27,19 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-dark"></tr>
       </table>
 
+      <div class="mt-5">
+        <button mat-raised-button color="warn" (click)="reject()">
+          {{'REQUESTS.REQUEST_DETAIL_REJECT' | translate}}
+        </button>
+        <div class="pull-right">
+          <button class="ml-2" mat-raised-button color="primary" (click)="requestChanges()">
+            {{'REQUESTS.REQUEST_DETAIL_REQUEST_CHANGES' | translate}}
+          </button>
+          <button class="ml-2" mat-raised-button color="accent" (click)="approve()">
+            {{'REQUESTS.REQUEST_DETAIL_APPROVE' | translate}}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

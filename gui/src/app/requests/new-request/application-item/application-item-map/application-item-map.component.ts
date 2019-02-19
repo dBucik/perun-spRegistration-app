@@ -93,7 +93,7 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
         this.noValueError = true;
         return false;
       }
-      if (this.values.length === 0) {
+      else if (this.values.length === 0) {
         return false;
       }
     }
@@ -111,10 +111,6 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
         this.showErredKey(keysWithIndexes.get(key));
         this.showErredKey(i);
 
-        return false;
-      }
-
-      if (value.length === 0 || key.length === 0) {
         return false;
       }
 

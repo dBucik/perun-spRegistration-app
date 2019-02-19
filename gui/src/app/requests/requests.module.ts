@@ -13,7 +13,8 @@ import { ApplicationItemMapComponent } from './new-request/application-item/appl
 import { ApplicationItemSelectComponent } from './new-request/application-item/application-item-select/application-item-select.component';
 import { RequestDetailComponent } from './request-detail/request-detail.component';
 import { RequestItemValuePipe } from './request-item-value.pipe';
-import { RequestCreationStepComponent } from './new-request/request-creation-step/request-creation-step.component';
+import { AllRequestsComponent } from './all-requests/all-requests.component';
+import {RequestCreationStepComponent} from "./new-request/request-creation-step/request-creation-step.component";
 
 @NgModule({
   imports: [
@@ -32,7 +33,8 @@ import { RequestCreationStepComponent } from './new-request/request-creation-ste
     ApplicationItemSelectComponent,
     RequestDetailComponent,
     RequestItemValuePipe,
-    RequestCreationStepComponent
+    RequestCreationStepComponent,
+    AllRequestsComponent
   ]
 })
 export class RequestsModule { }

@@ -70,7 +70,7 @@ export class NewRequestComponent implements OnInit {
     this.selected = "oidc";
 
     this.configService.getOidcApplicationItems().subscribe(items => {
-      this.applicationItemGroups = NewRequestComponent.sortItems(items);
+      this.applicationItemGroups = NewRequestComponent.sortItems(NewRequestComponent.filterItems(items));
       this.revealForm();
     });
   }
@@ -80,11 +80,14 @@ export class NewRequestComponent implements OnInit {
     this.selected = "saml";
 
     this.configService.getSamlApplicationItems().subscribe(items => {
-      this.applicationItemGroups = NewRequestComponent.sortItems(items);
+      this.applicationItemGroups = NewRequestComponent.sortItems(NewRequestComponent.filterItems(items));
       this.revealForm();
     })
   }
 
+  /**
+   * Collects data from form and submits new request
+   */
   submitRequest() {
 
     let perunAttributes : PerunAttribute[] = [];
@@ -101,6 +104,34 @@ export class NewRequestComponent implements OnInit {
     })
   }
 
+  /**
+   * Filters items that should not be displayed
+   *
+   * @param items
+   */
+  private static filterItems(items : ApplicationItem[][]) : ApplicationItem[][] {
+    let filteredItems : ApplicationItem[][] = [];
+
+    items.forEach(itemsGroup => {
+      let filteredGroup : ApplicationItem[] = [];
+
+      itemsGroup.forEach(item => {
+        if (item.displayed) {
+          filteredGroup.push(item);
+        }
+      });
+
+      filteredItems.push(filteredGroup);
+    });
+
+    return filteredItems;
+  }
+
+  /**
+   * Sorts items in order that they should be displayed
+   *
+   * @param items
+   */
   private static sortItems(items : ApplicationItem[][]) : ApplicationItem[][] {
     let sortedItems : ApplicationItem[][] = [];
 
@@ -110,6 +141,7 @@ export class NewRequestComponent implements OnInit {
       })))
     });
 
+    console.log(sortedItems);
     return sortedItems;
   }
 }

@@ -24,6 +24,11 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
   loading = true;
   request: Request;
 
+  tada = "<div><b>SDFSDFSDF</b></div>";
+
+  //TODO load this from api when implemented
+  isUserAdmin : boolean = true;
+
   private mapAttributes() {
     this.requestItems = [];
     for (let urn of Object.keys(this.request.attributes)) {
@@ -52,5 +57,17 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+  }
+
+  reject() {
+
+  }
+
+  approve() {
+
+  }
+
+  requestChanges() {
+
   }
 }

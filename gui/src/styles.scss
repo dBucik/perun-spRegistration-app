@@ -13,7 +13,7 @@
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
 $service-creation-primary: mat-palette($mat-indigo, 500);
-$service-creation-accent: mat-palette($mat-purple, A400);
+$service-creation-accent: mat-palette($mat-light-green, A400);
 
 // The warn palette is optional (defaults to red).
 $service-creation-warn: mat-palette($mat-red);
@@ -72,6 +72,10 @@ a:hover {
   color: mat-color($service-creation-accent);
 }
 
+.new-request {
+  color: #008800;
+}
+
 .perun-small-btn {
   height: auto;
   min-width: 1% !important;
@@ -95,9 +99,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .mat-horizontal-content-container {
-  padding: 0 !important;
+  //padding: 0 !important;
 }
 
+// HACK to reduce whitespace in request form
 .mat-horizontal-stepper-header-container {
   .mat-step-header:first-child {
     padding-left: 0 !important;

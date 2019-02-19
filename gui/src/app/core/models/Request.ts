@@ -1,12 +1,10 @@
-import {RequestStatus} from "./RequestStatus";
-import {RequestAction} from "./RequestAction";
 import {PerunAttribute} from "./PerunAttribute";
 
 export interface Request {
   reqId: number;
   facilityId: number;
-  status: RequestStatus;
-  action: RequestAction;
+  status: string;
+  action: string;
   reqUserId: number;
   attributes: Map<string, PerunAttribute>;
   modifiedAt: string;
