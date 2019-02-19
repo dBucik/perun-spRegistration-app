@@ -39,6 +39,11 @@
               {{'MENU.NEW_REQUEST' | translate}}
             </a>
           </li>
+          <li class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/requests/allRequests'">
+            <a class="no-hover-decoration" routerLink="requests/allRequests">
+              {{'MENU.ALL_REQUESTS' | translate}}
+            </a>
+          </li>
         </ul>
       </li>
       <li class="nav-item pt-0 pl-2 pr-2 pb-2" [class.active]="currentUrl !== undefined && currentUrl === '/facilities'">

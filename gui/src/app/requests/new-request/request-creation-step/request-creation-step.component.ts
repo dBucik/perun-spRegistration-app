@@ -1,8 +1,9 @@
 import {Component, Input, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {ApplicationItem} from "../../../core/models/ApplicationItem";
-import {MatStepper} from "@angular/material";
+import {MatSnackBar, MatStepper} from "@angular/material";
 import {ApplicationItemComponent} from "../application-item/application-item.component";
 import {PerunAttribute} from "../../../core/models/PerunAttribute";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-request-creation-step',
@@ -11,7 +12,10 @@ import {PerunAttribute} from "../../../core/models/PerunAttribute";
 })
 export class RequestCreationStepComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private snackBar: MatSnackBar,
+    private translation : TranslateService
+  ) { }
 
   @ViewChildren(ApplicationItemComponent)
   items: QueryList<ApplicationItemComponent>;
@@ -21,6 +25,8 @@ export class RequestCreationStepComponent implements OnInit {
 
   @Input()
   stepper : MatStepper;
+
+  private valueErrorText: string;
 
   public getPerunAttributes() : PerunAttribute[] {
     let perunAttributes : PerunAttribute[] = [];
@@ -51,7 +57,7 @@ export class RequestCreationStepComponent implements OnInit {
     this.items.forEach(i => i.onFormSubmitted());
 
     if (!this.attributesHasCorrectValues()) {
-      // this.snackBar.open(this.errorText, null, {duration: 6000});
+      this.snackBar.open(this.valueErrorText, null, {duration: 6000});
       return false;
     }
 
@@ -70,6 +76,7 @@ export class RequestCreationStepComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.translation.get("REQUESTS.NEW_VALUES_ERROR_MESSAGE").subscribe(text => this.valueErrorText = text);
   }
 
 }

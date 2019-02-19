@@ -27,7 +27,7 @@ export class AllRequestsComponent implements OnInit {
 
   loading = true;
 
-  displayedColumns: string[] = ['reqId', 'facilityId', 'status', 'action'];
+  displayedColumns: string[] = ['reqId', 'reqUserId', 'facilityId', 'status', 'action'];
   dataSource: MatTableDataSource<Request>;
 
   setDataSource() {

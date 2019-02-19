@@ -5,13 +5,16 @@
     "REQUESTS": "Requests",
     "FACILITIES": "Facilities",
     "NEW_REQUEST": "New request",
-    "MY_REQUESTS": "My requests"
+    "MY_REQUESTS": "My requests",
+    "ALL_REQUESTS": "All requests"
   },
   "REQUESTS": {
     "TITLE": "My requests",
     "YOUR_REQUESTS": "Your requests",
+    "ALL_REQUESTS": "All requests",
     "ID": "Id",
-    "FACILITY_ID": "Facility Id",
+    "FACILITY_ID": "Facility ID",
+    "USER_ID": "User ID",
     "STATUS": "Status",
     "ACTION": "Action",
     "MODIFIED_AT": "Modified at",
@@ -41,7 +44,10 @@
     "REQUEST_DETAIL_EDITED" : "Edited on: ",
     "REQUEST_DETAIL_ITEMS" : "Requested items:",
     "REQUEST_DETAIL_ITEM_NAME" : "Name",
-    "REQUEST_DETAIL_ITEM_VALUE" : "Value"
+    "REQUEST_DETAIL_ITEM_VALUE" : "Value",
+    "REQUEST_DETAIL_REJECT": "Reject",
+    "REQUEST_DETAIL_REQUEST_CHANGES": "Request changes",
+    "REQUEST_DETAIL_APPROVE": "Approve"
   },
   "FACILITIES": {
     "TITLE": "Facilities",
