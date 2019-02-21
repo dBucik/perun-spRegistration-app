@@ -1,15 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {Subscription} from "rxjs";
+import {ConfigService} from "../../../core/services/config.service";
 
 
 @Component({
   selector: 'app-perun-header',
-  templateUrl: './perun-header.component.html',
+  template: "<div [innerHTML]=\"headerHTML\"></div>",
+  //templateUrl: './perun-header.component.html',
   styleUrls: ['./perun-header.component.scss']
 })
 export class PerunHeaderComponent implements OnInit {
 
-  constructor() {}
+  constructor(private configService: ConfigService) {}
+
+  headerHTML : string;
+  headerSubscription : Subscription;
 
   ngOnInit() {
+    this.headerSubscription = this.configService.getHeader().subscribe(header => {
+      this.headerHTML = header;
+    })
   }
 }

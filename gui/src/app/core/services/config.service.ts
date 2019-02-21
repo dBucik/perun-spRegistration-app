@@ -23,4 +23,14 @@ export class ConfigService {
   getOidcApplicationItems() : Observable<ApplicationItem[][]> {
     return this.apiService.get('/config/oidcInputs');
   }
+
+  getHeader() : Observable<string>{
+    //todo type real in url
+    return this.apiService.get('/config/header');
+  }
+
+  getFooter() : Observable<string>{
+    //todo type real in url
+    return this.apiService.get('/config/footer');
+  }
 }
