@@ -2,6 +2,7 @@ package cz.metacentrum.perun.spRegistration.persistence.models;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class AttrInput {
 
@@ -128,5 +129,26 @@ public class AttrInput {
 				", regex='" + regex + '\'' +
 				", allowedKeys=" + allowedKeys +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (! (o instanceof AttrInput)) {
+			return false;
+		}
+
+		AttrInput them = (AttrInput) o;
+		return Objects.equals(this.name, them.name)
+				&& Objects.equals(this.displayName, them.displayName)
+				&& Objects.equals(this.type, them.type);
+	}
+
+	@Override
+	public int hashCode() {
+		long res = 31 * name.hashCode();
+		res *= 31 * displayName.hashCode();
+		res *= 31 * type.hashCode();
+
+		return (int) res;
 	}
 }

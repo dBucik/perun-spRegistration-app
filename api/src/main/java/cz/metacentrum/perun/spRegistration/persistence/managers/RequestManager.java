@@ -6,6 +6,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestApproval;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
@@ -78,7 +79,7 @@ public interface RequestManager {
 	 * @param facilityId ID of associated facility.
 	 * @return List of found Request objects.
 	 */
-	Request getRequestByFacilityId(Long facilityId);
+	List<Request> getAllRequestsByFacilityId(Long facilityId);
 
 	/**
 	 * Get all requests from DB associated with facilities specified by IDs.
@@ -96,6 +97,17 @@ public interface RequestManager {
 	 * @return true if all went OK, false otherwise.
 	 */
 	boolean addSignature(Long requestId, Long userId, String fullName, String approvalName);
+
+	/**
+	 * Add signature of transferring to the production approval to the request
+	 * @param requestId id of request for transfer
+	 * @param userId id of signing user
+	 * @param signerName full name of signing user from Perun
+	 * @param signerInput name entered by signing user
+	 * @param signedAt time when signature has been made
+	 * @return true if all went OK, false otherwise.
+	 */
+	boolean addSignature(Long requestId, Long userId, String signerName, String signerInput, Timestamp signedAt);
 
 	/**
 	 * Get all approvals for transferring of service into production environment

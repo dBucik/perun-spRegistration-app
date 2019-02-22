@@ -1,6 +1,7 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 
 /**
  * Approval for request of transferring service into production environment.
@@ -64,5 +65,30 @@ public class RequestApproval {
 				", signerInput='" + signerInput + '\'' +
 				", signedAt=" + signedAt +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (! (o instanceof RequestApproval)) {
+			return false;
+		}
+
+		RequestApproval them = (RequestApproval) o;
+		return Objects.equals(this.requestId, them.requestId)
+				&& Objects.equals(this.signerId, them.signerId)
+				&& Objects.equals(this.signerName, them.signerName)
+				&& Objects.equals(this.signerInput, them.signerInput)
+				&& Objects.equals(this.signedAt, them.signedAt);
+	}
+
+	@Override
+	public int hashCode() {
+		long res = 31 * requestId;
+		res *= 31 * signerId.hashCode();
+		res *= 31 * signerName.hashCode();
+		res *= 31 * signerInput.hashCode();
+		res *= 31 * signedAt.hashCode();
+
+		return (int) res;
 	}
 }

@@ -2,8 +2,8 @@ package cz.metacentrum.perun.spRegistration.persistence.models;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 /**
@@ -111,7 +111,7 @@ public class User extends PerunEntity {
 	}
 
 	public String getFullName() {
-		StringJoiner joiner = new StringJoiner("");
+		StringJoiner joiner = new StringJoiner(" ");
 		if (titleBefore != null && !titleBefore.isEmpty()) {
 			joiner.add(titleBefore);
 		}
@@ -122,7 +122,7 @@ public class User extends PerunEntity {
 			joiner.add(middleName);
 		}
 		if (lastName != null && !lastName.isEmpty()) {
-			joiner.add(middleName);
+			joiner.add(lastName);
 		}
 		if (titleAfter != null && !titleAfter.isEmpty()) {
 			joiner.add(titleAfter);
@@ -144,5 +144,22 @@ public class User extends PerunEntity {
 				", facilitiesWhereAdmin=" + facilitiesWhereAdmin +
 				", isAdmin=" + isAdmin +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (! (o instanceof User)) {
+			return false;
+		}
+
+		User them = (User) o;
+		return Objects.equals(this.getId(), them.getId());
+	}
+
+	@Override
+	public int hashCode() {
+		long res = 31 * this.getId();
+
+		return (int) res;
 	}
 }
