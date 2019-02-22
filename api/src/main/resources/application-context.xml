@@ -2,8 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
     <context:component-scan base-package="cz.metacentrum.perun.spRegistration"/>
     <context:property-placeholder properties-ref="properties" />
@@ -15,7 +16,7 @@
                 <prop key="jdbc.url">jdbc:postgresql://cloud69b.cerit-sc.cz/spregistration</prop>
                 <prop key="jdbc.username">spreg</prop>
                 <prop key="jdbc.password">spreg123</prop>
-                <prop key="rpc.url">XYZ</prop>
+                <prop key="rpc.url">https://perun-dev.cesnet.cz/ba/rpc/</prop>
                 <prop key="rpc.user">XYZ</prop>
                 <prop key="rpc.password">XYZ</prop>
                 <prop key="admins">62692,0,0</prop>
@@ -215,6 +216,10 @@
         <property name="username" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
     </bean>
+
+    <jdbc:embedded-database id="testDataSource" type="H2">
+        <jdbc:script location="classpath:sql/test-schema.sql"/>
+    </jdbc:embedded-database>
 
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <constructor-arg name="dataSource" ref="dataSource"/>
