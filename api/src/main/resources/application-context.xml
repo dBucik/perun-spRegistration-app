@@ -12,7 +12,7 @@
         <property name="properties">
             <props>
                 <prop key="jdbc.driver">org.postgresql.Driver</prop>
-                <prop key="jdbc.url">jdbc:postgresql://cloud69b.cerit-sc.cz/spregistration</prop>
+                <prop key="jdbc.url">jdbc:postgresql://127.0.0.1:5432/spregistration</prop>
                 <prop key="jdbc.username">spreg</prop>
                 <prop key="jdbc.password">spreg123</prop>
                 <prop key="rpc.url">XYZ</prop>
@@ -34,10 +34,10 @@
         <property name="properties" ref="defaultProperties"/>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/appConfig.properties</value>
+                <value>file:///etc/perun-spRegistration/appConfig.properties</value>
             </list>
         </property>
-        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreResourceNotFound" value="false"/>
     </bean>
 
     <bean id="facilityServiceAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -75,7 +75,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/serviceAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/serviceAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -122,7 +122,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/samlAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/samlAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -155,7 +155,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/oidcAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/oidcAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -176,7 +176,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/membershipAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/membershipAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -203,7 +203,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/messagesProperties.properties</value>
+                <value>file:///etc/perun-spRegistration/messagesProperties.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>

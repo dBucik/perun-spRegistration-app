@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 @RestController
@@ -21,6 +24,15 @@ public class GeneralController {
 	@Autowired
 	public GeneralController(Config config) {
 		this.config = config;
+	}
+
+	@RequestMapping(path="/api/test")
+	public String sess(HttpServletRequest req) {
+		log.debug("here");
+		log.debug(req.getRemoteUser());
+		log.debug(req.getSession().toString());
+
+		return req.getRemoteUser();
 	}
 
 	@RequestMapping(path = "/api/config/oidcInputs")
