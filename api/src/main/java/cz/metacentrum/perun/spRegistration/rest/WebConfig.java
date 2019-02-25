@@ -5,10 +5,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 /**
+ * This class is only used for testing and in production version it should be omitted.
+ *
  * @author Vojtech Sassmann <vojtech.sassmann@gmail.com>
  */
 @Configuration
-public class WebConfig extends WebMvcConfigurationSupport {
+public class WebConfig extends WebMvcConfigurationSupport  {
 	@Override
 	protected void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
