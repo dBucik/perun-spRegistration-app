@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
  *
  * @author Vojtech Sassmann <vojtech.sassmann@gmail.com>
  */
-@Configuration
+//@Configuration
 public class WebConfig extends WebMvcConfigurationSupport  {
 	@Override
 	protected void addCorsMappings(CorsRegistry registry) {
