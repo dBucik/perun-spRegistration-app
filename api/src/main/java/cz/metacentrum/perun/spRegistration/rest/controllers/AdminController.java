@@ -35,7 +35,7 @@ public class AdminController {
 	@RequestMapping(path = "/api")
 	public void start(HttpServletRequest request) {
 		//TODO: delete method, only for testing purposes
-		request.getSession().setAttribute("userId", 62692L);
+//		request.getSession().setAttribute("userId", 62692L);
 	}
 
 	@RequestMapping(path = "/api/allFacilities", method = RequestMethod.GET)
