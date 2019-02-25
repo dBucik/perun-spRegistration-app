@@ -14,7 +14,7 @@ public class WebConfig extends WebMvcConfigurationSupport  {
 	@Override
 	protected void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-				.allowedOrigins("http://localhost:4200")
+				.allowedOrigins("http://localhost:8009/spreg", "http://localhost:8080/spreg" )
 				.allowedMethods(
 						"GET",
 						"POST",
