@@ -1,6 +1,8 @@
 package cz.metacentrum.perun.spRegistration.service;
 
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -19,6 +21,8 @@ import java.util.StringJoiner;
 
 @SuppressWarnings("Duplicates")
 public class Mails {
+
+	private static final Logger log = LoggerFactory.getLogger(Mails.class);
 
 	private static final String ADMINS_MAILS = "admins.emails";
 	private static final String HOST_KEY = "host";
@@ -48,6 +52,8 @@ public class Mails {
 
 	public static boolean requestStatusUpdateUserNotify(Long requestId, RequestStatus status, List<String> recipients,
 														String additionalMessage, Properties props) {
+		log.debug("requestStatusUpdateUserNotify(requestId: {}, status: {}, recipients: {}, additionalMessage: {}, props: {})",
+				requestId, status, recipients, additionalMessage, props);
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
@@ -69,10 +75,14 @@ public class Mails {
 
 		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
 
-		return sendMail(host, from, recipients, subject, message);
+		boolean res = sendMail(host, from, recipients, subject, message);
+		log.debug("requestStatusUpdateUserNotify() returns: {}", res);
+		return res;
 	}
 
 	public static boolean userCreateRequestNotify(Long requestId, String serviceName, List<String> recipients, Properties props) {
+		log.debug("userCreateRequestNotify(requestId: {}, serviceName: {}, recipients: {}, props: {})",
+				requestId, serviceName, recipients, props);
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
@@ -91,10 +101,14 @@ public class Mails {
 		}
 		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
 
-		return sendMail(host, from, recipients, subject, message);
+		boolean res = sendMail(host, from, recipients, subject, message);
+		log.debug("userCreateRequestNotify() returns: {}", res);
+		return res;
 	}
 
 	public static boolean transferToProductionUserNotify(Long requestId, String serviceName, List<String> recipients, Properties props) {
+		log.debug("transferToProductionUserNotify(requestId: {}, serviceName: {}, recipients: {}, props: {})",
+				requestId, serviceName, recipients, props);
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
@@ -113,10 +127,14 @@ public class Mails {
 		}
 		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
 
-		return sendMail(host, from, recipients, subject, message);
+		boolean res = sendMail(host, from, recipients, subject, message);
+		log.debug("transferToProductionUserNotify() returns: {}", res);
+		return res;
 	}
 
 	public static boolean authoritiesApproveProductionTransferNotify(String approvalLink, String serviceName, List<String> recipients, Properties props) {
+		log.debug("authoritiesApproveProductionTransferNotify(approvalLink: {}, serviceName: {}, recipients: {}, props: {})",
+				approvalLink, serviceName, recipients, props);
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
@@ -134,10 +152,13 @@ public class Mails {
 		}
 		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
 
-		return sendMail(host, from, recipients, subject, message);
+		boolean res = sendMail(host, from, recipients, subject, message);
+		log.debug("authoritiesApproveProductionTransferNotify() returns: {}", res);
+		return res;
 	}
 
 	public static boolean requestApprovalAdminNotify(Long userId, Long requestId, Properties props) {
+		log.debug("requestApprovalAdminNotify(userId: {}, requestId: {}, props: {})", userId, requestId, props);
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
@@ -156,10 +177,13 @@ public class Mails {
 		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
 		List<String> admins = Arrays.asList(props.getProperty(ADMINS_MAILS).split(","));
 
-		return sendMail(host, from, admins, subject, message);
+		boolean res = sendMail(host, from, admins, subject, message);
+		log.debug("requestApprovalAdminNotify() returns: {}", res);
+		return res;
 	}
 
 	private static boolean sendMail(String host, String from, List<String> to, String subject, String msg) {
+		log.debug("sendMail(host: {}, from: {}, to: {}, subject: {}, msg: {})", host, from, to, subject, msg);
 		Properties props = new Properties();
 		props.put("mail.smtp.host", host);
 		Session session = Session.getDefaultInstance(props);
@@ -183,11 +207,13 @@ public class Mails {
 
 			message.setContent(multipart);
 
+			log.debug("sending message");
 			Transport.send(message);
 		} catch (MessagingException e) {
-			return false;
+			log.debug("sendMail() returns: FALSE");
 		}
 
+		log.debug("sendMail() returns: TRUE");
 		return true;
 	}
 }

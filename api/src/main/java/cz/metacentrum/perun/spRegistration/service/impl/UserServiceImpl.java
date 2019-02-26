@@ -1,5 +1,6 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
+import cz.metacentrum.perun.spRegistration.persistence.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
@@ -46,6 +47,7 @@ public class UserServiceImpl implements UserService {
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
 	private final Properties messagesProperties;
+	private final String adminsAttr;
 
 	@Autowired
 	public UserServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
@@ -53,6 +55,7 @@ public class UserServiceImpl implements UserService {
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.messagesProperties = messagesProperties;
+		this.adminsAttr = appConfig.getAdminsAttr();
 	}
 
 	@Override
@@ -65,15 +68,8 @@ public class UserServiceImpl implements UserService {
 
 		addProxyIdentifierAttr(attributes);
 
-		log.debug("creating request started");
 		Request req = createRequest(null, userId, attributes);
-		if (req == null) {
-			log.error("Could not create request");
-			throw new InternalErrorException("Could not create request");
-		}
-
-		log.debug("sending mail notification");
-		Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		validateCreatedRequestAndNotifyUser(req);
 
 		log.debug("createRegistrationRequest returns: {}", req.getReqId());
 		return req.getReqId();
@@ -91,15 +87,8 @@ public class UserServiceImpl implements UserService {
 			throw new UnauthorizedActionException("User is not registered as facility admin, cannot create request");
 		}
 
-		log.debug("creating request started");
 		Request req = createRequest(facilityId, userId, attributes);
-		if (req == null) {
-			log.error("Could not create request");
-			throw new InternalErrorException("Could not create request");
-		}
-
-		log.debug("sending mail notification");
-		Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		validateCreatedRequestAndNotifyUser(req);
 
 		log.debug("createFacilityChangesRequest returns: {}", req.getReqId());
 		return req.getReqId();
@@ -116,15 +105,8 @@ public class UserServiceImpl implements UserService {
 			throw new UnauthorizedActionException("User is not registered as facility admin, cannot create request");
 		}
 
-		log.debug("creating request started");
 		Request req = createRequest(facilityId, userId, new ArrayList<>());
-		if (req == null) {
-			log.error("Could not create request");
-			throw new InternalErrorException("Could not create request");
-		}
-
-		log.debug("sending mail notification");
-		Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		validateCreatedRequestAndNotifyUser(req);
 
 		log.debug("createRemovalRequest returns: {}", req.getReqId());
 		return req.getReqId();
@@ -142,28 +124,28 @@ public class UserServiceImpl implements UserService {
 			throw new UnauthorizedActionException("User is not registered as admin in request, cannot update it");
 		}
 
-		log.debug("fetching request from DB by id: {}", requestId);
-		Request request = requestManager.getRequestByReqId(requestId);
-		if (request == null) {
-			log.error("Could not retrieve request for id: {}", requestId);
-			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
-		}
+		Request request = fetchRequestAndValidate(requestId);
 
-		log.debug("updating request stared");
+		log.debug("updating request");
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
 		request.setAttributes(convertedAttributes);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		boolean result = requestManager.updateRequest(request);
-		log.debug("updated request: {}", result);
 
-		log.debug("updateRequest returns: {}", result);
-		return result;
+		log.debug("updating request");
+		boolean res = requestManager.updateRequest(request);
+		if (!res) {
+			log.error("FAILED WHEN updating request: {}", request);
+		}
+
+		log.debug("updateRequest returns: {}", res);
+		return res;
 	}
 
 	@Override
 	public boolean askForApproval(Long requestId, Long userId)
 			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException {
+		log.debug("askforApproval(requestId: {}, userId: {})", requestId, userId);
 		if (requestId == null || userId == null) {
 			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
 		} else if (! isAdminInRequest(requestId, userId)) {
@@ -179,15 +161,10 @@ public class UserServiceImpl implements UserService {
 			throw new CannotChangeStatusException("Cannot ask for approval, request not marked as NEW nor WAITING_FOR_CHANGES");
 		}
 
-		request.setStatus(RequestStatus.WFA);
-		request.setModifiedBy(userId);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		boolean res = requestManager.updateRequest(request);
+		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.WFA,
+				messagesProperties, appConfig.getAdminsAttr());
 
-		Mails.requestStatusUpdateUserNotify(requestId, RequestStatus.WFA,
-				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
-		Mails.requestApprovalAdminNotify(userId, requestId, messagesProperties);
-
+		log.debug("askForApproval() returns: {}", res);
 		return res;
 	}
 
@@ -203,12 +180,7 @@ public class UserServiceImpl implements UserService {
 			throw new UnauthorizedActionException("User is not registered as admin in request, cannot cancel it");
 		}
 
-		log.debug("fetching request from DB with id: {}", requestId);
-		Request request = requestManager.getRequestByReqId(requestId);
-		if (request == null) {
-			log.error("Could not retrieve request for id: {}", requestId);
-			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
-		}
+		Request request = fetchRequestAndValidate(requestId);
 
 		switch (request.getStatus()) {
 			case APPROVED:
@@ -220,16 +192,8 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 
-		log.debug("updating request started");
-		request.setStatus(RequestStatus.WFC);
-		request.setModifiedBy(userId);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		boolean res = requestManager.updateRequest(request);
-		log.debug("updating request: {}", res);
-
-		log.debug("sending mail notification");
-		Mails.requestStatusUpdateUserNotify(requestId, RequestStatus.CANCELED,
-				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.CANCELED,
+				messagesProperties, adminsAttr);
 
 		log.debug("cancelRequest returns: {}", res);
 		return res;
@@ -247,7 +211,6 @@ public class UserServiceImpl implements UserService {
 			throw new UnauthorizedActionException("User is not registered as admin in request, cannot renew it");
 		}
 
-		log.debug("fetching request from DB with id: {}", requestId);
 		Request request = requestManager.getRequestByReqId(requestId);
 		if (request == null) {
 			log.error("Could not retrieve request for id: {}", requestId);
@@ -257,16 +220,8 @@ public class UserServiceImpl implements UserService {
 			throw new CannotChangeStatusException("Cannot ask for renew, request not marked as WAITING_FOR_CANCEL");
 		}
 
-		log.debug("updating request started");
-		request.setStatus(RequestStatus.NEW);
-		request.setModifiedBy(userId);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		boolean res = requestManager.updateRequest(request);
-		log.debug("updating request: {}", res);
-
-		log.debug("sending mail notification");
-		Mails.requestStatusUpdateUserNotify(requestId, RequestStatus.NEW,
-				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.NEW,
+				messagesProperties, adminsAttr);
 
 		log.debug("renewRequest returns:  {}", res);
 		return res;
@@ -284,14 +239,12 @@ public class UserServiceImpl implements UserService {
 			throw new UnauthorizedActionException("User is not registered as admin for facility, cannot ask for moving to production");
 		}
 
-		log.debug("fetching facility from Perun with id: {} for user: {}", facilityId, userId);
 		Facility fac = getDetailedFacility(facilityId, userId);
 		if (fac == null) {
 			log.error("Could not retrieve facility for id: {}", facilityId);
 			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
 		}
 
-		log.debug("setting attributes");
 		Map<String, PerunAttribute> attributes = fac.getAttrs();
 		String listAttrName = appConfig.getShowOnServicesListAttribute();
 		String testSpAttrName = appConfig.getTestSpAttribute();
@@ -304,48 +257,47 @@ public class UserServiceImpl implements UserService {
 		listAttr.setOldValue(testSpAttr.getValue());
 		listAttr.setValue(false);
 
-		log.debug("creating request started");
 		Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, fac.getAttrs());
 		if (req == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
-		log.debug("creating request finished - created request with id: {}", req.getReqId());
 
-		log.debug("sending mail notifications");
-		Mails.transferToProductionUserNotify(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		boolean res = Mails.transferToProductionUserNotify(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		if (!res) {
+			log.error("sending notification to user FAILED");
+		}
 		//TODO: generate approval link
-		Mails.authoritiesApproveProductionTransferNotify(null, req.getFacilityName(), authorities, messagesProperties);
+		res = Mails.authoritiesApproveProductionTransferNotify(null, req.getFacilityName(), authorities, messagesProperties);
+		if (!res) {
+			log.error("sending notification to authorities FAILED");
+		}
 
 		log.debug("moveToProduction returns: {}", req.getReqId());
 		return req.getReqId();
 	}
 
 	@Override
-	public boolean signTransferToProduction(Long requestId, Long userId, String approvalName) throws InternalErrorException, RPCException {
+	public boolean signTransferToProduction(Long requestId, Long userId, String personInput) throws InternalErrorException, RPCException {
 		log.debug("signTransferToProduction(requestId: {}, userId: {}, approvalName: {})");
 		if (requestId == null || userId == null) {
 			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
 			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
 		}
 
-		log.debug("fetching request from DB with id: {}", requestId);
 		Request request = requestManager.getRequestByReqId(requestId);
 		if (request == null) {
 			log.debug("Could not retrieve request for id: {}", requestId);
 			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
 		}
 
-		log.debug("fetching user from Perun with id: {}", userId);
 		User signer = perunConnector.getRichUser(userId);
 		if (signer == null) {
 			log.error("Could not find user in Perun for id: {}", userId);
 			throw new InternalErrorException("Could not find user in Perun for id: " + userId);
 		}
 
-		log.debug("adding signature for request with id: {} by user: {}", requestId, userId);
-		boolean result = requestManager.addSignature(requestId, userId, signer.getFullName(), approvalName);
-		log.debug("added signature: {}", result);
+		boolean result = requestManager.addSignature(requestId, userId, signer.getFullName(), personInput);
 
 		log.debug("signTransferToProduction returns: {}", result);
 		return result;
@@ -356,12 +308,7 @@ public class UserServiceImpl implements UserService {
 			throws UnauthorizedActionException, InternalErrorException {
 		log.debug("getDetailedRequest(requestId: {}, userId: {})", requestId, userId);
 
-		Request request = requestManager.getRequestByReqId(requestId);
-		log.debug("fetching request from DB with id: {}", requestId);
-		if (request == null) {
-			log.error("Could not retrieve request for id: {}", requestId);
-			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
-		}
+		Request request = fetchRequestAndValidate(requestId);
 
 		if (requestId == null || userId == null) {
 			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
@@ -385,14 +332,12 @@ public class UserServiceImpl implements UserService {
 			throw new UnauthorizedActionException("User cannot view facility, user is not an admin");
 		}
 
-		log.debug("fetching facility from Perun with id: {}", facilityId);
 		Facility facility = perunConnector.getFacilityById(facilityId);
 		if (facility == null) {
 			log.error("Could not retrieve facility for id: {}", facilityId);
 			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
 		}
 
-		log.debug("fetching facility attributes");
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId);
 		facility.setAttrs(attrs);
 
@@ -407,9 +352,7 @@ public class UserServiceImpl implements UserService {
 			log.error("userId is null");
 			throw new IllegalArgumentException("userId is null");
 		}
-		log.debug("fetching requests for user with id: {} from DB", userId);
 		List<Request> requests = requestManager.getAllRequestsByUserId(userId);
-		log.debug("fetching facilities where user with id: {} is admin from Perun", userId);
 		Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
 		requests.addAll(requestManager.getAllRequestsByFacilityIds(whereAdmin));
 
@@ -424,14 +367,14 @@ public class UserServiceImpl implements UserService {
 			log.error("userId is null");
 			throw new IllegalArgumentException("userId is null");
 		}
-		log.debug("fetching facilities where user with id: {} is admin from Perun", userId);
 		List<Facility> userFacilities = perunConnector.getFacilitiesWhereUserIsAdmin(userId);
 		Map<String, String> params = new HashMap<>();
 		params.put(appConfig.getIdpAttribute(), appConfig.getIdpAttributeValue());
-		log.debug("fetching facilities by proxyIdp identifier");
 		List<Facility> proxyFacilities = perunConnector.getFacilitiesViaSearcher(params);
+		List<Facility> result = userFacilities.stream()
+				.filter(proxyFacilities::contains)
+				.collect(Collectors.toList());
 
-		List<Facility> result = userFacilities.stream().filter(proxyFacilities::contains).collect(Collectors.toList());
 		log.debug("getAllFacilitiesWhereUserIsAdmin returns: {}", result);
 		return result;
 	}
@@ -498,5 +441,27 @@ public class UserServiceImpl implements UserService {
 		identifierAttr.setValue(Collections.singletonList(value));
 
 		attributes.add(identifierAttr);
+	}
+
+	private Request fetchRequestAndValidate(Long requestId) throws InternalErrorException {
+		Request request = requestManager.getRequestByReqId(requestId);
+		if (request == null) {
+			log.error("Could not retrieve request for id: {}", requestId);
+			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
+		}
+		return request;
+	}
+
+	private void validateCreatedRequestAndNotifyUser(Request req) throws InternalErrorException {
+		if (req == null) {
+			log.error("Could not create request");
+			throw new InternalErrorException("Could not create request");
+		}
+
+		log.debug("sending mail notification");
+		boolean res = Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(), req.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		if (!res) {
+			log.error("sending notification to user FAILED");
+		}
 	}
 }

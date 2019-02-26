@@ -104,12 +104,12 @@ public interface UserService {
 	 * Sign transfer to the production
 	 * @param requestId id of request for transfer
 	 * @param userId id of signer
-	 * @param approvalName name entered by signer
+	 * @param personInput name entered by signer
 	 * @return True if all went OK.
 	 * @throws InternalErrorException
 	 * @throws RPCException in case of problems with RPC.
 	 */
-	boolean signTransferToProduction(Long requestId, Long userId, String approvalName) throws InternalErrorException, RPCException;
+	boolean signTransferToProduction(Long requestId, Long userId, String personInput) throws InternalErrorException, RPCException;
 
 	/**
 	 * Get all facilities from Perun where user is admin (manager).
