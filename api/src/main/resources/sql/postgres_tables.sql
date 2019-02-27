@@ -18,8 +18,6 @@ create unique index requests_id_uindex
 create table approvals
 (
 	request_id bigint not null
-		constraint approvals_pk
-			primary key
 		constraint approvals_requests_id_fk
 			references requests
 				on update cascade on delete cascade,

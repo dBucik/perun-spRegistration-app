@@ -1,6 +1,9 @@
+drop table if exists requests cascade;
+drop table if exists approvals cascade;
+
 create table requests
 (
-	id bigint auto_increment not null
+	id bigint auto_increment
 		constraint requests_pkey
 			primary key,
 	facility_id bigint,
@@ -15,7 +18,7 @@ create table requests
 create table approvals
 (
 	request_id bigint not null
-	  primary key references requests on update cascade on delete cascade,
+	  references requests on update cascade on delete cascade,
 	signer_id bigint not null,
 	signer_name varchar not null,
 	signer_input varchar not null,

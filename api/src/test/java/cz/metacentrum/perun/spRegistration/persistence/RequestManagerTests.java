@@ -1,7 +1,5 @@
 package cz.metacentrum.perun.spRegistration.persistence;
 
-import cz.metacentrum.perun.spRegistration.Application;
-import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl;
@@ -13,8 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
 import java.util.Collections;
@@ -29,15 +28,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath*:application-context-test.xml")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class RequestManagerTests {
 
 	@Autowired
 	private RequestManagerImpl requestManager;
-
-	@Autowired
-	private Config config;
 
 	private PerunAttributeDefinition def1;
 	private PerunAttributeDefinition def2;
@@ -50,12 +47,11 @@ public class RequestManagerTests {
 
 	@Before
 	public void setUp() {
-		def1 = config.getAppConfig().getAttrDefinition("urn:perun:facility:attribute-def:def:registrationURL");
-		def2 = config.getAppConfig().getAttrDefinition("urn:perun:facility:attribute-def:def:dynamicRegistration");
+		def1 = new PerunAttributeDefinition(1L, "attr_1", "namespace1", "desc1", "java.lang.String", "attr1", true, "facility", "attributeDefinition");
+		def2 = new PerunAttributeDefinition(2L, "attr_2", "namespace2", "desc2", "java.lang.Boolean", "attr2", true, "facility", "attributeDefinition");
 
 		prepareAttributes();
 		prepareRequests();
-		prepareApprovals();
 
 		Long req1Id = requestManager.createRequest(req1);
 		req1.setReqId(req1Id);
@@ -63,10 +59,11 @@ public class RequestManagerTests {
 		Long req2Id = requestManager.createRequest(req2);
 		req2.setReqId(req2Id);
 
+		prepareApprovals();
 		requestManager.addSignature(approval1.getRequestId(), approval1.getSignerId(),
-				approval1.getSignerName(), approval1.getSignerInput());
-		List<RequestApproval> approvals = requestManager.getApprovalsForRequest(approval1.getRequestId());
-		approval1.setSignedAt(approvals.get(0).getSignedAt());
+				approval1.getSignerName(), approval1.getSignerInput(), approval1.getSignedAt());
+		requestManager.addSignature(approval2.getRequestId(), approval2.getSignerId(),
+				approval2.getSignerName(), approval2.getSignerInput(), approval2.getSignedAt());
 	}
 
 	private void prepareApprovals() {
@@ -75,12 +72,14 @@ public class RequestManagerTests {
 		approval1.setRequestId(req1.getReqId());
 		approval1.setSignerName("test_user");
 		approval1.setSignerInput("test_approval");
+		approval1.setSignedAt(Timestamp.valueOf("2019-01-01 10:00:00.00"));
 
 		approval2 = new RequestApproval();
 		approval2.setSignerId(2L);
 		approval2.setRequestId(req1.getReqId());
 		approval2.setSignerName("test_user2");
 		approval2.setSignerInput("test_approval2");
+		approval2.setSignedAt(Timestamp.valueOf("2019-01-01 10:00:00.00"));
 	}
 
 	private void prepareAttributes() {
@@ -191,7 +190,7 @@ public class RequestManagerTests {
 		assertNotNull("Should find one request but null collection returned", fetched);
 		assertTrue("Result set should contain at least one request", fetched.size() > 0);
 		assertEquals("Result set should contain exactly one request", 1, fetched.size());
-		assertEquals("Request should be equal", req1, fetched.get(1));
+		assertEquals("Request should be equal", req1, fetched.get(0));
 	}
 
 	@Test
@@ -201,31 +200,30 @@ public class RequestManagerTests {
 		assertNotNull("Should find one request but null collection returned", fetched);
 		assertTrue("Result set should contain at least one request", fetched.size() > 0);
 		assertEquals("Result set should contain exactly one request", 1, fetched.size());
-		assertEquals("Request should be equal", req1, fetched.get(1));
+		assertEquals("Request should be equal", req1, fetched.get(0));
 	}
 
 	@Test
 	public void getRequestsByFacilityId() {
-		List<Request> fetched = requestManager.getAllRequestsByFacilityId(req1.getFacilityId());
+		List<Request> fetched = requestManager.getAllRequestsByFacilityId(req2.getFacilityId());
 
 		assertNotNull("Should find one request but null collection returned", fetched);
 		assertTrue("Result set should contain at least one request", fetched.size() > 0);
 		assertEquals("Result set should contain exactly one request", 1, fetched.size());
-		assertEquals("Request should be equal", req1, fetched.get(1));
+		assertEquals("Request should be equal", req2, fetched.get(0));
 
 	}
 
 	@Test
 	public void getAllRequestsByFacilityIds() {
 		Set<Long> ids = new HashSet<>();
-		ids.add(req1.getFacilityId());
 		ids.add(req2.getFacilityId());
 		List<Request> fetched = requestManager.getAllRequestsByFacilityIds(ids);
 
 		assertNotNull("Should find one request but null collection returned", fetched);
 		assertTrue("Result set should contain at least one request", fetched.size() > 0);
-		assertEquals("Result set should contain exactly two requests", 2, fetched.size());
-		assertThat("Result does not contain expected items", fetched, hasItems(req1, req2));
+		assertEquals("Result set should contain exactly two requests", 1, fetched.size());
+		assertThat("Result does not contain expected items", fetched, hasItems(req2));
 	}
 
 	@Test

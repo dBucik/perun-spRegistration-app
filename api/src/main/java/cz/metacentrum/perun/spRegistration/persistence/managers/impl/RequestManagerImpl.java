@@ -219,8 +219,8 @@ public class RequestManagerImpl implements RequestManager {
 	public boolean addSignature(Long requestId, Long userId, String signerName, String signerInput, Timestamp signedAt) {
 		log.debug("addSignature(requestId: {}, userId: {}, signerName: {}, signerInput: {})");
 		String query = "INSERT INTO" + APPROVALS_TABLE +
-				"(request_id, signer_id, signer_name, signer_input) " +
-				"VALUES (:req_id, :signer_id, :signer_name, :signer_input)";
+				"(request_id, signer_id, signer_name, signer_input, signed_at) " +
+				"VALUES (:req_id, :signer_id, :signer_name, :signer_input, :signed_at)";
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_id", requestId);
 		params.addValue("signer_id", userId);
