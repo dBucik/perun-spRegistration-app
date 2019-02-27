@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -53,7 +54,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/register")
+	@RequestMapping(path = "/api/register", method = RequestMethod.POST)
 	public Long createRegistrationRequest(@SessionAttribute("userId") Long userId,
 										  @RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
 		log.debug("createRegistrationRequest(userId: {}, attributes: {})", userId, attributes);
@@ -64,9 +65,10 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/changeFacility/{facilityId}")
-	public Long createFacilityChangesRequest(@SessionAttribute("userId") Long userId, @RequestBody List<PerunAttribute> attributes,
-											 @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
+	@RequestMapping(path = "/api/changeFacility/{facilityId}", method = RequestMethod.POST)
+	public Long createFacilityChangesRequest(@SessionAttribute("userId") Long userId,
+											 @PathVariable("facilityId") Long facilityId,
+											 @RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
 		log.debug("createFacilityChangesRequest(userId: {}, facilityId: {}, attributes: {})", userId, facilityId, attributes);
 		try {
 			return service.createFacilityChangesRequest(facilityId, userId, attributes);
@@ -75,7 +77,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/remove/{facilityId}")
+	@RequestMapping(path = "/api/remove/{facilityId}", method = RequestMethod.POST)
 	public Long createRemovalRequest(@SessionAttribute("userId") Long userId,
 									 @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
 		log.debug("createRemovalRequest(userId: {}, facilityId: {})", userId, facilityId);
@@ -86,9 +88,10 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/update/{requestId}")
-	public boolean updateRequest(@SessionAttribute("userId") Long userId, @RequestBody List<PerunAttribute> attributes,
-								@PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+	@RequestMapping(path = "/api/update/{requestId}", method = RequestMethod.POST)
+	public boolean updateRequest(@SessionAttribute("userId") Long userId,
+								 @PathVariable("requestId") Long requestId,
+								 @RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
 		log.debug("updateRequest(userId: {}, requestId: {}, attributes: {})", userId, requestId, attributes);
 		try {
 			return service.updateRequest(requestId, userId, attributes);
@@ -97,9 +100,9 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/askApproval/{requestId}")
+	@RequestMapping(path = "/api/askApproval/{requestId}", method = RequestMethod.GET)
 	public boolean askForApproval(@SessionAttribute("userId") Long userId,
-								 @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+								  @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("askForApproval(userId: {}, requestId: {})", userId, requestId);
 		try {
 			return service.askForApproval(requestId, userId);
@@ -108,9 +111,9 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/cancel/{requestId}")
+	@RequestMapping(path = "/api/cancel/{requestId}", method = RequestMethod.GET)
 	public boolean cancelRequest(@SessionAttribute("userId") Long userId,
-								@PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+								 @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("cancelRequest(userId: {}, requestId: {})", userId, requestId);
 		try {
 			return service.cancelRequest(requestId, userId);
@@ -119,7 +122,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/renew/{requestId}")
+	@RequestMapping(path = "/api/renew/{requestId}", method = RequestMethod.GET)
 	public boolean renewRequest(@SessionAttribute("userId") Long userId,
 							    @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("renewRequest(userId: {}, requestId: {})", userId, requestId);
@@ -130,19 +133,20 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/moveToProduction/{facilityId},{authorities}")
-	public Long moveToProduction(@SessionAttribute("userId") Long userId, @PathVariable("facilityId") Long facilityId,
-								 @PathVariable("authorities") List<String> authorities) throws SpRegistrationApiException {
-		log.debug("moveToProduction(userId: {}, facilityId: {}m authorities: {})", userId, facilityId, authorities);
+	@RequestMapping(path = "/api/moveToProduction/{facilityId}", method = RequestMethod.GET)
+	public Long moveToProduction(@SessionAttribute("userId") Long userId,
+								 @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
+		log.debug("moveToProduction(userId: {}, facilityId: {})", userId, facilityId);
 		try {
-			return service.moveToProduction(facilityId, userId, authorities);
+			return service.moveToProduction(facilityId, userId);
 		} catch (Exception e) {
 			throw new SpRegistrationApiException(e);
 		}
 	}
 
-	@RequestMapping(path = "/api/moveToProduction/{requestId}")
-	public boolean signApprovalForProduction(@SessionAttribute("userId") Long userId, @PathVariable("requestId") Long requestId,
+	@RequestMapping(path = "/api/moveToProduction/{requestId}", method = RequestMethod.POST)
+	public boolean signApprovalForProduction(@SessionAttribute("userId") Long userId,
+											 @PathVariable("requestId") Long requestId,
 											 @RequestBody String signerInput) throws SpRegistrationApiException {
 		log.debug("signApprovalForProduction(userId: {}, requestId: {}, signerInput: {})", userId, requestId, signerInput);
 		try {
@@ -152,7 +156,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/facility/{facilityId}")
+	@RequestMapping(path = "/api/facility/{facilityId}", method = RequestMethod.GET)
 	public Facility facilityDetail(@SessionAttribute("userId") Long userId,
 								   @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
 		log.debug("facilityDetail(userId: {}, facilityId: {})", userId, facilityId);
@@ -161,15 +165,36 @@ public class UserController {
 		} catch (Exception e) {
 			throw new SpRegistrationApiException(e);
 		}
-
 	}
 
-	@RequestMapping(path = "/api/request/{requestId}")
+	@RequestMapping(path = "/api/request/{requestId}", method = RequestMethod.GET)
 	public Request requestDetail(@SessionAttribute("userId") Long userId,
-							  @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+								 @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("requestDetail(userId: {}, requestId: {})", userId, requestId);
 		try {
 			return service.getDetailedRequest(requestId, userId);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
+		}
+	}
+
+	@RequestMapping(path = "/api/approve/{requestId}", method = RequestMethod.GET)
+	public Request signRequestGetData(@PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+		log.debug("signRequestGetData(requestId: {})", requestId);
+		try {
+			return service.getRequestDetailsForSignature(requestId);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
+		}
+	}
+
+	@RequestMapping(path = "/api/approve/{requestId}", method = RequestMethod.POST)
+	public boolean signRequest(@SessionAttribute Long userId,
+							   @PathVariable("requestId") Long requestId,
+							   @RequestBody String personInput) throws SpRegistrationApiException {
+		log.debug("signRequest(requestId: {})", requestId);
+		try {
+			return service.signTransferToProduction(requestId, userId, personInput);
 		} catch (Exception e) {
 			throw new SpRegistrationApiException(e);
 		}

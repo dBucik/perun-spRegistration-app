@@ -94,11 +94,10 @@ public interface UserService {
 	 * Ask for moving the service to the production environment.
 	 * @param facilityId ID of facility in Perun.
 	 * @param userId ID of requesting user.
-	 * @param authorities List of authority emails that should approve the transfer
 	 * @return Id of created request
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	Long moveToProduction(Long facilityId, Long userId, List<String> authorities) throws UnauthorizedActionException, InternalErrorException, RPCException;
+	Long moveToProduction(Long facilityId, Long userId) throws UnauthorizedActionException, InternalErrorException, RPCException;
 
 	/**
 	 * Sign transfer to the production
@@ -143,4 +142,10 @@ public interface UserService {
 	 */
 	Facility getDetailedFacility(Long facilityId, Long userId) throws UnauthorizedActionException, RPCException, InternalErrorException;
 
+	/**
+	 * Get request details for page with signatures of moving to production
+	 * @param requestId ID of request
+	 * @return Found request.
+	 */
+	Request getRequestDetailsForSignature(Long requestId) throws InternalErrorException;
 }

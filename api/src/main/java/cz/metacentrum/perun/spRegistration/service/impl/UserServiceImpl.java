@@ -228,9 +228,9 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Long moveToProduction(Long facilityId, Long userId, List<String> authorities)
+	public Long moveToProduction(Long facilityId, Long userId)
 			throws UnauthorizedActionException, InternalErrorException, RPCException {
-		log.debug("moveToProduction(facilityId: {}, userId: {}, authorities: {})", facilityId, userId, authorities);
+		log.debug("moveToProduction(facilityId: {}, userId: {})", facilityId, userId);
 		if (facilityId == null || userId == null) {
 			log.error("Illegal input - facilityId: {}, userId: {}", facilityId, userId);
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", userId: " + userId);
@@ -268,6 +268,7 @@ public class UserServiceImpl implements UserService {
 			log.error("sending notification to user FAILED");
 		}
 		//TODO: generate approval link
+		List<String> authorities = appConfig.getSigningAuthorities();
 		res = Mails.authoritiesApproveProductionTransferNotify(null, req.getFacilityName(), authorities, messagesProperties);
 		if (!res) {
 			log.error("sending notification to authorities FAILED");
@@ -377,6 +378,15 @@ public class UserServiceImpl implements UserService {
 
 		log.debug("getAllFacilitiesWhereUserIsAdmin returns: {}", result);
 		return result;
+	}
+
+	@Override
+	public Request getRequestDetailsForSignature(Long requestId) throws InternalErrorException {
+		log.debug("getRequestDetailsForSignature({})", requestId);
+		Request res = fetchRequestAndValidate(requestId);
+
+		log.debug("getRequestDetailsForSignature returns: {}", res);
+		return res;
 	}
 
 	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes) throws InternalErrorException {

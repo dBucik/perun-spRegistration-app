@@ -58,7 +58,7 @@ public class AdminController {
 		}
 	}
 
-	@RequestMapping(path = "/api/approve/{requestId}")
+	@RequestMapping(path = "/api/approve/{requestId}", method = RequestMethod.POST)
 	public boolean approveRequest(@SessionAttribute("userId") Long userId,
 							   @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("approveRequest(userId: {}, requestId: {})", userId, requestId);
@@ -69,7 +69,7 @@ public class AdminController {
 		}
 	}
 
-	@RequestMapping(path = "/api/reject/{requestId}")
+	@RequestMapping(path = "/api/reject/{requestId}", method = RequestMethod.POST)
 	public boolean rejectRequest(@SessionAttribute("userId") Long userId, @PathVariable("requestId") Long requestId,
 								@RequestBody String message) throws SpRegistrationApiException {
 		log.debug("rejectRequest(userId: {}, requestId: {}, message: {})", userId, requestId, message);
@@ -80,7 +80,7 @@ public class AdminController {
 		}
 	}
 
-	@RequestMapping(path = "/api/askForChanges/{requestId}")
+	@RequestMapping(path = "/api/askForChanges/{requestId}", method = RequestMethod.POST)
 	public boolean askForChanges(@SessionAttribute("userId") Long userId, @PathVariable("requestId") Long requestId,
 								@RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
 		log.debug("askForChanges(userId: {}, requestId: {}, attributes: {})", userId, requestId, attributes);
@@ -91,7 +91,7 @@ public class AdminController {
 		}
 	}
 
-	@RequestMapping(path = "/api/viewApprovals/{requestId}")
+	@RequestMapping(path = "/api/viewApprovals/{requestId}", method = RequestMethod.GET)
 	public List<RequestApproval> getApprovals(@SessionAttribute("userId") Long userId,
 											  @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("getApprovals(userId: {}, requestId: {})", userId, requestId);
@@ -102,7 +102,7 @@ public class AdminController {
 		}
 	}
 
-	@RequestMapping(path = "/api/addAdmins/{facilityId}")
+	@RequestMapping(path = "/api/addAdmins/{facilityId}", method = RequestMethod.POST)
 	public boolean addAdmins(@SessionAttribute("userId") Long userId, @PathVariable("facilityId") Long facilityId,
 							@RequestBody List<Long> admins) throws SpRegistrationApiException {
 		log.debug("addAdmins(userId: {}, facilityId: {}, admins: {})", userId, facilityId, admins);
@@ -113,7 +113,7 @@ public class AdminController {
 		}
 	}
 
-	@RequestMapping(path = "/api/removeAdmins/{facilityId}")
+	@RequestMapping(path = "/api/removeAdmins/{facilityId}", method = RequestMethod.POST)
 	public boolean removeAdmins(@SessionAttribute("userId") Long userId, @PathVariable("facilityId") Long facilityId,
 							   @RequestBody List<Long> admins) throws SpRegistrationApiException {
 		log.debug("removeAdmins(userId: {}, facilityId: {}, admins: {})", userId, facilityId, admins);

@@ -32,6 +32,8 @@ public class AppConfig {
 	private PerunConnector connector;
 	private String showOnServicesListAttribute;
 
+	private List<String> signingAuthorities = new ArrayList<>();
+
 	public AppConfig() {
 		Resource enLang = new ClassPathResource("localization.properties");
 		Resource csLang = new ClassPathResource("localization_cs.properties");
@@ -157,5 +159,13 @@ public class AppConfig {
 
 	public String getAdminsAttr() {
 		return adminsAttr;
+	}
+
+	public void setSigningAuthorities(List<String> signingAuthorities) {
+		this.signingAuthorities = signingAuthorities;
+	}
+
+	public List<String> getSigningAuthorities() {
+		return signingAuthorities;
 	}
 }
