@@ -175,7 +175,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/approve/{requestId}", method = RequestMethod.GET)
+	@RequestMapping(path = "/api/sign/{requestId}", method = RequestMethod.GET)
 	public Request signRequestGetData(@PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("signRequestGetData(requestId: {})", requestId);
 		try {
@@ -185,7 +185,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/approve/{requestId}", method = RequestMethod.POST)
+	@RequestMapping(path = "/api/sign/{requestId}", method = RequestMethod.POST)
 	public boolean signRequest(@SessionAttribute Long userId,
 							   @PathVariable("requestId") Long requestId,
 							   @RequestBody String personInput) throws SpRegistrationApiException {
