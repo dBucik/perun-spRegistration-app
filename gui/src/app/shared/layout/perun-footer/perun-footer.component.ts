@@ -17,8 +17,10 @@ export class PerunFooterComponent implements OnInit {
   footerSubscription : Subscription;
 
   ngOnInit() {
-    this.footerSubscription = this.configService.getFooter().subscribe(footer => {
-      this.footerHTML = footer;
-    })
+    //TODO uncomment when implemented on backend
+
+    // this.footerSubscription = this.configService.getFooter().subscribe(footer => {
+    //   this.footerHTML = footer;
+    // })
   }
 }

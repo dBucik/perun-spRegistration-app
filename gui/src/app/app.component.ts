@@ -19,6 +19,7 @@ export class AppComponent {
   ) {
     translate.setDefaultLang('en');
 
+    // TODO remove on production
     translate.use('en');
     router.events.subscribe((_: NavigationEnd) => {
       this.currentUrl = this.router.url;
