@@ -29,7 +29,6 @@
                 <prop key="attr.sub.name">urn:perun:user:attribute-def:def:login-namespace:einfraid-persistent-shadow</prop>
                 <prop key="oidc.isEnabled">true</prop>
                 <prop key="langs">en,cs</prop>
-                <prop key="signingAuthorities">auth1@mail.not,auth2@mail.not</prop>
             </props>
         </property>
     </bean>
@@ -247,7 +246,6 @@
         <property name="subAttr" value="${attr.sub.name}" />
         <property name="oidcEnabled" value="${oidc.isEnabled}" />
         <property name="langs" value="#{'${langs}'.split('\s*,\s*')}" />
-        <property name="signingAuthorities" value="#{'${signingAuthorities}'.split('\s*,\s*')}" />
     </bean>
 
     <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
