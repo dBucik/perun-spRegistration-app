@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import {NavigationEnd, Router} from "@angular/router";
+import { HostListener } from "@angular/core";
 
 @Component({
   selector: 'app-root',
@@ -9,14 +10,19 @@ import {NavigationEnd, Router} from "@angular/router";
 })
 export class AppComponent {
 
-  opened = true;
+  sideBarOpened = false;
 
+  lastScreenWidth: number;
+
+  sidebarMode = 'side';
   currentUrl: string;
 
   constructor(
-    translate: TranslateService,
+    private translate: TranslateService,
     private router: Router
   ) {
+    this.getScreenSize();
+
     translate.setDefaultLang('en');
 
     // TODO remove on production
@@ -24,5 +30,22 @@ export class AppComponent {
     router.events.subscribe((_: NavigationEnd) => {
       this.currentUrl = this.router.url;
     });
+  }
+
+  @HostListener('window:resize', ['$event'])
+  getScreenSize(event?) {
+
+    if (window.innerWidth > 576) {
+      this.sideBarOpened = true;
+      this.sidebarMode = 'side';
+    } else if (this.lastScreenWidth > 576) {
+      this.sideBarOpened = false;
+    }
+
+    if (window.innerWidth <= 576) {
+      this.sidebarMode = 'over';
+    }
+
+    this.lastScreenWidth = window.innerWidth;
   }
 }

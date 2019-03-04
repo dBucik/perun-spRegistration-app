@@ -4,44 +4,50 @@ import {
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
-  HttpRequest,
-  HttpResponse
+  HttpRequest
 } from "@angular/common/http";
 import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import {DialogService} from "../../shared/dialog.service";
 import {TranslateService} from "@ngx-translate/core";
+import {Router} from "@angular/router";
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
 
   constructor(
     private translate : TranslateService,
-    private dialogService : DialogService
-  ) { }
+    private dialogService : DialogService,
+    private router : Router
+  ) {
+    this.translate
+      .get('ERROR.SERVER_DOWN')
+      .subscribe(value => this.serverNotLiveError = value);
+  }
 
-  private server_not_live_error: String = "asdf";
+  private serverNotLiveError: String;
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
     return next.handle(req).pipe(
       catchError((err: HttpErrorResponse) => {
         let errors = [];
-        if (typeof err.error === "string") {
+
+        if (err.status === 404) {
+          this.router.navigate(['/notFound']);
+          return;
+        }
+        if (err.status === 0) {
+          errors.push(this.serverNotLiveError);
+        }
+
+        else if (typeof err.error === "string") {
           errors.push(JSON.parse(err.error).errors);
         } else {
           errors.push(err.message);
         }
 
-        if (errors === undefined || errors.length === 0) {
-          errors.push(err.statusText);
-        }
-
-        if (err.status === 0) {
-          errors.push(this.server_not_live_error);
-        }
-
-        this.dialogService.openDialog(errors);
+        this.dialogService.openErrorDialog(errors);
 
         return throwError(err);
       }));

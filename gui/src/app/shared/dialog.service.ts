@@ -9,10 +9,11 @@ export class DialogService {
 
   constructor(private dialog: MatDialog) { }
 
-  openDialog(data) : void {
+  openErrorDialog(data) : void {
     const dialogRef = this.dialog.open(ErrorDialogComponent, {
       width: '600px',
-      data: data
+      data: data,
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {

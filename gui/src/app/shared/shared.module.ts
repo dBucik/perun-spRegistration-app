@@ -25,6 +25,7 @@ import {
   MatTooltipModule
 } from "@angular/material";
 import { ErrorDialogComponent } from './error-dialog/error-dialog.component';
+import { NotFoundPageComponent } from './not-found-page/not-found-page.component';
 
 @NgModule({
   imports: [
@@ -56,7 +57,8 @@ import { ErrorDialogComponent } from './error-dialog/error-dialog.component';
     PerunHeaderComponent,
     PerunSidebarComponent,
     PerunFooterComponent,
-    ErrorDialogComponent
+    ErrorDialogComponent,
+    NotFoundPageComponent
   ],
   exports: [
     FontAwesomeModule,
