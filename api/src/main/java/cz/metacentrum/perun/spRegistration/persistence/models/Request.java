@@ -176,7 +176,7 @@ public class Request {
 		long res = 31 * reqId;
 		res *= 31 * action.hashCode();
 		res *= 31 * status.hashCode();
-		res *= 31 * facilityId;
+		if (facilityId!= null) res *= 31 * facilityId;
 
 		return (int) res;
 	}

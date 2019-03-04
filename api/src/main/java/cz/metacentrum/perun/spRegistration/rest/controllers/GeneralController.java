@@ -33,7 +33,7 @@ public class GeneralController {
 		this.connector = connector;
 	}
 
-	@RequestMapping(path="/api/test")
+	@RequestMapping(path = "/api/test")
 	public String sess(HttpServletRequest req) {
 		log.debug(req.getRemoteUser());
 		log.debug(req.getSession().toString());
@@ -79,21 +79,5 @@ public class GeneralController {
 	public boolean isUserAdmin(@SessionAttribute("userId") Long userId) {
 		log.debug("isUserAdmin()");
 		return config.getAppConfig().isAdmin(userId);
-	}
-
-	@RequestMapping(path = "/api/session/setUser")
-	public void getLoggedUser(HttpServletRequest req, HttpServletResponse res) throws RPCException, IOException {
-		String userEmailAttr = config.getAppConfig().getUserEmailAttr();
-		String perunSubAttr = config.getAppConfig().getSubAttr();
-		log.debug("settingUser");
-		String sub = req.getRemoteUser();
-		log.debug("found userId: {} ", sub);
-		User user = connector.getRichUser(sub, perunSubAttr, userEmailAttr);
-		log.debug("found user: {}", user);
-
-		req.getSession().setAttribute("user", user);
-		String originalUrl = req.getRequestURL().toString();
-		String newUrl = originalUrl.replace("/api/session/setUser", "");
-		res.sendRedirect(newUrl);
 	}
 }
