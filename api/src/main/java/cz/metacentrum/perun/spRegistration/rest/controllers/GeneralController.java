@@ -1,7 +1,10 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
+import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -20,15 +25,16 @@ public class GeneralController {
 
 	private static final Logger log = LoggerFactory.getLogger(GeneralController.class);
 	private final Config config;
+	private PerunConnector connector;
 
 	@Autowired
-	public GeneralController(Config config) {
+	public GeneralController(Config config, PerunConnector connector) {
 		this.config = config;
+		this.connector = connector;
 	}
 
 	@RequestMapping(path="/api/test")
 	public String sess(HttpServletRequest req) {
-		log.debug("here");
 		log.debug(req.getRemoteUser());
 		log.debug(req.getSession().toString());
 
@@ -73,5 +79,21 @@ public class GeneralController {
 	public boolean isUserAdmin(@SessionAttribute("userId") Long userId) {
 		log.debug("isUserAdmin()");
 		return config.getAppConfig().isAdmin(userId);
+	}
+
+	@RequestMapping(path = "/api/session/setUser")
+	public void getLoggedUser(HttpServletRequest req, HttpServletResponse res) throws RPCException, IOException {
+		String userEmailAttr = config.getAppConfig().getUserEmailAttr();
+		String perunSubAttr = config.getAppConfig().getSubAttr();
+		log.debug("settingUser");
+		String sub = req.getRemoteUser();
+		log.debug("found userId: {} ", sub);
+		User user = connector.getRichUser(sub, perunSubAttr, userEmailAttr);
+		log.debug("found user: {}", user);
+
+		req.getSession().setAttribute("user", user);
+		String originalUrl = req.getRequestURL().toString();
+		String newUrl = originalUrl.replace("/api/session/setUser", "");
+		res.sendRedirect(newUrl);
 	}
 }

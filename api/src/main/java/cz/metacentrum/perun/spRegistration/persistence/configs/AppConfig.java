@@ -22,6 +22,8 @@ public class AppConfig {
 	private String testSpAttribute;
 	private String adminsAttr;
 	private Set<Long> admins;
+	private String subAttr;
+	private String userEmailAttr;
 	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
 	private boolean oidcEnabled;
 	private List<String> langs = new ArrayList<>();
@@ -31,8 +33,6 @@ public class AppConfig {
 
 	private PerunConnector connector;
 	private String showOnServicesListAttribute;
-
-	private List<String> signingAuthorities = new ArrayList<>();
 
 	public AppConfig() {
 		Resource enLang = new ClassPathResource("localization.properties");
@@ -117,6 +117,30 @@ public class AppConfig {
 		this.perunAttributeDefinitionsMap = perunAttributeDefinitionsMap;
 	}
 
+	public String getAdminsAttr() {
+		return adminsAttr;
+	}
+
+	public void setAdminsAttr(String adminsAttr) {
+		this.adminsAttr = adminsAttr;
+	}
+
+	public String getSubAttr() {
+		return subAttr;
+	}
+
+	public void setSubAttr(String subAttr) {
+		this.subAttr = subAttr;
+	}
+
+	public String getUserEmailAttr() {
+		return userEmailAttr;
+	}
+
+	public void setUserEmailAttr(String userEmailAttr) {
+		this.userEmailAttr = userEmailAttr;
+	}
+
 	@Override
 	public String toString() {
 		return "AppConfig{" +
@@ -125,6 +149,8 @@ public class AppConfig {
 				", testSpAttribute='" + testSpAttribute + '\'' +
 				", adminsAttr='" + adminsAttr + '\'' +
 				", admins=" + admins +
+				", userEmailAttr=" + userEmailAttr +
+				", subAttr=" + subAttr +
 				", perunAttributeDefinitionsMap=" + perunAttributeDefinitionsMap +
 				", oidcEnabled=" + oidcEnabled +
 				", langs=" + langs +
@@ -153,19 +179,4 @@ public class AppConfig {
 		return admins.contains(userId);
 	}
 
-	public void setAdminsAttr(String adminsAttr) {
-		this.adminsAttr = adminsAttr;
-	}
-
-	public String getAdminsAttr() {
-		return adminsAttr;
-	}
-
-	public void setSigningAuthorities(List<String> signingAuthorities) {
-		this.signingAuthorities = signingAuthorities;
-	}
-
-	public List<String> getSigningAuthorities() {
-		return signingAuthorities;
-	}
 }

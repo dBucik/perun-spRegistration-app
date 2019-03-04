@@ -237,16 +237,29 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public User getRichUser(Long userId) throws RPCException {
-		log.debug("getRichUser({})", userId);
-		if (userId == null) {
+	public User getRichUser(String sub, String subAttributeInPerun, String userEmailAttr) throws RPCException {
+		log.debug("getRichUser({})", sub);
+		if (sub == null || sub.isEmpty()) {
 			throw new IllegalArgumentException("userId is null");
 		}
 		Map<String, Object> params = new LinkedHashMap<>();
-		params.put("user", userId);
 
-		JSONObject res = makeRpcCallForObject(USERS_MANAGER, "getRichUser", params);
-		User user = MapperUtils.mapUser(res, true);
+		params.put("attributeName", subAttributeInPerun);
+		params.put("attributeValue", sub);
+
+		JSONArray res = makeRpcCallForArray(USERS_MANAGER, "getUsersByAttribute", params);
+		if (res.length() > 1) {
+			throw new RPCException("Should not found more than one user");
+		}
+		User user = MapperUtils.mapUser(res.getJSONObject(0), false);
+		params.clear();
+		params.put("user", user.getId().intValue());
+		params.put("attributeName", userEmailAttr);
+
+		JSONObject attr = makeRpcCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
+		PerunAttribute attribute = MapperUtils.mapAttribute(attr);
+
+		user.setEmail(attribute.valueAsString(false));
 
 		log.debug("getRichUser returns: {}", user);
 		return user;
