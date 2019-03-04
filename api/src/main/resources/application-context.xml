@@ -36,7 +36,7 @@
         <property name="properties" ref="defaultProperties"/>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/appConfig.properties</value>
+                <value>file:///etc/perun-spRegistration/appConfig.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -77,7 +77,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/serviceAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/serviceAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -97,7 +97,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/organizationAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/organizationAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -124,7 +124,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/samlAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/samlAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -157,7 +157,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/oidcAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/oidcAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -178,7 +178,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/membershipAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/membershipAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -205,7 +205,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/messagesProperties.properties</value>
+                <value>file:///etc/perun-spRegistration/messagesProperties.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -217,10 +217,6 @@
         <property name="username" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
     </bean>
-
-    <jdbc:embedded-database id="testDataSource" type="H2">
-        <jdbc:script location="classpath:sql/test-schema.sql"/>
-    </jdbc:embedded-database>
 
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <constructor-arg name="dataSource" ref="dataSource"/>
