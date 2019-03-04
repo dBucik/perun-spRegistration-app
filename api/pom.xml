@@ -30,6 +30,7 @@
             <artifactId>spring-jdbc</artifactId>
         </dependency>
 
+        <!-- javax mail -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -49,6 +50,14 @@
             <artifactId>postgresql</artifactId>
         </dependency>
 
+        <!-- H2 driver -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.194</version>
+        </dependency>
+
+        <!-- GUI -->
         <dependency>
             <groupId>cz.metacentrum.perun</groupId>
             <artifactId>spRegistration-gui</artifactId>
@@ -104,6 +113,7 @@
                 </executions>
             </plugin>
         </plugins>
+        <finalName>spreg</finalName>
     </build>
 
 </project>

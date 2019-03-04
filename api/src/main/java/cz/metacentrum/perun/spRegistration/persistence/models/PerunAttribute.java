@@ -10,10 +10,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class PerunAttribute {
 
-	public final static String STRING_TYPE = "java.lang.String";
+	private final static String STRING_TYPE = "java.lang.String";
 	private final static String INTEGER_TYPE = "java.lang.Long";
 	private final static String BOOLEAN_TYPE = "java.lang.Boolean";
 	private final static String ARRAY_TYPE = "java.util.ArrayList";
@@ -317,5 +318,28 @@ public class PerunAttribute {
 				", comment='" + comment + '\'' +
 				", fullName='" + fullName + '\'' +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (! (o instanceof PerunAttribute)) {
+			return false;
+		}
+
+		PerunAttribute them = (PerunAttribute) o;
+		return Objects.equals(this.definition, them.definition)
+				&& Objects.equals(this.value, them.value)
+				&& Objects.equals(this.oldValue, them.oldValue)
+				&& Objects.equals(this.comment, them.comment);
+	}
+
+	@Override
+	public int hashCode() {
+		long res = 31 * definition.getId();
+		res *= 31 * value.hashCode();
+		res *= 31 * oldValue.hashCode();
+		res *= 31 * comment.hashCode();
+
+		return (int) res;
 	}
 }

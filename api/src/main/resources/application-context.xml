@@ -2,8 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
     <context:component-scan base-package="cz.metacentrum.perun.spRegistration"/>
     <context:property-placeholder properties-ref="properties" />
@@ -15,7 +16,7 @@
                 <prop key="jdbc.url">jdbc:postgresql://cloud69b.cerit-sc.cz/spregistration</prop>
                 <prop key="jdbc.username">spreg</prop>
                 <prop key="jdbc.password">spreg123</prop>
-                <prop key="rpc.url">XYZ</prop>
+                <prop key="rpc.url">https://perun-dev.cesnet.cz/ba/rpc/</prop>
                 <prop key="rpc.user">XYZ</prop>
                 <prop key="rpc.password">XYZ</prop>
                 <prop key="admins">62692,0,0</prop>
@@ -26,6 +27,7 @@
                 <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
                 <prop key="oidc.isEnabled">true</prop>
                 <prop key="langs">en,cs</prop>
+                <prop key="signingAuthorities">auth1@mail.not,auth2@mail.not</prop>
             </props>
         </property>
     </bean>
@@ -34,7 +36,7 @@
         <property name="properties" ref="defaultProperties"/>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/appConfig.properties</value>
+                <value>file:///etc/perun-spRegistration/appConfig.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -75,7 +77,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/serviceAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/serviceAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -95,7 +97,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/organizationAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/organizationAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -122,7 +124,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/samlAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/samlAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -155,7 +157,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/oidcAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/oidcAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -176,7 +178,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/membershipAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/membershipAttrs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -203,7 +205,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:/etc/perun-spRegistration/messagesProperties.properties</value>
+                <value>file:///etc/perun-spRegistration/messagesProperties.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -241,6 +243,7 @@
         <property name="adminsAttr" value="${attr.facilityAdmins.name}" />
         <property name="oidcEnabled" value="${oidc.isEnabled}" />
         <property name="langs" value="#{'${langs}'.split('\s*,\s*')}" />
+        <property name="signingAuthorities" value="#{'${signingAuthorities}'.split('\s*,\s*')}" />
     </bean>
 
     <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">

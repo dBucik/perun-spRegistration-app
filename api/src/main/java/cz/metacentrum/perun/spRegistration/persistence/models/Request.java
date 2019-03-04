@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Class represents request made by user. It contains all the data that needs to be stored.
@@ -155,5 +156,28 @@ public class Request {
 				", modifiedAt=" + modifiedAt +
 				", modifiedBy=" + modifiedBy +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (! (o instanceof Request)) {
+			return false;
+		}
+
+		Request them = (Request) o;
+		return Objects.equals(this.reqId, them.reqId)
+				&& Objects.equals(this.action, them.action)
+				&& Objects.equals(this.status, them.status)
+				&& Objects.equals(this.facilityId, them.facilityId);
+	}
+
+	@Override
+	public int hashCode() {
+		long res = 31 * reqId;
+		res *= 31 * action.hashCode();
+		res *= 31 * status.hashCode();
+		res *= 31 * facilityId;
+
+		return (int) res;
 	}
 }

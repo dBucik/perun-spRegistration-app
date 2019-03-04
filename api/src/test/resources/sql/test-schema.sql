@@ -1,6 +1,9 @@
+drop table if exists requests cascade;
+drop table if exists approvals cascade;
+
 create table requests
 (
-	id bigserial not null
+	id bigint auto_increment
 		constraint requests_pkey
 			primary key,
 	facility_id bigint,
@@ -12,15 +15,10 @@ create table requests
 	modified_at timestamp default now()
 );
 
-create unique index requests_id_uindex
-	on requests (id);
-
 create table approvals
 (
 	request_id bigint not null
-		constraint approvals_requests_id_fk
-			references requests
-				on update cascade on delete cascade,
+	  references requests on update cascade on delete cascade,
 	signer_id bigint not null,
 	signer_name varchar not null,
 	signer_input varchar not null,

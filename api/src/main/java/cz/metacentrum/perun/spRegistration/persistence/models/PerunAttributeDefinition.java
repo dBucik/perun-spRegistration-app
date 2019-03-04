@@ -3,6 +3,8 @@ package cz.metacentrum.perun.spRegistration.persistence.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 public class PerunAttributeDefinition extends PerunEntity {
 
 	private String friendlyName;
@@ -140,4 +142,28 @@ public class PerunAttributeDefinition extends PerunEntity {
 				", beanName='" + beanName + '\'' +
 				'}';
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (! (o instanceof PerunAttributeDefinition)) {
+			return false;
+		}
+
+		PerunAttributeDefinition them = (PerunAttributeDefinition) o;
+		return Objects.equals(this.getId(), them.getId())
+				&& Objects.equals(this.friendlyName, them.friendlyName)
+				&& Objects.equals(this.namespace, them.namespace)
+				&& Objects.equals(this.entity, them.entity);
+	}
+
+	@Override
+	public int hashCode() {
+		long res = 31 * this.getId();
+		res *= 31 * friendlyName.hashCode();
+		res *= 31 * namespace.hashCode();
+		res *= 31 * entity.hashCode();
+
+		return (int) res;
+	}
+
 }

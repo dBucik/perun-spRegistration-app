@@ -77,17 +77,6 @@ public class Facility extends PerunEntity {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (! (o instanceof Facility)) {
-			return false;
-		}
-
-		Facility them = (Facility) o;
-		return Objects.equals(this.getId(), them.getId())
-				&& Objects.equals(this.name, them.name);
-	}
-
-	@Override
 	public String toString() {
 		return "Facility{" +
 				super.toString() +
@@ -95,5 +84,26 @@ public class Facility extends PerunEntity {
 				", description='" + description + '\'' +
 				", attrs=" + attrs +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (! (o instanceof Facility)) {
+			return false;
+		}
+
+		Facility them = (Facility) o;
+		return Objects.equals(this.getId(), them.getId())
+				&& Objects.equals(this.name, them.name)
+				&& Objects.equals(this.description, them.description);
+	}
+
+	@Override
+	public int hashCode() {
+		long res = 31 * this.getId();
+		res *= 31 * name.hashCode();
+		res *= 31 * description.hashCode();
+
+		return (int) res;
 	}
 }

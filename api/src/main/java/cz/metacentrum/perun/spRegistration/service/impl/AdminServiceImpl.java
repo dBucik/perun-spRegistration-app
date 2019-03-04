@@ -1,9 +1,10 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
+import cz.metacentrum.perun.spRegistration.persistence.Utils;
+import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
@@ -40,6 +41,7 @@ public class AdminServiceImpl implements AdminService {
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
 	private final Properties messagesProperties;
+	private final String adminsAttr;
 
 	@Autowired
 	public AdminServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
@@ -47,6 +49,7 @@ public class AdminServiceImpl implements AdminService {
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.messagesProperties = messagesProperties;
+		this.adminsAttr = appConfig.getAdminsAttr();
 	}
 
 	@Override
@@ -62,7 +65,6 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnauthorizedActionException("User is not authorized to approve request");
 		}
 
-		log.debug("fetching request from DB");
 		Request request = requestManager.getRequestByReqId(requestId);
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
@@ -77,18 +79,9 @@ public class AdminServiceImpl implements AdminService {
 			return false;
 		}
 
-		log.debug("updating request in DB");
-		request.setStatus(RequestStatus.APPROVED);
-		request.setModifiedBy(userId);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		boolean res = requestManager.updateRequest(request);
-		log.debug("updated request in DB: {}", res);
+		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.APPROVED, messagesProperties, adminsAttr);
 
-		log.debug("sending mail notification");
-		Mails.requestStatusUpdateUserNotify(requestId, RequestStatus.APPROVED,
-				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
-
-		log.debug("approveRequest returns: {}", res);
+		log.debug("updateRequestInDbAndNotifyUser() returns: {}", res);
 		return res;
 	}
 
@@ -105,7 +98,6 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnauthorizedActionException("User is not authorized to reject request");
 		}
 
-		log.debug("fetching request from DB");
 		Request request = requestManager.getRequestByReqId(requestId);
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
@@ -115,18 +107,9 @@ public class AdminServiceImpl implements AdminService {
 			throw new CannotChangeStatusException("Cannot reject request, request not marked as WAITING_FOR_APPROVAL");
 		}
 
-		log.debug("updating request in DB");
-		request.setStatus(RequestStatus.REJECTED);
-		request.setModifiedBy(userId);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		boolean res = requestManager.updateRequest(request);
-		log.debug("updated request in DB: {}", res);
+		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.REJECTED, messagesProperties, adminsAttr);
 
-		log.debug("sending mail notification");
-		Mails.requestStatusUpdateUserNotify(requestId, RequestStatus.REJECTED,
-				request.getAdmins(appConfig.getAdminsAttr()), message, messagesProperties);
-
-		log.debug("rejectRequest returns: {}", res);
+		log.debug("updateRequestInDbAndNotifyUser() returns: {}", res);
 		return res;
 	}
 
@@ -143,7 +126,6 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnauthorizedActionException("User is not authorized to ask for changes");
 		}
 
-		log.debug("fetching request from DB");
 		Request request = requestManager.getRequestByReqId(requestId);
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
@@ -153,18 +135,9 @@ public class AdminServiceImpl implements AdminService {
 			throw new CannotChangeStatusException("Cannot ask for changes, request not marked as WAITING_FOR_APPROVAL");
 		}
 
-		log.debug("updating request in DB");
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
-		request.setStatus(RequestStatus.WFC);
 		request.setAttributes(convertedAttributes);
-		request.setModifiedBy(userId);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		boolean res = requestManager.updateRequest(request);
-		log.debug("updated request in DB: {}", res);
-
-		log.debug("sending mail notification");
-		Mails.requestStatusUpdateUserNotify(requestId, RequestStatus.WFC,
-				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.WFC, messagesProperties, adminsAttr);
 
 		log.debug("askForChanges returns: {}", res);
 		return res;
@@ -181,23 +154,13 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnauthorizedActionException("User cannot approve transfer, user not an admin");
 		}
 
-		log.debug("fetching request from DB");
 		Request request = requestManager.getRequestByReqId(requestId);
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
 			throw new InternalErrorException("Could not fetch request with ID: " + requestId + " from database");
 		}
 
-		log.debug("updating request in DB");
-		request.setStatus(RequestStatus.APPROVED);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		request.setModifiedBy(userId);
-		boolean res = requestManager.updateRequest(request);
-		log.debug("updated request in DB: {}", res);
-
-		log.debug("sending mail notification");
-		Mails.requestStatusUpdateUserNotify(requestId, RequestStatus.APPROVED,
-				request.getAdmins(appConfig.getAdminsAttr()), messagesProperties);
+		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.APPROVED, messagesProperties, adminsAttr);
 
 		log.debug("approveTransferToProduction returns: {}", res);
 		return res;
@@ -223,8 +186,8 @@ public class AdminServiceImpl implements AdminService {
 	public List<Request> getAllRequests(Long adminId) throws UnauthorizedActionException {
 		log.debug("getAllRequests({})", adminId);
 		if (adminId == null) {
-			log.error("Illegal input - adminId: {}", adminId);
-			throw new IllegalArgumentException("Illegal input - adminId: " + adminId);
+			log.error("Illegal input - adminId is null");
+			throw new IllegalArgumentException("Illegal input - adminId is null");
 		} else if (! appConfig.isAdmin(adminId)) {
 			log.error("User cannot list all requests, user is not an admin");
 			throw new UnauthorizedActionException("User cannot list all requests, user is not an admin");
@@ -240,8 +203,8 @@ public class AdminServiceImpl implements AdminService {
 	public List<Facility> getAllFacilities(Long adminId) throws UnauthorizedActionException, RPCException {
 		log.debug("getAllFacilities({})", adminId);
 		if (adminId == null) {
-			log.error("Illegal input - adminId: {}", adminId);
-			throw new IllegalArgumentException("Illegal input - adminId: " + adminId);
+			log.error("Illegal input - adminId is null");
+			throw new IllegalArgumentException("Illegal input - adminId is null");
 		} else if (! appConfig.isAdmin(adminId)) {
 			log.error("User cannot list all facilities, user not an admin");
 			throw new UnauthorizedActionException("User cannot list all facilities, user not an admin");
@@ -266,14 +229,14 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnauthorizedActionException("User is not authorized to add facility admins");
 		}
 
-		log.debug("adding admins started");
+		log.info("Add admins");
 		boolean result = true;
 		for (Long id: admins) {
 			boolean partial = perunConnector.addFacilityAdmin(facilityId, id);
 			log.debug("adding admin with id: {} succeeded: {}", id, partial);
 			result = result && partial;
 		}
-		log.debug("adding admins finished - all calls successful: {}", result);
+		log.info("Admins were added - all calls successful: {}", result);
 
 		log.debug("addAdmins returns: {}", result);
 		return result;
@@ -290,14 +253,14 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnauthorizedActionException("User is not authorized to remove facility admins");
 		}
 
-		log.debug("removing admins started");
+		log.debug("Removing admins");
 		boolean result = true;
 		for (Long id: admins) {
 			boolean partial = perunConnector.removeFacilityAdmin(facilityId, id);
 			log.debug("removing admin with id: {} succeeded: {}", id, partial);
 			result = result && partial;
 		}
-		log.debug("removing admins finished - all calls successful: {}", result);
+		log.debug("Removing admins finished - all calls successful: {}", result);
 
 		log.debug("removeAdmins returns: {}", result);
 		return result;
@@ -316,68 +279,70 @@ public class AdminServiceImpl implements AdminService {
 		return false;
 	}
 
-	private boolean deleteFacilityFromPerun(Request request) throws RPCException {
-		log.debug("deleteFacilityFromPerun({})", request);
-		if (request == null) {
-			log.error("Request is null");
-			throw new IllegalArgumentException("Request is null");
+	private boolean registerNewFacilityToPerun(Request request) throws RPCException, InternalErrorException {
+		log.debug("registerNewFacilityToPerun({})", request);
+
+		Facility facility = new Facility(null);
+		String newName = request.getFacilityName();
+		String newDesc = request.getFacilityDescription();
+
+		if (newName == null || newDesc == null) {
+			log.error("Cannot register facility without name and description");
+			throw new IllegalArgumentException("Cannot register facility without name and description");
 		}
 
-		Long facilityId = request.getFacilityId();
-		if (facilityId == null) {
-			log.error("Request: {} does not have facilityId", request);
-			throw new IllegalArgumentException("Request: " + request.getReqId() + " does not have facilityId");
+		log.info("Creating facility");
+		facility.setName(newName);
+		facility.setDescription(newDesc);
+		facility = perunConnector.createFacilityInPerun(facility.toJsonString());
+
+		if (facility == null) {
+			log.error("Creating facility in Perun failed");
+			throw new InternalErrorException("Creating facility in Perun failed");
 		}
 
-		log.debug("removing facility from Perun with id: {}", facilityId);
-		boolean result = perunConnector.deleteFacilityFromPerun(facilityId);
-		log.debug("removed facility: {}", result);
+		request.setFacilityId(facility.getId());
 
-		log.debug("deleteFacilityFromPerun returns: {}", result);
+		log.info("Setting facility attributes");
+		boolean result = perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonForPerun());
+
+		log.debug("registerNewFacilityToPerun returns: {}", result);
 		return result;
 	}
 
 	private boolean updateFacilityInPerun(Request request) throws RPCException, InternalErrorException {
 		log.debug("updateFacilityInPerun({})", request);
-		if (request == null) {
-			log.error("Request is null");
-			throw new IllegalArgumentException("Request is null");
-		}
 
-		Long facilityId = request.getFacilityId();
-		if (facilityId == null) {
-			log.error("Request: {} does not have facilityId", request);
-			throw new IllegalArgumentException("Request: " + request.getReqId() + " does not have facilityId");
-		}
+		Long facilityId = extractFacilityIdFromRequest(request);
 
-		log.debug("Fetching facility from Perun with id: {}", facilityId);
+		log.debug("Fetching facility with ID: {} from Perun ", facilityId);
 		Facility actualFacility = perunConnector.getFacilityById(facilityId);
 		if (actualFacility == null) {
 			log.error("Facility with ID: {} does not exist in Perun", facilityId);
 			throw new InternalErrorException("Facility with ID: " + facilityId + " does not exist in Perun");
 		}
 
-		log.debug("setting facility attributes");
+		log.info("Setting facility attributes");
 		boolean result = perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonForPerun());
 
-		String newName = getName(request);
-		String newDesc = getDesc(request);
+		String newName = request.getFacilityName();
+		String newDesc = request.getFacilityDescription();
 
 		boolean changed = false;
 		if (newName != null && !actualFacility.getName().equals(newName)) {
-			log.debug("update facility name requested");
+			log.debug("Update facility name requested");
 			actualFacility.setName(newName);
 			changed = true;
 		}
 
 		if (newDesc != null && !actualFacility.getDescription().equals(newDesc)) {
-			log.debug("update facility description requested");
+			log.debug("Update facility description requested");
 			actualFacility.setDescription(newDesc);
 			changed = true;
 		}
 
 		if (changed) {
-			log.debug("updating facility name and/or description");
+			log.debug("Updating facility name and/or description");
 			perunConnector.updateFacilityInPerun(actualFacility.toJsonString());
 		}
 
@@ -385,41 +350,32 @@ public class AdminServiceImpl implements AdminService {
 		return result;
 	}
 
-	private boolean registerNewFacilityToPerun(Request request) throws RPCException, InternalErrorException {
-		log.debug("registerNewFacilityToPerun({})", request);
-		Facility facility = new Facility(null);
-		String newName = getName(request);
-		String newDesc = getDesc(request);
+	private boolean deleteFacilityFromPerun(Request request) throws RPCException {
+		log.debug("deleteFacilityFromPerun({})", request);
+		Long facilityId = extractFacilityIdFromRequest(request);
 
-		if (newName == null || newDesc == null) {
-			log.error("Cannot register facility without name and description");
-			throw new IllegalArgumentException("Cannot register facility without name and description");
+		log.info("Removing facility with ID: {} from Perun", facilityId);
+		boolean result = perunConnector.deleteFacilityFromPerun(facilityId);
+		if (! result) {
+			log.error("Facility has not been removed");
 		}
 
-		log.debug("creating facility in Perun");
-		facility.setName(newName);
-		facility.setDescription(newDesc);
-		facility = perunConnector.createFacilityInPerun(facility.toJsonString());
-		if (facility == null) {
-			log.error("Creating facility in Perun failed");
-			throw new InternalErrorException("Creating facility in Perun failed");
-		}
-		request.setFacilityId(facility.getId());
-		log.debug("created facility in Perun with ID: {}", facility.getId());
-
-		log.debug("setting facility attributes");
-		boolean result = perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonForPerun());
-		log.debug("setting facility attributes succeeded: {}", result);
-
-		log.debug("registerNewFacilityToPerun returns: {}", result);
+		log.debug("deleteFacilityFromPerun returns: {}", result);
 		return result;
 	}
 
-	private String getDesc(Request request) {
-		return request.getFacilityDescription();
-	}
+	private Long extractFacilityIdFromRequest(Request request) {
+		if (request == null) {
+			log.error("Request is null");
+			throw new IllegalArgumentException("Request is null");
+		}
 
-	private String getName(Request request) {
-		return request.getFacilityName();
+		Long facilityId = request.getFacilityId();
+		if (facilityId == null) {
+			log.error("Request: {} does not have facilityId", request);
+			throw new IllegalArgumentException("Request: " + request.getReqId() + " does not have facilityId");
+		}
+
+		return facilityId;
 	}
 }

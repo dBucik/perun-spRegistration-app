@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -179,17 +180,17 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
-	public Request getRequestByFacilityId(Long facilityId) {
-		log.debug("getRequestByFacilityId({})", facilityId);
+	public List<Request> getAllRequestsByFacilityId(Long facilityId) {
+		log.debug("getAllRequestsByFacilityId({})", facilityId);
 		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE facility_id = :fac_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("fac_id", facilityId);
 
-		Request request = jdbcTemplate.queryForObject(query, params, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, params, requestMapper);
 
-		log.debug("getRequestByFacilityId returns: {}", request);
-		return request;
+		log.debug("getAllRequestsByFacilityId returns: {}", requests);
+		return requests;
 	}
 
 	@Override
@@ -209,14 +210,25 @@ public class RequestManagerImpl implements RequestManager {
 	@Override
 	public boolean addSignature(Long requestId, Long userId, String fullName, String approvalName) {
 		log.debug("addSignature(requestId: {}, userId: {}, fullName: {}, approvalName: {})");
+		boolean result = addSignature(requestId, userId, fullName, approvalName, null);
+		log.debug("addSignature returns: {}", result);
+		return result;
+	}
+
+	@Override
+	public boolean addSignature(Long requestId, Long userId, String signerName, String signerInput, Timestamp signedAt) {
+		log.debug("addSignature(requestId: {}, userId: {}, signerName: {}, signerInput: {})");
 		String query = "INSERT INTO" + APPROVALS_TABLE +
-				"(request_id, signer_id, signer_name, signer_input) " +
-				"VALUES (:req_id, :signer_id, :signer_name, :signer_input)";
+				"(request_id, signer_id, signer_name, signer_input, signed_at) " +
+				"VALUES (:req_id, :signer_id, :signer_name, :signer_input, :signed_at)";
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_id", requestId);
 		params.addValue("signer_id", userId);
-		params.addValue("signer_name", fullName);
-		params.addValue("signer_input", approvalName);
+		params.addValue("signer_name", signerName);
+		params.addValue("signer_input", signerInput);
+		if (signedAt != null) {
+			params.addValue("signed_at", signedAt);
+		}
 
 		jdbcTemplate.update(query, params);
 
