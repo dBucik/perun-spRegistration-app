@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 import {MainMenuComponent} from "./main-menu/main-menu.component";
+import {NotFoundPageComponent} from "./shared/not-found-page/not-found-page.component";
 
 const routes: Routes = [
   {
@@ -14,6 +15,10 @@ const routes: Routes = [
   {
     path: 'facilities',
     loadChildren: './facilities/facilities.module#FacilitiesModule'
+  },
+  {
+    path: 'notFound',
+    component: NotFoundPageComponent
   }
 ];
 

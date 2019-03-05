@@ -13,9 +13,9 @@
 
 <mat-sidenav-container>
   <mat-sidenav #sidenav
-               mode="side"
+               [mode]="sidebarMode"
                class="perun-sidenav"
-               [(opened)]="opened"
+               [(opened)]="sideBarOpened"
                [fixedInViewport]="true"
                [fixedTopGap]="64">
     <ul class="navbar-nav">
@@ -56,7 +56,7 @@
 
   <mat-sidenav-content class="example-container">
     <div class="row mr-0 ml-0">
-      <div class="col-12 col-xl-11 pr-5 pl-5">
+      <div class="col-12 col-xl-11 pr-lg-5 pl-lg-5">
         <router-outlet></router-outlet>
       </div>
     </div>
