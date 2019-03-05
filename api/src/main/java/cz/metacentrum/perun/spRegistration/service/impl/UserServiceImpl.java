@@ -228,7 +228,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Long moveToProduction(Long facilityId, Long userId)
+	public Long moveToProduction(Long facilityId, Long userId, List<String> authorities)
 			throws UnauthorizedActionException, InternalErrorException, RPCException {
 		log.debug("moveToProduction(facilityId: {}, userId: {})", facilityId, userId);
 		if (facilityId == null || userId == null) {
@@ -268,7 +268,6 @@ public class UserServiceImpl implements UserService {
 			log.error("sending notification to user FAILED");
 		}
 		//TODO: generate approval link
-		List<String> authorities = appConfig.getSigningAuthorities();
 		res = Mails.authoritiesApproveProductionTransferNotify(null, req.getFacilityName(), authorities, messagesProperties);
 		if (!res) {
 			log.error("sending notification to authorities FAILED");
@@ -279,11 +278,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean signTransferToProduction(Long requestId, Long userId, String personInput) throws InternalErrorException, RPCException {
-		log.debug("signTransferToProduction(requestId: {}, userId: {}, approvalName: {})");
-		if (requestId == null || userId == null) {
-			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
-			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
+	public boolean signTransferToProduction(Long requestId, User user, String approvalName) throws InternalErrorException {
+		log.debug("signTransferToProduction(requestId: {}, user: {}, approvalName: {})", requestId, user, approvalName);
+		if (requestId == null || user == null) {
+			log.error("Illegal input - request: {}, userId: {}", requestId, user);
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + user);
 		}
 
 		Request request = requestManager.getRequestByReqId(requestId);
@@ -292,13 +291,9 @@ public class UserServiceImpl implements UserService {
 			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
 		}
 
-		User signer = perunConnector.getRichUser(userId);
-		if (signer == null) {
-			log.error("Could not find user in Perun for id: {}", userId);
-			throw new InternalErrorException("Could not find user in Perun for id: " + userId);
-		}
-
-		boolean result = requestManager.addSignature(requestId, userId, signer.getFullName(), personInput);
+		log.debug("adding signature for request with id: {} by user: {}", requestId, user.getId());
+		boolean result = requestManager.addSignature(requestId, user.getId(), user.getFullName(), approvalName);
+		log.debug("added signature: {}", result);
 
 		log.debug("signTransferToProduction returns: {}", result);
 		return result;

@@ -4,6 +4,7 @@ import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
@@ -94,21 +95,23 @@ public interface UserService {
 	 * Ask for moving the service to the production environment.
 	 * @param facilityId ID of facility in Perun.
 	 * @param userId ID of requesting user.
+	 * @param authorities List to whom the emails should be sent
 	 * @return Id of created request
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	Long moveToProduction(Long facilityId, Long userId) throws UnauthorizedActionException, InternalErrorException, RPCException;
+	Long moveToProduction(Long facilityId, Long userId, List<String> authorities) throws UnauthorizedActionException, InternalErrorException, RPCException;
 
 	/**
 	 * Sign transfer to the production
 	 * @param requestId id of request for transfer
-	 * @param userId id of signer
-	 * @param personInput name entered by signer
+	 * @param user signer
+	 * @param approvalName name entered by signer
 	 * @return True if all went OK.
 	 * @throws InternalErrorException
 	 * @throws RPCException in case of problems with RPC.
 	 */
-	boolean signTransferToProduction(Long requestId, Long userId, String personInput) throws InternalErrorException, RPCException;
+
+	boolean signTransferToProduction(Long requestId, User user, String approvalName) throws InternalErrorException, RPCException;
 
 	/**
 	 * Get all facilities from Perun where user is admin (manager).

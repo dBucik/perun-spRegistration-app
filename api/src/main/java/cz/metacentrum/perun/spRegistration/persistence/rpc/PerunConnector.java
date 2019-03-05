@@ -107,10 +107,12 @@ public interface PerunConnector {
 
 	/**
 	 * Get user from Perun.
-	 * @param userId ID of user.
+	 * @param sub sub from OIDC.
+	 * @param subAttributeInPerun Perun attribute that corresponds to SUB claim from OIDC.
+	 * @param userEmailAttr user email.
 	 * @return Retrieved user object.
 	 */
-	User getRichUser(Long userId) throws RPCException;
+	User getRichUser(String sub, String subAttributeInPerun, String userEmailAttr) throws RPCException;
 
 	/**
 	 * Add user as an admin (manager) of facility.

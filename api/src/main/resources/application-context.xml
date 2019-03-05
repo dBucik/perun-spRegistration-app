@@ -13,7 +13,7 @@
         <property name="properties">
             <props>
                 <prop key="jdbc.driver">org.postgresql.Driver</prop>
-                <prop key="jdbc.url">jdbc:postgresql://cloud69b.cerit-sc.cz/spregistration</prop>
+                <prop key="jdbc.url">jdbc:postgresql://127.0.0.1:5432/spregistration</prop>
                 <prop key="jdbc.username">spreg</prop>
                 <prop key="jdbc.password">spreg123</prop>
                 <prop key="rpc.url">https://perun-dev.cesnet.cz/ba/rpc/</prop>
@@ -25,9 +25,10 @@
                 <prop key="attr.testSp.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
                 <prop key="attr.showOnServicesList.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
                 <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
+                <prop key="attr.userEmail.name">urn:perun:user:attribute-def:def:preferredMail</prop>
+                <prop key="attr.sub.name">urn:perun:user:attribute-def:def:login-namespace:einfraid-persistent-shadow</prop>
                 <prop key="oidc.isEnabled">true</prop>
                 <prop key="langs">en,cs</prop>
-                <prop key="signingAuthorities">auth1@mail.not,auth2@mail.not</prop>
             </props>
         </property>
     </bean>
@@ -39,7 +40,7 @@
                 <value>file:///etc/perun-spRegistration/appConfig.properties</value>
             </list>
         </property>
-        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreResourceNotFound" value="false"/>
     </bean>
 
     <bean id="facilityServiceAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -241,9 +242,10 @@
         <property name="testSpAttribute" value="${attr.testSp.name}" />
         <property name="showOnServicesListAttribute" value="${attr.showOnServicesList.name}" />
         <property name="adminsAttr" value="${attr.facilityAdmins.name}" />
+        <property name="userEmailAttr" value="${attr.userEmail.name}" />
+        <property name="subAttr" value="${attr.sub.name}" />
         <property name="oidcEnabled" value="${oidc.isEnabled}" />
         <property name="langs" value="#{'${langs}'.split('\s*,\s*')}" />
-        <property name="signingAuthorities" value="#{'${signingAuthorities}'.split('\s*,\s*')}" />
     </bean>
 
     <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
