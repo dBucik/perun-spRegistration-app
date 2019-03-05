@@ -1,4 +1,5 @@
-Perun module for SP registration
+Perun application for SP registration.
 
-** RUN WITH: mvn clean install && mvn spring-boot:run -pl rest
+Deploy to the tomcat.
+
 
