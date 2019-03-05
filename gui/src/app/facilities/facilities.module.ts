@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FacilitiesRoutingModule } from './facilities-routing.module';
 import { FacilitiesOverviewComponent } from "./facilities-overview/facilities-overview.component";
 import { SharedModule } from "../shared/shared.module";
+import { FacilitiesDetailComponent } from './facilities-detail/facilities-detail.component';
 
 @NgModule({
   imports: [
@@ -11,6 +12,6 @@ import { SharedModule } from "../shared/shared.module";
     FacilitiesRoutingModule,
     SharedModule
   ],
-  declarations: [FacilitiesOverviewComponent]
+  declarations: [FacilitiesOverviewComponent, FacilitiesDetailComponent]
 })
 export class FacilitiesModule { }

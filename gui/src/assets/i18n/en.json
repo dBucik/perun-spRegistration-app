@@ -10,7 +10,8 @@
     "FACILITIES": "Facilities",
     "NEW_REQUEST": "New request",
     "MY_REQUESTS": "My requests",
-    "ALL_REQUESTS": "All requests"
+    "ALL_REQUESTS": "All requests",
+    "MY_FACILITIES": "My facilities"
   },
   "REQUESTS": {
     "TITLE": "My requests",

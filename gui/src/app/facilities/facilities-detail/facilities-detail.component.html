@@ -1,0 +1,11 @@
+<div class="container-fluid pt-5 p-lg-5">
+  <mat-spinner class="ml-auto mr-auto" *ngIf="loading" color=""></mat-spinner>
+  <div *ngIf="!loading" class="card mb-4 shadow-sm">
+    <div class="card-body p-5">
+      <h2 class="card-title">
+        {{facility.id}} : {{facility.name}}
+      </h2>
+      {{facility.description}}
+    </div>
+  </div>
+</div>

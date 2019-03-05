@@ -19,4 +19,8 @@ export class FacilitiesService {
   getMyFacilities(): Observable<Facility[]> {
     return this.apiService.get('/userFacilities');
   }
+
+  getFacility(id: number): Observable<Facility> {
+    return this.apiService.get('/facility/' + id);
+  }
 }
