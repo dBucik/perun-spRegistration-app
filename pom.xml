@@ -89,8 +89,8 @@
                 <server.port>8081</server.port>
                 <server.contextPath/>
                 <angular.build.profile/>
-                <angular.deploy.url/>
-                <angular.base.href/>
+                <angular.deploy.url>--deploy-url=${server.contextPath}/</angular.deploy.url>
+                <angular.base.href>--base-href=${server.contextPath}/</angular.base.href>
                 <logging.path>/var/log/perun-spreg</logging.path>
                 <logging.file>perun-spreg.debug</logging.file>
             </properties>
