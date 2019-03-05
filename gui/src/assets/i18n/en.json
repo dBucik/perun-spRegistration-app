@@ -1,5 +1,9 @@
 {
-  "TITLE" : "Service registration",
+  "TITLE": "Service registration",
+  "ERROR": {
+    "GENERAL_ERROR_TITLE": "Something went wrong.",
+    "SERVER_DOWN": "Server is currently offline. Please try it again later."
+  },
   "MENU": {
     "HOME": "Home",
     "REQUESTS": "Requests",

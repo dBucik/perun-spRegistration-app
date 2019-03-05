@@ -11,7 +11,7 @@ import {RouterModule} from "@angular/router";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {
   MatButtonModule,
-  MatCheckboxModule, MatFormFieldModule,
+  MatCheckboxModule, MatDialogModule, MatFormFieldModule,
   MatIconModule,
   MatInputModule,
   MatProgressSpinnerModule,
@@ -24,6 +24,8 @@ import {
   MatToolbarModule,
   MatTooltipModule
 } from "@angular/material";
+import { ErrorDialogComponent } from './error-dialog/error-dialog.component';
+import { NotFoundPageComponent } from './not-found-page/not-found-page.component';
 
 @NgModule({
   imports: [
@@ -46,14 +48,17 @@ import {
     TranslateModule,
     MatStepperModule,
     MatSidenavModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatDialogModule
   ],
   declarations: [
     SortableColumnComponent,
     SortableTableDirective,
     PerunHeaderComponent,
     PerunSidebarComponent,
-    PerunFooterComponent
+    PerunFooterComponent,
+    ErrorDialogComponent,
+    NotFoundPageComponent
   ],
   exports: [
     FontAwesomeModule,
@@ -80,6 +85,9 @@ import {
     MatStepperModule,
     MatFormFieldModule,
     ReactiveFormsModule
+  ],
+  entryComponents: [
+    ErrorDialogComponent
   ]
 })
 export class SharedModule {
