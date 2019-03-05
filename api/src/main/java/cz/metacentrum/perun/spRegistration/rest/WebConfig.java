@@ -1,6 +1,5 @@
 package cz.metacentrum.perun.spRegistration.rest;
 
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
@@ -9,12 +8,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
  *
  * @author Vojtech Sassmann <vojtech.sassmann@gmail.com>
  */
-@Configuration
+//@Configuration
 public class WebConfig extends WebMvcConfigurationSupport  {
 	@Override
 	protected void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-				.allowedOrigins("http://localhost:4200/spreg/")
+				.allowedOrigins("http://localhost:4200/spreg")
 				.allowedMethods(
 						"GET",
 						"POST",
