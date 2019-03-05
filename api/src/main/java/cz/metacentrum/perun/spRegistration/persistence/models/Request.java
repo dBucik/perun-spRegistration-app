@@ -160,24 +160,17 @@ public class Request {
 
 	@Override
 	public boolean equals(Object o) {
-		if (! (o instanceof Request)) {
-			return false;
-		}
-
-		Request them = (Request) o;
-		return Objects.equals(this.reqId, them.reqId)
-				&& Objects.equals(this.action, them.action)
-				&& Objects.equals(this.status, them.status)
-				&& Objects.equals(this.facilityId, them.facilityId);
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Request request = (Request) o;
+		return Objects.equals(reqId, request.reqId) &&
+				status == request.status &&
+				action == request.action &&
+				Objects.equals(reqUserId, request.reqUserId);
 	}
 
 	@Override
 	public int hashCode() {
-		long res = 31 * reqId;
-		res *= 31 * action.hashCode();
-		res *= 31 * status.hashCode();
-		res *= 31 * facilityId;
-
-		return (int) res;
+		return Objects.hash(reqId, status, action, reqUserId);
 	}
 }
