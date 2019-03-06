@@ -38,12 +38,6 @@ export class FacilitiesOverviewComponent implements OnInit, OnDestroy {
     this.facilitiesSubscription = this.facilitiesService.getMyFacilities().subscribe(facilities => {
       this.loading = false;
       this.myFacilities = facilities;
-      facilities.push({   //for testing purposes
-        id: 3,
-        name: "X Cloud META",
-        description: "Very ugly and old facility",
-        attrs: []
-      });
       this.dataSource = new MatTableDataSource<Facility>(facilities);
     }, error => {
         this.loading = false;

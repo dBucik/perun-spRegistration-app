@@ -5,6 +5,7 @@ import { FacilitiesRoutingModule } from './facilities-routing.module';
 import { FacilitiesOverviewComponent } from "./facilities-overview/facilities-overview.component";
 import { SharedModule } from "../shared/shared.module";
 import { FacilitiesDetailComponent } from './facilities-detail/facilities-detail.component';
+import {FacilityAttributeValuePipe} from "../facilities/facility-attribute-value.pipe";
 
 @NgModule({
   imports: [
@@ -12,6 +13,10 @@ import { FacilitiesDetailComponent } from './facilities-detail/facilities-detail
     FacilitiesRoutingModule,
     SharedModule
   ],
-  declarations: [FacilitiesOverviewComponent, FacilitiesDetailComponent]
+  declarations: [
+    FacilitiesOverviewComponent,
+    FacilitiesDetailComponent,
+    FacilityAttributeValuePipe
+  ]
 })
 export class FacilitiesModule { }

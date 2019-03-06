@@ -79,7 +79,7 @@ public class MapperUtils {
 			if (a != null) {
 				PerunAttributeDefinition def = a.getDefinition();
 				a.setDefinition(def);
-				attrs.put(a.getFullName(), a);
+				attrs.put(def.getFullName(), a);
 			}
 		}
 

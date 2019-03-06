@@ -3,6 +3,8 @@ import {ActivatedRoute} from "@angular/router";
 import {Subscription} from "rxjs";
 import {FacilitiesService} from "../../core/services/facilities.service";
 import {Facility} from "../../core/models/Facility";
+import {MatTableDataSource} from "@angular/material";
+import {PerunAttribute} from "../../core/models/PerunAttribute";
 
 @Component({
   selector: 'app-facilities-detail',
@@ -17,7 +19,9 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   ) { }
 
   private sub : Subscription;
-  //TODO edit datatype
+
+  displayedColumns: string[] = ['fullname', 'value'];
+  facilityAttributes: PerunAttribute[];
 
   loading = true;
   facility: Facility;
@@ -25,12 +29,20 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   //TODO load this from api when implemented
   isUserAdmin : boolean = true;
 
+  private mapAttributes() {
+  this.facilityAttributes = [];
+    for (let urn of Object.keys(this.facility.attrs)) {
+      let item = this.facility.attrs[urn];
+      this.facilityAttributes.push(new PerunAttribute(item.value, item.definition.displayName));
+    }
+  }
+
   ngOnInit() {
     this.sub = this.route.params.subscribe(params => {
       this.facilitiesService.getFacility(params['id']).subscribe(facility => {
         this.facility = facility;
+        this.mapAttributes();
         this.loading = false;
-        //this.mapAttributes();
       }, error => {
         this.loading = false;
         console.log(error);
