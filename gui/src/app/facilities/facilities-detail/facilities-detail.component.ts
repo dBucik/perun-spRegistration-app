@@ -3,7 +3,6 @@ import {ActivatedRoute} from "@angular/router";
 import {Subscription} from "rxjs";
 import {FacilitiesService} from "../../core/services/facilities.service";
 import {Facility} from "../../core/models/Facility";
-import {MatTableDataSource} from "@angular/material";
 import {PerunAttribute} from "../../core/models/PerunAttribute";
 
 @Component({
