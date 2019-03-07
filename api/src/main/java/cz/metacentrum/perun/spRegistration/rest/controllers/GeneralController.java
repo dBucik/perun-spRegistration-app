@@ -8,16 +8,14 @@ import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 @RestController
@@ -27,10 +25,34 @@ public class GeneralController {
 	private final Config config;
 	private PerunConnector connector;
 
+	@Value("${dev.enabled}")
+	private boolean devEnabled;
+
 	@Autowired
 	public GeneralController(Config config, PerunConnector connector) {
 		this.config = config;
 		this.connector = connector;
+	}
+
+	@RequestMapping(path = "/api/setUser", method = RequestMethod.GET)
+	public void setUser(HttpServletRequest req) throws RPCException {
+		String userEmailAttr = config.getAppConfig().getUserEmailAttr();
+		String extSourceProxy = config.getAppConfig().getExtSourceProxy();
+		log.debug("settingUser");
+		String sub;
+		if (devEnabled) {
+			sub = req.getHeader("fake-usr-hdr");
+		} else {
+			sub = req.getRemoteUser();
+		}
+
+		if (sub != null && !sub.isEmpty()) {
+			log.debug("found userId: {} ", sub);
+			User user = connector.getUserWithEmail(sub, extSourceProxy, userEmailAttr);
+			log.debug("found user: {}", user);
+
+			req.getSession().setAttribute("user", user);
+		}
 	}
 
 	@RequestMapping(path = "/api/test")

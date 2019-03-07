@@ -361,7 +361,7 @@ public class PerunConnectorRpc implements PerunConnector {
 			} else {
 				log.error(ex.getMessage());
 			}
-			throw new RPCException("cannot connect to Perun RPC", ex);
+			throw new RPCException("cannot connect to Perun RPC: {}" + ex.getMessage() , ex);
 		} catch (IOException e) {
 			log.error("cannot parse response to String", e);
 			throw new RPCException("cannot connect to Perun RPC", e);

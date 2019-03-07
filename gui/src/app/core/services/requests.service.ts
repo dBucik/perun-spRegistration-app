@@ -15,7 +15,7 @@ export class RequestsService {
 
   //TODO delete THIS!!!
   login() {
-    return this.apiService.get('');
+    return this.apiService.get('/setUser');
   }
 
   getAllRequests(): Observable<Request[]> {

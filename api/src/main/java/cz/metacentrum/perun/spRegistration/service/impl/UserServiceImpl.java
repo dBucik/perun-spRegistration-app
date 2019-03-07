@@ -2,6 +2,8 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.persistence.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig;
+import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
@@ -78,9 +80,9 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Long createFacilityChangesRequest(Long facilityId, Long userId, List<PerunAttribute> attributes)
 			throws UnauthorizedActionException, RPCException, InternalErrorException {
-		log.debug("createFacilityChangesRequest(facility: {}, userId: {}, attributes: {})");
+		log.debug("createFacilityChangesRequest(facility: {}, userId: {}, attributes: {})", facilityId, userId, attributes);
 		if (facilityId == null || userId == null || attributes == null) {
-			log.error("Illegal input - facilityId: {}, userId: {}, attributes: {}" + facilityId, userId, attributes);
+			log.error("Illegal input - facilityId: {}, userId: {}, attributes: {}", facilityId, userId, attributes);
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", userId: " + userId + ", attributes: " + attributes);
 		} else if (! isFacilityAdmin(facilityId, userId)) {
 			log.error("User is not registered as facility admin, cannot create request");
@@ -336,6 +338,8 @@ public class UserServiceImpl implements UserService {
 
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId);
 		facility.setAttrs(attrs);
+		boolean inTest = attrs.get(appConfig.getTestSpAttribute()).valueAsBoolean(false);
+		facility.setTestEnv(inTest);
 
 		log.debug("getDetailedFacility returns: {}", facility);
 		return facility;

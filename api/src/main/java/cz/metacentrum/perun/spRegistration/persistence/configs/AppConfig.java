@@ -19,8 +19,7 @@ public class AppConfig {
 
 	private String idpAttribute;
 	private String idpAttributeValue;
-	private String testSpAttribute;
-	private String adminsAttr;
+		private String adminsAttr;
 	private Set<Long> admins;
 	private String extSourceProxy;
 	private String userEmailAttr;
@@ -33,6 +32,7 @@ public class AppConfig {
 
 	private PerunConnector connector;
 	private String showOnServicesListAttribute;
+	private String testSpAttribute;
 
 	public AppConfig() {
 		Resource enLang = new ClassPathResource("localization.properties");

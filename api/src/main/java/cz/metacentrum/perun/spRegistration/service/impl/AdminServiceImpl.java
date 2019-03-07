@@ -144,7 +144,7 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public boolean approveTransferToProduction(Long requestId, Long userId) throws InternalErrorException, UnauthorizedActionException {
+	public boolean approveTransferToProduction(Long requestId, Long userId) throws InternalErrorException, UnauthorizedActionException, RPCException {
 		log.debug("approveTransferToProduction(requestId: {}, userId: {})", requestId, userId);
 		if (requestId == null || userId == null) {
 			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
@@ -161,6 +161,7 @@ public class AdminServiceImpl implements AdminService {
 		}
 
 		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.APPROVED, messagesProperties, adminsAttr);
+		finishRequestApproved(request);
 
 		log.debug("approveTransferToProduction returns: {}", res);
 		return res;
@@ -274,6 +275,8 @@ public class AdminServiceImpl implements AdminService {
 				return updateFacilityInPerun(request);
 			case DELETE_FACILITY:
 				return deleteFacilityFromPerun(request);
+			case MOVE_TO_PRODUCTION:
+				return moveToProduction(request);
 		}
 
 		return false;
@@ -362,6 +365,23 @@ public class AdminServiceImpl implements AdminService {
 
 		log.debug("deleteFacilityFromPerun returns: {}", result);
 		return result;
+	}
+
+	private boolean moveToProduction(Request request) throws RPCException {
+		log.debug("moveToProduction({})", request);
+		log.info("Updating facility attributes");
+		boolean res;
+		PerunAttribute testSp = perunConnector.getFacilityAttribute(
+				request.getFacilityId(), appConfig.getTestSpAttribute());
+		testSp.setValue(false);
+		res = perunConnector.setFacilityAttribute(request.getFacilityId(), testSp.toJsonForPerun().toString());
+		PerunAttribute displayOnList = perunConnector.getFacilityAttribute(
+				request.getFacilityId(), appConfig.getShowOnServicesListAttribute());
+		displayOnList.setValue(true);
+		res = res && perunConnector.setFacilityAttribute(request.getFacilityId(), displayOnList.toJsonForPerun().toString());
+
+		log.debug("moveToProduction returns: {}", res);
+		return res;
 	}
 
 	private Long extractFacilityIdFromRequest(Request request) {
