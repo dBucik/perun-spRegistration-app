@@ -237,21 +237,21 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public User getRichUser(String sub, String subAttributeInPerun, String userEmailAttr) throws RPCException {
-		log.debug("getRichUser({})", sub);
-		if (sub == null || sub.isEmpty()) {
+	public User getUserWithEmail(String extLogin, String extSourceName, String userEmailAttr) throws RPCException {
+		log.debug("getUserWithEmail({})", extLogin);
+		if (extLogin == null || extLogin.isEmpty()) {
 			throw new IllegalArgumentException("userId is null");
 		}
 		Map<String, Object> params = new LinkedHashMap<>();
 
-		params.put("attributeName", subAttributeInPerun);
-		params.put("attributeValue", sub);
+		params.put("extSourceName", extSourceName);
+		params.put("extLogin", extLogin);
 
-		JSONArray res = makeRpcCallForArray(USERS_MANAGER, "getUsersByAttribute", params);
-		if (res.length() > 1) {
+		JSONObject res = makeRpcCallForObject(USERS_MANAGER, "getUserByExtSourceNameAndExtLogin", params);
+		if (res == null) {
 			throw new RPCException("Should not found more than one user");
 		}
-		User user = MapperUtils.mapUser(res.getJSONObject(0), false);
+		User user = MapperUtils.mapUser(res, false);
 		params.clear();
 		params.put("user", user.getId().intValue());
 		params.put("attributeName", userEmailAttr);
@@ -261,7 +261,7 @@ public class PerunConnectorRpc implements PerunConnector {
 
 		user.setEmail(attribute.valueAsString(false));
 
-		log.debug("getRichUser returns: {}", user);
+		log.debug("getUserWithEmail returns: {}", user);
 		return user;
 	}
 

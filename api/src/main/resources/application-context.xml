@@ -26,7 +26,7 @@
                 <prop key="attr.showOnServicesList.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
                 <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
                 <prop key="attr.userEmail.name">urn:perun:user:attribute-def:def:preferredMail</prop>
-                <prop key="attr.sub.name">urn:perun:user:attribute-def:def:login-namespace:einfraid-persistent-shadow</prop>
+                <prop key="extSource.proxy.entityId">https://login.cesnet.cz/idp/</prop>
                 <prop key="oidc.isEnabled">true</prop>
                 <prop key="langs">en,cs</prop>
             </props>
@@ -243,7 +243,7 @@
         <property name="showOnServicesListAttribute" value="${attr.showOnServicesList.name}" />
         <property name="adminsAttr" value="${attr.facilityAdmins.name}" />
         <property name="userEmailAttr" value="${attr.userEmail.name}" />
-        <property name="subAttr" value="${attr.sub.name}" />
+        <property name="extSourceProxy" value="${extSource.proxy.entityId}" />
         <property name="oidcEnabled" value="${oidc.isEnabled}" />
         <property name="langs" value="#{'${langs}'.split('\s*,\s*')}" />
     </bean>

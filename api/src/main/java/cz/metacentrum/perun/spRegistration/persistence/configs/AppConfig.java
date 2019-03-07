@@ -22,7 +22,7 @@ public class AppConfig {
 	private String testSpAttribute;
 	private String adminsAttr;
 	private Set<Long> admins;
-	private String subAttr;
+	private String extSourceProxy;
 	private String userEmailAttr;
 	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
 	private boolean oidcEnabled;
@@ -125,12 +125,12 @@ public class AppConfig {
 		this.adminsAttr = adminsAttr;
 	}
 
-	public String getSubAttr() {
-		return subAttr;
+	public String getExtSourceProxy() {
+		return extSourceProxy;
 	}
 
-	public void setSubAttr(String subAttr) {
-		this.subAttr = subAttr;
+	public void setExtSourceProxy(String extSourceProxy) {
+		this.extSourceProxy = extSourceProxy;
 	}
 
 	public String getUserEmailAttr() {
@@ -150,7 +150,7 @@ public class AppConfig {
 				", adminsAttr='" + adminsAttr + '\'' +
 				", admins=" + admins +
 				", userEmailAttr=" + userEmailAttr +
-				", subAttr=" + subAttr +
+				", extSourceProxy=" + extSourceProxy +
 				", perunAttributeDefinitionsMap=" + perunAttributeDefinitionsMap +
 				", oidcEnabled=" + oidcEnabled +
 				", langs=" + langs +
