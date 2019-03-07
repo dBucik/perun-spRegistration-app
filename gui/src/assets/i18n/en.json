@@ -10,7 +10,8 @@
     "FACILITIES": "Facilities",
     "NEW_REQUEST": "New request",
     "MY_REQUESTS": "My requests",
-    "ALL_REQUESTS": "All requests"
+    "ALL_REQUESTS": "All requests",
+    "MY_FACILITIES": "My facilities"
   },
   "REQUESTS": {
     "TITLE": "My requests",
@@ -58,6 +59,10 @@
     "YOUR_FACILITIES": "Your facilities",
     "ID": "Id",
     "NAME": "Name",
-    "DESCRIPTION": "Description"
+    "DESCRIPTION": "Description",
+    "FACILITY_DETAIL_TITLE" : "Facility #",
+    "FACILITY_ATTRIBUTES" : "Facility attributes:",
+    "FACILITY_DETAIL_ITEM_NAME" : "Name",
+    "FACILITY_DETAIL_ITEM_VALUE" : "Value"
   }
 }

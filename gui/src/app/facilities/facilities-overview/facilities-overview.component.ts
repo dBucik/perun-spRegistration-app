@@ -14,33 +14,14 @@ export class FacilitiesOverviewComponent implements OnInit, OnDestroy {
   constructor(private facilitiesService: FacilitiesService) { }
 
   @Input()
-  facilities: Facility[] = [
-    {
-      id: 1,
-      name: "C Cloud META 9",
-      description: "Very ugly and old facility",
-      attrs: []
-    },
-    {
-      id: 2,
-      name: "A Cloud",
-      description: "Very ugly and old facility and this is the only facility that uses the unordinary black papers for their customers. ",
-      attrs: []
-    },
-    {
-      id: 3,
-      name: "X Cloud META",
-      description: "Very ugly and old facility",
-      attrs: []
-    }
-  ];
+  myFacilities: Facility[];
 
   @ViewChild(MatSort) set matSort(ms: MatSort) {
     this.sort = ms;
     this.setDataSource();
   }
 
-  displayedColumns: string[] = ['id', 'name'];
+  displayedColumns: string[] = ['id', 'name', 'description'];
   dataSource: MatTableDataSource<Facility>;
   loading = true;
 
@@ -55,14 +36,12 @@ export class FacilitiesOverviewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.facilitiesSubscription = this.facilitiesService.getMyFacilities().subscribe(facilities => {
-      // TODO: uncomment this
-      // this.facilities = facilities;
-      this.dataSource = new MatTableDataSource<Facility>(this.facilities);
-      this.dataSource.sort = this.sort;
       this.loading = false;
+      this.myFacilities = facilities;
+      this.dataSource = new MatTableDataSource<Facility>(facilities);
     }, error => {
-      this.loading = false;
-      console.log(error);
+        this.loading = false;
+        console.log(error);
     });
   }
 
