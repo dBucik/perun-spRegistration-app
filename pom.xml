@@ -30,14 +30,22 @@
         <npm.version>5.3.0</npm.version>
         <org.json.version>20180813</org.json.version>
         <org.postgresql.version>42.2.5</org.postgresql.version>
+        <spring.jdbc.version>5.1.5.RELEASE</spring.jdbc.version>
+        <javax.mail.version>1.5.0-b01</javax.mail.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+    </repositories>
+
     <dependencies>
-        <!-- SPRING -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
-            <version>5.1.5.RELEASE</version>
+            <version>${spring.jdbc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -53,13 +61,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>spring-releases</id>
-            <url>https://repo.spring.io/libs-release</url>
-        </repository>
-    </repositories>
 
     <profiles>
         <profile>

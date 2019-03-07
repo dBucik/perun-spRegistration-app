@@ -11,9 +11,10 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <name>SpRegistration GUI</name>
-
     <artifactId>spRegistration-gui</artifactId>
+
+    <name>SpRegistration GUI</name>
+    <description>Frontend part of SpRegistration Application</description>
 
     <build>
         <plugins>
