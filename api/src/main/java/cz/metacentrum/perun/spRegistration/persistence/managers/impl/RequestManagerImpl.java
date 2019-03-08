@@ -196,6 +196,9 @@ public class RequestManagerImpl implements RequestManager {
 	@Override
 	public List<Request> getAllRequestsByFacilityIds(Set<Long> facilityIds) {
 		log.debug("getAllRequestsByFacilityIds({})", facilityIds);
+		if (facilityIds == null || facilityIds.isEmpty()) {
+			return new ArrayList<>();
+		}
 		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE facility_id IN (:ids)";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
