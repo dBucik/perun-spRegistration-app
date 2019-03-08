@@ -52,7 +52,8 @@
     "REQUEST_DETAIL_ITEM_VALUE" : "Value",
     "REQUEST_DETAIL_REJECT": "Reject",
     "REQUEST_DETAIL_REQUEST_CHANGES": "Request changes",
-    "REQUEST_DETAIL_APPROVE": "Approve"
+    "REQUEST_DETAIL_APPROVE": "Approve",
+    "NEW_LAST_STEP_HEADER" : "That's all we need to know! You can now submit the request."
   },
   "FACILITIES": {
     "TITLE": "Facilities",
