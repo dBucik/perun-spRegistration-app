@@ -27,6 +27,10 @@
                 <prop key="extSource.proxy.entityId">https://login.cesnet.cz/idp/</prop>
                 <prop key="oidc.isEnabled">true</prop>
                 <prop key="langs">en,cs</prop>
+                <prop key="app.footer.html"/>
+                <prop key="app.header.html"/>
+                <prop key="app.header.title">Registration of SP - dev</prop>
+                <prop key="app.header.logo">https://perun.cesnet.cz/signpost/images/perun_3.png</prop>
             </props>
         </property>
     </bean>
@@ -245,6 +249,10 @@
         <property name="extSourceProxy" value="${extSource.proxy.entityId}" />
         <property name="oidcEnabled" value="${oidc.isEnabled}" />
         <property name="langs" value="#{'${langs}'.split('\s*,\s*')}" />
+        <property name="footerHTML" value="${app.footer.html}" />
+        <property name="headerHTML" value="${app.header.html}" />
+        <property name="headerTitle" value="${app.header.title}" />
+        <property name="headerLogo" value="${app.header.logo}" />
     </bean>
 
     <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
