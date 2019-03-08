@@ -107,7 +107,7 @@ public interface UserService {
 	 * @param user signer
 	 * @param approvalName name entered by signer
 	 * @return True if all went OK.
-	 * @throws InternalErrorException
+	 * @throws InternalErrorException if some internal error has occured
 	 */
 
 	boolean signTransferToProduction(Long requestId, User user, String approvalName) throws InternalErrorException;
