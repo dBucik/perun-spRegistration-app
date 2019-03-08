@@ -61,7 +61,7 @@ public interface AdminService {
 	 * @param userId ID of user (ADMIN) approving the request.
 	 * @return True if everything went OK.
 	 */
-	boolean approveTransferToProduction(Long requestId, Long userId) throws InternalErrorException, UnauthorizedActionException;
+	boolean approveTransferToProduction(Long requestId, Long userId) throws InternalErrorException, UnauthorizedActionException, RPCException;
 
 	/**
 	 * Get approvals for request to transfer to production.

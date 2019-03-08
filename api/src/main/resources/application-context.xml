@@ -7,7 +7,8 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
     <context:component-scan base-package="cz.metacentrum.perun.spRegistration"/>
-    <context:property-placeholder properties-ref="properties" />
+    <context:property-placeholder properties-ref="properties" order="1" ignore-unresolvable="true" />
+    <context:property-placeholder properties-ref="facilityServiceAttributes" order="2" />
 
     <bean id="defaultProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
@@ -20,13 +21,10 @@
                 <prop key="rpc.user">XYZ</prop>
                 <prop key="rpc.password">XYZ</prop>
                 <prop key="admins">62692,0,0</prop>
-                <prop key="attr.idpAttribute.name">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
                 <prop key="attr.idpAttribute.value">XYZ</prop>
-                <prop key="attr.testSp.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
-                <prop key="attr.showOnServicesList.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
-                <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
                 <prop key="attr.userEmail.name">urn:perun:user:attribute-def:def:preferredMail</prop>
-                <prop key="attr.sub.name">urn:perun:user:attribute-def:def:login-namespace:einfraid-persistent-shadow</prop>
+                <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
+                <prop key="extSource.proxy.entityId">https://login.cesnet.cz/idp/</prop>
                 <prop key="oidc.isEnabled">true</prop>
                 <prop key="langs">en,cs</prop>
             </props>
@@ -43,14 +41,15 @@
         <property name="ignoreResourceNotFound" value="false"/>
     </bean>
 
+
     <bean id="facilityServiceAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
-                <!--DO NOT DISPLAY-->
+                <!--DO NOT DISPLAY AND EDIT-->
                 <prop key="proxyIdentifiers.attrName">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
                 <prop key="proxyIdentifiers.isDisplayed">false</prop>
                 <prop key="proxyIdentifiers.isEditable">false</prop>
-                <prop key="showOnServicesList.attrName">urn:perun:facility:attribute-def:def:showOnServiceList</prop>
+                <prop key="showOnServicesList.attrName">urn:perun:facility:attribute-def:def:isTestSp</prop>
                 <prop key="showOnServicesList.isDisplayed">false</prop>
                 <prop key="showOnServicesList.isEditable">false</prop>
                 <prop key="isTestSp.attrName">urn:perun:facility:attribute-def:def:isTestSp</prop>
@@ -237,13 +236,13 @@
     <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig">
         <property name="connector" ref="connector" />
         <property name="admins" value="#{'${admins}'.split('\s*,\s*')}" />
-        <property name="idpAttribute" value="${attr.idpAttribute.name}" />
+        <property name="idpAttribute" value="${proxyIdentifiers.attrName}" />
         <property name="idpAttributeValue" value="${attr.idpAttribute.value}" />
-        <property name="testSpAttribute" value="${attr.testSp.name}" />
-        <property name="showOnServicesListAttribute" value="${attr.showOnServicesList.name}" />
+        <property name="testSpAttribute" value="${isTestSp.attrName}" />
+        <property name="showOnServicesListAttribute" value="${showOnServicesList.attrName}" />
         <property name="adminsAttr" value="${attr.facilityAdmins.name}" />
         <property name="userEmailAttr" value="${attr.userEmail.name}" />
-        <property name="subAttr" value="${attr.sub.name}" />
+        <property name="extSourceProxy" value="${extSource.proxy.entityId}" />
         <property name="oidcEnabled" value="${oidc.isEnabled}" />
         <property name="langs" value="#{'${langs}'.split('\s*,\s*')}" />
     </bean>
