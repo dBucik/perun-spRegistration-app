@@ -55,14 +55,6 @@ public class GeneralController {
 		}
 	}
 
-	@RequestMapping(path = "/api/test")
-	public String sess(HttpServletRequest req) {
-		log.debug(req.getRemoteUser());
-		log.debug(req.getSession().toString());
-
-		return req.getRemoteUser();
-	}
-
 	@RequestMapping(path = "/api/config/oidcInputs")
 	public List<List<AttrInput>> getInputsForOidc() {
 		log.debug("getInputsForOidc()");
