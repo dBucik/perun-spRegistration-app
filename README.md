@@ -4,17 +4,22 @@
 ###Install necessary SW
 - sudo apt install apache2 npm wget maven
 
+###Set-up mapping for spreg.com
+- vim /etc/hosts
+- add following
+```127.0.0.1  spreg.com```
+
 ###Set-up apache2:
 - Enable necessary apache2 modules
 - a2enmod proxy_http
 
 #####Create web config for SPreg app
 - cd /etc/apache2/sites-available
-- vim 000-default.conf
+- vim spreg.conf
 - Paste following: (and fill your EPPN - Slack message from dBucik)
 ```
 <VirtualHost *:80>
-        #ServerName www.example.com
+        ServerName spreg.com
         ServerAdmin webmaster@localhost
         DocumentRoot /var/www/html
 
