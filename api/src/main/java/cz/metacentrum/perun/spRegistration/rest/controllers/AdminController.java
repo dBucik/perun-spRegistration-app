@@ -25,7 +25,7 @@ import java.util.List;
 public class AdminController {
 
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
-	private AdminService adminService;
+	private final AdminService adminService;
 
 	@Autowired
 	public AdminController(AdminService adminService) {

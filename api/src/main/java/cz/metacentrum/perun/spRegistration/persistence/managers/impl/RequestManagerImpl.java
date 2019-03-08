@@ -29,7 +29,7 @@ public class RequestManagerImpl implements RequestManager {
 	private static final String APPROVALS_TABLE = " approvals ";
 
 	private RequestMapper requestMapper;
-	private RequestApprovalMapper requestApprovalMapper;
+	private final RequestApprovalMapper requestApprovalMapper;
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
 	public RequestManagerImpl() {

@@ -108,10 +108,9 @@ public interface UserService {
 	 * @param approvalName name entered by signer
 	 * @return True if all went OK.
 	 * @throws InternalErrorException
-	 * @throws RPCException in case of problems with RPC.
 	 */
 
-	boolean signTransferToProduction(Long requestId, User user, String approvalName) throws InternalErrorException, RPCException;
+	boolean signTransferToProduction(Long requestId, User user, String approvalName) throws InternalErrorException;
 
 	/**
 	 * Get all facilities from Perun where user is admin (manager).

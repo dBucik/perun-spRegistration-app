@@ -23,12 +23,12 @@ public class AppConfig {
 	private Set<Long> admins;
 	private String extSourceProxy;
 	private String userEmailAttr;
-	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
+	private final Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
 	private boolean oidcEnabled;
 	private List<String> langs = new ArrayList<>();
 
-	private Properties enLocale = new Properties();
-	private Properties csLocale = new Properties();
+	private final Properties enLocale = new Properties();
+	private final Properties csLocale = new Properties();
 
 	private PerunConnector connector;
 	private String showOnServicesListAttribute;
