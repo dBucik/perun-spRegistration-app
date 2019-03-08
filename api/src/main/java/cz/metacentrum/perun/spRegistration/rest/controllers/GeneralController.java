@@ -1,20 +1,16 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,37 +18,12 @@ import java.util.List;
 public class GeneralController {
 
 	private static final Logger log = LoggerFactory.getLogger(GeneralController.class);
-	private final Config config;
-	private PerunConnector connector;
 
-	@Value("${dev.enabled}")
-	private boolean devEnabled;
+	private final Config config;
 
 	@Autowired
-	public GeneralController(Config config, PerunConnector connector) {
+	public GeneralController(Config config) {
 		this.config = config;
-		this.connector = connector;
-	}
-
-	@RequestMapping(path = "/api/setUser", method = RequestMethod.GET)
-	public void setUser(HttpServletRequest req) throws RPCException {
-		String userEmailAttr = config.getAppConfig().getUserEmailAttr();
-		String extSourceProxy = config.getAppConfig().getExtSourceProxy();
-		log.debug("settingUser");
-		String sub;
-		if (devEnabled) {
-			sub = req.getHeader("fake-usr-hdr");
-		} else {
-			sub = req.getRemoteUser();
-		}
-
-		if (sub != null && !sub.isEmpty()) {
-			log.debug("found userId: {} ", sub);
-			User user = connector.getUserWithEmail(sub, extSourceProxy, userEmailAttr);
-			log.debug("found user: {}", user);
-
-			req.getSession().setAttribute("user", user);
-		}
 	}
 
 	@RequestMapping(path = "/api/config/oidcInputs")
