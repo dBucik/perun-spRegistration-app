@@ -48,4 +48,10 @@ export class AppComponent {
 
     this.lastScreenWidth = window.innerWidth;
   }
+
+    closeSideBar() {
+        if (this.sidebarMode == 'over') {
+            this.sideBarOpened = false;
+        }
+    }
 }

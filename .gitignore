@@ -9,6 +9,7 @@
 /gui/tmp
 /gui/out-tsc
 /out
+/gui/src/main
 
 # Gui dependencies
 /gui/node_modules
