@@ -348,11 +348,18 @@ public class PerunConnectorRpc implements PerunConnector {
 		//make the call
 		try {
 			JsonNode response = restTemplate.postForObject(actionUrl, map, JsonNode.class);
-			return prettyPrintJsonString(response);
+			if (response != null) {
+				return prettyPrintJsonString(response);
+			} else {
+				return null;
+			}
 		} catch (HttpClientErrorException ex) {
-			MediaType contentType = ex.getResponseHeaders().getContentType();
+			MediaType contentType = null;
+			if (ex.getResponseHeaders() != null) {
+				contentType = ex.getResponseHeaders().getContentType();
+			}
 			String body = ex.getResponseBodyAsString();
-			if ("json".equals(contentType.getSubtype())) {
+			if (contentType != null && "json".equals(contentType.getSubtype())) {
 				try {
 					new ObjectMapper().readValue(body, JsonNode.class).path("message").asText();
 				} catch (IOException e) {

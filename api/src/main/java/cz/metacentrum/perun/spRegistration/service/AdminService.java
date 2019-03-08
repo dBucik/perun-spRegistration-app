@@ -10,7 +10,6 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorExcep
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Service layer with methods specific for Admins.

@@ -23,16 +23,20 @@ public class AppConfig {
 	private Set<Long> admins;
 	private String extSourceProxy;
 	private String userEmailAttr;
-	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
+	private final Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
 	private boolean oidcEnabled;
 	private List<String> langs = new ArrayList<>();
 
-	private Properties enLocale = new Properties();
-	private Properties csLocale = new Properties();
+	private final Properties enLocale = new Properties();
+	private final Properties csLocale = new Properties();
 
 	private PerunConnector connector;
 	private String showOnServicesListAttribute;
 	private String testSpAttribute;
+	private String footerHTML;
+	private String headerLogo;
+	private String headerTitle;
+	private String headerHTML;
 
 	public AppConfig() {
 		Resource enLang = new ClassPathResource("localization.properties");
@@ -113,10 +117,6 @@ public class AppConfig {
 		return perunAttributeDefinitionsMap;
 	}
 
-	public void setPerunAttributeDefinitionsMap(Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap) {
-		this.perunAttributeDefinitionsMap = perunAttributeDefinitionsMap;
-	}
-
 	public String getAdminsAttr() {
 		return adminsAttr;
 	}
@@ -139,6 +139,38 @@ public class AppConfig {
 
 	public void setUserEmailAttr(String userEmailAttr) {
 		this.userEmailAttr = userEmailAttr;
+	}
+
+	public String getFooterHTML() {
+		return footerHTML;
+	}
+
+	public void setFooterHTML(String footerHTML) {
+		this.footerHTML = footerHTML;
+	}
+
+	public String getHeaderLogo() {
+		return headerLogo;
+	}
+
+	public void setHeaderLogo(String headerLogo) {
+		this.headerLogo = headerLogo;
+	}
+
+	public String getHeaderTitle() {
+		return headerTitle;
+	}
+
+	public void setHeaderTitle(String headerTitle) {
+		this.headerTitle = headerTitle;
+	}
+
+	public String getHeaderHTML() {
+		return headerHTML;
+	}
+
+	public void setHeaderHTML(String headerHTML) {
+		this.headerHTML = headerHTML;
 	}
 
 	@Override
@@ -178,5 +210,4 @@ public class AppConfig {
 	public boolean isAdmin (Long userId) {
 		return admins.contains(userId);
 	}
-
 }

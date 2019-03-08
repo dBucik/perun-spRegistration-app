@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -26,7 +25,7 @@ import java.util.List;
 public class AdminController {
 
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
-	private AdminService adminService;
+	private final AdminService adminService;
 
 	@Autowired
 	public AdminController(AdminService adminService) {

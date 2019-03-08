@@ -1,14 +1,18 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers;
 
+import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.UserService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,10 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @SessionAttributes("user")
@@ -29,10 +31,17 @@ public class UserController {
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
 	private final UserService service;
+	private final AppConfig appConfig;
+	private final PerunConnector connector;
+
+	@Value("${dev.enabled}")
+	private boolean devEnabled;
 
 	@Autowired
-	public UserController(UserService service) {
+	public UserController(UserService service, AppConfig appConfig, PerunConnector connector) {
 		this.service = service;
+		this.appConfig = appConfig;
+		this.connector = connector;
 	}
 
 	@RequestMapping(path = "/api/userFacilities", method = RequestMethod.GET)
@@ -196,6 +205,27 @@ public class UserController {
 			return service.signTransferToProduction(requestId, user, personInput);
 		} catch (Exception e) {
 			throw new SpRegistrationApiException(e);
+		}
+	}
+
+	@RequestMapping(path = "/api/setUser", method = RequestMethod.GET)
+	public void setUser(HttpServletRequest req) throws RPCException {
+		String userEmailAttr = appConfig.getUserEmailAttr();
+		String extSourceProxy = appConfig.getExtSourceProxy();
+		log.debug("settingUser");
+		String sub;
+		if (devEnabled) {
+			sub = req.getHeader("fake-usr-hdr");
+		} else {
+			sub = req.getRemoteUser();
+		}
+
+		if (sub != null && !sub.isEmpty()) {
+			log.debug("found userId: {} ", sub);
+			User user = connector.getUserWithEmail(sub, extSourceProxy, userEmailAttr);
+			log.debug("found user: {}", user);
+
+			req.getSession().setAttribute("user", user);
 		}
 	}
 
