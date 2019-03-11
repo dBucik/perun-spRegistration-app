@@ -25,6 +25,9 @@ export class ErrorInterceptor implements HttpInterceptor {
       .subscribe(value => this.serverNotLiveError = value);
   }
 
+  private HTTP_NOT_FOUND = 404;
+  private HTTP_FORBIDDEN = 403;
+
   private serverNotLiveError: String;
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -32,8 +35,12 @@ export class ErrorInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         let errors = [];
-        if (errorResponse.status === 404) {
+        if (errorResponse.status === this.HTTP_NOT_FOUND) {
           this.router.navigate(['/notFound']);
+          return;
+        }
+        if (errorResponse.status === this.HTTP_FORBIDDEN) {
+          this.router.navigate(['/notAuthorized']);
           return;
         }
         if (errorResponse.status === 0) {
