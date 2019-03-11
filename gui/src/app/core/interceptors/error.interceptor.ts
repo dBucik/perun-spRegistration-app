@@ -30,26 +30,25 @@ export class ErrorInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
     return next.handle(req).pipe(
-      catchError((err: HttpErrorResponse) => {
+      catchError((errorResponse: HttpErrorResponse) => {
         let errors = [];
-
-        if (err.status === 404) {
+        if (errorResponse.status === 404) {
           this.router.navigate(['/notFound']);
           return;
         }
-        if (err.status === 0) {
+        if (errorResponse.status === 0) {
           errors.push(this.serverNotLiveError);
         }
 
-        else if (typeof err.error === "string") {
-          errors.push(JSON.parse(err.error).errors);
+        else if (typeof errorResponse.error === "string") {
+          errors.push(errorResponse.error);
         } else {
-          errors.push(err.message);
+          errors.push(errorResponse.message);
         }
 
         this.dialogService.openErrorDialog(errors);
 
-        return throwError(err);
+        return throwError(errorResponse);
       }));
   }
 }
