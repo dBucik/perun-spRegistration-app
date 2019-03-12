@@ -88,4 +88,10 @@ public class GeneralController {
 		log.debug("getHeader()");
 		return config.getAppConfig().getHeaderHTML();
 	}
+
+	@RequestMapping(path = "/api/config/specifyAuthoritiesEnabled", method = RequestMethod.GET)
+	public boolean getSpecifyAuthoritiesEnabled() {
+		log.debug("getSpecifyAuthoritiesEnabled()");
+		return config.getAppConfig().getSpecifyAuthoritiesEnabled();
+	}
 }

@@ -31,6 +31,10 @@
                 <prop key="app.header.html"/>
                 <prop key="app.header.title">Registration of SP - dev</prop>
                 <prop key="app.header.logo">https://perun.cesnet.cz/signpost/images/perun_3.png</prop>
+                <prop key="approval.confirmationPeriod.days">30</prop>
+                <prop key="approval.confirmationPeriod.hours">0</prop>
+                <prop key="approval.specify.authorities.enabled">true</prop>
+                <prop key="hash.salt">kn15aokn@~lpq~nW!vYXm</prop>
             </props>
         </property>
     </bean>
@@ -205,6 +209,7 @@
                 <prop key="approval.message">User %USER_INFO% has asked for approval of request %REQUEST_ID%</prop>
                 <prop key="production.authorities.subject">Approve transfer to production: %SERVICE_NAME%</prop>
                 <prop key="production.authorities.message">For approval of moving service %SERVICE_NAME% to production visit %APPROVAL_LINK%</prop>
+                <prop key="moveToProduction.authorities">user1@email.com,user2@email.com,user3@email.com</prop>
             </props>
         </property>
         <property name="locations">
@@ -253,6 +258,10 @@
         <property name="headerHTML" value="${app.header.html}" />
         <property name="headerTitle" value="${app.header.title}" />
         <property name="headerLogo" value="${app.header.logo}" />
+        <property name="confirmationPeriodDays" value="${approval.confirmationPeriod.days}" />
+        <property name="confirmationPeriodHours" value="${approval.confirmationPeriod.hours}" />
+        <property name="specifyAuthoritiesEnabled" value="${approval.specify.authorities.enabled}" />
+        <property name="hashSalt" value="${hash.salt}" />
     </bean>
 
     <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">

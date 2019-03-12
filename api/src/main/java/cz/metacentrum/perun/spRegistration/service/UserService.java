@@ -99,18 +99,13 @@ public interface UserService {
 	 * @return Id of created request
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	Long moveToProduction(Long facilityId, Long userId, List<String> authorities) throws UnauthorizedActionException, InternalErrorException, RPCException;
+	Long requestMoveToProduction(Long facilityId, Long userId, List<String> authorities) throws UnauthorizedActionException, InternalErrorException, RPCException;
 
-	/**
-	 * Sign transfer to the production
-	 * @param requestId id of request for transfer
-	 * @param user signer
-	 * @param approvalName name entered by signer
-	 * @return True if all went OK.
-	 * @throws InternalErrorException if some internal error has occured
-	 */
+	//TODO: javadoc
+	Facility getFacilityDetailsForSignature(Long facilityId) throws RPCException;
 
-	boolean signTransferToProduction(Long requestId, User user, String approvalName) throws InternalErrorException;
+	//TODO: javadoc
+	boolean signTransferToProduction(Long facilityId, String hash, User user);
 
 	/**
 	 * Get all facilities from Perun where user is admin (manager).
@@ -143,11 +138,4 @@ public interface UserService {
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	Facility getDetailedFacility(Long facilityId, Long userId) throws UnauthorizedActionException, RPCException, InternalErrorException;
-
-	/**
-	 * Get request details for page with signatures of moving to production
-	 * @param requestId ID of request
-	 * @return Found request.
-	 */
-	Request getRequestDetailsForSignature(Long requestId) throws InternalErrorException;
 }

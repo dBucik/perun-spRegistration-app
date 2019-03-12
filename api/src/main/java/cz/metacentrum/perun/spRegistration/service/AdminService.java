@@ -4,7 +4,7 @@ import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.RequestApproval;
+import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
@@ -68,7 +68,7 @@ public interface AdminService {
 	 * @param userId ID of user (ADMIN) displaying the approvals.
 	 * @return List of approvals.
 	 */
-	List<RequestApproval> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException;
+	List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException;
 
 	/**
 	 * Get all requests stored in system.

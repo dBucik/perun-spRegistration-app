@@ -141,29 +141,6 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/moveToProduction/{facilityId}", method = RequestMethod.POST)
-	public Long moveToProduction(@SessionAttribute("user") User user,
-								 @PathVariable("facilityId") Long facilityId,
-								 @RequestBody List<String> authorities) throws SpRegistrationApiException {
-		log.debug("moveToProduction(user: {}, facilityId: {} authorities: {})", user.getId(), facilityId, authorities);
-		try {
-			return service.moveToProduction(facilityId, user.getId(), authorities);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
-	@RequestMapping(path = "/api/moveToProduction/{requestId}")
-	public boolean signApprovalForProduction(@SessionAttribute("user") User user, @PathVariable("requestId") Long requestId,
-											 @RequestBody String signerInput) throws SpRegistrationApiException {
-		log.debug("signApprovalForProduction(user: {}, requestId: {}, signerInput: {})", user.getId(), requestId, signerInput);
-		try {
-			return service.signTransferToProduction(requestId, user, signerInput);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
 	@RequestMapping(path = "/api/facility/{facilityId}")
 	public Facility facilityDetail(@SessionAttribute("user") User user,
 								   @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
@@ -186,23 +163,35 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/sign/{requestId}", method = RequestMethod.GET)
-	public Request signRequestGetData(@PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
-		log.debug("signRequestGetData(requestId: {})", requestId);
+	@RequestMapping(path = "/api/moveToProduction/createRequest/{facilityId}", method = RequestMethod.POST)
+	public Long moveToProduction(@SessionAttribute("user") User user,
+								 @PathVariable("facilityId") Long facilityId,
+								 @RequestBody List<String> authorities) throws SpRegistrationApiException {
+		log.debug("moveToProduction(user: {}, facilityId: {} authorities: {})", user.getId(), facilityId, authorities);
 		try {
-			return service.getRequestDetailsForSignature(requestId);
+			return service.requestMoveToProduction(facilityId, user.getId(), authorities);
 		} catch (Exception e) {
 			throw new SpRegistrationApiException(e);
 		}
 	}
 
-	@RequestMapping(path = "/api/sign/{requestId}", method = RequestMethod.POST)
-	public boolean signRequest(@SessionAttribute("user") User user,
-							   @PathVariable("requestId") Long requestId,
-							   @RequestBody String personInput) throws SpRegistrationApiException {
-		log.debug("signRequest(requestId: {})", requestId);
+	@RequestMapping(path = "/api/moveToProduction/getFacilityDetails/{facilityId}", method = RequestMethod.GET)
+	public Facility signRequestGetData(@PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
+		log.debug("signRequestGetData(facilityId: {})", facilityId);
 		try {
-			return service.signTransferToProduction(requestId, user, personInput);
+			return service.getFacilityDetailsForSignature(facilityId);
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
+		}
+	}
+
+	@RequestMapping(path = "/api/moveToProduction/approve/{facilityId}", method = RequestMethod.POST)
+	public boolean signApprovalForProduction(@SessionAttribute("user") User user,
+											 @PathVariable("facilityId") Long facilityId,
+											 @RequestBody String hash) throws SpRegistrationApiException {
+		log.debug("signApprovalForProduction(user: {}, facilityId: {}, hash: {})", user, facilityId, hash);
+		try {
+			return service.signTransferToProduction(facilityId, hash, user);
 		} catch (Exception e) {
 			throw new SpRegistrationApiException(e);
 		}
@@ -228,5 +217,4 @@ public class UserController {
 			req.getSession().setAttribute("user", user);
 		}
 	}
-
 }

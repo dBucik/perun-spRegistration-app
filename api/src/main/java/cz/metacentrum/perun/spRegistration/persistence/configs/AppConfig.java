@@ -37,6 +37,10 @@ public class AppConfig {
 	private String headerLogo;
 	private String headerTitle;
 	private String headerHTML;
+	private long confirmationPeriodDays;
+	private long confirmationPeriodHours;
+	private String hashSalt;
+	private boolean specifyAuthoritiesEnabled;
 
 	public AppConfig() {
 		Resource enLang = new ClassPathResource("localization.properties");
@@ -173,6 +177,38 @@ public class AppConfig {
 		this.headerHTML = headerHTML;
 	}
 
+	public void setConfirmationPeriodDays(long confirmationPeriodDays) {
+		this.confirmationPeriodDays = confirmationPeriodDays;
+	}
+
+	public long getConfirmationPeriodDays() {
+		return confirmationPeriodDays;
+	}
+
+	public void setConfirmationPeriodHours(long confirmationPeriodHours) {
+		this.confirmationPeriodHours = confirmationPeriodHours;
+	}
+
+	public long getConfirmationPeriodHours() {
+		return confirmationPeriodHours;
+	}
+
+	public void setHashSalt(String hashSalt) {
+		this.hashSalt = hashSalt;
+	}
+
+	public String getHashSalt() {
+		return hashSalt;
+	}
+
+	public void setSpecifyAuthoritiesEnabled(boolean specifyAuthoritiesEnabled) {
+		this.specifyAuthoritiesEnabled = specifyAuthoritiesEnabled;
+	}
+
+	public boolean getSpecifyAuthoritiesEnabled() {
+		return specifyAuthoritiesEnabled;
+	}
+
 	@Override
 	public String toString() {
 		return "AppConfig{" +
@@ -189,7 +225,14 @@ public class AppConfig {
 				", enLocale=" + enLocale +
 				", csLocale=" + csLocale +
 				", connector=" + connector +
-				", showOnServicesListAttribute='" + showOnServicesListAttribute + '\'' +
+				", footerHTML='" + footerHTML + '\'' +
+				", headerLogo='" + headerLogo + '\'' +
+				", headerTitle='" + headerTitle + '\'' +
+				", headerHTML='" + headerHTML + '\'' +
+				", confirmationPeriodDays='" + confirmationPeriodDays + '\'' +
+				", confirmationPeriodHours='" + confirmationPeriodHours + '\'' +
+				", hashSalt'" + hashSalt + '\'' +
+				", specifyAuthoritiesEnabled='" + specifyAuthoritiesEnabled + '\'' +
 				'}';
 	}
 

@@ -8,7 +8,7 @@ import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.RequestApproval;
+import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.AdminService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
@@ -166,7 +166,7 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public List<RequestApproval> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException {
+	public List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException {
 		log.debug("getApprovalsOfProductionTransfer(requestId: {}, userId: {})", requestId, userId);
 		if (userId == null || requestId == null) {
 			log.error("Illegal input - requestId: {}, userId: {} " , requestId, userId);
@@ -176,7 +176,7 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnauthorizedActionException("User is not authorized to view approvals");
 		}
 
-		List<RequestApproval> result = requestManager.getApprovalsForRequest(requestId);
+		List<RequestSignature> result = requestManager.getRequestSignatures(requestId);
 		log.debug("getApprovalsOfProductionTransfer returns: {}", result);
 		return result;
 	}
@@ -366,7 +366,7 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	private boolean moveToProduction(Request request) throws RPCException {
-		log.debug("moveToProduction({})", request);
+		log.debug("requestMoveToProduction({})", request);
 		log.info("Updating facility attributes");
 		boolean res;
 		PerunAttribute testSp = perunConnector.getFacilityAttribute(
@@ -378,7 +378,7 @@ public class AdminServiceImpl implements AdminService {
 		displayOnList.setValue(true);
 		res = res && perunConnector.setFacilityAttribute(request.getFacilityId(), displayOnList.toJsonForPerun().toString());
 
-		log.debug("moveToProduction returns: {}", res);
+		log.debug("requestMoveToProduction returns: {}", res);
 		return res;
 	}
 
