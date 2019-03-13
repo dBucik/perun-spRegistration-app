@@ -6,6 +6,13 @@
         {{'FACILITIES.FACILITY_DETAIL_TITLE' | translate}}{{facility.id}} - {{facility.name}}
       </h2>
       {{'FACILITIES.DESCRIPTION' | translate}}: {{facility.description}}
+
+      <div class="pull-right">
+        <button class="ml-2" mat-raised-button color="primary" (click)="moveToProduction()">
+          {{'FACILITIES.MOVE_TO_PRODUCTION' | translate}}
+        </button>
+      </div>
+
       <h4 class="mt-4">{{'FACILITIES.FACILITY_ATTRIBUTES' | translate}}</h4>
 
       <table mat-table [dataSource]="facilityAttributes" class="w-100">
@@ -21,6 +28,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-dark"></tr>
       </table>
+
     </div>
   </div>
 </div>

@@ -74,6 +74,13 @@
     "FACILITY_DETAIL_TITLE" : "Facility #",
     "FACILITY_ATTRIBUTES" : "Facility attributes:",
     "FACILITY_DETAIL_ITEM_NAME" : "Name",
-    "FACILITY_DETAIL_ITEM_VALUE" : "Value"
+    "FACILITY_DETAIL_ITEM_VALUE" : "Value",
+    "MOVE_TO_PRODUCTION" : "Move to production",
+    "MOVE_TO_PRODUCTION_TITLE_1" : "Move Facility #",
+    "MOVE_TO_PRODUCTION_TITLE_2" : "to production",
+    "MOVE_TO_PRODUCTION_DESCRIPTION" : "You are applying for a move facility to production. Fill in the following form.",
+    "MOVE_TO_PRODUCTION_FORM1" : "Whatever 1",
+    "MOVE_TO_PRODUCTION_FORM2" : "Whatever 2",
+    "MOVE_TO_PRODUCTION_SUBMIT_BUTTON" : "Submit"
   }
 }

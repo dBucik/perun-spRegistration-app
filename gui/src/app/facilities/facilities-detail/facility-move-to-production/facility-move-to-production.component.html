@@ -1,0 +1,36 @@
+<div class="container-fluid pt-5 p-lg-5">
+  <mat-spinner class="ml-auto mr-auto" *ngIf="loading" color=""></mat-spinner>
+  <div *ngIf="!loading" class="card mb-4 shadow-sm">
+    <div class="card-body p-5">
+      <h2 class="card-title">
+        {{'FACILITIES.MOVE_TO_PRODUCTION_TITLE_1' | translate}}{{facility.id}} - {{facility.name}} {{'FACILITIES.MOVE_TO_PRODUCTION_TITLE_2' | translate}}
+      </h2>
+      {{'FACILITIES.MOVE_TO_PRODUCTION_DESCRIPTION' | translate}}
+
+      <mat-accordion>
+        <mat-expansion-panel (opened)="switcherForm = true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{'FACILITIES.MOVE_TO_PRODUCTION_FORM1' | translate}}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <button class="ml-2" mat-raised-button color="primary" (click)="moveToProduction()">
+            {{'FACILITIES.MOVE_TO_PRODUCTION_SUBMIT_BUTTON' | translate}}
+          </button>
+        </mat-expansion-panel>
+
+
+        <mat-expansion-panel (opened)="switcherForm = false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{'FACILITIES.MOVE_TO_PRODUCTION_FORM2' | translate}}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <button class="ml-2" mat-raised-button color="primary" (click)="moveToProduction()">
+            {{'FACILITIES.MOVE_TO_PRODUCTION_SUBMIT_BUTTON' | translate}}
+          </button>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </div>
+</div>

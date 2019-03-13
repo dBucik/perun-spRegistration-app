@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {Subscription} from "rxjs";
 import {FacilitiesService} from "../../core/services/facilities.service";
 import {Facility} from "../../core/models/Facility";
@@ -14,7 +14,8 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private facilitiesService: FacilitiesService
+    private facilitiesService: FacilitiesService,
+    private router: Router
   ) { }
 
   private sub : Subscription;
@@ -51,6 +52,10 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+  }
+
+  moveToProduction(): void {
+    this.router.navigateByUrl('facilities/moveToProduction/' + this.facility.id );
   }
 
 }
