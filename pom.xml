@@ -30,6 +30,7 @@
         <npm.version>5.3.0</npm.version>
         <org.json.version>20180813</org.json.version>
         <org.postgresql.version>42.2.5</org.postgresql.version>
+        <mysql.version>8.0.15</mysql.version>
         <spring.jdbc.version>5.1.5.RELEASE</spring.jdbc.version>
         <javax.mail.version>1.5.0-b01</javax.mail.version>
 
@@ -71,34 +72,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-<!--    <profiles>-->
-<!--        <profile>-->
-<!--            <id>prod</id>-->
-<!--            <activation>-->
-<!--                <property>-->
-<!--                    <name>prod</name>-->
-<!--                    <value>True</value>-->
-<!--                </property>-->
-<!--            </activation>-->
-<!--            <properties>-->
-<!--                <server.port>8080</server.port>-->
-<!--                <server.contextPath>/spreg</server.contextPath>-->
-<!--            </properties>-->
-<!--        </profile>-->
-<!--        <profile>-->
-<!--            <id>dev</id>-->
-<!--            <activation>-->
-<!--                <activeByDefault>true</activeByDefault>-->
-<!--            </activation>-->
-<!--            <properties>-->
-<!--                <server.port>8081</server.port>-->
-<!--                <server.contextPath/>-->
-<!--                <angular.build.profile/>-->
-<!--                <dev.enabled>true</dev.enabled>-->
-<!--            </properties>-->
-<!--        </profile>-->
-<!--    </profiles>-->
 
     <!-- Project info -->
     <name>perun-spRegistration</name>
