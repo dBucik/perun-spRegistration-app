@@ -14,6 +14,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringJoiner;
@@ -131,9 +132,9 @@ public class Mails {
 		return res;
 	}
 
-	public static boolean authoritiesApproveProductionTransferNotify(String approvalLink, String serviceName, List<String> recipients, Properties props) {
-		log.debug("authoritiesApproveProductionTransferNotify(approvalLink: {}, serviceName: {}, recipients: {}, props: {})",
-				approvalLink, serviceName, recipients, props);
+	public static boolean authoritiesApproveProductionTransferNotify(String approvalLink, String serviceName, String recipient, Properties props) {
+		log.debug("authoritiesApproveProductionTransferNotify(approvalLink: {}, serviceName: {}, recipient: {}, props: {})",
+				approvalLink, serviceName, recipient, props);
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
@@ -151,7 +152,7 @@ public class Mails {
 		}
 		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
 
-		boolean res = sendMail(host, from, recipients, subject, message);
+		boolean res = sendMail(host, from, Collections.singletonList(recipient), subject, message);
 		log.debug("authoritiesApproveProductionTransferNotify() returns: {}", res);
 		return res;
 	}

@@ -3,7 +3,7 @@ package cz.metacentrum.perun.spRegistration.rest.controllers;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.RequestApproval;
+import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.AdminService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiException;
@@ -87,8 +87,8 @@ public class AdminController {
 	}
 
 	@RequestMapping(path = "/api/viewApprovals/{requestId}")
-	public List<RequestApproval> getApprovals(@SessionAttribute("user") User user,
-											  @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+	public List<RequestSignature> getApprovals(@SessionAttribute("user") User user,
+											   @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("getApprovals(user: {}, requestId: {})", user.getId(), requestId);
 		try {
 			return adminService.getApprovalsOfProductionTransfer(requestId, user.getId());
