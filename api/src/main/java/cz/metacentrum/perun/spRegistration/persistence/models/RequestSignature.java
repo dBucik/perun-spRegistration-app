@@ -1,8 +1,6 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Objects;
 
 /**

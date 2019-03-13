@@ -16,9 +16,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -133,7 +131,7 @@ public class RequestManagerTests {
 		request.setReqUserId(3L);
 
 		Long requestId = requestManager.createRequest(request);
-		assertNotNull("Creating request shoudl generate an ID", requestId);
+		assertNotNull("Creating request should generate an ID", requestId);
 		request.setReqId(requestId);
 
 		Request fetched = requestManager.getRequestByReqId(requestId);
@@ -148,7 +146,7 @@ public class RequestManagerTests {
 		req1.setFacilityId(3L);
 
 		boolean result = requestManager.updateRequest(req1);
-		assertTrue("Updating shold return true", result);
+		assertTrue("Updating should return true", result);
 
 		Request fetched = requestManager.getRequestByReqId(req1.getReqId());
 		assertNotNull("Updated request has not been fetched", fetched);

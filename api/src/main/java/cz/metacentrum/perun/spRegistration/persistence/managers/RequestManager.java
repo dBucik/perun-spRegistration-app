@@ -89,7 +89,14 @@ public interface RequestManager {
 	 */
 	List<Request> getAllRequestsByFacilityIds(Set<Long> facilityIds);
 
-	//TODO: javadoc
+	/**
+	 * Add signature for moving to production
+	 * @param facilityId if of facility to be moved
+	 * @param hash hash of request
+	 * @param user user giving the signature
+	 * @param signedAt when the signature has been made
+	 * @return True if everything went OK
+	 */
 	boolean addSignature(Long facilityId, String hash, User user, LocalDateTime signedAt);
 
 	/**
@@ -99,6 +106,14 @@ public interface RequestManager {
 	 */
 	List<RequestSignature> getRequestSignatures(Long requestId);
 
-	//TODO: javadoc
+	/**
+	 * Store link where user can sign the request for moving to production
+	 * @param authority user email the link belongs to
+	 * @param hash hash of request
+	 * @param facilityId id of facility to be transferred
+	 * @param link link for the signature
+	 * @param validUntil until when the link is valid
+	 * @return True if everything went OK.
+	 */
 	boolean storeApprovalLink(String authority, String hash, Long facilityId, String link, LocalDateTime validUntil);
 }

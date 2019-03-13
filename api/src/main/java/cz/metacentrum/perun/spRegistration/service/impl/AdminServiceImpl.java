@@ -77,7 +77,7 @@ public class AdminServiceImpl implements AdminService {
 			return false;
 		}
 
-		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.APPROVED, messagesProperties, adminsAttr);
+		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.APPROVED, messagesProperties, adminsAttr);
 
 		log.debug("updateRequestInDbAndNotifyUser() returns: {}", res);
 		return res;
@@ -105,7 +105,7 @@ public class AdminServiceImpl implements AdminService {
 			throw new CannotChangeStatusException("Cannot reject request, request not marked as WAITING_FOR_APPROVAL");
 		}
 
-		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.REJECTED, messagesProperties, adminsAttr);
+		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.REJECTED, messagesProperties, adminsAttr);
 
 		log.debug("updateRequestInDbAndNotifyUser() returns: {}", res);
 		return res;
@@ -135,33 +135,9 @@ public class AdminServiceImpl implements AdminService {
 
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
 		request.setAttributes(convertedAttributes);
-		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.WFC, messagesProperties, adminsAttr);
+		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.WFC, messagesProperties, adminsAttr);
 
 		log.debug("askForChanges returns: {}", res);
-		return res;
-	}
-
-	@Override
-	public boolean approveTransferToProduction(Long requestId, Long userId) throws InternalErrorException, UnauthorizedActionException, RPCException {
-		log.debug("approveTransferToProduction(requestId: {}, userId: {})", requestId, userId);
-		if (requestId == null || userId == null) {
-			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
-			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
-		} else if (! appConfig.isAdmin(userId)) {
-			log.error("User cannot approve transfer, user not an admin");
-			throw new UnauthorizedActionException("User cannot approve transfer, user not an admin");
-		}
-
-		Request request = requestManager.getRequestByReqId(requestId);
-		if (request == null) {
-			log.error("Could not fetch request with ID: {} from database", requestId);
-			throw new InternalErrorException("Could not fetch request with ID: " + requestId + " from database");
-		}
-
-		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.APPROVED, messagesProperties, adminsAttr);
-		finishRequestApproved(request);
-
-		log.debug("approveTransferToProduction returns: {}", res);
 		return res;
 	}
 
