@@ -47,20 +47,12 @@ public interface AdminService {
 	 * @param userId ID of user (ADMIN) asking for changes.
 	 * @param attributes Map (key = attribute name, value = PerunAttribute) of attributes.
 	 *                   It contains comments left by ADMIN.
-	 * @return True if everyting went OK.
+	 * @return True if everything went OK.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 * @throws CannotChangeStatusException when status of the request cannot be changed.
 	 */
 	boolean askForChanges(Long requestId, Long userId, List<PerunAttribute> attributes)
 			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException;
-
-	/**
-	 * Mark request of transfer to the production environment as approved.
-	 * @param requestId id of request for transfer
-	 * @param userId ID of user (ADMIN) approving the request.
-	 * @return True if everything went OK.
-	 */
-	boolean approveTransferToProduction(Long requestId, Long userId) throws InternalErrorException, UnauthorizedActionException, RPCException;
 
 	/**
 	 * Get approvals for request to transfer to production.

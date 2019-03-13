@@ -31,7 +31,7 @@ public interface UserService {
 	 * @param facilityId ID of facility in Perun.
 	 * @param userId ID of requesting user.
 	 * @param attributes Attributes set for SP (key = attribute name, value = attribute).
-	 * @return Generated request ID after stroing to the DB.
+	 * @return Generated request ID after storing to the DB.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	Long createFacilityChangesRequest(Long facilityId, Long userId, List<PerunAttribute> attributes)
@@ -41,7 +41,7 @@ public interface UserService {
 	 * Create request for removal of SP (which already exists as facility in Perun).
 	 * @param userId ID of requesting user.
 	 * @param facilityId ID of facility in Perun.
-	 * @return Generated request ID after stroing to the DB.
+	 * @return Generated request ID after storing to the DB.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	Long createRemovalRequest(Long userId, Long facilityId)
@@ -101,10 +101,21 @@ public interface UserService {
 	 */
 	Long requestMoveToProduction(Long facilityId, Long userId, List<String> authorities) throws UnauthorizedActionException, InternalErrorException, RPCException;
 
-	//TODO: javadoc
+	/**
+	 * Get details of facility for the signatures interface
+	 * @param facilityId id of facility
+	 * @return Fetched facility object
+	 * @throws RPCException when some problem with Perun RPC has occurred.
+	 */
 	Facility getFacilityDetailsForSignature(Long facilityId) throws RPCException;
 
-	//TODO: javadoc
+	/**
+	 * Add signature for transfer to production
+	 * @param facilityId id of facility to be moved
+	 * @param hash hash of request
+	 * @param user user giving the signature
+	 * @return True if everything went OK
+	 */
 	boolean signTransferToProduction(Long facilityId, String hash, User user);
 
 	/**

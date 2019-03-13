@@ -122,7 +122,7 @@ public class Utils {
 		}
 	}
 
-	public static boolean updaterequestAndNotifyUser(RequestManager rm, Request request, RequestStatus newStatus,
+	public static boolean updateRequestAndNotifyUser(RequestManager rm, Request request, RequestStatus newStatus,
 													 Properties mp, String adminsAttr) {
 		boolean res = updateRequest(rm, request, newStatus);
 		if (res) {
@@ -133,12 +133,6 @@ public class Utils {
 	}
 
 	private static boolean updateRequest(RequestManager rm, Request request, RequestStatus newStatus) {
-//		if (requestId != null) {
-//			request.setReqId(requestId);
-//		}
-//		if (modifiedById != null) {
-//			request.setModifiedBy(modifiedById);
-//		}
 		request.setStatus(newStatus);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 

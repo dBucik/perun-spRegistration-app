@@ -22,10 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -150,7 +148,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean askForApproval(Long requestId, Long userId)
 			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException {
-		log.debug("askforApproval(requestId: {}, userId: {})", requestId, userId);
+		log.debug("askForApproval(requestId: {}, userId: {})", requestId, userId);
 		if (requestId == null || userId == null) {
 			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
 		} else if (! isAdminInRequest(requestId, userId)) {
@@ -166,7 +164,7 @@ public class UserServiceImpl implements UserService {
 			throw new CannotChangeStatusException("Cannot ask for approval, request not marked as NEW nor WAITING_FOR_CHANGES");
 		}
 
-		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.WFA,
+		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.WFA,
 				messagesProperties, appConfig.getAdminsAttr());
 
 		log.debug("askForApproval() returns: {}", res);
@@ -197,7 +195,7 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 
-		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.CANCELED,
+		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.CANCELED,
 				messagesProperties, adminsAttr);
 
 		log.debug("cancelRequest returns: {}", res);
@@ -225,7 +223,7 @@ public class UserServiceImpl implements UserService {
 			throw new CannotChangeStatusException("Cannot ask for renew, request not marked as WAITING_FOR_CANCEL");
 		}
 
-		boolean res = Utils.updaterequestAndNotifyUser(requestManager, request, RequestStatus.NEW,
+		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.NEW,
 				messagesProperties, adminsAttr);
 
 		log.debug("renewRequest returns:  {}", res);

@@ -126,7 +126,7 @@ public class PerunConnectorRpc implements PerunConnector {
 	public List<Facility> getFacilitiesViaSearcher(Map<String, String> attributesWithSearchingValues) throws RPCException {
 		log.debug("getFacilitiesViaSearcher({})", attributesWithSearchingValues);
 		if (attributesWithSearchingValues == null) {
-			throw new IllegalArgumentException("attriutesWithSearchinValues is null");
+			throw new IllegalArgumentException("attributesWithSearchingValues is null");
 		}
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("attributesWithSearchingValues", attributesWithSearchingValues);
