@@ -2,6 +2,7 @@ package cz.metacentrum.perun.spRegistration.rest.controllers;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
+import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class GeneralController {
+public class ConfigController {
 
-	private static final Logger log = LoggerFactory.getLogger(GeneralController.class);
+	private static final Logger log = LoggerFactory.getLogger(ConfigController.class);
 
 	private final Config config;
 
 	@Autowired
-	public GeneralController(Config config) {
+	public ConfigController(Config config) {
 		this.config = config;
 	}
 
@@ -60,9 +61,9 @@ public class GeneralController {
 	}
 
 	@RequestMapping(path = "/api/config/isUserAdmin")
-	public boolean isUserAdmin(@SessionAttribute("userId") Long userId) {
+	public boolean isUserAdmin(@SessionAttribute("user") User user) {
 		log.debug("isUserAdmin()");
-		return config.getAppConfig().isAdmin(userId);
+		return config.getAppConfig().isAdmin(user.getId());
 	}
 
 	@RequestMapping(path = "/api/config/footer", method = RequestMethod.GET)

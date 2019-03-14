@@ -13,7 +13,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
-import cz.metacentrum.perun.spRegistration.service.UserService;
+import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
@@ -37,14 +37,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of UserService.
+ * Implementation of UserCommandsService.
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
 @Service("userService")
-public class UserServiceImpl implements UserService {
+public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
-	private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(UserCommandsCommandsServiceImpl.class);
 
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
 	private final String adminsAttr;
 
 	@Autowired
-	public UserServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
+	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
