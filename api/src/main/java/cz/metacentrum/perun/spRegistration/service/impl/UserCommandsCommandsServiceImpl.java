@@ -316,7 +316,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		if (requestId == null || userId == null) {
 			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
 			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
-		} else if (!isAdminInRequest(request.getReqUserId(), userId)) {
+		} else if (appConfig.isAdmin(userId) && !isAdminInRequest(request.getReqUserId(), userId)) {
 			log.error("User cannot view request, user is not a requester");
 			throw new UnauthorizedActionException("User cannot view request, user is not a requester");
 		}
