@@ -23,4 +23,8 @@ export class FacilitiesService {
   getFacility(id: number): Observable<Facility> {
     return this.apiService.get('/facility/' + id);
   }
+
+  createRequest(id: number, emails: string[]) {
+      return this.apiService.post('moveToProduction/createRequest/' + id, emails);
+  }
 }

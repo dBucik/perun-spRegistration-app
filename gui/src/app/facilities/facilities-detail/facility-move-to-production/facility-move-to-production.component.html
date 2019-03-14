@@ -14,6 +14,24 @@
               {{'FACILITIES.MOVE_TO_PRODUCTION_FORM1' | translate}}
             </mat-panel-title>
           </mat-expansion-panel-header>
+          <div *ngIf="isEmailEnabled">
+
+              <mat-form-field>
+                  <mat-chip-list #chipList>
+                      <mat-chip *ngFor="let email of emails" [selectable]="false"
+                                [removable]="true" (removed)="remove(email)">
+                          {{email}}
+                          <mat-icon matChipRemove>cancel</mat-icon>
+                      </mat-chip>
+                      <input placeholder="Fill emails..."
+                             [matChipInputFor]="chipList"
+                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                             [matChipInputAddOnBlur]="true"
+                             (matChipInputTokenEnd)="add($event)">
+                  </mat-chip-list>
+              </mat-form-field>
+
+          </div>
           <button class="ml-2" mat-raised-button color="primary" (click)="moveToProduction()">
             {{'FACILITIES.MOVE_TO_PRODUCTION_SUBMIT_BUTTON' | translate}}
           </button>
