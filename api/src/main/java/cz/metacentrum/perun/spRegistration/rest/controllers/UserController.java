@@ -217,4 +217,9 @@ public class UserController {
 			req.getSession().setAttribute("user", user);
 		}
 	}
+
+	@RequestMapping(path = "/api/setUser", method = RequestMethod.GET)
+	public User getUser(@SessionAttribute("user") User user) {
+		return user;
+	}
 }
