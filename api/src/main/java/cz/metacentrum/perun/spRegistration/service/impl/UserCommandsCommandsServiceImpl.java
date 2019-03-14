@@ -165,7 +165,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
 		} else if (! isAdminInRequest(request.getReqUserId(), userId)) {
 			throw new UnauthorizedActionException("User is not registered as admin in request, cannot ask for approval");
-		} else if (! RequestStatus.NEW.equals(request.getStatus()) ||
+		} else if (! RequestStatus.NEW.equals(request.getStatus()) &&
 			! RequestStatus.WFC.equals(request.getStatus())) {
 			throw new CannotChangeStatusException("Cannot ask for approval, request not marked as NEW nor WAITING_FOR_CHANGES");
 		}
