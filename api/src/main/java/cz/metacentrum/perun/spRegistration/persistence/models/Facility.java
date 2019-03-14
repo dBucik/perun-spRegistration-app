@@ -64,13 +64,18 @@ public class Facility extends PerunEntity {
 	 * Convert object to JSON representation
 	 * @return JSON String
 	 */
-	public String toJsonString() {
-		String json = "{";
-		json += " \"facility\" : { \"name\" : \"" + name + "\" ," +
-				" \"description\" : \"" + description + "\" ," +
-				" \"beanName\" : \"facility\" }}";
+	public JSONObject toJson() {
+		JSONObject res = new JSONObject();
+		if (this.getId() == null) {
+			res.put("id", JSONObject.NULL);
+		} else {
+			res.put("id", getId());
+		}
+		res.put("name", name);
+		res.put("description", description);
+		res.put("beanName", "facility");
 
-		return json;
+		return res;
 	}
 
 	public static Facility fromPerunJson(JSONObject json) {
