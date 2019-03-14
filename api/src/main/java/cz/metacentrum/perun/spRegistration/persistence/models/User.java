@@ -107,7 +107,7 @@ public class User extends PerunEntity {
 		String titleBefore = json.optString("titleBefore", "");
 		String titleAfter = json.optString("titleAfter", "");
 
-		return new User(id, firstName, middleName, lastName, titleBefore, titleAfter);
+		return new User(id, titleBefore, firstName, middleName, lastName, titleAfter);
 	}
 
 	public String getFullName() {
