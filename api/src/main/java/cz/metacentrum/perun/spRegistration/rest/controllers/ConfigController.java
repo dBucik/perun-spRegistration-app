@@ -2,6 +2,7 @@ package cz.metacentrum.perun.spRegistration.rest.controllers;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
+import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +61,9 @@ public class ConfigController {
 	}
 
 	@RequestMapping(path = "/api/config/isUserAdmin")
-	public boolean isUserAdmin(@SessionAttribute("userId") Long userId) {
+	public boolean isUserAdmin(@SessionAttribute("user") User user) {
 		log.debug("isUserAdmin()");
-		return config.getAppConfig().isAdmin(userId);
+		return config.getAppConfig().isAdmin(user.getId());
 	}
 
 	@RequestMapping(path = "/api/config/footer", method = RequestMethod.GET)
