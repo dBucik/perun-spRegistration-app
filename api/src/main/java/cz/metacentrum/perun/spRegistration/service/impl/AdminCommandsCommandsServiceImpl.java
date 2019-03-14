@@ -10,7 +10,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
-import cz.metacentrum.perun.spRegistration.service.AdminService;
+import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Implementation of AdminService.
+ * Implementation of AdminCommandsService.
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
 @Service("adminService")
-public class AdminServiceImpl implements AdminService {
+public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 
-	private static final Logger log = LoggerFactory.getLogger(AdminServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(AdminCommandsCommandsServiceImpl.class);
 
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
@@ -42,7 +42,7 @@ public class AdminServiceImpl implements AdminService {
 	private final String adminsAttr;
 
 	@Autowired
-	public AdminServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
+	public AdminCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;

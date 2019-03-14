@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
-public interface UserService {
+public interface UserCommandsService {
 
 	/**
 	 * Create request for Registration of SP (initial version of facility, not stored in Perun yet).

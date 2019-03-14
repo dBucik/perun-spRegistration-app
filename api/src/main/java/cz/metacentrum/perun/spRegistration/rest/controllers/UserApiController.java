@@ -1,13 +1,12 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
-import cz.metacentrum.perun.spRegistration.service.UserService;
+import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,27 +20,21 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
 @SessionAttributes("user")
-public class UserController {
+public class UserApiController {
 
-	private static final Logger log = LoggerFactory.getLogger(UserController.class);
+	private static final Logger log = LoggerFactory.getLogger(UserApiController.class);
 
-	private final UserService service;
-	private final AppConfig appConfig;
-	private final PerunConnector connector;
-
+	private final UserCommandsService service;
 	@Value("${dev.enabled}")
 	private boolean devEnabled;
 
 	@Autowired
-	public UserController(UserService service, AppConfig appConfig, PerunConnector connector) {
+	public UserApiController(UserCommandsService service) {
 		this.service = service;
-		this.appConfig = appConfig;
-		this.connector = connector;
 	}
 
 	@RequestMapping(path = "/api/userFacilities", method = RequestMethod.GET)
@@ -197,29 +190,4 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(path = "/api/setUser", method = RequestMethod.GET)
-	public void setUser(HttpServletRequest req) throws RPCException {
-		String userEmailAttr = appConfig.getUserEmailAttr();
-		String extSourceProxy = appConfig.getExtSourceProxy();
-		log.debug("settingUser");
-		String sub;
-		if (devEnabled) {
-			sub = req.getHeader("fake-usr-hdr");
-		} else {
-			sub = req.getRemoteUser();
-		}
-
-		if (sub != null && !sub.isEmpty()) {
-			log.debug("found userId: {} ", sub);
-			User user = connector.getUserWithEmail(sub, extSourceProxy, userEmailAttr);
-			log.debug("found user: {}", user);
-
-			req.getSession().setAttribute("user", user);
-		}
-	}
-
-	@RequestMapping(path = "/api/setUser", method = RequestMethod.GET)
-	public User getUser(@SessionAttribute("user") User user) {
-		return user;
-	}
 }

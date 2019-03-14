@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
-public interface AdminService {
+public interface AdminCommandsService {
 
 	/**
 	 * Approve request.

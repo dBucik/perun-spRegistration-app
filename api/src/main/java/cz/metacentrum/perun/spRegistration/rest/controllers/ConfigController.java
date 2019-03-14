@@ -14,14 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class GeneralController {
+public class ConfigController {
 
-	private static final Logger log = LoggerFactory.getLogger(GeneralController.class);
+	private static final Logger log = LoggerFactory.getLogger(ConfigController.class);
 
 	private final Config config;
 
 	@Autowired
-	public GeneralController(Config config) {
+	public ConfigController(Config config) {
 		this.config = config;
 	}
 
