@@ -56,7 +56,11 @@
     "REQUEST_DETAIL_REJECT": "Reject",
     "REQUEST_DETAIL_REQUEST_CHANGES": "Request changes",
     "REQUEST_DETAIL_APPROVE": "Approve",
-    "NEW_LAST_STEP_HEADER" : "That's all we need to know! You can now submit the request."
+    "NEW_LAST_STEP_HEADER" : "That's all we need to know! You can now submit the request.",
+    "REQUEST_CHANGES_COMMENT" : "Comment",
+    "REQUEST_ERROR" : "Some error happened",
+    "SET_REQUEST_WFA" : "Set status to Waiting for changes",
+    "EDIT_REQUEST" : "Edit"
   },
   "FACILITIES": {
     "TITLE": "Facilities",
