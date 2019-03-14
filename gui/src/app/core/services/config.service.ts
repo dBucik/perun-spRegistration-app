@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from "./api.service";
-import { Observable } from "rxjs";
+import {Observable, of} from "rxjs";
 import {ApplicationItem} from "../models/ApplicationItem";
 
 @Injectable({
@@ -32,5 +32,9 @@ export class ConfigService {
   getFooter() : Observable<string>{
     //todo type real in url
     return this.apiService.get('/config/footer');
+  }
+
+  isUserAdmin() : Observable<boolean> {
+    return this.apiService.get('/config/isUserAdmin');
   }
 }

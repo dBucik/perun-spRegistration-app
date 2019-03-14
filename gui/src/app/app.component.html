@@ -39,7 +39,7 @@
               {{'MENU.NEW_REQUEST' | translate}}
             </a>
           </li>
-          <li class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/requests/allRequests'">
+            <li class="nav-item pl-2 pb-1" *ngIf="isAdmin" [class.active]="currentUrl !== undefined && currentUrl === '/requests/allRequests'">
             <a class="no-hover-decoration" routerLink="requests/allRequests" (click)="closeSideBar()">
               {{'MENU.ALL_REQUESTS' | translate}}
             </a>

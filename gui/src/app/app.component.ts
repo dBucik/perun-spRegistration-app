@@ -3,6 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import {NavigationEnd, Router} from "@angular/router";
 import { HostListener } from "@angular/core";
 import {UsersService} from "./core/services/users.service";
+import {ConfigService} from "./core/services/config.service";
 
 @Component({
   selector: 'app-root',
@@ -20,10 +21,13 @@ export class AppComponent implements OnInit {
 
   userLoggedIn = false;
 
+  isAdmin : boolean;
+
   constructor(
     private userService: UsersService,
     private translate: TranslateService,
-    private router: Router
+    private router: Router,
+    private configService: ConfigService
   ) {
     this.getScreenSize();
 
@@ -34,6 +38,8 @@ export class AppComponent implements OnInit {
     router.events.subscribe((_: NavigationEnd) => {
       this.currentUrl = this.router.url;
     });
+
+    //configService.isUserAdmin().subscribe(bool => this.isAdmin = bool);
   }
 
   @HostListener('window:resize', ['$event'])
@@ -65,5 +71,6 @@ export class AppComponent implements OnInit {
         this.userLoggedIn = true;
       });
     }
+    this.configService.isUserAdmin().subscribe(bool => this.isAdmin = bool);
   }
 }
