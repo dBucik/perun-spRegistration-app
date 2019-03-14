@@ -59,7 +59,7 @@ public class AuthController {
 		}
 	}
 
-	@RequestMapping(path = "/api/setUser", method = RequestMethod.GET)
+	@RequestMapping(path = "/api/getUser", method = RequestMethod.GET)
 	public User getUser(@SessionAttribute("user") User user) {
 		return user;
 	}
