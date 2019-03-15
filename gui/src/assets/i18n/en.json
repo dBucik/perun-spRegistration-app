@@ -60,7 +60,7 @@
     "NEW_LAST_STEP_HEADER" : "That's all we need to know! You can now submit the request.",
     "REQUEST_CHANGES_COMMENT" : "Comment",
     "REQUEST_ERROR" : "Some error happened",
-    "SET_REQUEST_WFA" : "Set status to Waiting for changes",
+    "SET_REQUEST_WFA" : "Set status to Waiting for approval",
     "EDIT_REQUEST" : "Edit"
   },
   "FACILITIES": {

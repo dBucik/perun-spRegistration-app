@@ -1,9 +1,10 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {Routes, RouterModule} from '@angular/router';
 import {RequestsOverviewComponent} from "./requests-overview/requests-overview.component";
 import {NewRequestComponent} from "./new-request/new-request.component";
 import {RequestDetailComponent} from "./request-detail/request-detail.component";
 import {AllRequestsComponent} from "./all-requests/all-requests.component";
+import {RequestEditComponent} from "./request-edit/request-edit.component";
 import {NotFoundPageComponent} from "../shared/not-found-page/not-found-page.component";
 
 const routes: Routes = [
@@ -23,6 +24,10 @@ const routes: Routes = [
     path: 'detail/:id',
     component: RequestDetailComponent
   },
+    {
+        path: 'editRequest/:id',
+        component: RequestEditComponent
+    },
   {
     path: '**',
     component: NotFoundPageComponent

@@ -46,23 +46,19 @@
 
             <div class="mt-5">
                 <div class="pull-right">
-                    <button mat-raised-button *ngIf="isUserAdmin" color="warn" (click)="reject()">
+                    <button mat-raised-button *ngIf="isUserAdmin && (request.status=='WFA' || request.status=='WFC')" color="warn" (click)="reject()">
                         {{'REQUESTS.REQUEST_DETAIL_REJECT' | translate}}
                     </button>
                     <button class="ml-2" *ngIf="isUserAdmin && request.status=='WFA'" mat-raised-button color="primary"
                             (click)="requestChanges()">
                         {{'REQUESTS.REQUEST_DETAIL_REQUEST_CHANGES' | translate}}
                     </button>
-                    <button class="ml-2" *ngIf="isUserAdmin && request.status=='WFA'" mat-raised-button color="accent" (click)="approve()">
+                    <button class="ml-2" *ngIf="isUserAdmin && (request.status=='WFA' || request.status=='WFC')" mat-raised-button color="accent" (click)="approve()">
                         {{'REQUESTS.REQUEST_DETAIL_APPROVE' | translate}}
                     </button>
-                    <button class="ml-2" *ngIf="isUsersRequest && request.status=='NEW'"  mat-raised-button color="accent" (click)="setWFA()">
-                        {{'REQUESTS.SET_REQUEST_WFA' | translate}}
-                    </button>
-                    <button class="ml-2" *ngIf="isUsersRequest" mat-raised-button color="primary" (click)="edit()">
+                    <button class="ml-2" *ngIf="(isUserAdmin && request.status=='WFA') || (request.status=='WFC')" mat-raised-button color="primary" [routerLink]="['/requests/editRequest', request.reqId]">
                         {{'REQUESTS.EDIT_REQUEST' | translate}}
                     </button>
-                    <!--*ngIf="isUsersRequest && request.status!='NEW'"-->
                 </div>
             </div>
         </div>

@@ -8,6 +8,7 @@ import {PerunAttribute} from "../../core/models/PerunAttribute";
 import {MatSnackBar} from "@angular/material";
 import {TranslateService} from "@ngx-translate/core";
 import {ConfigService} from "../../core/services/config.service";
+import {AppComponent} from "../../app.component";
 
 @Component({
     selector: 'app-request-detail',
@@ -21,7 +22,6 @@ export class RequestDetailComponent implements OnInit {
         private requestsService: RequestsService,
         private snackBar: MatSnackBar,
         private translate: TranslateService,
-        private configService: ConfigService
     ) {
 
     }
@@ -39,11 +39,7 @@ export class RequestDetailComponent implements OnInit {
 
     noCommentErrorMessage: string;
 
-    //TODO load this from api when implemented
     isUserAdmin: boolean;
-
-    //TODO initialize this
-    isUsersRequest: boolean = true;
 
     private mapAttributes() {
         this.requestItems = [];
@@ -72,7 +68,8 @@ export class RequestDetailComponent implements OnInit {
         });
         //TODO add translation
         this.translate.get("REQUEST.REQUEST_ERROR").subscribe(value => this.noCommentErrorMessage = value);
-        this.configService.isUserAdmin().subscribe(bool => this.isUserAdmin = bool);
+        this.isUserAdmin = AppComponent.isUserAdmin();
+        //this.configService.isUserAdmin().subscribe(bool => this.isUserAdmin = bool);
     }
 
     ngOnDestroy(): void {
@@ -120,19 +117,4 @@ export class RequestDetailComponent implements OnInit {
             });
         }
     }
-
-    //TODO remove (here for testing purposes)
-    setWFA() {
-        this.requestsService.askForApproval(this.request.reqId).subscribe(bool => {
-            this.snackBar.open(this.noCommentErrorMessage, null, {duration: 6000});
-        }, error => {
-            console.log("Error");
-            console.log(error);
-        });
-    }
-
-    edit() {
-
-    }
-
 }
