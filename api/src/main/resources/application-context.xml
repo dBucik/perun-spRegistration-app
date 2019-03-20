@@ -24,7 +24,7 @@
                 <prop key="rpc.url">https://perun-dev.cesnet.cz/ba/rpc/</prop>
                 <prop key="rpc.user">XYZ</prop>
                 <prop key="rpc.password">XYZ</prop>
-                <prop key="admins">62692,0,0</prop>
+                <prop key="admins">62692,61904,60838,65395</prop>
                 <prop key="attr.idpAttribute.value">XYZ</prop>
                 <prop key="attr.userEmail.name">urn:perun:user:attribute-def:def:preferredMail</prop>
                 <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
