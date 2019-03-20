@@ -53,9 +53,9 @@ public class AdminApiController {
 	}
 
 
-	@RequestMapping(path = "/api/approve/{requestId}")
+	@RequestMapping(path = "/api/approve/{requestId}", method = RequestMethod.POST)
 	public boolean approveRequest(@SessionAttribute("user") User user,
-							   @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+								  @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("approveRequest(user: {}, requestId: {})", user.getId(), requestId);
 		try {
 			return adminCommandsService.approveRequest(requestId, user.getId());
@@ -64,9 +64,10 @@ public class AdminApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/reject/{requestId}")
-	public boolean rejectRequest(@SessionAttribute("user") User user, @PathVariable("requestId") Long requestId,
-								@RequestBody String message) throws SpRegistrationApiException {
+	@RequestMapping(path = "/api/reject/{requestId}", method = RequestMethod.POST)
+	public boolean rejectRequest(@SessionAttribute("user") User user,
+								 @PathVariable("requestId") Long requestId,
+								 @RequestBody String message) throws SpRegistrationApiException {
 		log.debug("rejectRequest(user: {}, requestId: {}, message: {})", user.getId(), requestId, message);
 		try {
 			return adminCommandsService.rejectRequest(requestId, user.getId(), message);
@@ -75,9 +76,10 @@ public class AdminApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/askForChanges/{requestId}")
-	public boolean askForChanges(@SessionAttribute("user") User user, @PathVariable("requestId") Long requestId,
-								@RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
+	@RequestMapping(path = "/api/askForChanges/{requestId}", method = RequestMethod.POST)
+	public boolean askForChanges(@SessionAttribute("user") User user,
+								 @PathVariable("requestId") Long requestId,
+								 @RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
 		log.debug("askForChanges(user: {}, requestId: {}, attributes: {})", user.getId(), requestId, attributes);
 		try {
 			return adminCommandsService.askForChanges(requestId, user.getId(), attributes);
@@ -86,7 +88,7 @@ public class AdminApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/viewApprovals/{requestId}")
+	@RequestMapping(path = "/api/viewApprovals/{requestId}", method = RequestMethod.GET)
 	public List<RequestSignature> getApprovals(@SessionAttribute("user") User user,
 											   @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("getApprovals(user: {}, requestId: {})", user.getId(), requestId);
@@ -97,9 +99,10 @@ public class AdminApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/addAdmins/{facilityId}")
-	public boolean addAdmins(@SessionAttribute("user") User user, @PathVariable("facilityId") Long facilityId,
-							@RequestBody List<Long> admins) throws SpRegistrationApiException {
+	@RequestMapping(path = "/api/addAdmins/{facilityId}", method = RequestMethod.POST)
+	public boolean addAdmins(@SessionAttribute("user") User user,
+							 @PathVariable("facilityId") Long facilityId,
+							 @RequestBody List<Long> admins) throws SpRegistrationApiException {
 		log.debug("addAdmins(user: {}, facilityId: {}, admins: {})", user.getId(), facilityId, admins);
 		try {
 			return adminCommandsService.addAdmins(user.getId(), facilityId, admins);
@@ -108,9 +111,10 @@ public class AdminApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/removeAdmins/{facilityId}")
-	public boolean removeAdmins(@SessionAttribute("user") User user, @PathVariable("facilityId") Long facilityId,
-							   @RequestBody List<Long> admins) throws SpRegistrationApiException {
+	@RequestMapping(path = "/api/removeAdmins/{facilityId}", method = RequestMethod.POST)
+	public boolean removeAdmins(@SessionAttribute("user") User user,
+								@PathVariable("facilityId") Long facilityId,
+								@RequestBody List<Long> admins) throws SpRegistrationApiException {
 		log.debug("removeAdmins(user: {}, facilityId: {}, admins: {})", user.getId(), facilityId, admins);
 		try {
 			return adminCommandsService.removeAdmins(user.getId(), facilityId, admins);

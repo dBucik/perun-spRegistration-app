@@ -1,11 +1,9 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers;
 
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiException;
 import org.slf4j.Logger;
@@ -57,7 +55,7 @@ public class UserApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/register")
+	@RequestMapping(path = "/api/register", method = RequestMethod.POST)
 	public Long createRegistrationRequest(@SessionAttribute("user") User user,
 										  @RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
 		log.debug("createRegistrationRequest(user: {}, attributes: {})", user.getId(), attributes);
@@ -68,8 +66,9 @@ public class UserApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/changeFacility/{facilityId}")
-	public Long createFacilityChangesRequest(@SessionAttribute("user") User user, @RequestBody List<PerunAttribute> attributes,
+	@RequestMapping(path = "/api/changeFacility/{facilityId}", method = RequestMethod.POST)
+	public Long createFacilityChangesRequest(@SessionAttribute("user") User user,
+											 @RequestBody List<PerunAttribute> attributes,
 											 @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
 		log.debug("createFacilityChangesRequest(user: {}, facilityId: {}, attributes: {})", user.getId(), facilityId, attributes);
 		try {
@@ -79,7 +78,7 @@ public class UserApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/remove/{facilityId}")
+	@RequestMapping(path = "/api/remove/{facilityId}", method = RequestMethod.POST)
 	public Long createRemovalRequest(@SessionAttribute("user") User user,
 									 @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
 		log.debug("createRemovalRequest(user: {}, facilityId: {})", user.getId(), facilityId);
@@ -90,9 +89,10 @@ public class UserApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/update/{requestId}")
-	public boolean updateRequest(@SessionAttribute("user") User user, @RequestBody List<PerunAttribute> attributes,
-								@PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+	@RequestMapping(path = "/api/update/{requestId}", method = RequestMethod.POST)
+	public boolean updateRequest(@SessionAttribute("user") User user,
+								 @PathVariable("requestId") Long requestId,
+								 @RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
 		log.debug("updateRequest(user: {}, requestId: {}, attributes: {})", user.getId(), requestId, attributes);
 		try {
 			return service.updateRequest(requestId, user.getId(), attributes);
@@ -101,7 +101,7 @@ public class UserApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/facility/{facilityId}")
+	@RequestMapping(path = "/api/facility/{facilityId}", method = RequestMethod.GET)
 	public Facility facilityDetail(@SessionAttribute("user") User user,
 								   @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
 		log.debug("facilityDetail(user(): {}, facilityId: {})", user.getId(), facilityId);
@@ -112,7 +112,7 @@ public class UserApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/request/{requestId}")
+	@RequestMapping(path = "/api/request/{requestId}", method = RequestMethod.GET)
 	public Request requestDetail(@SessionAttribute("user") User user,
 								 @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("requestDetail(user: {}, requestId: {})", user.getId(), requestId);

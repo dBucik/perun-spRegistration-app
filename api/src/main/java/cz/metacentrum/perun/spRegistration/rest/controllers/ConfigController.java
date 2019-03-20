@@ -6,7 +6,6 @@ import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +28,7 @@ public class ConfigController {
 		this.config = config;
 	}
 
-	@RequestMapping(path = "/api/config/oidcInputs")
+	@RequestMapping(path = "/api/config/oidcInputs", method = RequestMethod.GET)
 	public List<List<AttrInput>> getInputsForOidc() {
 		log.debug("getInputsForOidc()");
 		List<List<AttrInput>> inputs = new ArrayList<>();
@@ -40,7 +39,7 @@ public class ConfigController {
 		return inputs;
 	}
 
-	@RequestMapping(path = "/api/config/samlInputs")
+	@RequestMapping(path = "/api/config/samlInputs", method = RequestMethod.GET)
 	public List<List<AttrInput>> getInputsForSaml() {
 		log.debug("getInputsForSaml()");
 		List<List<AttrInput>> inputs = new ArrayList<>();
@@ -51,26 +50,27 @@ public class ConfigController {
 		return inputs;
 	}
 
-	@RequestMapping(path = "/api/config/oidcEnabled")
+	@RequestMapping(path = "/api/config/oidcEnabled", method = RequestMethod.GET)
 	public boolean getOidcEnabled() {
 		log.debug("getOidcEnabled()");
 		return config.getAppConfig().isOidcEnabled();
 	}
 
-	@RequestMapping(path = "/api/config/langs")
+	@RequestMapping(path = "/api/config/langs", method = RequestMethod.GET)
 	public List<String> getLangs() {
 		log.debug("getLangs()");
 		return config.getAppConfig().getLangs();
 	}
 
-	@RequestMapping(path = "/api/config/isUserAdmin")
+	@RequestMapping(path = "/api/config/isUserAdmin", method = RequestMethod.GET)
 	public boolean isUserAdmin(@SessionAttribute("user") User user) {
 		log.debug("isUserAdmin()");
 		return config.getAppConfig().isAdmin(user.getId());
 	}
 
-	@GetMapping(path = "/api/config/pageConfig")
+	@RequestMapping(path = "/api/config/pageConfig", method = RequestMethod.GET)
 	public Map<String, String> getPageConfig() {
+		log.debug("getPageConfig()");
 		Map<String, String> pageConfig = new HashMap<>();
 		pageConfig.put("logoUrl", config.getAppConfig().getHeaderLogo());
 		pageConfig.put("headerLabel", config.getAppConfig().getHeaderTitle());
