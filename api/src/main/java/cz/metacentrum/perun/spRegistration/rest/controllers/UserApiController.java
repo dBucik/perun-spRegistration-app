@@ -101,39 +101,6 @@ public class UserApiController {
 		}
 	}
 
-	@RequestMapping(path = "/api/askApproval/{requestId}")
-	public boolean askForApproval(@SessionAttribute("user") User user,
-								  @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
-		log.debug("askForApproval(user: {}, requestId: {})", user.getId(), requestId);
-		try {
-			return service.askForApproval(requestId, user.getId());
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
-	@RequestMapping(path = "/api/cancel/{requestId}")
-	public boolean cancelRequest(@SessionAttribute("user") User user,
-								@PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
-		log.debug("cancelRequest(user: {}, requestId: {})", user.getId(), requestId);
-		try {
-			return service.cancelRequest(requestId, user.getId());
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
-	@RequestMapping(path = "/api/renew/{requestId}")
-	public boolean renewRequest(@SessionAttribute("user") User user,
-							    @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
-		log.debug("renewRequest(user: {}, requestId: {})", user.getId(), requestId);
-		try {
-			return service.renewRequest(requestId, user.getId());
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
 	@RequestMapping(path = "/api/facility/{facilityId}")
 	public Facility facilityDetail(@SessionAttribute("user") User user,
 								   @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {

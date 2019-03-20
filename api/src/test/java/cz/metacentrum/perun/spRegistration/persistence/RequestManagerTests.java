@@ -86,7 +86,7 @@ public class RequestManagerTests {
 	private void prepareRequests() {
 		req1 = new Request();
 		req1.setAction(RequestAction.REGISTER_NEW_SP);
-		req1.setStatus(RequestStatus.NEW);
+		req1.setStatus(RequestStatus.WFA);
 		req1.setFacilityId(null);
 		req1.setModifiedBy(1L);
 		req1.setAttributes(Collections.singletonMap(attr1.getFullName(), attr1));
@@ -129,7 +129,7 @@ public class RequestManagerTests {
 	public void createRequest() {
 		Request request = new Request();
 		request.setAction(RequestAction.REGISTER_NEW_SP);
-		request.setStatus(RequestStatus.NEW);
+		request.setStatus(RequestStatus.WFA);
 		request.setFacilityId(null);
 		request.setModifiedBy(3L);
 		request.setReqUserId(3L);
@@ -198,7 +198,7 @@ public class RequestManagerTests {
 
 		assertNotNull("Should find one request but null collection returned", fetched);
 		assertTrue("Result set should contain at least one request", fetched.size() > 0);
-		assertEquals("Result set should contain exactly one request", 1, fetched.size());
+		assertEquals("Result set should contain exactly two requests", 2, fetched.size());
 		assertEquals("Request should be equal", req1, fetched.get(0));
 	}
 

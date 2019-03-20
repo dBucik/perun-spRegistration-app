@@ -7,45 +7,37 @@ package cz.metacentrum.perun.spRegistration.persistence.enums;
  */
 public enum RequestStatus {
 
-	NEW,
 	APPROVED,
 	REJECTED,
 	WFA,
-	WFC,
-	CANCELED;
+	WFC;
 
 	/**
 	 * Convert Enum value to INTEGER representation (used in DB).
-	 * @return Positive Int value [1-6], -1 in case of error.
+	 * @return Positive Int value [1-4], -1 in case of error.
 	 */
 	public int getAsInt() {
 		switch (this) {
-			case NEW: return 1;
-			case APPROVED: return 2;
-			case REJECTED: return 3;
-			case WFA: return 4;
-			case WFC: return 5;
-			case CANCELED: return 6;
+			case APPROVED: return 1;
+			case REJECTED: return 2;
+			case WFA: return 3;
+			case WFC: return 4;
+			default: return -1;
 		}
-
-		return -1;
 	}
 
 	/**
 	 * Convert INTEGER value (from DB) to ENUM value.
-	 * @param i value to be converted (accepted values are in range [1-6])
+	 * @param i value to be converted (accepted values are in range [1-4])
 	 * @return Enum value, null n case of error.
 	 */
 	public static RequestStatus resolve(int i) {
 		switch (i) {
-			case 1: return NEW;
-			case 2: return APPROVED;
-			case 3: return REJECTED;
-			case 4: return WFA;
-			case 5: return WFC;
-			case 6: return CANCELED;
+			case 1: return APPROVED;
+			case 2: return REJECTED;
+			case 3: return WFA;
+			case 4: return WFC;
+			default: return null;
 		}
-
-		return null;
 	}
 }
