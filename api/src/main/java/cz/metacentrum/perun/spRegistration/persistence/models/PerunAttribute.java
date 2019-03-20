@@ -47,7 +47,7 @@ public class PerunAttribute {
 	}
 
 	public String getFullName() {
-		return fullName;
+		return (fullName == null) ? definition.getFullName() : fullName;
 	}
 
 	public void setFullName(String fullName) {
