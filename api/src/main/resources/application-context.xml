@@ -100,6 +100,7 @@
             <props>
                 <!-- ORGANIZATION ATTRIBUTES -->
                 <prop key="organizationName.attrName">urn:perun:facility:attribute-def:def:organizationName</prop>
+                <prop key="organizationName.allowedKeys">en,cs</prop>
                 <prop key="organizationName.position">1</prop>
                 <prop key="organizationURL.attrName">urn:perun:facility:attribute-def:def:organizationURL</prop>
                 <prop key="organizationURL.position">2</prop>
@@ -121,6 +122,7 @@
                 <prop key="entityID.attrName">urn:perun:facility:attribute-def:def:entityID</prop>
                 <prop key="entityID.position">1</prop>
                 <prop key="assertionConsumerService.attrName">urn:perun:facility:attribute-def:def:assertionConsumerService</prop>
+                <prop key="assertionConsumerService.isRequired">false</prop>
                 <prop key="assertionConsumerService.position">2</prop>
                 <prop key="singleLogoutService.attrName">urn:perun:facility:attribute-def:def:singleLogoutService</prop>
                 <prop key="singleLogoutService.isRequired">false</prop>
@@ -146,24 +148,22 @@
         <property name="properties">
             <props>
                 <prop key="oidcClientId.attrName">urn:perun:facility:attribute-def:def:OIDCClientID</prop>
-                <prop key="oidcClientId.isEditable">false</prop>
                 <prop key="oidcClientId.position">1</prop>
-                <prop key="oidcClientSecret.attrName">urn:perun:facility:attribute-def:def:OIDCClientSecret</prop>
-                <prop key="oidcClientSecret.isEditable">false</prop>
-                <prop key="oidcClientSecret.position">2</prop>
                 <prop key="oidcRedirectUris.attrName">urn:perun:facility:attribute-def:def:OIDCRedirectURIs</prop>
-                <prop key="oidcRedirectUris.position">3</prop>
+                <prop key="oidcRedirectUris.position">2</prop>
                 <prop key="oidcGrantTypes.attrName">urn:perun:facility:attribute-def:def:OIDCGrantTypes</prop>
-                <prop key="oidcGrantTypes.position">4</prop>
+                <prop key="oidcGrantTypes.position">3</prop>
+                <prop key="oidcGrantTypes.allowedValues">authorization_code,implicit,device</prop>
                 <prop key="oidcResponseTypes.attrName">urn:perun:facility:attribute-def:def:OIDCResponseTypes</prop>
-                <prop key="oidcResponseTypes.position">5</prop>
+                <prop key="oidcResponseTypes.position">4</prop>
+                <prop key="oidcResponseTypes.allowedValues">code,token,id_token,token id_token,code id_token,code token,code token id_token</prop>
                 <prop key="oidcAllowIntrospection.attrName">urn:perun:facility:attribute-def:def:OIDCAllowIntrospection</prop>
-                <prop key="oidcAllowIntrospection.position">6</prop>
+                <prop key="oidcAllowIntrospection.position">5</prop>
                 <prop key="oidcRequiredScopes.attrName">urn:perun:facility:attribute-def:def:requiredScopes</prop>
-                <prop key="oidcRequiredScopes.position">7</prop>
+                <prop key="oidcRequiredScopes.position">6</prop>
                 <prop key="oidcRequiredScopes.allowedValues">openid,profile,email,address,phone,offline_access,perun_api,groupNames,permissions_ega,forwardedScopedAffiliations,bona_fide_status,country,eduPersonEntitlement</prop>
                 <prop key="oidcLogoUrl.attrName">urn:perun:facility:attribute-def:def:OIDCLogoUrl</prop>
-                <prop key="oidcLogoUrl.position">8</prop>
+                <prop key="oidcLogoUrl.position">7</prop>
                 <prop key="oidcLogoUrl.isRequired">false</prop>
             </props>
         </property>
@@ -185,6 +185,7 @@
                 <prop key="dynamicRegistration.attrName">urn:perun:facility:attribute-def:def:dynamicRegistration</prop>
                 <prop key="dynamicRegistration.position">3</prop>
                 <prop key="registrationURL.attrName">urn:perun:facility:attribute-def:def:registrationURL</prop>
+                <prop key="registrationURL.isRequired">false</prop>
                 <prop key="registrationURL.position">4</prop>
             </props>
         </property>
