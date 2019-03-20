@@ -1,11 +1,11 @@
 package cz.metacentrum.perun.spRegistration.persistence.managers.impl;
 
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
-import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestSignatureMapper;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestMapper;
+import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestSignatureMapper;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
@@ -38,7 +38,7 @@ public class RequestManagerImpl implements RequestManager {
 		REQUEST_SIGNATURE_MAPPER = new RequestSignatureMapper();
 	}
 
-	public void setAppConfig(AppConfig config) {
+	public void setAppConfig(Config config) {
 		requestMapper = new RequestMapper(config);
 	}
 

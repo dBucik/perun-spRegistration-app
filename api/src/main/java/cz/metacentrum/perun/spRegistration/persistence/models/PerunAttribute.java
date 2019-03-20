@@ -27,15 +27,18 @@ public class PerunAttribute {
 	private Object oldValue;
 	private String comment;
 	private String fullName;
+	private AttrInput input;
 
 	public PerunAttribute() { }
 
-	public PerunAttribute(PerunAttributeDefinition definition, String fullName, Object value, Object oldValue, String comment) {
+	public PerunAttribute(PerunAttributeDefinition definition, String fullName, Object value, Object oldValue, String comment,
+						  AttrInput input) {
 		this.definition = definition;
 		this.fullName = fullName;
 		this.value = value;
 		this.oldValue = oldValue;
 		this.comment = comment;
+		this.input = input;
 	}
 
 	public PerunAttributeDefinition getDefinition() {
@@ -76,6 +79,14 @@ public class PerunAttribute {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public AttrInput getInput() {
+		return input;
+	}
+
+	public void setInput(AttrInput input) {
+		this.input = input;
 	}
 
 	public String valueAsString(boolean isOldValue) {
@@ -146,21 +157,17 @@ public class PerunAttribute {
 		return attr;
 	}
 
-	public static PerunAttribute fromJsonOfDb(String name, JSONObject json, AppConfig appConfig) {
+	public static PerunAttribute fromJsonOfDb(String name, JSONObject json, Map<String,
+			PerunAttributeDefinition> attributeDefinitionMap, Map<String, AttrInput> inputMap) {
 		String type = json.getString("type");
 		Object newValue = getValue(json, "newValue", type);
 		Object oldValue = getValue(json, "oldValue", type);
 		String comment = json.optString("comment", null);
 
-		PerunAttributeDefinition def = appConfig.getAttrDefinition(name);
-		PerunAttribute attr = new PerunAttribute();
+		PerunAttributeDefinition def = attributeDefinitionMap.get(name);
+		AttrInput input = inputMap.get(name);
 
-		attr.setDefinition(def);
-		attr.setValue(newValue);
-		attr.setOldValue(oldValue);
-		attr.setComment(comment);
-
-		return attr;
+		return new PerunAttribute(def, name, newValue, oldValue, comment, input);
 	}
 
 	private void putValue(JSONObject json, String key, String type, boolean isOldValue) {
@@ -317,29 +324,25 @@ public class PerunAttribute {
 				", oldValue=" + oldValue +
 				", comment='" + comment + '\'' +
 				", fullName='" + fullName + '\'' +
+				", input=" + input +
 				'}';
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (! (o instanceof PerunAttribute)) {
-			return false;
-		}
-
-		PerunAttribute them = (PerunAttribute) o;
-		return Objects.equals(this.definition, them.definition)
-				&& Objects.equals(this.value, them.value)
-				&& Objects.equals(this.oldValue, them.oldValue)
-				&& Objects.equals(this.comment, them.comment);
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		PerunAttribute that = (PerunAttribute) o;
+		return Objects.equals(definition, that.definition) &&
+				Objects.equals(value, that.value) &&
+				Objects.equals(oldValue, that.oldValue) &&
+				Objects.equals(comment, that.comment) &&
+				Objects.equals(fullName, that.fullName) &&
+				Objects.equals(input, that.input);
 	}
 
 	@Override
 	public int hashCode() {
-		long res = 31 * definition.getId();
-		res *= 31 * value.hashCode();
-		res *= 31 * oldValue.hashCode();
-		res *= 31 * comment.hashCode();
-
-		return (int) res;
+		return Objects.hash(definition, value, oldValue, comment, fullName, input);
 	}
 }

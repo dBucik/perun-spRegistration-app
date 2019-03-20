@@ -40,7 +40,6 @@
     </bean>
 
     <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
-        <property name="appConfig" ref="appConfig" />
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
     </bean>
 

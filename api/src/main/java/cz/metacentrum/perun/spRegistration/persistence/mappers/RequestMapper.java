@@ -1,9 +1,11 @@
 package cz.metacentrum.perun.spRegistration.persistence.mappers;
 
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +33,18 @@ public class RequestMapper implements RowMapper<Request> {
 	private static final String MODIFIED_BY_KEY = "modified_by";
 	private static final String MODIFIED_AT_KEY = "modified_at";
 
-	@Autowired
-	private AppConfig appConfig;
+	private final Map<String, PerunAttributeDefinition> definitionMap;
+	private final Map<String, AttrInput> attrInputMap;
 
-	public RequestMapper(AppConfig appConfig) {
-		this.appConfig = appConfig;
+	@Autowired
+	public RequestMapper(Config config) {
+		if (config != null) {
+			this.definitionMap = config.getAppConfig().getPerunAttributeDefinitionsMap();
+			this.attrInputMap = config.getInputMap();
+		} else {
+			this.definitionMap = null;
+			this.attrInputMap = null;
+		}
 	}
 
 	@Override
@@ -64,7 +73,9 @@ public class RequestMapper implements RowMapper<Request> {
 		Iterator<String> keys = json.keys();
 		while (keys.hasNext()) {
 			String key = keys.next();
-			PerunAttribute mappedAttribute = PerunAttribute.fromJsonOfDb(key, json.getJSONObject(key), appConfig);
+			PerunAttribute mappedAttribute = PerunAttribute.fromJsonOfDb(
+					key, json.getJSONObject(key), definitionMap, attrInputMap
+			);
 			attributes.put(key, mappedAttribute);
 		}
 
