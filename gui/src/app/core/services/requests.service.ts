@@ -34,7 +34,7 @@ export class RequestsService {
   }
 
   approveRequest(id: number): Observable<boolean>{
-    return this.apiService.get(`/approve/${id}`);
+    return this.apiService.post(`/approve/${id}`);
   }
 
   rejectRequest(id: number): Observable<boolean>{

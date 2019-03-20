@@ -59,39 +59,6 @@ public interface UserCommandsService {
 			throws UnauthorizedActionException, InternalErrorException;
 
 	/**
-	 * Ask for approval of the request from Admin.
-	 * @param requestId ID of request.
-	 * @param userId ID of user requesting approval.
-	 * @return True if everything went OK.
-	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
-	 * @throws CannotChangeStatusException when status of the request cannot be changed.
-	 */
-	boolean askForApproval(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException;
-
-	/**
-	 * Cancel pending request.
-	 * @param requestId ID of request.
-	 * @param userId ID of user canceling the request.
-	 * @return True if everything went OK.
-	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
-	 * @throws CannotChangeStatusException when status of the request cannot be changed.
-	 */
-	boolean cancelRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException;
-
-	/**
-	 * Renew canceled request.
-	 * @param requestId ID of request.
-	 * @param userId ID of user renewing the request.
-	 * @return True if everything went OK.
-	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
-	 * @throws CannotChangeStatusException when status of the request cannot be changed.
-	 */
-	boolean renewRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException;
-
-	/**
 	 * Ask for moving the service to the production environment.
 	 * @param facilityId ID of facility in Perun.
 	 * @param userId ID of requesting user.

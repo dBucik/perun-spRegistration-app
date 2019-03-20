@@ -4,7 +4,9 @@ import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class Config {
@@ -18,6 +20,7 @@ public class Config {
 	private AttrsConfig facilityOidcConfig;
 	private AttrsConfig facilitySamlConfig;
 	private Properties messagesConfig;
+	private Map<String, AttrInput> inputMap = new HashMap<>();
 
 	public void setAppConfig(AppConfig appConfig) {
 		log.debug("setting app config: {}", appConfig);
@@ -31,26 +34,41 @@ public class Config {
 	public void setFacilityServiceConfig(AttrsConfig facilityServiceConfig) {
 		log.debug("setting facility service config: {}", facilityServiceConfig);
 		this.facilityServiceConfig = facilityServiceConfig;
+		for (AttrInput a: facilityServiceConfig.getInputs()) {
+			inputMap.put(a.getName(), a);
+		}
 	}
 
 	public void setFacilityOrganizationConfig(AttrsConfig facilityOrganizationConfig) {
 		log.debug("setting facility organization config: {}", facilityOrganizationConfig);
 		this.facilityOrganizationConfig = facilityOrganizationConfig;
+		for (AttrInput a: facilityOrganizationConfig.getInputs()) {
+			inputMap.put(a.getName(), a);
+		}
 	}
 
 	public void setFacilityMembershipConfig(AttrsConfig facilityMembershipConfig) {
 		log.debug("setting facility membership config: {}", facilityMembershipConfig);
 		this.facilityMembershipConfig = facilityMembershipConfig;
+		for (AttrInput a: facilityMembershipConfig.getInputs()) {
+			inputMap.put(a.getName(), a);
+		}
 	}
 
 	public void setFacilityOidcConfig(AttrsConfig facilityOidcConfig) {
 		log.debug("setting facility oidc config: {}", facilityOidcConfig);
 		this.facilityOidcConfig = facilityOidcConfig;
+		for (AttrInput a: facilityOidcConfig.getInputs()) {
+			inputMap.put(a.getName(), a);
+		}
 	}
 
 	public void setFacilitySamlConfig(AttrsConfig facilitySamlConfig) {
 		log.debug("setting facility saml config: {}", facilitySamlConfig);
 		this.facilitySamlConfig = facilitySamlConfig;
+		for (AttrInput a: facilitySamlConfig.getInputs()) {
+			inputMap.put(a.getName(), a);
+		}
 	}
 
 	public void setMessagesConfig(Properties messagesConfig) {
@@ -82,4 +100,7 @@ public class Config {
 		return this.facilityMembershipConfig.getInputs();
 	}
 
+	public Map<String, AttrInput> getInputMap() {
+		return inputMap;
+	}
 }

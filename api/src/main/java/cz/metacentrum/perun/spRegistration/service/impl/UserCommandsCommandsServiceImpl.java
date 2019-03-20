@@ -1,20 +1,18 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
-import cz.metacentrum.perun.spRegistration.persistence.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
-import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
@@ -147,97 +145,6 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 
 		log.debug("updateRequest returns: {}", res);
-		return res;
-	}
-
-	@Override
-	public boolean askForApproval(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException {
-		log.debug("askForApproval(requestId: {}, userId: {})", requestId, userId);
-		if (requestId == null || userId == null) {
-			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
-		}
-
-		Request request = requestManager.getRequestByReqId(requestId);
-
-		if (request == null) {
-			log.error("Could not retrieve request for id: {}", requestId);
-			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
-		} else if (! isAdminInRequest(request.getReqUserId(), userId)) {
-			throw new UnauthorizedActionException("User is not registered as admin in request, cannot ask for approval");
-		} else if (! RequestStatus.NEW.equals(request.getStatus()) &&
-			! RequestStatus.WFC.equals(request.getStatus())) {
-			throw new CannotChangeStatusException("Cannot ask for approval, request not marked as NEW nor WAITING_FOR_CHANGES");
-		}
-
-		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.WFA,
-				messagesProperties, appConfig.getAdminsAttr());
-
-		log.debug("askForApproval() returns: {}", res);
-		return res;
-	}
-
-	@Override
-	public boolean cancelRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException {
-		log.debug("cancelRequest(requestId: {}, userId: {})", requestId, userId);
-		if (requestId == null || userId == null) {
-			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
-			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
-		}
-
-		Request request = fetchRequestAndValidate(requestId);
-
-		if (request == null) {
-			log.error("Could not retrieve request for id: {}", requestId);
-			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
-		} else if (! isAdminInRequest(request.getReqUserId(), userId)) {
-			log.error("User is not registered as admin in request, cannot cancel it");
-			throw new UnauthorizedActionException("User is not registered as admin in request, cannot cancel it");
-		}
-
-		switch (request.getStatus()) {
-			case APPROVED:
-			case REJECTED:
-			case CANCELED: {
-				log.error("Cannot ask for abort, request has got status: {}", request.getStatus());
-				throw new CannotChangeStatusException("Cannot ask for abort, request has got status "
-						+ request.getStatus());
-			}
-		}
-
-		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.CANCELED,
-				messagesProperties, adminsAttr);
-
-		log.debug("cancelRequest returns: {}", res);
-		return res;
-	}
-
-	@Override
-	public boolean renewRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException {
-		log.debug("renewRequest(requestId: {}, userId: {})", requestId, userId);
-		if (requestId == null || userId == null) {
-			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
-			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
-		}
-
-		Request request = requestManager.getRequestByReqId(requestId);
-		if (request == null) {
-			log.error("Could not retrieve request for id: {}", requestId);
-			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
-		} else if (! isAdminInRequest(request.getReqUserId(), userId)) {
-			log.error("User is not registered as admin in request, cannot renew it");
-			throw new UnauthorizedActionException("User is not registered as admin in request, cannot renew it");
-		} else if (! RequestStatus.WFC.equals(request.getStatus())) {
-			log.error("Cannot ask for renew, request not marked as WAITING_FOR_CANCEL");
-			throw new CannotChangeStatusException("Cannot ask for renew, request not marked as WAITING_FOR_CANCEL");
-		}
-
-		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.NEW,
-				messagesProperties, adminsAttr);
-
-		log.debug("renewRequest returns:  {}", res);
 		return res;
 	}
 
@@ -405,7 +312,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		log.debug("createRequest(facilityId: {}, userId: {}, action: {}, attributes: {})", facilityId, userId, action, attributes);
 		Request request = new Request();
 		request.setFacilityId(facilityId);
-		request.setStatus(RequestStatus.NEW);
+		request.setStatus(RequestStatus.WFA);
 		request.setAction(action);
 		request.setAttributes(attributes);
 		request.setReqUserId(userId);

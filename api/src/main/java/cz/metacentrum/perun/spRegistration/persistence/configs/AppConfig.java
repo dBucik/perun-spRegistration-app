@@ -19,7 +19,7 @@ public class AppConfig {
 
 	private String idpAttribute;
 	private String idpAttributeValue;
-		private String adminsAttr;
+	private String adminsAttr;
 	private Set<Long> admins;
 	private String extSourceProxy;
 	private String userEmailAttr;
