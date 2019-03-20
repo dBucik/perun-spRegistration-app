@@ -75,6 +75,7 @@ public class ConfigController {
 		pageConfig.put("logoUrl", config.getAppConfig().getHeaderLogo());
 		pageConfig.put("headerLabel", config.getAppConfig().getHeaderTitle());
 		pageConfig.put("footerHtml", config.getAppConfig().getFooterHTML());
+		pageConfig.put("headerHtml", config.getAppConfig().getHeaderHTML());
 
 		return pageConfig;
 	}
