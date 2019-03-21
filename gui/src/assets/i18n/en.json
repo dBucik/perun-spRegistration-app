@@ -81,6 +81,8 @@
     "MOVE_TO_PRODUCTION_DESCRIPTION" : "You are applying for a move facility to production. Fill in the following form.",
     "MOVE_TO_PRODUCTION_FORM1" : "Whatever 1",
     "MOVE_TO_PRODUCTION_FORM2" : "Whatever 2",
-    "MOVE_TO_PRODUCTION_SUBMIT_BUTTON" : "Submit"
+    "MOVE_TO_PRODUCTION_SUBMIT_BUTTON" : "Submit",
+    "MOVE_TO_PRODUCTION_SUCCESS": "Request was created",
+    "MOVE_TO_PRODUCTION_EMAIL_ERROR": "Fill in an email!"
   }
 }

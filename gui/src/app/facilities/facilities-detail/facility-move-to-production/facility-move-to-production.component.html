@@ -16,7 +16,7 @@
           </mat-expansion-panel-header>
           <div *ngIf="isEmailEnabled">
 
-              <mat-form-field>
+              <mat-form-field class="chip-list">
                   <mat-chip-list #chipList>
                       <mat-chip *ngFor="let email of emails" [selectable]="false"
                                 [removable]="true" (removed)="remove(email)">

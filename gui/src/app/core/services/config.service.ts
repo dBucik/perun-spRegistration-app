@@ -34,6 +34,6 @@ export class ConfigService {
   }
 
   isAuthoritiesEnabled() : Observable<boolean>{
-      return this.apiService.get('config/specifyAuthoritiesEnabled');
+      return this.apiService.get('/config/specifyAuthoritiesEnabled');
   }
 }
