@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.rest.controllers;
+package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;

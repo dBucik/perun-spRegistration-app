@@ -1,6 +1,5 @@
-package cz.metacentrum.perun.spRegistration.rest.controllers;
+package cz.metacentrum.perun.spRegistration.rest.controllers.requests;
 
-import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
@@ -9,40 +8,25 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiE
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.util.List;
 
 @RestController
-@SessionAttributes("user")
-public class UserApiController {
+public class UserRequestsController {
 
-	private static final Logger log = LoggerFactory.getLogger(UserApiController.class);
+	private static final Logger log = LoggerFactory.getLogger(UserRequestsController.class);
 
 	private final UserCommandsService service;
-	@Value("${dev.enabled}")
-	private boolean devEnabled;
 
 	@Autowired
-	public UserApiController(UserCommandsService service) {
+	public UserRequestsController(UserCommandsService service) {
 		this.service = service;
-	}
-
-	@RequestMapping(path = "/api/userFacilities", method = RequestMethod.GET)
-	public List<Facility> userFacilities(@SessionAttribute("user") User user) throws SpRegistrationApiException {
-		log.debug("userFacilities({})", user.getId());
-		try {
-			return service.getAllFacilitiesWhereUserIsAdmin(user.getId());
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
 	}
 
 	@RequestMapping(path = "/api/userRequests", method = RequestMethod.GET)
@@ -100,61 +84,4 @@ public class UserApiController {
 			throw new SpRegistrationApiException(e);
 		}
 	}
-
-	@RequestMapping(path = "/api/facility/{facilityId}", method = RequestMethod.GET)
-	public Facility facilityDetail(@SessionAttribute("user") User user,
-								   @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
-		log.debug("facilityDetail(user(): {}, facilityId: {})", user.getId(), facilityId);
-		try {
-			return service.getDetailedFacility(facilityId, user.getId());
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
-	@RequestMapping(path = "/api/request/{requestId}", method = RequestMethod.GET)
-	public Request requestDetail(@SessionAttribute("user") User user,
-								 @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
-		log.debug("requestDetail(user: {}, requestId: {})", user.getId(), requestId);
-		try {
-			return service.getDetailedRequest(requestId, user.getId());
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
-	@RequestMapping(path = "/api/moveToProduction/createRequest/{facilityId}", method = RequestMethod.POST)
-	public Long moveToProduction(@SessionAttribute("user") User user,
-								 @PathVariable("facilityId") Long facilityId,
-								 @RequestBody List<String> authorities) throws SpRegistrationApiException {
-		log.debug("moveToProduction(user: {}, facilityId: {} authorities: {})", user.getId(), facilityId, authorities);
-		try {
-			return service.requestMoveToProduction(facilityId, user.getId(), authorities);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
-	@RequestMapping(path = "/api/moveToProduction/getFacilityDetails/{facilityId}", method = RequestMethod.GET)
-	public Facility signRequestGetData(@PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
-		log.debug("signRequestGetData(facilityId: {})", facilityId);
-		try {
-			return service.getFacilityDetailsForSignature(facilityId);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
-	@RequestMapping(path = "/api/moveToProduction/approve/{facilityId}", method = RequestMethod.POST)
-	public boolean signApprovalForProduction(@SessionAttribute("user") User user,
-											 @PathVariable("facilityId") Long facilityId,
-											 @RequestBody String hash) throws SpRegistrationApiException {
-		log.debug("signApprovalForProduction(user: {}, facilityId: {}, hash: {})", user, facilityId, hash);
-		try {
-			return service.signTransferToProduction(facilityId, hash, user);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
 }

@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.rest.controllers;
+package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.springframework.http.HttpStatus;

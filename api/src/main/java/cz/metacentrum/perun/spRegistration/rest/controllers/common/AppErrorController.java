@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.rest.controllers;
+package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
