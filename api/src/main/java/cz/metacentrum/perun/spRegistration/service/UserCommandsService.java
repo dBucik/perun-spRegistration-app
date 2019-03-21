@@ -1,5 +1,6 @@
 package cz.metacentrum.perun.spRegistration.service;
 
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
@@ -24,7 +25,7 @@ public interface UserCommandsService {
 	 * @param attributes Attributes set for SP (key = attribute name, value = attribute).
 	 * @return Generated request ID after storing to the DB.
 	 */
-	Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes) throws InternalErrorException;
+	Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes) throws InternalErrorException, CreateRequestException;
 
 	/**
 	 * Create request for changes of SP (which already exists as facility in Perun).
@@ -35,7 +36,7 @@ public interface UserCommandsService {
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	Long createFacilityChangesRequest(Long facilityId, Long userId, List<PerunAttribute> attributes)
-			throws UnauthorizedActionException, RPCException, InternalErrorException;
+			throws UnauthorizedActionException, RPCException, InternalErrorException, CreateRequestException;
 
 	/**
 	 * Create request for removal of SP (which already exists as facility in Perun).
@@ -45,7 +46,7 @@ public interface UserCommandsService {
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	Long createRemovalRequest(Long userId, Long facilityId)
-			throws UnauthorizedActionException, RPCException, InternalErrorException;
+			throws UnauthorizedActionException, RPCException, InternalErrorException, CreateRequestException;
 
 	/**
 	 * Update existing request in DB with new data.
@@ -66,7 +67,7 @@ public interface UserCommandsService {
 	 * @return Id of created request
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	Long requestMoveToProduction(Long facilityId, Long userId, List<String> authorities) throws UnauthorizedActionException, InternalErrorException, RPCException;
+	Long requestMoveToProduction(Long facilityId, Long userId, List<String> authorities) throws UnauthorizedActionException, InternalErrorException, RPCException, CreateRequestException;
 
 	/**
 	 * Get details of facility for the signatures interface

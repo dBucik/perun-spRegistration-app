@@ -3,6 +3,7 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
@@ -60,7 +61,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes) throws InternalErrorException {
+	public Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes) throws InternalErrorException, CreateRequestException {
 		log.debug("createRegistrationRequest(userId: {}, attributes: {})", userId, attributes);
 		if (userId == null || attributes == null) {
 			log.error("Illegal input - userId: {}, attributes: {}", userId, attributes);
@@ -78,7 +79,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	@Override
 	public Long createFacilityChangesRequest(Long facilityId, Long userId, List<PerunAttribute> attributes)
-			throws UnauthorizedActionException, RPCException, InternalErrorException {
+			throws UnauthorizedActionException, RPCException, InternalErrorException, CreateRequestException {
 		log.debug("createFacilityChangesRequest(facility: {}, userId: {}, attributes: {})", facilityId, userId, attributes);
 		if (facilityId == null || userId == null || attributes == null) {
 			log.error("Illegal input - facilityId: {}, userId: {}, attributes: {}", facilityId, userId, attributes);
@@ -96,7 +97,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public Long createRemovalRequest(Long userId, Long facilityId) throws UnauthorizedActionException, RPCException, InternalErrorException {
+	public Long createRemovalRequest(Long userId, Long facilityId) throws UnauthorizedActionException, RPCException, InternalErrorException, CreateRequestException {
 		log.debug("createRemovalRequest(userId: {}, facilityId: {})", userId, facilityId);
 		if (facilityId == null || userId == null) {
 			log.error("Illegal input - facilityId: {}, userId: {}", facilityId, userId);
@@ -150,7 +151,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	@Override
 	public Long requestMoveToProduction(Long facilityId, Long userId, List<String> authorities)
-			throws UnauthorizedActionException, InternalErrorException, RPCException {
+			throws UnauthorizedActionException, InternalErrorException, RPCException, CreateRequestException {
 		log.debug("requestMoveToProduction(facilityId: {}, userId: {}, authorities: {})", facilityId, userId, authorities);
 		if (facilityId == null || userId == null) {
 			log.error("Illegal input - facilityId: {}, userId: {}", facilityId, userId);
@@ -258,6 +259,9 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
 		}
 
+		Long activeRequestId = requestManager.getActiveRequestIdByFacilityId(facilityId);
+		facility.setActiveRequestId(activeRequestId);
+
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId);
 		facility.setAttrs(attrs);
 		boolean inTest = attrs.get(appConfig.getTestSpAttribute()).valueAsBoolean(false);
@@ -303,12 +307,12 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	/* PRIVATE METHODS */
 
-	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes) throws InternalErrorException {
+	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes) throws InternalErrorException, CreateRequestException {
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
 		return createRequest(facilityId, userId, RequestAction.REGISTER_NEW_SP, convertedAttributes);
 	}
 
-	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes) throws InternalErrorException {
+	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes) throws InternalErrorException, CreateRequestException {
 		log.debug("createRequest(facilityId: {}, userId: {}, action: {}, attributes: {})", facilityId, userId, action, attributes);
 		Request request = new Request();
 		request.setFacilityId(facilityId);

@@ -3,14 +3,19 @@ package cz.metacentrum.perun.spRegistration.persistence.managers.impl;
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestMapper;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestSignatureMapper;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jca.cci.CannotCreateRecordException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -20,6 +25,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -55,8 +61,16 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
-	public Long createRequest(Request request) {
+	public Long createRequest(Request request) throws InternalErrorException, CreateRequestException {
 		log.debug("createRequest({})", request);
+
+		if (request.getFacilityId() != null) {
+			Long activeRequestId = this.getActiveRequestIdByFacilityId(request.getFacilityId());
+			if (activeRequestId != null) {
+				throw new CreateRequestException("Active requests already exist for facility");
+			}
+		}
+
 		String query = "INSERT INTO" + REQUESTS_TABLE +
 				"(facility_id, status, action, requesting_user_id, attributes, modified_by) " +
 				"VALUES (:fac_id, :status, :action, :req_user_id, :attributes, :modified_by)";
@@ -270,4 +284,22 @@ public class RequestManagerImpl implements RequestManager {
 		return true;
 	}
 
+	@Override
+	public Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException {
+		log.debug("getActiveRequestIdByFacilityId({})", facilityId);
+		String query = "SELECT id FROM " + REQUESTS_TABLE +
+				"WHERE facility_id = :fac_id AND status NOT IN (:allowed_statuses)";
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("fac_id", facilityId);
+		List<Integer> allowedStatuses = Arrays.asList(RequestStatus.APPROVED.getAsInt(), RequestStatus.REJECTED.getAsInt());
+		params.addValue("allowed_statuses", allowedStatuses);
+
+		try {
+			return jdbcTemplate.queryForObject(query, params, Long.class);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		} catch (IncorrectResultSizeDataAccessException e) {
+			throw new InternalErrorException("Two active requests for one facility found", e);
+		}
+	}
 }
