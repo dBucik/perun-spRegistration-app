@@ -1,8 +1,8 @@
 package cz.metacentrum.perun.spRegistration.persistence.rpc;
 
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import org.json.JSONArray;
