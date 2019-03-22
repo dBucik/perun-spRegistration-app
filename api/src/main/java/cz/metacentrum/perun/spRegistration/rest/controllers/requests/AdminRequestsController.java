@@ -8,7 +8,9 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiE
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +31,7 @@ public class AdminRequestsController {
 		this.service = service;
 	}
 
-	@RequestMapping(path = "/api/allRequests", method = RequestMethod.GET)
+	@GetMapping(path = "/api/allRequests")
 	public List<Request> allRequests(@SessionAttribute("user") User user) throws SpRegistrationApiException {
 		log.debug("allRequests({})", user.getId());
 		try {
@@ -39,7 +41,7 @@ public class AdminRequestsController {
 		}
 	}
 
-	@RequestMapping(path = "/api/approve/{requestId}", method = RequestMethod.POST)
+	@PostMapping(path = "/api/approve/{requestId}")
 	public boolean approveRequest(@SessionAttribute("user") User user,
 								  @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("approveRequest(user: {}, requestId: {})", user.getId(), requestId);
@@ -50,7 +52,7 @@ public class AdminRequestsController {
 		}
 	}
 
-	@RequestMapping(path = "/api/reject/{requestId}", method = RequestMethod.POST)
+	@PostMapping(path = "/api/reject/{requestId}")
 	public boolean rejectRequest(@SessionAttribute("user") User user,
 								 @PathVariable("requestId") Long requestId,
 								 @RequestBody String message) throws SpRegistrationApiException {
@@ -62,7 +64,7 @@ public class AdminRequestsController {
 		}
 	}
 
-	@RequestMapping(path = "/api/askForChanges/{requestId}", method = RequestMethod.POST)
+	@PostMapping(path = "/api/askForChanges/{requestId}")
 	public boolean askForChanges(@SessionAttribute("user") User user,
 								 @PathVariable("requestId") Long requestId,
 								 @RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {

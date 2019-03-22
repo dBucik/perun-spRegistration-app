@@ -7,7 +7,9 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiE
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +30,7 @@ public class AdminFacilitiesController {
 		this.service = service;
 	}
 
-	@RequestMapping(path = "/api/allFacilities", method = RequestMethod.GET)
+	@GetMapping(path = "/api/allFacilities")
 	public List<Facility> allFacilities(@SessionAttribute("user") User user) throws SpRegistrationApiException {
 		log.debug("allFacilities({})", user.getId());
 		try {
@@ -38,7 +40,7 @@ public class AdminFacilitiesController {
 		}
 	}
 
-	@RequestMapping(path = "/api/addAdmins/{facilityId}", method = RequestMethod.POST)
+	@PostMapping(path = "/api/addAdmins/{facilityId}")
 	public boolean addAdmins(@SessionAttribute("user") User user,
 							 @PathVariable("facilityId") Long facilityId,
 							 @RequestBody List<Long> admins) throws SpRegistrationApiException {
@@ -50,7 +52,7 @@ public class AdminFacilitiesController {
 		}
 	}
 
-	@RequestMapping(path = "/api/removeAdmins/{facilityId}", method = RequestMethod.POST)
+	@PostMapping(path = "/api/removeAdmins/{facilityId}")
 	public boolean removeAdmins(@SessionAttribute("user") User user,
 								@PathVariable("facilityId") Long facilityId,
 								@RequestBody List<Long> admins) throws SpRegistrationApiException {

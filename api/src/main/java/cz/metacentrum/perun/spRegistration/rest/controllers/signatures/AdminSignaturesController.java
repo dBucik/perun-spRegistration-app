@@ -7,6 +7,7 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiE
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,7 +28,7 @@ public class AdminSignaturesController {
 		this.service = service;
 	}
 
-	@RequestMapping(path = "/api/viewApprovals/{requestId}", method = RequestMethod.GET)
+	@GetMapping(path = "/api/viewApprovals/{requestId}")
 	public List<RequestSignature> getApprovals(@SessionAttribute("user") User user,
 											   @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
 		log.debug("getApprovals(user: {}, requestId: {})", user.getId(), requestId);

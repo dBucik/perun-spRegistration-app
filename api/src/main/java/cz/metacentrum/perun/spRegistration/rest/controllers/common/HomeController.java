@@ -1,6 +1,7 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class HomeController {
 
-	@RequestMapping(path = "/home", method = RequestMethod.GET)
+	@GetMapping(path = "/home")
 	public String getLoggedUser() {
 		return "forward:/index.html";
 	}

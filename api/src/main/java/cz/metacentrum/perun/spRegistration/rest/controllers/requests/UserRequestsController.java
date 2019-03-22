@@ -8,7 +8,9 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiE
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +31,7 @@ public class UserRequestsController {
 		this.service = service;
 	}
 
-	@RequestMapping(path = "/api/userRequests", method = RequestMethod.GET)
+	@GetMapping(path = "/api/userRequests")
 	public List<Request> userRequests(@SessionAttribute("user") User user) throws SpRegistrationApiException {
 		log.debug("userRequests({})", user.getId());
 		try {
@@ -39,7 +41,7 @@ public class UserRequestsController {
 		}
 	}
 
-	@RequestMapping(path = "/api/register", method = RequestMethod.POST)
+	@PostMapping(path = "/api/register")
 	public Long createRegistrationRequest(@SessionAttribute("user") User user,
 										  @RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
 		log.debug("createRegistrationRequest(user: {}, attributes: {})", user.getId(), attributes);
@@ -50,7 +52,7 @@ public class UserRequestsController {
 		}
 	}
 
-	@RequestMapping(path = "/api/changeFacility/{facilityId}", method = RequestMethod.POST)
+	@PostMapping(path = "/api/changeFacility/{facilityId}")
 	public Long createFacilityChangesRequest(@SessionAttribute("user") User user,
 											 @RequestBody List<PerunAttribute> attributes,
 											 @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
@@ -62,7 +64,7 @@ public class UserRequestsController {
 		}
 	}
 
-	@RequestMapping(path = "/api/remove/{facilityId}", method = RequestMethod.POST)
+	@PostMapping(path = "/api/remove/{facilityId}")
 	public Long createRemovalRequest(@SessionAttribute("user") User user,
 									 @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
 		log.debug("createRemovalRequest(user: {}, facilityId: {})", user.getId(), facilityId);
@@ -73,7 +75,7 @@ public class UserRequestsController {
 		}
 	}
 
-	@RequestMapping(path = "/api/update/{requestId}", method = RequestMethod.POST)
+	@PostMapping(path = "/api/update/{requestId}")
 	public boolean updateRequest(@SessionAttribute("user") User user,
 								 @PathVariable("requestId") Long requestId,
 								 @RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
