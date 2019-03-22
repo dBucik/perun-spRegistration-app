@@ -47,6 +47,7 @@ public class AppConfig {
 	private SecretKeySpec secret;
 	private boolean specifyAuthoritiesEnabled;
 	private String signaturesEndpointUrl;
+	private String adminsEndpoint;
 
 	public AppConfig() {
 		Resource enLang = new ClassPathResource("localization.properties");
@@ -235,6 +236,15 @@ public class AppConfig {
 
 	public void setSignaturesEndpointUrl(String signaturesEndpointUrl) {
 		this.signaturesEndpointUrl = signaturesEndpointUrl;
+	}
+
+
+	public String getAdminsEndpoint() {
+		return adminsEndpoint;
+	}
+
+	public void setAdminsEndpoint(String adminsEndpoint) {
+		this.adminsEndpoint = adminsEndpoint;
 	}
 
 	@Override

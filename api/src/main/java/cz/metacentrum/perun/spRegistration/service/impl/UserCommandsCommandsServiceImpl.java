@@ -63,6 +63,9 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	private static final String FACILITY_ID_KEY = "facilityId";
 	private static final String CREATED_AT_KEY = "createdAt";
 	private static final String REQUESTED_MAIL_KEY = "requestedMail";
+	private static final String ACTION_KEY = "action";
+	private static final String ACTION_ADD_ADMIN = "ADD";
+	private static final String ACTION_REMOVE_ADMIN = "REMOVE";
 
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
@@ -233,7 +236,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	public Request getRequestDetailsForSignature(String code) throws InvalidKeyException,
 			BadPaddingException, IllegalBlockSizeException, MalformedCodeException, ExpiredCodeException {
 		log.debug("getRequestDetailsForSignature({})", code);
-		JSONObject decrypted = decryptCode(code);
+		JSONObject decrypted = decryptRequestCode(code);
 		boolean isExpired = isExpiredCode(decrypted);
 
 		if (isExpired) {
@@ -250,7 +253,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	@Override
 	public boolean signTransferToProduction(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException {
 		log.debug("signTransferToProduction(user: {}, code: {})", user, code);
-		JSONObject decrypted = decryptCode(code);
+		JSONObject decrypted = decryptRequestCode(code);
 		boolean isExpired = isExpiredCode(decrypted);
 
 		if (isExpired) {
@@ -343,6 +346,93 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 				.collect(Collectors.toList());
 
 		log.debug("getAllFacilitiesWhereUserIsAdmin returns: {}", result);
+		return result;
+	}
+
+	@Override
+	public boolean addAdminsNotify(User user, Long facilityId, List<String> admins)
+			throws UnauthorizedActionException, RPCException, BadPaddingException, InvalidKeyException,
+			IllegalBlockSizeException, UnsupportedEncodingException, InternalErrorException {
+		log.debug("addAdminsNotify(user: {}, facilityId: {}, admins: {}", user, facilityId, admins);
+		boolean res = addRemoveAdminsNotify(user, facilityId, admins, ACTION_ADD_ADMIN);
+
+		log.debug("addAdminsNotify returns: {}", res);
+		return res;
+	}
+
+	@Override
+	public boolean removeAdminsNotify(User user, Long facilityId, List<String> admins)
+			throws UnauthorizedActionException, RPCException, BadPaddingException, InvalidKeyException,
+			IllegalBlockSizeException, UnsupportedEncodingException, InternalErrorException {
+		log.debug("removeAdminsNotify(user: {}, facilityId: {}, admins: {}", user, facilityId, admins);
+		boolean res = addRemoveAdminsNotify(user, facilityId, admins, ACTION_REMOVE_ADMIN);
+
+		log.debug("removeAdminsNotify returns: {}", res);
+		return res;
+	}
+
+	private boolean addRemoveAdminsNotify(User user, Long facilityId, List<String> admins, String action)
+			throws UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, RPCException, UnsupportedEncodingException, InternalErrorException {
+		log.debug("addRemoveAdminsNotify(user: {}, facilityId: {}, admins: {}", user, facilityId, admins);
+		if (user == null || user.getId() == null || facilityId == null || admins == null || admins.isEmpty()) {
+			log.error("Wrong parameters passed(user: {}, facilityId: {}, admins: {})", user, facilityId, admins);
+			throw new IllegalArgumentException("Wrong parameters passed(user: " + user + ", facilityId: " + facilityId
+					+ ", admins: " + admins +")");
+		} else if (! isFacilityAdmin(facilityId, user.getId())) {
+			log.error("User cannot request adding admins to facility, user is not an admin");
+			throw new UnauthorizedActionException("User cannot request adding admins to facility, user is not an admin");
+		}
+
+		Map<String, String> mailsMap = new HashMap<>();
+		for (String adminEmail: admins) {
+			String code = createAddRemoveAdminCode(facilityId, adminEmail, action);
+			code = URLEncoder.encode(code, StandardCharsets.UTF_8.toString());
+			String link = appConfig.getAdminsEndpoint().concat("?").concat(code);
+			mailsMap.put(adminEmail, link);
+			log.debug("Generated code: {}", code); //TODO: remove
+		}
+
+		Facility facility = perunConnector.getFacilityById(facilityId);
+		if (facility == null) {
+			throw new InternalErrorException("Could not find facility for id: " + facilityId);
+		}
+
+		boolean res = true;
+		boolean isAddAdmins = ACTION_ADD_ADMIN.equalsIgnoreCase(action);
+		for (Map.Entry<String, String> entry: mailsMap.entrySet()) {
+			res = res && Mails.adminAddRemoveNotify(entry.getValue(), facility.getName(), entry.getKey(), isAddAdmins,
+					messagesProperties);
+		}
+
+		log.debug("addRemoveAdminsNotify returns: {}", res);
+		return res;
+	}
+
+	@Override
+	public boolean confirmAddRemoveAdmin(User user, String code)
+			throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
+			ExpiredCodeException, RPCException {
+		log.debug("confirmAddRemoveAdmin({})", code);
+		JSONObject decrypted = decryptAddRemoveAdminCode(code);
+		boolean isExpired = isExpiredCode(decrypted);
+
+		if (isExpired) {
+			throw new ExpiredCodeException("Code has expired");
+		}
+
+		Long facilityId = decrypted.getLong(FACILITY_ID_KEY);
+		String action = decrypted.getString(ACTION_KEY);
+
+		boolean result;
+		if (ACTION_ADD_ADMIN.equalsIgnoreCase(action)) {
+			result = perunConnector.addFacilityAdmin(facilityId, user.getId());
+		} else if (ACTION_REMOVE_ADMIN.equalsIgnoreCase(action)) {
+			result = perunConnector.removeFacilityAdmin(facilityId, user.getId());
+		} else {
+			throw new MalformedCodeException("No valid action has been found in code");
+		}
+
+		log.debug("confirmAddRemoveAdmin returns: {}", result);
 		return result;
 	}
 
@@ -450,7 +540,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 		Map<String, String> linksMap = new HashMap<>();
 		for (String authority: authorities) {
-			String code = createCode(request.getReqId(), request.getFacilityId(), authority);
+			String code = createRequestCode(request.getReqId(), request.getFacilityId(), authority);
 			code = URLEncoder.encode(code, StandardCharsets.UTF_8.toString());
 			String link = appConfig.getSignaturesEndpointUrl().concat("?").concat(code);
 			linksMap.put(authority, link);
@@ -460,7 +550,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		return linksMap;
 	}
 
-	private JSONObject decryptCode(String code)
+	private JSONObject decryptRequestCode(String code)
 			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException {
 		cipher.init(Cipher.DECRYPT_MODE, appConfig.getSecret());
 		Base64.Decoder b64dec = Base64.getDecoder();
@@ -474,7 +564,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 	}
 
-	private String createCode(Long requestId, Long facilityId, String requestedMail)
+	private String createRequestCode(Long requestId, Long facilityId, String requestedMail)
 			throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
 		cipher.init(Cipher.ENCRYPT_MODE, appConfig.getSecret());
 		JSONObject object = new JSONObject();
@@ -482,6 +572,35 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		object.put(FACILITY_ID_KEY, facilityId);
 		object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
 		object.put(REQUESTED_MAIL_KEY, requestedMail);
+
+		String strToEncrypt = object.toString();
+		Base64.Encoder b64enc = Base64.getEncoder();
+		byte[] encrypted = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
+		return b64enc.encodeToString(encrypted);
+	}
+
+	private JSONObject decryptAddRemoveAdminCode(String code)
+			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException {
+		cipher.init(Cipher.DECRYPT_MODE, appConfig.getSecret());
+		Base64.Decoder b64dec = Base64.getDecoder();
+		byte[] decrypted = cipher.doFinal(b64dec.decode(code));
+		String objInString = new String(decrypted);
+
+		try {
+			return new JSONObject(objInString);
+		} catch (JSONException e) {
+			throw new MalformedCodeException();
+		}
+	}
+
+	private String createAddRemoveAdminCode(Long facilityId, String requestedMail, String action)
+			throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+		cipher.init(Cipher.ENCRYPT_MODE, appConfig.getSecret());
+		JSONObject object = new JSONObject();
+		object.put(FACILITY_ID_KEY, facilityId);
+		object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
+		object.put(REQUESTED_MAIL_KEY, requestedMail);
+		object.put(ACTION_KEY, action);
 
 		String strToEncrypt = object.toString();
 		Base64.Encoder b64enc = Base64.getEncoder();

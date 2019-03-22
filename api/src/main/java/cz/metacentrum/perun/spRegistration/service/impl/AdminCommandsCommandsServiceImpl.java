@@ -193,54 +193,6 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		return result;
 	}
 
-	@Override
-	public boolean addAdmins(Long userId, Long facilityId, List<Long> admins) throws UnauthorizedActionException, RPCException {
-		log.debug("addAdmins(userId: {}, facilityId: {}, admins: {})", userId, facilityId, admins);
-		if (userId == null || facilityId == null || admins == null) {
-			log.error("Illegal input - userId: {}, facilityId: {}, admins: {}", userId, facilityId, admins);
-			throw new IllegalArgumentException("Illegal input - userId: " + userId + ", facilityId: " + facilityId + ", admins: " + admins);
-		} else if (! appConfig.isAdmin(userId)) {
-			log.error("User is not authorized to add facility admins");
-			throw new UnauthorizedActionException("User is not authorized to add facility admins");
-		}
-
-		log.info("Add admins");
-		boolean result = true;
-		for (Long id: admins) {
-			boolean partial = perunConnector.addFacilityAdmin(facilityId, id);
-			log.debug("adding admin with id: {} succeeded: {}", id, partial);
-			result = result && partial;
-		}
-		log.info("Admins were added - all calls successful: {}", result);
-
-		log.debug("addAdmins returns: {}", result);
-		return result;
-	}
-
-	@Override
-	public boolean removeAdmins(Long userId, Long facilityId, List<Long> admins) throws UnauthorizedActionException, RPCException {
-		log.debug("removeAdmins(userId: {}, facilityId: {}, admins: {})", userId, facilityId, admins);
-		if (userId == null || facilityId == null || admins == null) {
-			log.error("Illegal input - userId: {}, facilityId: {}, admins: {}", userId, facilityId, admins);
-			throw new IllegalArgumentException("Illegal input - userId: " + userId + ", facilityId: " + facilityId + ", admins: " + admins);
-		} else if (! appConfig.isAdmin(userId)) {
-			log.error("User is not authorized to remove facility admins");
-			throw new UnauthorizedActionException("User is not authorized to remove facility admins");
-		}
-
-		log.debug("Removing admins");
-		boolean result = true;
-		for (Long id: admins) {
-			boolean partial = perunConnector.removeFacilityAdmin(facilityId, id);
-			log.debug("removing admin with id: {} succeeded: {}", id, partial);
-			result = result && partial;
-		}
-		log.debug("Removing admins finished - all calls successful: {}", result);
-
-		log.debug("removeAdmins returns: {}", result);
-		return result;
-	}
-
 	private boolean finishRequestApproved(Request request) throws RPCException, InternalErrorException {
 		switch(request.getAction()) {
 			case REGISTER_NEW_SP:

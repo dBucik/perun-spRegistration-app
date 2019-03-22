@@ -37,6 +37,10 @@ public class Mails {
 	private static final String APPROVAL_MESSAGE_KEY = "approval.message";
 	private static final String PRODUCTION_AUTHORITIES_MESSAGE_KEY = "production.authorities.subject";
 	private static final String PRODUCTION_AUTHORITIES_SUBJECT_KEY = "production.authorities.message";
+	private static final String ADD_ADMIN_SUBJECT_KEY = "admins.add.subject";
+	private static final String ADD_ADMIN_MESSAGE_KEY = "admins.add.message";
+	private static final String REMOVE_ADMIN_SUBJECT_KEY = "admins.remove.subject";
+	private static final String REMOVE_ADMIN_MESSAGE_KEY = "admins.remove.message";
 	private static final String FOOTER_KEY = "footer";
 
 	private static final String REQUEST_ID_FIELD = "%REQUEST_ID%";
@@ -179,6 +183,27 @@ public class Mails {
 
 		boolean res = sendMail(host, from, admins, subject, message);
 		log.debug("requestApprovalAdminNotify() returns: {}", res);
+		return res;
+	}
+
+	public static boolean adminAddRemoveNotify(String approvalLink, String serviceName, String recipient, boolean isAddAdmins, Properties props) {
+		log.debug("adminAddRemoveNotify(approvalLink: {}, recipient: {}, props: {})",
+				approvalLink, recipient, props);
+		String host = props.getProperty(HOST_KEY);
+		String from = props.getProperty(FROM_KEY);
+
+		String subject = props.getProperty((isAddAdmins) ? ADD_ADMIN_SUBJECT_KEY : REMOVE_ADMIN_SUBJECT_KEY);
+		String message = props.getProperty((isAddAdmins) ? ADD_ADMIN_MESSAGE_KEY : REMOVE_ADMIN_MESSAGE_KEY);
+		if (message.contains(SERVICE_NAME_FIELD)) {
+			message = message.replaceAll(SERVICE_NAME_FIELD, serviceName);
+		}
+		if (message.contains(APPROVAL_LINK_FIELD)) {
+			message = message.replaceAll(APPROVAL_LINK_FIELD, approvalLink);
+		}
+		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
+
+		boolean res = sendMail(host, from, Collections.singletonList(recipient), subject, message);
+		log.debug("adminAddRemoveNotify() returns: {}", res);
 		return res;
 	}
 

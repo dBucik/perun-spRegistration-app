@@ -40,6 +40,7 @@
                 <prop key="approval.specify.authorities.enabled">true</prop>
                 <prop key="secret">kn15aokn@~lpq~nW!vYXm</prop>
                 <prop key="signatures.endpoint.URL">http://spreg.com/spreg/sign</prop>
+                <prop key="admins.endpoint.URL">http://spreg.com/spreg/admins</prop>
             </props>
         </property>
     </bean>
@@ -216,6 +217,10 @@
                 <prop key="production.authorities.subject">Approve transfer to production: %SERVICE_NAME%</prop>
                 <prop key="production.authorities.message">For approval of moving service %SERVICE_NAME% to production visit %APPROVAL_LINK%</prop>
                 <prop key="moveToProduction.authorities">user1@email.com,user2@email.com,user3@email.com</prop>
+                <prop key="admins.add.subject">Approve request to become admin: %SERVICE_NAME%</prop>
+                <prop key="admins.add.message">For approval of becoming admin of %SERVICE_NAME% visit %APPROVAL_LINK%</prop>
+                <prop key="admins.remove.subject">Approve request to be removed as an admin: %SERVICE_NAME%</prop>
+                <prop key="admins.remove.message">For approval of being removed as an admin of %SERVICE_NAME% visit %APPROVAL_LINK%</prop>
             </props>
         </property>
         <property name="locations">
@@ -268,6 +273,7 @@
         <property name="specifyAuthoritiesEnabled" value="${approval.specify.authorities.enabled}" />
         <property name="secret" value="${secret}" />
         <property name="signaturesEndpointUrl" value="${signatures.endpoint.URL}"/>
+        <property name="adminsEndpoint" value="${admins.endpoint.URL}"/>
     </bean>
 
     <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">

@@ -78,24 +78,4 @@ public interface AdminCommandsService {
 	 */
 	List<Facility> getAllFacilities(Long adminId) throws UnauthorizedActionException, RPCException;
 
-	/**
-	 * Add users as admins (managers) for facility in Perun
-	 * @param userId ID of admin performing the action.
-	 * @param facilityId ID of facility in Perun.
-	 * @param admins List of IDs of new facility admins.
-	 * @return True if everything went OK.
-	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
-	 */
-	boolean addAdmins(Long userId, Long facilityId, List<Long> admins) throws UnauthorizedActionException, RPCException;
-
-	/**
-	 * Remove users from admins (managers) of facility in Perun.
-	 * @param userId ID of admin performing the action.
-	 * @param facilityId ID of facility in Perun.
-	 * @param admins List of IDs of admins to be removed.
-	 * @return True if everything went OK.
-	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
-	 */
-	boolean removeAdmins(Long userId, Long facilityId, List<Long> admins) throws UnauthorizedActionException, RPCException;
-
 }
