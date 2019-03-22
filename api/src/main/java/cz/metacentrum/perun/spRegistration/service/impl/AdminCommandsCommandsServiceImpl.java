@@ -63,7 +63,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 			throw new UnauthorizedActionException("User is not authorized to approve request");
 		}
 
-		Request request = requestManager.getRequestByReqId(requestId);
+		Request request = requestManager.getRequestById(requestId);
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
 			throw new InternalErrorException("Could not fetch request with ID: " + requestId + " from database");
@@ -96,7 +96,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 			throw new UnauthorizedActionException("User is not authorized to reject request");
 		}
 
-		Request request = requestManager.getRequestByReqId(requestId);
+		Request request = requestManager.getRequestById(requestId);
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
 			throw new InternalErrorException("Could not fetch request with ID: " + requestId + " from database");
@@ -124,7 +124,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 			throw new UnauthorizedActionException("User is not authorized to ask for changes");
 		}
 
-		Request request = requestManager.getRequestByReqId(requestId);
+		Request request = requestManager.getRequestById(requestId);
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
 			throw new InternalErrorException("Could not fetch request with ID: " + requestId + " from database");

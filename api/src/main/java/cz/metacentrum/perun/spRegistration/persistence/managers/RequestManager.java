@@ -48,7 +48,7 @@ public interface RequestManager {
 	 * @param reqId ID of request.
 	 * @return Found Request object.
 	 */
-	Request getRequestByReqId(Long reqId);
+	Request getRequestById(Long reqId);
 
 	/**
 	 * Get all requests from DB.
@@ -92,12 +92,19 @@ public interface RequestManager {
 	List<Request> getAllRequestsByFacilityIds(Set<Long> facilityIds);
 
 	/**
+	 * Get id of active request for Facility.
+	 * @param facilityId Id of facility
+	 * @return Id of found request (request with status different than APPROVED/REJECTED), null otherwise
+	 */
+	Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException;
+
+	/**
 	 * Add signature for moving to production
 	 * @param requestId id of request to be signed
-	 * @param user user giving the signature
+	 * @param userId id of user giving the signature
 	 * @return True if everything went OK
 	 */
-	boolean addSignature(Long requestId, User user);
+	boolean addSignature(Long requestId, Long userId);
 
 	/**
 	 * Get all approvals for transferring of service into production environment
@@ -105,22 +112,4 @@ public interface RequestManager {
 	 * @return List of associated approvals
 	 */
 	List<RequestSignature> getRequestSignatures(Long requestId);
-
-	/**
-	 * Store link where user can sign the request for moving to production
-	 * @param authority user email the link belongs to
-	 * @param hash hash of request
-	 * @param facilityId id of facility to be transferred
-	 * @param link link for the signature
-	 * @param validUntil until when the link is valid
-	 * @return True if everything went OK.
-	 */
-	boolean storeApprovalLink(String authority, String hash, Long facilityId, String link, LocalDateTime validUntil);
-
-	/**
-	 * Get id of active request for Facility.
-	 * @param facilityId Id of facility
-	 * @return Id of found request (request with status different than APPROVED/REJECTED), null otherwise
-	 */
-	Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException;
 }

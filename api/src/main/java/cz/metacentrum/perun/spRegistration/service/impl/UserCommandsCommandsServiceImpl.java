@@ -244,7 +244,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Long requestId = decrypted.getLong(REQUEST_ID_KEY);
-		Request result = requestManager.getRequestByReqId(requestId);
+		Request result = requestManager.getRequestById(requestId);
 
 		log.debug("getRequestDetailsForSignature returns: {}", result);
 		return result;
@@ -261,7 +261,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Long requestId = decrypted.getLong(REQUEST_ID_KEY);
-		boolean result = requestManager.addSignature(requestId, user);
+		boolean result = requestManager.addSignature(requestId, user.getId());
 
 		log.debug("signTransferToProduction returns: {}", result);
 		return result;
@@ -507,7 +507,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	}
 
 	private Request fetchRequestAndValidate(Long requestId) throws InternalErrorException {
-		Request request = requestManager.getRequestByReqId(requestId);
+		Request request = requestManager.getRequestById(requestId);
 		if (request == null) {
 			log.error("Could not retrieve request for id: {}", requestId);
 			throw new InternalErrorException("Could not retrieve request for id: " + requestId);

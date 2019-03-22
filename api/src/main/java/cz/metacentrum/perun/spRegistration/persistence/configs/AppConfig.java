@@ -184,20 +184,24 @@ public class AppConfig {
 		this.headerHTML = headerHTML;
 	}
 
+	public long getConfirmationPeriodDays() {
+		return confirmationPeriodDays;
+	}
+
 	public void setConfirmationPeriodDays(long confirmationPeriodDays) {
 		this.confirmationPeriodDays = confirmationPeriodDays;
 	}
 
-	public long getConfirmationPeriodDays() {
-		return confirmationPeriodDays;
+	public long getConfirmationPeriodHours() {
+		return confirmationPeriodHours;
 	}
 
 	public void setConfirmationPeriodHours(long confirmationPeriodHours) {
 		this.confirmationPeriodHours = confirmationPeriodHours;
 	}
 
-	public long getConfirmationPeriodHours() {
-		return confirmationPeriodHours;
+	public SecretKeySpec getSecret() {
+		return secret;
 	}
 
 	public void setSecret(String secret) {
@@ -214,64 +218,60 @@ public class AppConfig {
 		}
 	}
 
-	public SecretKeySpec getSecret() {
-		return secret;
+	public boolean getSpecifyAuthoritiesEnabled() {
+		return specifyAuthoritiesEnabled;
 	}
 
 	public void setSpecifyAuthoritiesEnabled(boolean specifyAuthoritiesEnabled) {
 		this.specifyAuthoritiesEnabled = specifyAuthoritiesEnabled;
 	}
 
-	public boolean getSpecifyAuthoritiesEnabled() {
-		return specifyAuthoritiesEnabled;
-	}
-
 	public void setPerunAttributeDefinitionsMap(Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap) {
 		this.perunAttributeDefinitionsMap = perunAttributeDefinitionsMap;
-	}
-
-	public String getSignaturesEndpointUrl() {
-		return signaturesEndpointUrl;
 	}
 
 	public void setSignaturesEndpointUrl(String signaturesEndpointUrl) {
 		this.signaturesEndpointUrl = signaturesEndpointUrl;
 	}
 
-
-	public String getAdminsEndpoint() {
-		return adminsEndpoint;
+	public String getSignaturesEndpointUrl() {
+		return signaturesEndpointUrl;
 	}
 
 	public void setAdminsEndpoint(String adminsEndpoint) {
 		this.adminsEndpoint = adminsEndpoint;
 	}
 
+	public String getAdminsEndpoint() {
+		return adminsEndpoint;
+	}
+
 	@Override
 	public String toString() {
-		return "AppConfig{" +
-				"idpAttribute='" + idpAttribute + '\'' +
-				", idpAttributeValue='" + idpAttributeValue + '\'' +
-				", testSpAttribute='" + testSpAttribute + '\'' +
-				", adminsAttr='" + adminsAttr + '\'' +
-				", admins=" + admins +
-				", userEmailAttr=" + userEmailAttr +
-				", extSourceProxy=" + extSourceProxy +
-				", perunAttributeDefinitionsMap=" + perunAttributeDefinitionsMap +
-				", oidcEnabled=" + oidcEnabled +
-				", langs=" + langs +
-				", enLocale=" + enLocale +
-				", csLocale=" + csLocale +
-				", connector=" + connector +
-				", footerHTML='" + footerHTML + '\'' +
-				", headerLogo='" + headerLogo + '\'' +
-				", headerTitle='" + headerTitle + '\'' +
-				", headerHTML='" + headerHTML + '\'' +
-				", confirmationPeriodDays='" + confirmationPeriodDays + '\'' +
-				", confirmationPeriodHours='" + confirmationPeriodHours + '\'' +
-				", secret'" + secret + '\'' +
-				", specifyAuthoritiesEnabled='" + specifyAuthoritiesEnabled + '\'' +
-				'}';
+		return "idpAttribute: '" + idpAttribute + "'\n" +
+				"idpAttributeValue: '" + idpAttributeValue + "'\n" +
+				"adminsAttr: '" + adminsAttr + "'\n" +
+				"admins=" + admins + "'\n" +
+				"extSourceProxy: '" + extSourceProxy + "'\n" +
+				"userEmailAttr: '" + userEmailAttr + "'\n" +
+				"perunAttributeDefinitionsMap: " + perunAttributeDefinitionsMap + "'\n" +
+				"oidcEnabled=" + oidcEnabled + "'\n" +
+				"langs=" + langs + "'\n" +
+				"enLocale=" + enLocale + "'\n" +
+				"csLocale=" + csLocale + "'\n" +
+				"connector=" + connector + "'\n" +
+				"showOnServicesListAttribute: '" + showOnServicesListAttribute + "'\n" +
+				"testSpAttribute: '" + testSpAttribute + "'\n" +
+				"footerHTML: '" + footerHTML + "'\n" +
+				"headerLogo: '" + headerLogo + "'\n" +
+				"headerTitle: '" + headerTitle + "'\n" +
+				"headerHTML: '" + headerHTML + "'\n" +
+				"confirmationPeriodDays: " + confirmationPeriodDays + "'\n" +
+				"confirmationPeriodHours: " + confirmationPeriodHours + "'\n" +
+				"secret: " + secret + "'\n" +
+				"specifyAuthoritiesEnabled: " + specifyAuthoritiesEnabled + "'\n" +
+				"signaturesEndpointUrl: '" + signaturesEndpointUrl + "'\n" +
+				"adminsEndpoint: '" + adminsEndpoint + "'\n";
 	}
 
 	// custom methods

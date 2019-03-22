@@ -135,7 +135,7 @@ public class RequestManagerTests {
 		assertNotNull("Creating request should generate an ID", requestId);
 		request.setReqId(requestId);
 
-		Request fetched = requestManager.getRequestByReqId(requestId);
+		Request fetched = requestManager.getRequestById(requestId);
 		assertNotNull("Created request could not be fetched", fetched);
 		assertEquals("Stored request is not the same", request, fetched);
 	}
@@ -149,7 +149,7 @@ public class RequestManagerTests {
 		boolean result = requestManager.updateRequest(req1);
 		assertTrue("Updating should return true", result);
 
-		Request fetched = requestManager.getRequestByReqId(req1.getReqId());
+		Request fetched = requestManager.getRequestById(req1.getReqId());
 		assertNotNull("Updated request has not been fetched", fetched);
 		assertEquals("Updated request is different", req1, fetched);
 	}
@@ -166,7 +166,7 @@ public class RequestManagerTests {
 
 	@Test
 	public void getRequestById() {
-		Request fetched = requestManager.getRequestByReqId(req1.getReqId());
+		Request fetched = requestManager.getRequestById(req1.getReqId());
 		assertEquals("Fetched request is different than expected", req1, fetched);
 	}
 
@@ -234,7 +234,7 @@ public class RequestManagerTests {
 
 	@Test
 	public void addSignature() {
-		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser);
+		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser.getId() );
 
 		List<RequestSignature> found = requestManager.getRequestSignatures(req1.getReqId());
 
@@ -249,7 +249,7 @@ public class RequestManagerTests {
 
 	@Test
 	public void getRequestSignatures() {
-		requestManager.addSignature(req1.getReqId(), fakeUser);
+		requestManager.addSignature(req1.getReqId(), fakeUser.getId());
 		approval1.setRequestId(req1.getReqId());
 
 		List<RequestSignature> res = requestManager.getRequestSignatures(approval1.getRequestId());

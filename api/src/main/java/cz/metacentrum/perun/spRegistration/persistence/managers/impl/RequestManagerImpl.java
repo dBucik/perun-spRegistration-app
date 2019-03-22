@@ -49,24 +49,28 @@ public class RequestManagerImpl implements RequestManager {
 	@Override
 	public void setJdbcTemplate(JdbcTemplate template) {
 		if (template == null) {
-			log.error("Trying to provide NULL as jdbcTemplate");
-			throw new IllegalArgumentException("JDBCTemplate is null");
+			log.error("Illegal parameters passed: template IS NULL");
+			throw new IllegalArgumentException();
 		} else if (template.getDataSource() == null) {
-			log.error("Trying to provide jdbcTemplate without assigned dataSource");
-			throw new IllegalArgumentException("JDBCTemplate does not contain dataSource");
+			log.error("Illegal parameters passed: template.dataSource IS NULL");
+			throw new IllegalArgumentException();
 		}
+		
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(template.getDataSource());
 	}
 
 	@Override
 	public Long createRequest(Request request) throws InternalErrorException, CreateRequestException {
-		log.debug("createRequest({})", request);
+		log.trace("PERS: createRequest({})", request);
+		if (request == null) {
+			log.error("Illegal parameters passed: request IS NULL");
+			throw new IllegalArgumentException();
+		}
 
-		if (request.getFacilityId() != null) {
-			Long activeRequestId = this.getActiveRequestIdByFacilityId(request.getFacilityId());
-			if (activeRequestId != null) {
-				throw new CreateRequestException("Active requests already exist for facility");
-			}
+		Long activeRequestId = this.getActiveRequestIdByFacilityId(request.getFacilityId());
+		if (activeRequestId != null) {
+			log.error("Active requests already exist for facilityId: {}", request.getFacilityId());
+			throw new CreateRequestException();
 		}
 
 		String query = "INSERT INTO" + REQUESTS_TABLE +
@@ -85,13 +89,18 @@ public class RequestManagerImpl implements RequestManager {
 		jdbcTemplate.update(query, params, key, new String[] { "id" });
 		Long result = (Long) key.getKey();
 
-		log.debug("createRequest returns: {}", result);
+		log.trace("PERS: createRequest returns: {}", result);
 		return result;
 	}
 
 	@Override
 	public boolean updateRequest(Request request) {
-		log.debug("updateRequest({})", request);
+		log.trace("PERS: updateRequest({})", request);
+		if (request == null) {
+			log.error("Illegal parameters passed: request IS NULL");
+			throw new IllegalArgumentException();
+		}
+		
 		String query = "UPDATE" + REQUESTS_TABLE +
 				"SET facility_id = :fac_id, status = :status, action = :action, requesting_user_id = :req_user_id, " +
 				"attributes = :attributes, modified_by = :modified_by, modified_at = NOW()" +
@@ -108,13 +117,18 @@ public class RequestManagerImpl implements RequestManager {
 
 		jdbcTemplate.update(query, params);
 
-		log.debug("updateRequest returns: {}", true);
+		log.trace("PERS: updateRequest returns: {}", true);
 		return true;
 	}
 
 	@Override
 	public boolean deleteRequest(Long reqId) {
-		log.debug("deleteRequest({})", reqId);
+		log.trace("PERS: deleteRequest({})", reqId);
+		if (reqId == null) {
+			log.error("Illegal parameters passed: reqId IS NULL");
+			throw new IllegalArgumentException();
+		}
+		
 		String query = "DELETE FROM" + REQUESTS_TABLE + "WHERE id = :req_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
@@ -122,13 +136,18 @@ public class RequestManagerImpl implements RequestManager {
 
 		jdbcTemplate.update(query, params);
 
-		log.debug("deleteRequest returns: {}", true);
+		log.trace("PERS: deleteRequest returns: {}", true);
 		return true;
 	}
 
 	@Override
-	public Request getRequestByReqId(Long reqId) {
-		log.debug("getRequestByReqId({})", reqId);
+	public Request getRequestById(Long reqId) {
+		log.trace("PERS: getRequestById({})", reqId);
+		if (reqId == null) {
+			log.error("Illegal parameters passed: reqId IS NULL");
+			throw new IllegalArgumentException();
+		}
+		
 		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE id = :req_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
@@ -136,24 +155,29 @@ public class RequestManagerImpl implements RequestManager {
 
 		Request request = jdbcTemplate.queryForObject(query, params, REQUEST_MAPPER);
 
-		log.debug("getRequestByReqId returns: {}", request);
+		log.trace("PERS: getRequestById returns: {}", request);
 		return request;
 	}
 
 	@Override
 	public List<Request> getAllRequests() {
-		log.debug("getAllRequests()");
+		log.trace("PERS: getAllRequests()");
 		String query = "SELECT * FROM" + REQUESTS_TABLE;
 
 		List<Request> requests = jdbcTemplate.query(query, REQUEST_MAPPER);
 
-		log.debug("getAllRequests returns: {}", requests);
+		log.trace("PERS: getAllRequests returns: {}", requests);
 		return requests;
 	}
 
 	@Override
 	public List<Request> getAllRequestsByUserId(Long userId) {
-		log.debug("getAllRequestsByUserId({})", userId);
+		log.trace("PERS: getAllRequestsByUserId({})", userId);
+		if (userId == null) {
+			log.error("Illegal parameters passed: userId IS NULL");
+			throw new IllegalArgumentException();
+		}
+		
 		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE requesting_user_id = :req_user_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
@@ -161,13 +185,18 @@ public class RequestManagerImpl implements RequestManager {
 
 		List<Request> requests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
 
-		log.debug("getAllRequestsByUserId returns: {}", requests);
+		log.trace("PERS: getAllRequestsByUserId returns: {}", requests);
 		return requests;
 	}
 
 	@Override
 	public List<Request> getAllRequestsByStatus(RequestStatus status) {
-		log.debug("getAllRequestsByStatus({})", status);
+		log.trace("PERS: getAllRequestsByStatus({})", status);
+		if (status == null) {
+			log.error("Illegal parameters passed: status IS NULL");
+			throw new IllegalArgumentException();
+		}
+		
 		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE status = :status";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
@@ -175,13 +204,18 @@ public class RequestManagerImpl implements RequestManager {
 
 		List<Request> requests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
 
-		log.debug("getAllRequestsByStatus returns: {}", requests);
+		log.trace("getAllRequestsByStatus returns: {}", requests);
 		return requests;
 	}
 
 	@Override
 	public List<Request> getAllRequestsByAction(RequestAction action) {
-		log.debug("getAllRequestsByAction({})", action);
+		log.trace("PERS: getAllRequestsByAction({})", action);
+		if (action == null) {
+			log.error("Illegal parameters passed: action IS NULL");
+			throw new IllegalArgumentException();
+		}
+		
 		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE action = :action";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
@@ -189,13 +223,18 @@ public class RequestManagerImpl implements RequestManager {
 
 		List<Request> requests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
 
-		log.debug("getAllRequestsByAction returns: {}", requests);
+		log.trace("PERS: getAllRequestsByAction returns: {}", requests);
 		return requests;
 	}
 
 	@Override
 	public List<Request> getAllRequestsByFacilityId(Long facilityId) {
-		log.debug("getAllRequestsByFacilityId({})", facilityId);
+		log.trace("PERS: getAllRequestsByFacilityId({})", facilityId);
+		if (facilityId == null) {
+			log.error("Illegal parameters passed: facilityId IS NULL");
+			throw new IllegalArgumentException();
+		}
+
 		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE facility_id = :fac_id";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
@@ -203,16 +242,18 @@ public class RequestManagerImpl implements RequestManager {
 
 		List<Request> requests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
 
-		log.debug("getAllRequestsByFacilityId returns: {}", requests);
+		log.trace("PERS: getAllRequestsByFacilityId returns: {}", requests);
 		return requests;
 	}
 
 	@Override
 	public List<Request> getAllRequestsByFacilityIds(Set<Long> facilityIds) {
-		log.debug("getAllRequestsByFacilityIds({})", facilityIds);
+		log.trace("PERS: getAllRequestsByFacilityIds({})", facilityIds);
 		if (facilityIds == null || facilityIds.isEmpty()) {
-			return new ArrayList<>();
+			log.error("Illegal parameters passed: facilityIds IS NULL OR EMPTY: {}", facilityIds);
+			throw new IllegalArgumentException();
 		}
+		
 		String query = "SELECT * FROM" + REQUESTS_TABLE + "WHERE facility_id IN (:ids)";
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
@@ -220,78 +261,75 @@ public class RequestManagerImpl implements RequestManager {
 
 		List<Request> requests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
 
-		log.debug("getAllRequestsByFacilityIds returns: {}", requests);
+		log.trace("PERS: getAllRequestsByFacilityIds returns: {}", requests);
 		return requests;
 	}
 
 	@Override
-	public boolean addSignature(Long requestId, User user) {
-		log.debug("addSignature(requestId: {}, user: {})", requestId, user);
+	public Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException {
+		log.trace("PERS: getActiveRequestIdByFacilityId({})", facilityId);
+		if (facilityId == null) {
+			log.error("Illegal parameters passed: facilityId IS NULL");
+			throw new IllegalArgumentException();
+		}
+		List<Integer> allowedStatuses = Arrays.asList(RequestStatus.APPROVED.getAsInt(), RequestStatus.REJECTED.getAsInt());
+
+		String query = "SELECT id FROM " + REQUESTS_TABLE +
+				"WHERE facility_id = :fac_id AND status NOT IN (:allowed_statuses)";
+
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("fac_id", facilityId);
+		params.addValue("allowed_statuses", allowedStatuses);
+
+		Long result;
+		try {
+			result = jdbcTemplate.queryForObject(query, params, Long.class);
+		} catch (EmptyResultDataAccessException e) {
+			result = null;
+		} catch (IncorrectResultSizeDataAccessException e) {
+			throw new InternalErrorException("Two active requests for one facility found", e);
+		}
+
+		log.trace("PERS: getActiveRequestIdByFacilityId returns: {}", result);
+		return result;
+	}
+
+	@Override
+	public boolean addSignature(Long requestId, Long userId) {
+		log.trace("PERS: addSignature(requestId: {}, userId: {})", requestId, userId);
+		if (requestId == null || userId == null) {
+			log.error("Wrong parameters passed: (requestId: {}, user:Id {})", requestId, userId);
+			throw new IllegalArgumentException();
+		}
+		
 		String query = "INSERT INTO" + APPROVALS_TABLE +
 				"(request_id, user_id) VALUES (:request_id, :user_id)";
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("request_id", requestId);
-		params.addValue("user_id", user.getId());
+		params.addValue("user_id", userId);
 
 		int res = jdbcTemplate.update(query, params);
-
-		if (res == 1) {
-			log.debug("addSignature returns: {}", true);
-			return true;
-		}
-
-		return false;
+		
+		log.trace("PERS: addSignature returns: {}", res == 1);
+		return res == 1;
 	}
 
 	@Override
 	public List<RequestSignature> getRequestSignatures(Long requestId) {
-		log.debug("getRequestSignatures({})", requestId);
+		log.trace("PERS: getRequestSignatures({})", requestId);
+		if (requestId == null) {
+			log.error("Illegal parameters passed: requestId IS NULL");
+			throw new IllegalArgumentException();
+		}
+
 		String query = "SELECT * FROM" + APPROVALS_TABLE + "WHERE request_id = :request_id";
+
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("request_id", requestId);
 
 		List<RequestSignature> approvals = jdbcTemplate.query(query, params, REQUEST_SIGNATURE_MAPPER);
 
-		log.debug("getRequestSignatures returns: {}", approvals);
+		log.trace("PERS: getRequestSignatures returns: {}", approvals);
 		return approvals;
-	}
-
-	@Override
-	public boolean storeApprovalLink(String authority, String hash, Long facilityId, String link, LocalDateTime validUntil) {
-		log.debug("storeApprovalLink(authority: {}, hash {}, facilityId: {}, link: {}, validUntil: {})",
-				authority, hash, facilityId, link, validUntil);
-		String query = "INSERT INTO" + APPROVALS_TABLE +
-				"(facility_id, link, hash, user_email, valid_until) " +
-				"VALUES (:fac_id, :link, :hash, :user_email, :valid_until)";
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("fac_id", facilityId);
-		params.addValue("link", link);
-		params.addValue("hash", hash);
-		params.addValue("user_email", authority);
-		params.addValue("valid_until", Timestamp.valueOf(validUntil));
-
-		jdbcTemplate.update(query, params);
-
-		log.debug("storeApprovalLink returns: {}", true);
-		return true;
-	}
-
-	@Override
-	public Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException {
-		log.debug("getActiveRequestIdByFacilityId({})", facilityId);
-		String query = "SELECT id FROM " + REQUESTS_TABLE +
-				"WHERE facility_id = :fac_id AND status NOT IN (:allowed_statuses)";
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("fac_id", facilityId);
-		List<Integer> allowedStatuses = Arrays.asList(RequestStatus.APPROVED.getAsInt(), RequestStatus.REJECTED.getAsInt());
-		params.addValue("allowed_statuses", allowedStatuses);
-
-		try {
-			return jdbcTemplate.queryForObject(query, params, Long.class);
-		} catch (EmptyResultDataAccessException e) {
-			return null;
-		} catch (IncorrectResultSizeDataAccessException e) {
-			throw new InternalErrorException("Two active requests for one facility found", e);
-		}
 	}
 }
