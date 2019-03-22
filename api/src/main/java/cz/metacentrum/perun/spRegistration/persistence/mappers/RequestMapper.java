@@ -36,9 +36,8 @@ public class RequestMapper implements RowMapper<Request> {
 	private final Map<String, PerunAttributeDefinition> definitionMap;
 	private final Map<String, AttrInput> attrInputMap;
 
-	@Autowired
 	public RequestMapper(Config config) {
-		if (config != null) {
+		if (config.getAppConfig() != null) {
 			this.definitionMap = config.getAppConfig().getPerunAttributeDefinitionsMap();
 			this.attrInputMap = config.getInputMap();
 		} else {

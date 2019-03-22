@@ -7,9 +7,15 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.util.List;
 
 /**
@@ -52,7 +58,7 @@ public interface UserCommandsService {
 	 * Update existing request in DB with new data.
 	 * @param requestId ID of request in DB.
 	 * @param userId ID of requesting user.
-	 * @param attributes Attributes set for SP (key = attribute name, value = attribute).
+	 * @param attributes Attributes set for SP (key = attribute name, value = attribute)
 	 * @return True if everything went OK.
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
@@ -67,24 +73,24 @@ public interface UserCommandsService {
 	 * @return Id of created request
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
-	Long requestMoveToProduction(Long facilityId, Long userId, List<String> authorities) throws UnauthorizedActionException, InternalErrorException, RPCException, CreateRequestException;
+	Long requestMoveToProduction(Long facilityId, Long userId, List<String> authorities)
+			throws UnauthorizedActionException, InternalErrorException, RPCException, CreateRequestException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, UnsupportedEncodingException;
 
 	/**
 	 * Get details of facility for the signatures interface
-	 * @param facilityId id of facility
-	 * @return Fetched facility object
+	 * @param code code
+	 * @return Fetched request object
 	 * @throws RPCException when some problem with Perun RPC has occurred.
 	 */
-	Facility getFacilityDetailsForSignature(Long facilityId) throws RPCException;
+	Request getRequestDetailsForSignature(String code) throws RPCException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException, ExpiredCodeException;
 
 	/**
 	 * Add signature for transfer to production
-	 * @param facilityId id of facility to be moved
-	 * @param hash hash of request
-	 * @param user user giving the signature
+	 * @param user user signing the request
+	 * @param code hash of request
 	 * @return True if everything went OK
 	 */
-	boolean signTransferToProduction(Long facilityId, String hash, User user);
+	boolean signTransferToProduction(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException;
 
 	/**
 	 * Get all facilities from Perun where user is admin (manager).

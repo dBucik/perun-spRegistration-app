@@ -38,7 +38,8 @@
                 <prop key="approval.confirmationPeriod.days">30</prop>
                 <prop key="approval.confirmationPeriod.hours">0</prop>
                 <prop key="approval.specify.authorities.enabled">true</prop>
-                <prop key="hash.salt">kn15aokn@~lpq~nW!vYXm</prop>
+                <prop key="secret">kn15aokn@~lpq~nW!vYXm</prop>
+                <prop key="signatures.endpoint.URL">http://spreg.com/spreg/sign</prop>
             </props>
         </property>
     </bean>
@@ -243,7 +244,6 @@
     </bean>
 
     <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
-        <property name="appConfig" ref="config" />
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
     </bean>
 
@@ -266,7 +266,8 @@
         <property name="confirmationPeriodDays" value="${approval.confirmationPeriod.days}" />
         <property name="confirmationPeriodHours" value="${approval.confirmationPeriod.hours}" />
         <property name="specifyAuthoritiesEnabled" value="${approval.specify.authorities.enabled}" />
-        <property name="hashSalt" value="${hash.salt}" />
+        <property name="secret" value="${secret}" />
+        <property name="signaturesEndpointUrl" value="${signatures.endpoint.URL}"/>
     </bean>
 
     <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">

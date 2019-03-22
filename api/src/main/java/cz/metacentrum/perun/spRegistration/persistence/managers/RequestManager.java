@@ -93,13 +93,11 @@ public interface RequestManager {
 
 	/**
 	 * Add signature for moving to production
-	 * @param facilityId if of facility to be moved
-	 * @param hash hash of request
+	 * @param requestId id of request to be signed
 	 * @param user user giving the signature
-	 * @param signedAt when the signature has been made
 	 * @return True if everything went OK
 	 */
-	boolean addSignature(Long facilityId, String hash, User user, LocalDateTime signedAt);
+	boolean addSignature(Long requestId, User user);
 
 	/**
 	 * Get all approvals for transferring of service into production environment

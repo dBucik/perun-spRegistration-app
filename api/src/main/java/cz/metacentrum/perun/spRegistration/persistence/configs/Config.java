@@ -76,6 +76,10 @@ public class Config {
 		this.messagesConfig = messagesConfig;
 	}
 
+	public void setInputMap(Map<String, AttrInput> inputMap) {
+		this.inputMap = inputMap;
+	}
+
 	public Properties getMessagesConfig() {
 		return messagesConfig;
 	}
@@ -103,4 +107,5 @@ public class Config {
 	public Map<String, AttrInput> getInputMap() {
 		return inputMap;
 	}
+
 }

@@ -14,12 +14,7 @@ CREATE UNIQUE index requests_id_uindex ON requests (id);
 
 CREATE TABLE approvals
 (
-	facility_id INTEGER NOT NULL,
-	link VARCHAR(256) NOT NULL,
-	hash VARCHAR(256) NOT NULL,
-	user_id BIGINT,
-	user_email VARCHAR(256) NOT NULL,
-	user_name VARCHAR(256),
-	valid_until TIMESTAMP NOT NULL,
-	signed_at TIMESTAMP
+	request_id BIGINT NOT NULL,
+	user_id BIGINT NOT NULL,
+	signed_at TIMESTAMP DEFAULT now()
 );

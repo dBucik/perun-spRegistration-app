@@ -106,13 +106,8 @@ public class RequestManagerTests {
 	private void prepareApprovals() {
 		LocalDateTime now = LocalDateTime.now();
 		approval1 = new RequestSignature();
-		approval1.setFacilityId(2L);
-		approval1.setLink("/link");
-		approval1.setHash("hash");
-		approval1.setSignerId(fakeUser.getId());
-		approval1.setSignerName(fakeUser.getFullName());
-		approval1.setSignerEmail(fakeUser.getEmail());
-		approval1.setValidUntil(now.plusDays(10));
+		approval1.setRequestId(2L);
+		approval1.setSignedAt(now.plusDays(10));
 	}
 
 	private void prepareFakeUser() {
@@ -238,44 +233,34 @@ public class RequestManagerTests {
 	}
 
 	@Test
-	public void storeApprovalLink() {
-		boolean res = requestManager.storeApprovalLink(approval1.getSignerEmail(), approval1.getHash(),
-				approval1.getFacilityId(), approval1.getLink(), approval1.getValidUntil());
-		assertTrue("Storing link should return true", res);
-	}
-
-	@Test
 	public void addSignature() {
-		requestManager.storeApprovalLink(approval1.getSignerEmail(), approval1.getHash(),
-				approval1.getFacilityId(), approval1.getLink(), approval1.getValidUntil());
-		LocalDateTime now = LocalDateTime.now();
+		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser);
 
-		boolean res = requestManager.addSignature(approval1.getFacilityId(), approval1.getHash(), fakeUser, now);
-		approval1.setSignedAt(now);
-
-		List<RequestSignature> found = requestManager.getRequestSignatures(approval1.getFacilityId());
+		List<RequestSignature> found = requestManager.getRequestSignatures(req1.getReqId());
 
 		assertTrue("Storing signature should return true", res);
 		assertNotNull("Found cannot be null", found);
 		assertTrue("Should find at least one signature", found.size() > 0);
 		assertEquals("Only one approval should be in DB", 1, found.size());
-		assertEquals("Approvals are not the same", approval1, found.get(0));
+		RequestSignature signature = found.get(0);
+		assertEquals("UserID is different", fakeUser.getId(), signature.getUserId());
+		assertNotNull("Signed at has not been fetched / set", signature.getSignedAt());
 	}
 
 	@Test
 	public void getRequestSignatures() {
-		requestManager.storeApprovalLink(approval1.getSignerEmail(), approval1.getHash(),
-				approval1.getFacilityId(), approval1.getLink(), approval1.getValidUntil());
-		LocalDateTime now = LocalDateTime.now();
-		requestManager.addSignature(approval1.getFacilityId(), approval1.getHash(), fakeUser, now);
-		approval1.setSignedAt(now);
+		requestManager.addSignature(req1.getReqId(), fakeUser);
+		approval1.setRequestId(req1.getReqId());
 
-		List<RequestSignature> res = requestManager.getRequestSignatures(approval1.getFacilityId());
+		List<RequestSignature> res = requestManager.getRequestSignatures(approval1.getRequestId());
 
 		assertNotNull("Result cannot be null", res);
 		assertTrue("Should find at least one signature", res.size() > 0);
 		assertEquals("Only one approval should be in DB", 1, res.size());
-		assertEquals("Approvals are not the same", approval1, res.get(0));
+		RequestSignature signature = res.get(0);
+		assertEquals("RequestID is different", approval1.getRequestId(), signature.getRequestId());
+		assertEquals("UserID is different", fakeUser.getId(), signature.getUserId());
+		assertNotNull("Signed at has not been fetched / set", signature.getSignedAt());
 	}
 
 }

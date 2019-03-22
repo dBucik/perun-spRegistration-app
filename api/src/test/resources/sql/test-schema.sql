@@ -15,14 +15,9 @@ create table requests
 	modified_at timestamp default now()
 );
 
-create table approvals
+CREATE TABLE approvals
 (
-	facility_id bigint not null,
-	link varchar,
-	hash varchar,
-	user_id bigint,
-	user_email varchar,
-	user_name varchar,
-	valid_until timestamp,
-	signed_at timestamp,
+	request_id BIGINT NOT NULL,
+	user_id BIGINT NOT NULL,
+	signed_at TIMESTAMP DEFAULT now()
 );

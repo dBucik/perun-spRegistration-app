@@ -1,7 +1,5 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
-
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

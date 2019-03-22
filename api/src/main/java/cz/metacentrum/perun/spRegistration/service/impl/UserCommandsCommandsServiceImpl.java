@@ -14,13 +14,27 @@ import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
+import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,19 +59,27 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	private static final Logger log = LoggerFactory.getLogger(UserCommandsCommandsServiceImpl.class);
 
+	private static final String REQUEST_ID_KEY = "requestId";
+	private static final String FACILITY_ID_KEY = "facilityId";
+	private static final String CREATED_AT_KEY = "createdAt";
+	private static final String REQUESTED_MAIL_KEY = "requestedMail";
+
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
 	private final Properties messagesProperties;
 	private final String adminsAttr;
+	private final Cipher cipher;
 
 	@Autowired
-	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
+	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
+										   AppConfig appConfig, Properties messagesProperties) throws NoSuchPaddingException, NoSuchAlgorithmException {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.messagesProperties = messagesProperties;
 		this.adminsAttr = appConfig.getAdminsAttr();
+		this.cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 	}
 
 	@Override
@@ -151,7 +173,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	@Override
 	public Long requestMoveToProduction(Long facilityId, Long userId, List<String> authorities)
-			throws UnauthorizedActionException, InternalErrorException, RPCException, CreateRequestException {
+			throws UnauthorizedActionException, InternalErrorException, RPCException, CreateRequestException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, UnsupportedEncodingException {
 		log.debug("requestMoveToProduction(facilityId: {}, userId: {}, authorities: {})", facilityId, userId, authorities);
 		if (facilityId == null || userId == null) {
 			log.error("Illegal input - facilityId: {}, userId: {}", facilityId, userId);
@@ -207,19 +229,35 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public Facility getFacilityDetailsForSignature(Long facilityId) throws RPCException {
-		return perunConnector.getFacilityById(facilityId);
+	public Request getRequestDetailsForSignature(String code) throws InvalidKeyException,
+			BadPaddingException, IllegalBlockSizeException, MalformedCodeException, ExpiredCodeException {
+		log.debug("getRequestDetailsForSignature({})", code);
+		JSONObject decrypted = decryptCode(code);
+		boolean isExpired = isExpiredCode(decrypted);
+
+		if (isExpired) {
+			throw new ExpiredCodeException("Code has expired");
+		}
+
+		Long requestId = decrypted.getLong(REQUEST_ID_KEY);
+		Request result = requestManager.getRequestByReqId(requestId);
+
+		log.debug("getRequestDetailsForSignature returns: {}", result);
+		return result;
 	}
 
 	@Override
-	public boolean signTransferToProduction(Long facilityId, String hash, User user) {
-		log.debug("signTransferToProduction(facilityId: {}, hash: {}, user: {})", facilityId, hash, user);
-		if (facilityId == null || hash == null || user == null) {
-			log.error("Illegal input - facilityId: {}, hash: {}, userId: {}", facilityId, hash, user);
-			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", hash: " + hash + ", userId: " + user);
+	public boolean signTransferToProduction(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException {
+		log.debug("signTransferToProduction(user: {}, code: {})", user, code);
+		JSONObject decrypted = decryptCode(code);
+		boolean isExpired = isExpiredCode(decrypted);
+
+		if (isExpired) {
+			throw new ExpiredCodeException("Code has expired");
 		}
 
-		boolean result = requestManager.addSignature(facilityId, hash, user, LocalDateTime.now());
+		Long requestId = decrypted.getLong(REQUEST_ID_KEY);
+		boolean result = requestManager.addSignature(requestId, user);
 
 		log.debug("signTransferToProduction returns: {}", result);
 		return result;
@@ -393,7 +431,11 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 	}
 
-	private Map<String, String> generateLinksForAuthorities(List<String> authorities, Request request) {
+	private Map<String, String> generateLinksForAuthorities(List<String> authorities, Request request)
+			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException {
+		SecretKeySpec secret = appConfig.getSecret();
+		cipher.init(Cipher.ENCRYPT_MODE, secret);
+
 		if (authorities == null || authorities.isEmpty()) {
 			String prop = messagesProperties.getProperty("moveToProduction.authorities");
 			authorities = Arrays.asList(prop.split(","));
@@ -401,16 +443,51 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 		Map<String, String> linksMap = new HashMap<>();
 		for (String authority: authorities) {
-			String hashBase = request.hashCode() + authority + appConfig.getHashSalt();
-			String hash = Base64.getEncoder().encodeToString(hashBase.getBytes());
-			String link = "";
-			LocalDateTime now = LocalDateTime.now();
-			LocalDateTime validUntil = now.plusDays(appConfig.getConfirmationPeriodDays())
-					.plusHours(appConfig.getConfirmationPeriodHours());
-			requestManager.storeApprovalLink(authority, hash, request.getFacilityId(), link, validUntil);
+			String code = createCode(request.getReqId(), request.getFacilityId(), authority);
+			code = URLEncoder.encode(code, StandardCharsets.UTF_8.toString());
+			String link = appConfig.getSignaturesEndpointUrl().concat("?").concat(code);
 			linksMap.put(authority, link);
+			log.debug("Generated code: {}", code); //TODO: remove
 		}
 
 		return linksMap;
+	}
+
+	private JSONObject decryptCode(String code)
+			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException {
+		cipher.init(Cipher.DECRYPT_MODE, appConfig.getSecret());
+		Base64.Decoder b64dec = Base64.getDecoder();
+		byte[] decrypted = cipher.doFinal(b64dec.decode(code));
+		String objInString = new String(decrypted);
+
+		try {
+			return new JSONObject(objInString);
+		} catch (JSONException e) {
+			throw new MalformedCodeException();
+		}
+	}
+
+	private String createCode(Long requestId, Long facilityId, String requestedMail)
+			throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+		cipher.init(Cipher.ENCRYPT_MODE, appConfig.getSecret());
+		JSONObject object = new JSONObject();
+		object.put(REQUEST_ID_KEY, requestId);
+		object.put(FACILITY_ID_KEY, facilityId);
+		object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
+		object.put(REQUESTED_MAIL_KEY, requestedMail);
+
+		String strToEncrypt = object.toString();
+		Base64.Encoder b64enc = Base64.getEncoder();
+		byte[] encrypted = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
+		return b64enc.encodeToString(encrypted);
+	}
+
+	private boolean isExpiredCode(JSONObject decrypted) {
+		LocalDateTime createdAt = LocalDateTime.parse(decrypted.getString(CREATED_AT_KEY));
+		long daysValid = appConfig.getConfirmationPeriodDays();
+		long hoursValid = appConfig.getConfirmationPeriodHours();
+		LocalDateTime validUntil = createdAt.plusDays(daysValid).plusHours(hoursValid);
+
+		return LocalDateTime.now().isAfter(validUntil);
 	}
 }
