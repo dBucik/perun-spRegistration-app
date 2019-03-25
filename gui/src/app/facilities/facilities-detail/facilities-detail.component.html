@@ -7,8 +7,8 @@
       </h2>
       {{'FACILITIES.DESCRIPTION' | translate}}: {{facility.description}}
 
-      <div class="pull-right">
-        <button class="ml-2" mat-raised-button color="primary" (click)="moveToProduction()">
+      <div *ngIf="facility.testEnv" class="pull-right">
+        <button class="ml-2" mat-raised-button color="accent" (click)="moveToProduction()">
           {{'FACILITIES.MOVE_TO_PRODUCTION' | translate}}
         </button>
       </div>

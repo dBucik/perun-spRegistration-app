@@ -27,4 +27,12 @@ export class FacilitiesService {
   createRequest(id: number, emails: string[]): Observable<number> {
       return this.apiService.post('/moveToProduction/createRequest/' + id, emails);
   }
+
+  getFacilityDetailsWithHash(hash: string): Observable<Facility> {
+    return this.apiService.get('/moveToProduction/getFacilityDetails/' + hash);
+  }
+
+  signApprovalForProduction(id: number, hash: string): Observable<boolean> {
+    return this.apiService.post('/moveToProduction/approve/' + id, hash);
+  }
 }

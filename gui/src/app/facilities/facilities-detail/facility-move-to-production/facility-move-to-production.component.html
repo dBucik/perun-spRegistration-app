@@ -7,48 +7,32 @@
       </h2>
       {{'FACILITIES.MOVE_TO_PRODUCTION_DESCRIPTION' | translate}}
 
-      <mat-accordion>
-        <mat-expansion-panel (opened)="switcherForm = true">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              {{'FACILITIES.MOVE_TO_PRODUCTION_FORM1' | translate}}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div *ngIf="isEmailEnabled">
+      <div *ngIf="isEmailEnabled">
+        <mat-form-field class="chip-list">
+          <mat-chip-list #chipList
+                         [disabled]="!emailEnabled">
+            <mat-chip *ngFor="let email of emails" [selectable]="false"
+                      [removable]="true" (removed)="remove(email)">
+              {{email}}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+            <input placeholder="{{'FACILITIES.MOVE_TO_PRODUCTION_EMAIL_DESCRIPTION' | translate}}"
+                   [matChipInputFor]="chipList"
+                   [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                   [matChipInputAddOnBlur]="true"
+                   (matChipInputTokenEnd)="add($event)">
+          </mat-chip-list>
+        </mat-form-field>
 
-              <mat-form-field class="chip-list">
-                  <mat-chip-list #chipList>
-                      <mat-chip *ngFor="let email of emails" [selectable]="false"
-                                [removable]="true" (removed)="remove(email)">
-                          {{email}}
-                          <mat-icon matChipRemove>cancel</mat-icon>
-                      </mat-chip>
-                      <input placeholder="Fill emails..."
-                             [matChipInputFor]="chipList"
-                             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                             [matChipInputAddOnBlur]="true"
-                             (matChipInputTokenEnd)="add($event)">
-                  </mat-chip-list>
-              </mat-form-field>
+        <mat-checkbox class="example-margin" [(ngModel)]="emailEnabled">{{'FACILITIES.MOVE_TO_PRODUCTION_EMAIL' | translate}}</mat-checkbox>
+      </div>
 
-          </div>
-          <button class="ml-2" mat-raised-button color="primary" (click)="moveToProduction()">
-            {{'FACILITIES.MOVE_TO_PRODUCTION_SUBMIT_BUTTON' | translate}}
-          </button>
-        </mat-expansion-panel>
+      <div class="pull-right">
+        <button class="ml-2" mat-raised-button color="accent" (click)="moveToProduction()">
+          {{'FACILITIES.MOVE_TO_PRODUCTION_SUBMIT_BUTTON' | translate}}
+        </button>
+      </div>
 
-
-        <mat-expansion-panel (opened)="switcherForm = false">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              {{'FACILITIES.MOVE_TO_PRODUCTION_FORM2' | translate}}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <button class="ml-2" mat-raised-button color="primary" (click)="moveToProduction()">
-            {{'FACILITIES.MOVE_TO_PRODUCTION_SUBMIT_BUTTON' | translate}}
-          </button>
-        </mat-expansion-panel>
-      </mat-accordion>
     </div>
   </div>
 </div>

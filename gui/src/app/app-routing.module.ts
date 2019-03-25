@@ -4,6 +4,7 @@ import {MainMenuComponent} from "./main-menu/main-menu.component";
 import {NotFoundPageComponent} from "./shared/not-found-page/not-found-page.component";
 import {NotAuthorizedPageComponent} from "./shared/not-authorized-page/not-authorized-page.component";
 import {LoginComponent} from "./login/login.component";
+import {DocumentSignComponent} from "./document-sign/document-sign.component";
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
   {
     path: 'facilities',
     loadChildren: './facilities/facilities.module#FacilitiesModule'
+  },
+  {
+    path: 'documentSign',
+    component: DocumentSignComponent
   },
   {
     path: 'notAuthorized',

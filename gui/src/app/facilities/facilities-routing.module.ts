@@ -11,20 +11,16 @@ const routes: Routes = [
     component: FacilitiesOverviewComponent
   },
   {
-      path: 'detail/:id',
-      component: FacilitiesDetailComponent
+    path: 'detail/:id',
+    component: FacilitiesDetailComponent
+  },
+  {
+    path: 'moveToProduction/:id',
+    component: FacilityMoveToProductionComponent
   },
   {
     path: '**',
     component: NotFoundPageComponent
-  },
-  {
-      path: 'detail/:id',
-      component: FacilitiesDetailComponent
-  },
-  {
-      path: 'moveToProduction/:id',
-      component: FacilityMoveToProductionComponent
   }
 ];
 

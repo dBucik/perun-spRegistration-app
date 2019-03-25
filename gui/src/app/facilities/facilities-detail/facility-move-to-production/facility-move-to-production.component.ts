@@ -1,9 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {FacilitiesService} from "../../../core/services/facilities.service";
 import {Subscription} from "rxjs";
 import {Facility} from "../../../core/models/Facility";
-import {MatChipInputEvent, MatSnackBar, MatSnackBarConfig, MatSnackBarVerticalPosition} from "@angular/material";
+import {MatChipInputEvent, MatSnackBar} from "@angular/material";
 import {COMMA, ENTER} from "@angular/cdk/keycodes";
 import {TranslateService} from "@ngx-translate/core";
 import {ConfigService} from "../../../core/services/config.service";
@@ -20,7 +20,8 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
     private facilitiesService: FacilitiesService,
     private snackBar: MatSnackBar,
     private translate: TranslateService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private router: Router
   ) { }
 
   private sub : Subscription;
@@ -29,29 +30,51 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
 
   facility: Facility;
   isEmailEnabled: boolean;
-  switcherForm: boolean;
   emails: string[];
+  emailEnabled = false;
 
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 
   ngOnInit() {
-    this.switcherForm = false;
-    this.emails = [];
     this.sub = this.route.params.subscribe(params => {
       this.facilitiesService.getFacility(params['id']).subscribe(facility => {
         this.configService.isAuthoritiesEnabled().subscribe(response =>{
             this.isEmailEnabled = response;
             this.facility = facility;
+            this.emails = [];
             this.loading = false;
         });
-
       });
     });
   }
 
   moveToProduction() : void {
-    this.facilitiesService.createRequest(this.facility.id, this.emails);
-    this.openSnackBar('FACILITIES.MOVE_TO_PRODUCTION_SUCCESS');
+    if(!this.emailEnabled){
+      this.emails = [];
+    }
+
+    if(this.emailEnabled && this.emails.length == 0){
+      this.translate.get('FACILITIES.MOVE_TO_PRODUCTION_EMAIL_ERROR_FILL').subscribe(result => {
+        this.snackBar.open(result, null, {duration: 5000});
+      });
+      return;
+    }
+
+    this.facilitiesService.createRequest(this.facility.id, this.emails).subscribe(reqid => {
+        this.translate.get('FACILITIES.MOVE_TO_PRODUCTION_SUCCESS').subscribe(successMessage => {
+          this.translate.get('FACILITIES.MOVE_TO_PRODUCTION_TO_REQUEST').subscribe(goToRequestMessage =>{
+            let snackBarRef = this.snackBar
+              .open(successMessage, goToRequestMessage, {duration: 5000});
+
+            snackBarRef.onAction().subscribe(() => {
+                this.router.navigate(['/requests/detail/' + reqid]);
+            });
+
+            this.router.navigate(['/']);
+          });
+        });
+    });
+
   }
 
   add(event: MatChipInputEvent): void {
@@ -63,8 +86,11 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
     }
 
     let EMAIL_REGEXP = /^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
+
     if (value.length <= 5 || !EMAIL_REGEXP.test(value)) {
-        this.openSnackBar('FACILITIES.MOVE_TO_PRODUCTION_EMAIL_ERROR');
+        this.translate.get('FACILITIES.MOVE_TO_PRODUCTION_EMAIL_ERROR_CORRECT').subscribe(result => {
+          this.snackBar.open(result, null, {duration: 5000});
+        });
     } else{
        this.emails.push(value);
        if (input) {
@@ -78,12 +104,6 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
     if (index >= 0) {
         this.emails.splice(index, 1);
     }
- }
-
- openSnackBar(message: string):void {
-    let config = new MatSnackBarConfig();
-    config.duration = 5000;
-    this.translate.get(message).subscribe(result => {this.snackBar.open(result, null, config);});
  }
 
   ngOnDestroy(): void {
