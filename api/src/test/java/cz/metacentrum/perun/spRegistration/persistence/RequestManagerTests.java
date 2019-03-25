@@ -2,12 +2,14 @@ package cz.metacentrum.perun.spRegistration.persistence;
 
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +49,7 @@ public class RequestManagerTests {
 	private User fakeUser;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws CreateRequestException, InternalErrorException {
 		def1 = new PerunAttributeDefinition(1L, "attr_1", "namespace1", "desc1",
 				"java.lang.String", "attr1", true, false, "facility",
 				"baseFriendlyName", "friendlyNameParameter");
@@ -104,13 +106,8 @@ public class RequestManagerTests {
 	private void prepareApprovals() {
 		LocalDateTime now = LocalDateTime.now();
 		approval1 = new RequestSignature();
-		approval1.setFacilityId(2L);
-		approval1.setLink("/link");
-		approval1.setHash("hash");
-		approval1.setSignerId(fakeUser.getId());
-		approval1.setSignerName(fakeUser.getFullName());
-		approval1.setSignerEmail(fakeUser.getEmail());
-		approval1.setValidUntil(now.plusDays(10));
+		approval1.setRequestId(2L);
+		approval1.setSignedAt(now.plusDays(10));
 	}
 
 	private void prepareFakeUser() {
@@ -126,7 +123,7 @@ public class RequestManagerTests {
 	}
 
 	@Test
-	public void createRequest() {
+	public void createRequest() throws CreateRequestException, InternalErrorException {
 		Request request = new Request();
 		request.setAction(RequestAction.REGISTER_NEW_SP);
 		request.setStatus(RequestStatus.WFA);
@@ -236,44 +233,34 @@ public class RequestManagerTests {
 	}
 
 	@Test
-	public void storeApprovalLink() {
-		boolean res = requestManager.storeApprovalLink(approval1.getSignerEmail(), approval1.getHash(),
-				approval1.getFacilityId(), approval1.getLink(), approval1.getValidUntil());
-		assertTrue("Storing link should return true", res);
-	}
-
-	@Test
 	public void addSignature() {
-		requestManager.storeApprovalLink(approval1.getSignerEmail(), approval1.getHash(),
-				approval1.getFacilityId(), approval1.getLink(), approval1.getValidUntil());
-		LocalDateTime now = LocalDateTime.now();
+		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser);
 
-		boolean res = requestManager.addSignature(approval1.getFacilityId(), approval1.getHash(), fakeUser, now);
-		approval1.setSignedAt(now);
-
-		List<RequestSignature> found = requestManager.getRequestSignatures(approval1.getFacilityId());
+		List<RequestSignature> found = requestManager.getRequestSignatures(req1.getReqId());
 
 		assertTrue("Storing signature should return true", res);
 		assertNotNull("Found cannot be null", found);
 		assertTrue("Should find at least one signature", found.size() > 0);
 		assertEquals("Only one approval should be in DB", 1, found.size());
-		assertEquals("Approvals are not the same", approval1, found.get(0));
+		RequestSignature signature = found.get(0);
+		assertEquals("UserID is different", fakeUser.getId(), signature.getUserId());
+		assertNotNull("Signed at has not been fetched / set", signature.getSignedAt());
 	}
 
 	@Test
 	public void getRequestSignatures() {
-		requestManager.storeApprovalLink(approval1.getSignerEmail(), approval1.getHash(),
-				approval1.getFacilityId(), approval1.getLink(), approval1.getValidUntil());
-		LocalDateTime now = LocalDateTime.now();
-		requestManager.addSignature(approval1.getFacilityId(), approval1.getHash(), fakeUser, now);
-		approval1.setSignedAt(now);
+		requestManager.addSignature(req1.getReqId(), fakeUser);
+		approval1.setRequestId(req1.getReqId());
 
-		List<RequestSignature> res = requestManager.getRequestSignatures(approval1.getFacilityId());
+		List<RequestSignature> res = requestManager.getRequestSignatures(approval1.getRequestId());
 
 		assertNotNull("Result cannot be null", res);
 		assertTrue("Should find at least one signature", res.size() > 0);
 		assertEquals("Only one approval should be in DB", 1, res.size());
-		assertEquals("Approvals are not the same", approval1, res.get(0));
+		RequestSignature signature = res.get(0);
+		assertEquals("RequestID is different", approval1.getRequestId(), signature.getRequestId());
+		assertEquals("UserID is different", fakeUser.getId(), signature.getUserId());
+		assertNotNull("Signed at has not been fetched / set", signature.getSignedAt());
 	}
 
 }

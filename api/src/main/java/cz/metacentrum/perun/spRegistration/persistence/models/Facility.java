@@ -16,6 +16,7 @@ public class Facility extends PerunEntity {
 	private String name;
 	private String description;
 	private boolean testEnv;
+	private Long activeRequestId;
 	private Map<String, PerunAttribute> attrs = new HashMap<>();
 
 	public Facility(Long id) {
@@ -50,6 +51,14 @@ public class Facility extends PerunEntity {
 
 	public void setTestEnv(boolean testEnv) {
 		this.testEnv = testEnv;
+	}
+
+	public Long getActiveRequestId() {
+		return activeRequestId;
+	}
+
+	public void setActiveRequestId(Long activeRequestId) {
+		this.activeRequestId = activeRequestId;
 	}
 
 	public Map<String, PerunAttribute> getAttrs() {
@@ -89,32 +98,27 @@ public class Facility extends PerunEntity {
 	@Override
 	public String toString() {
 		return "Facility{" +
-				super.toString() +
-				", name='" + name + '\'' +
+				"name='" + name + '\'' +
 				", description='" + description + '\'' +
-				", testEnv='" + testEnv + '\'' +
+				", testEnv=" + testEnv +
+				", activeRequestId=" + activeRequestId +
 				", attrs=" + attrs +
 				'}';
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (! (o instanceof Facility)) {
-			return false;
-		}
-
-		Facility them = (Facility) o;
-		return Objects.equals(this.getId(), them.getId())
-				&& Objects.equals(this.name, them.name)
-				&& Objects.equals(this.description, them.description);
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Facility facility = (Facility) o;
+		return testEnv == facility.testEnv &&
+				Objects.equals(name, facility.name) &&
+				Objects.equals(description, facility.description) &&
+				Objects.equals(attrs, facility.attrs);
 	}
 
 	@Override
 	public int hashCode() {
-		long res = 31 * this.getId();
-		res *= 31 * name.hashCode();
-		res *= 31 * description.hashCode();
-
-		return (int) res;
+		return Objects.hash(name, description, testEnv, attrs);
 	}
 }

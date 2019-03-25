@@ -3,6 +3,7 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
@@ -13,13 +14,27 @@ import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
+import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,23 +59,31 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	private static final Logger log = LoggerFactory.getLogger(UserCommandsCommandsServiceImpl.class);
 
+	private static final String REQUEST_ID_KEY = "requestId";
+	private static final String FACILITY_ID_KEY = "facilityId";
+	private static final String CREATED_AT_KEY = "createdAt";
+	private static final String REQUESTED_MAIL_KEY = "requestedMail";
+
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
 	private final Properties messagesProperties;
 	private final String adminsAttr;
+	private final Cipher cipher;
 
 	@Autowired
-	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
+	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
+										   AppConfig appConfig, Properties messagesProperties) throws NoSuchPaddingException, NoSuchAlgorithmException {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.messagesProperties = messagesProperties;
 		this.adminsAttr = appConfig.getAdminsAttr();
+		this.cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 	}
 
 	@Override
-	public Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes) throws InternalErrorException {
+	public Long createRegistrationRequest(Long userId, List<PerunAttribute> attributes) throws InternalErrorException, CreateRequestException {
 		log.debug("createRegistrationRequest(userId: {}, attributes: {})", userId, attributes);
 		if (userId == null || attributes == null) {
 			log.error("Illegal input - userId: {}, attributes: {}", userId, attributes);
@@ -78,7 +101,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	@Override
 	public Long createFacilityChangesRequest(Long facilityId, Long userId, List<PerunAttribute> attributes)
-			throws UnauthorizedActionException, RPCException, InternalErrorException {
+			throws UnauthorizedActionException, RPCException, InternalErrorException, CreateRequestException {
 		log.debug("createFacilityChangesRequest(facility: {}, userId: {}, attributes: {})", facilityId, userId, attributes);
 		if (facilityId == null || userId == null || attributes == null) {
 			log.error("Illegal input - facilityId: {}, userId: {}, attributes: {}", facilityId, userId, attributes);
@@ -96,7 +119,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public Long createRemovalRequest(Long userId, Long facilityId) throws UnauthorizedActionException, RPCException, InternalErrorException {
+	public Long createRemovalRequest(Long userId, Long facilityId) throws UnauthorizedActionException, RPCException, InternalErrorException, CreateRequestException {
 		log.debug("createRemovalRequest(userId: {}, facilityId: {})", userId, facilityId);
 		if (facilityId == null || userId == null) {
 			log.error("Illegal input - facilityId: {}, userId: {}", facilityId, userId);
@@ -150,7 +173,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	@Override
 	public Long requestMoveToProduction(Long facilityId, Long userId, List<String> authorities)
-			throws UnauthorizedActionException, InternalErrorException, RPCException {
+			throws UnauthorizedActionException, InternalErrorException, RPCException, CreateRequestException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, UnsupportedEncodingException {
 		log.debug("requestMoveToProduction(facilityId: {}, userId: {}, authorities: {})", facilityId, userId, authorities);
 		if (facilityId == null || userId == null) {
 			log.error("Illegal input - facilityId: {}, userId: {}", facilityId, userId);
@@ -206,19 +229,35 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public Facility getFacilityDetailsForSignature(Long facilityId) throws RPCException {
-		return perunConnector.getFacilityById(facilityId);
+	public Request getRequestDetailsForSignature(String code) throws InvalidKeyException,
+			BadPaddingException, IllegalBlockSizeException, MalformedCodeException, ExpiredCodeException {
+		log.debug("getRequestDetailsForSignature({})", code);
+		JSONObject decrypted = decryptCode(code);
+		boolean isExpired = isExpiredCode(decrypted);
+
+		if (isExpired) {
+			throw new ExpiredCodeException("Code has expired");
+		}
+
+		Long requestId = decrypted.getLong(REQUEST_ID_KEY);
+		Request result = requestManager.getRequestByReqId(requestId);
+
+		log.debug("getRequestDetailsForSignature returns: {}", result);
+		return result;
 	}
 
 	@Override
-	public boolean signTransferToProduction(Long facilityId, String hash, User user) {
-		log.debug("signTransferToProduction(facilityId: {}, hash: {}, user: {})", facilityId, hash, user);
-		if (facilityId == null || hash == null || user == null) {
-			log.error("Illegal input - facilityId: {}, hash: {}, userId: {}", facilityId, hash, user);
-			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", hash: " + hash + ", userId: " + user);
+	public boolean signTransferToProduction(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException {
+		log.debug("signTransferToProduction(user: {}, code: {})", user, code);
+		JSONObject decrypted = decryptCode(code);
+		boolean isExpired = isExpiredCode(decrypted);
+
+		if (isExpired) {
+			throw new ExpiredCodeException("Code has expired");
 		}
 
-		boolean result = requestManager.addSignature(facilityId, hash, user, LocalDateTime.now());
+		Long requestId = decrypted.getLong(REQUEST_ID_KEY);
+		boolean result = requestManager.addSignature(requestId, user);
 
 		log.debug("signTransferToProduction returns: {}", result);
 		return result;
@@ -257,6 +296,9 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 			log.error("Could not retrieve facility for id: {}", facilityId);
 			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
 		}
+
+		Long activeRequestId = requestManager.getActiveRequestIdByFacilityId(facilityId);
+		facility.setActiveRequestId(activeRequestId);
 
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId);
 		facility.setAttrs(attrs);
@@ -303,12 +345,12 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	/* PRIVATE METHODS */
 
-	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes) throws InternalErrorException {
+	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes) throws InternalErrorException, CreateRequestException {
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
 		return createRequest(facilityId, userId, RequestAction.REGISTER_NEW_SP, convertedAttributes);
 	}
 
-	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes) throws InternalErrorException {
+	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes) throws InternalErrorException, CreateRequestException {
 		log.debug("createRequest(facilityId: {}, userId: {}, action: {}, attributes: {})", facilityId, userId, action, attributes);
 		Request request = new Request();
 		request.setFacilityId(facilityId);
@@ -389,7 +431,11 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 	}
 
-	private Map<String, String> generateLinksForAuthorities(List<String> authorities, Request request) {
+	private Map<String, String> generateLinksForAuthorities(List<String> authorities, Request request)
+			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException {
+		SecretKeySpec secret = appConfig.getSecret();
+		cipher.init(Cipher.ENCRYPT_MODE, secret);
+
 		if (authorities == null || authorities.isEmpty()) {
 			String prop = messagesProperties.getProperty("moveToProduction.authorities");
 			authorities = Arrays.asList(prop.split(","));
@@ -397,16 +443,51 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 		Map<String, String> linksMap = new HashMap<>();
 		for (String authority: authorities) {
-			String hashBase = request.hashCode() + authority + appConfig.getHashSalt();
-			String hash = Base64.getEncoder().encodeToString(hashBase.getBytes());
-			String link = "";
-			LocalDateTime now = LocalDateTime.now();
-			LocalDateTime validUntil = now.plusDays(appConfig.getConfirmationPeriodDays())
-					.plusHours(appConfig.getConfirmationPeriodHours());
-			requestManager.storeApprovalLink(authority, hash, request.getFacilityId(), link, validUntil);
+			String code = createCode(request.getReqId(), request.getFacilityId(), authority);
+			code = URLEncoder.encode(code, StandardCharsets.UTF_8.toString());
+			String link = appConfig.getSignaturesEndpointUrl().concat("?").concat(code);
 			linksMap.put(authority, link);
+			log.debug("Generated code: {}", code); //TODO: remove
 		}
 
 		return linksMap;
+	}
+
+	private JSONObject decryptCode(String code)
+			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException {
+		cipher.init(Cipher.DECRYPT_MODE, appConfig.getSecret());
+		Base64.Decoder b64dec = Base64.getDecoder();
+		byte[] decrypted = cipher.doFinal(b64dec.decode(code));
+		String objInString = new String(decrypted);
+
+		try {
+			return new JSONObject(objInString);
+		} catch (JSONException e) {
+			throw new MalformedCodeException();
+		}
+	}
+
+	private String createCode(Long requestId, Long facilityId, String requestedMail)
+			throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+		cipher.init(Cipher.ENCRYPT_MODE, appConfig.getSecret());
+		JSONObject object = new JSONObject();
+		object.put(REQUEST_ID_KEY, requestId);
+		object.put(FACILITY_ID_KEY, facilityId);
+		object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
+		object.put(REQUESTED_MAIL_KEY, requestedMail);
+
+		String strToEncrypt = object.toString();
+		Base64.Encoder b64enc = Base64.getEncoder();
+		byte[] encrypted = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
+		return b64enc.encodeToString(encrypted);
+	}
+
+	private boolean isExpiredCode(JSONObject decrypted) {
+		LocalDateTime createdAt = LocalDateTime.parse(decrypted.getString(CREATED_AT_KEY));
+		long daysValid = appConfig.getConfirmationPeriodDays();
+		long hoursValid = appConfig.getConfirmationPeriodHours();
+		LocalDateTime validUntil = createdAt.plusDays(daysValid).plusHours(hoursValid);
+
+		return LocalDateTime.now().isAfter(validUntil);
 	}
 }

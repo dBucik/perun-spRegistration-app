@@ -2,9 +2,11 @@ package cz.metacentrum.perun.spRegistration.persistence.managers;
 
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDateTime;
@@ -25,7 +27,7 @@ public interface RequestManager {
 	 * @param request Request object to be stored.
 	 * @return Generated ID of stored Request.
 	 */
-	Long createRequest(Request request);
+	Long createRequest(Request request) throws InternalErrorException, CreateRequestException;
 
 	/**
 	 * Update request in DB.
@@ -91,13 +93,11 @@ public interface RequestManager {
 
 	/**
 	 * Add signature for moving to production
-	 * @param facilityId if of facility to be moved
-	 * @param hash hash of request
+	 * @param requestId id of request to be signed
 	 * @param user user giving the signature
-	 * @param signedAt when the signature has been made
 	 * @return True if everything went OK
 	 */
-	boolean addSignature(Long facilityId, String hash, User user, LocalDateTime signedAt);
+	boolean addSignature(Long requestId, User user);
 
 	/**
 	 * Get all approvals for transferring of service into production environment
@@ -116,4 +116,11 @@ public interface RequestManager {
 	 * @return True if everything went OK.
 	 */
 	boolean storeApprovalLink(String authority, String hash, Long facilityId, String link, LocalDateTime validUntil);
+
+	/**
+	 * Get id of active request for Facility.
+	 * @param facilityId Id of facility
+	 * @return Id of found request (request with status different than APPROVED/REJECTED), null otherwise
+	 */
+	Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException;
 }

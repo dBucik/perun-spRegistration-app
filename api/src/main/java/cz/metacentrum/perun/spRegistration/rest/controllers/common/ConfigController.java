@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.rest.controllers;
+package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
@@ -6,8 +6,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
@@ -28,7 +27,7 @@ public class ConfigController {
 		this.config = config;
 	}
 
-	@RequestMapping(path = "/api/config/oidcInputs", method = RequestMethod.GET)
+	@GetMapping(path = "/api/config/oidcInputs")
 	public List<List<AttrInput>> getInputsForOidc() {
 		log.debug("getInputsForOidc()");
 		List<List<AttrInput>> inputs = new ArrayList<>();
@@ -39,7 +38,7 @@ public class ConfigController {
 		return inputs;
 	}
 
-	@RequestMapping(path = "/api/config/samlInputs", method = RequestMethod.GET)
+	@GetMapping(path = "/api/config/samlInputs")
 	public List<List<AttrInput>> getInputsForSaml() {
 		log.debug("getInputsForSaml()");
 		List<List<AttrInput>> inputs = new ArrayList<>();
@@ -50,25 +49,25 @@ public class ConfigController {
 		return inputs;
 	}
 
-	@RequestMapping(path = "/api/config/oidcEnabled", method = RequestMethod.GET)
+	@GetMapping(path = "/api/config/oidcEnabled")
 	public boolean getOidcEnabled() {
 		log.debug("getOidcEnabled()");
 		return config.getAppConfig().isOidcEnabled();
 	}
 
-	@RequestMapping(path = "/api/config/langs", method = RequestMethod.GET)
+	@GetMapping(path = "/api/config/langs")
 	public List<String> getLangs() {
 		log.debug("getLangs()");
 		return config.getAppConfig().getLangs();
 	}
 
-	@RequestMapping(path = "/api/config/isUserAdmin", method = RequestMethod.GET)
+	@GetMapping(path = "/api/config/isUserAdmin")
 	public boolean isUserAdmin(@SessionAttribute("user") User user) {
 		log.debug("isUserAdmin()");
 		return config.getAppConfig().isAdmin(user.getId());
 	}
 
-	@RequestMapping(path = "/api/config/pageConfig", method = RequestMethod.GET)
+	@GetMapping(path = "/api/config/pageConfig")
 	public Map<String, String> getPageConfig() {
 		log.debug("getPageConfig()");
 		Map<String, String> pageConfig = new HashMap<>();
@@ -80,7 +79,7 @@ public class ConfigController {
 		return pageConfig;
 	}
 
-	@RequestMapping(path = "/api/config/specifyAuthoritiesEnabled", method = RequestMethod.GET)
+	@GetMapping(path = "/api/config/specifyAuthoritiesEnabled")
 	public boolean getSpecifyAuthoritiesEnabled() {
 		log.debug("getSpecifyAuthoritiesEnabled()");
 		return config.getAppConfig().getSpecifyAuthoritiesEnabled();

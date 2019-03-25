@@ -8,7 +8,6 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -36,9 +35,8 @@ public class RequestMapper implements RowMapper<Request> {
 	private final Map<String, PerunAttributeDefinition> definitionMap;
 	private final Map<String, AttrInput> attrInputMap;
 
-	@Autowired
 	public RequestMapper(Config config) {
-		if (config != null) {
+		if (config.getAppConfig() != null) {
 			this.definitionMap = config.getAppConfig().getPerunAttributeDefinitionsMap();
 			this.attrInputMap = config.getInputMap();
 		} else {

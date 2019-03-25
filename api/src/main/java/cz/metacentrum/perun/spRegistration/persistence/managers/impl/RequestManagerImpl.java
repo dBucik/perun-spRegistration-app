@@ -3,14 +3,19 @@ package cz.metacentrum.perun.spRegistration.persistence.managers.impl;
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestMapper;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestSignatureMapper;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -20,6 +25,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -30,16 +36,14 @@ public class RequestManagerImpl implements RequestManager {
 	private static final String REQUESTS_TABLE = " requests ";
 	private static final String APPROVALS_TABLE = " approvals ";
 
-	private RequestMapper requestMapper;
+	private final RequestMapper REQUEST_MAPPER;
 	private final RequestSignatureMapper REQUEST_SIGNATURE_MAPPER;
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
-	public RequestManagerImpl() {
+	@Autowired
+	public RequestManagerImpl(Config config) {
 		REQUEST_SIGNATURE_MAPPER = new RequestSignatureMapper();
-	}
-
-	public void setAppConfig(Config config) {
-		requestMapper = new RequestMapper(config);
+		REQUEST_MAPPER = new RequestMapper(config);
 	}
 
 	@Override
@@ -55,8 +59,16 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
-	public Long createRequest(Request request) {
+	public Long createRequest(Request request) throws InternalErrorException, CreateRequestException {
 		log.debug("createRequest({})", request);
+
+		if (request.getFacilityId() != null) {
+			Long activeRequestId = this.getActiveRequestIdByFacilityId(request.getFacilityId());
+			if (activeRequestId != null) {
+				throw new CreateRequestException("Active requests already exist for facility");
+			}
+		}
+
 		String query = "INSERT INTO" + REQUESTS_TABLE +
 				"(facility_id, status, action, requesting_user_id, attributes, modified_by) " +
 				"VALUES (:fac_id, :status, :action, :req_user_id, :attributes, :modified_by)";
@@ -122,7 +134,7 @@ public class RequestManagerImpl implements RequestManager {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_id", reqId);
 
-		Request request = jdbcTemplate.queryForObject(query, params, requestMapper);
+		Request request = jdbcTemplate.queryForObject(query, params, REQUEST_MAPPER);
 
 		log.debug("getRequestByReqId returns: {}", request);
 		return request;
@@ -133,7 +145,7 @@ public class RequestManagerImpl implements RequestManager {
 		log.debug("getAllRequests()");
 		String query = "SELECT * FROM" + REQUESTS_TABLE;
 
-		List<Request> requests = jdbcTemplate.query(query, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, REQUEST_MAPPER);
 
 		log.debug("getAllRequests returns: {}", requests);
 		return requests;
@@ -147,7 +159,7 @@ public class RequestManagerImpl implements RequestManager {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("req_user_id", userId);
 
-		List<Request> requests = jdbcTemplate.query(query, params, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
 
 		log.debug("getAllRequestsByUserId returns: {}", requests);
 		return requests;
@@ -161,7 +173,7 @@ public class RequestManagerImpl implements RequestManager {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("status", status.getAsInt());
 
-		List<Request> requests = jdbcTemplate.query(query, params, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
 
 		log.debug("getAllRequestsByStatus returns: {}", requests);
 		return requests;
@@ -175,7 +187,7 @@ public class RequestManagerImpl implements RequestManager {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("action", action.getAsInt());
 
-		List<Request> requests = jdbcTemplate.query(query, params, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
 
 		log.debug("getAllRequestsByAction returns: {}", requests);
 		return requests;
@@ -189,7 +201,7 @@ public class RequestManagerImpl implements RequestManager {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("fac_id", facilityId);
 
-		List<Request> requests = jdbcTemplate.query(query, params, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
 
 		log.debug("getAllRequestsByFacilityId returns: {}", requests);
 		return requests;
@@ -206,25 +218,20 @@ public class RequestManagerImpl implements RequestManager {
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("ids", new ArrayList<>(facilityIds));
 
-		List<Request> requests = jdbcTemplate.query(query, params, requestMapper);
+		List<Request> requests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
 
 		log.debug("getAllRequestsByFacilityIds returns: {}", requests);
 		return requests;
 	}
 
 	@Override
-	public boolean addSignature(Long facilityId, String hash, User user, LocalDateTime signedAt) {
-		log.debug("addSignature(facilityId: {}, hash: {}, user: {}, signedAt: {})", facilityId, hash, user, signedAt);
-		String query = "UPDATE" + APPROVALS_TABLE +
-				"SET user_id = :user_id, user_name = :user_name, signed_at = :signed_at " +
-				"WHERE facility_id = :fac_id AND hash = :hash";
+	public boolean addSignature(Long requestId, User user) {
+		log.debug("addSignature(requestId: {}, user: {})", requestId, user);
+		String query = "INSERT INTO" + APPROVALS_TABLE +
+				"(request_id, user_id) VALUES (:request_id, :user_id)";
 		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("request_id", requestId);
 		params.addValue("user_id", user.getId());
-		params.addValue("user_name", user.getFullName());
-		params.addValue("user_email", user.getEmail());
-		params.addValue("signed_at", Timestamp.valueOf(signedAt));
-		params.addValue("fac_id", facilityId);
-		params.addValue("hash", hash);
 
 		int res = jdbcTemplate.update(query, params);
 
@@ -233,16 +240,15 @@ public class RequestManagerImpl implements RequestManager {
 			return true;
 		}
 
-		//todo Exception?
 		return false;
 	}
 
 	@Override
-	public List<RequestSignature> getRequestSignatures(Long facilityId) {
-		log.debug("getRequestSignatures({})", facilityId);
-		String query = "SELECT * FROM" + APPROVALS_TABLE + "WHERE facility_id = :fac_id";
+	public List<RequestSignature> getRequestSignatures(Long requestId) {
+		log.debug("getRequestSignatures({})", requestId);
+		String query = "SELECT * FROM" + APPROVALS_TABLE + "WHERE request_id = :request_id";
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("fac_id", facilityId);
+		params.addValue("request_id", requestId);
 
 		List<RequestSignature> approvals = jdbcTemplate.query(query, params, REQUEST_SIGNATURE_MAPPER);
 
@@ -270,4 +276,22 @@ public class RequestManagerImpl implements RequestManager {
 		return true;
 	}
 
+	@Override
+	public Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException {
+		log.debug("getActiveRequestIdByFacilityId({})", facilityId);
+		String query = "SELECT id FROM " + REQUESTS_TABLE +
+				"WHERE facility_id = :fac_id AND status NOT IN (:allowed_statuses)";
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("fac_id", facilityId);
+		List<Integer> allowedStatuses = Arrays.asList(RequestStatus.APPROVED.getAsInt(), RequestStatus.REJECTED.getAsInt());
+		params.addValue("allowed_statuses", allowedStatuses);
+
+		try {
+			return jdbcTemplate.queryForObject(query, params, Long.class);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		} catch (IncorrectResultSizeDataAccessException e) {
+			throw new InternalErrorException("Two active requests for one facility found", e);
+		}
+	}
 }

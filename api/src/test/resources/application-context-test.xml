@@ -17,41 +17,78 @@
     </bean>
 
 
-    <bean id="defaultProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-        <property name="properties">
-            <props>
-                <prop key="jdbc.driver">org.postgresql.Driver</prop>
-                <prop key="jdbc.url">jdbc:postgresql://cloud69b.cerit-sc.cz/spregistration</prop>
-                <prop key="jdbc.username">spreg</prop>
-                <prop key="jdbc.password">spreg123</prop>
-                <prop key="rpc.url">https://perun-dev.cesnet.cz/ba/rpc/</prop>
-                <prop key="rpc.user">XYZ</prop>
-                <prop key="rpc.password">XYZ</prop>
-                <prop key="admins">62692,0,0</prop>
-                <prop key="attr.idpAttribute.name">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
-                <prop key="attr.idpAttribute.value">XYZ</prop>
-                <prop key="attr.testSp.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
-                <prop key="attr.showOnServicesList.name">urn:perun:facility:attribute-def:def:isTestSp</prop>
-                <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
-                <prop key="oidc.isEnabled">true</prop>
-                <prop key="langs">en,cs</prop>
-            </props>
-        </property>
-    </bean>
+    <bean id="defaultProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean"/>
 
     <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
     </bean>
+    
+    <bean id="definitionsMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map key-type="java.lang.String" value-type="cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition">
+                <entry key="attr_1">
+                    <bean class="cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition">
+                        <constructor-arg name="id" value="1"/>
+                        <constructor-arg name="friendlyName" value="attr_1"/>
+                        <constructor-arg name="namespace" value="namespace1"/>
+                        <constructor-arg name="description" value="desc1"/>
+                        <constructor-arg name="type" value="java.lang.String"/>
+                        <constructor-arg name="displayName" value="attr1"/>
+                        <constructor-arg name="writable" value="true"/>
+                        <constructor-arg name="unique" value="false"/>
+                        <constructor-arg name="entity" value="facility"/>
+                        <constructor-arg name="baseFriendlyName" value="baseFriendlyName"/>
+                        <constructor-arg name="friendlyNameParameter" value="friendlyNameParameter"/>
+                    </bean>
+                </entry>
+                <entry key="attr_2">
+                    <bean class="cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition">
+                        <constructor-arg name="id" value="2"/>
+                        <constructor-arg name="friendlyName" value="attr_2"/>
+                        <constructor-arg name="namespace" value="namespace2"/>
+                        <constructor-arg name="description" value="desc2"/>
+                        <constructor-arg name="type" value="java.lang.Boolean"/>
+                        <constructor-arg name="displayName" value="attr2"/>
+                        <constructor-arg name="writable" value="true"/>
+                        <constructor-arg name="unique" value="false"/>
+                        <constructor-arg name="entity" value="facility"/>
+                        <constructor-arg name="baseFriendlyName" value="baseFriendlyName"/>
+                        <constructor-arg name="friendlyNameParameter" value="friendlyNameParameter"/>
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
 
+    <bean id="attrInputsMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map key-type="java.lang.String" value-type="cz.metacentrum.perun.spRegistration.persistence.models.AttrInput">
+                <entry key="attr_1">
+                    <bean class="cz.metacentrum.perun.spRegistration.persistence.models.AttrInput">
+                        <constructor-arg name="name" value="attr_1"/>
+                        <constructor-arg name="displayName"><null /></constructor-arg>
+                        <constructor-arg name="description"><null /></constructor-arg>
+                        <constructor-arg name="type"><null /></constructor-arg>
+                    </bean>
+                </entry>
+                <entry key="attr_2">
+                    <bean class="cz.metacentrum.perun.spRegistration.persistence.models.AttrInput">
+                        <constructor-arg name="name" value="attr_2"/>
+                        <constructor-arg name="displayName"><null /></constructor-arg>
+                        <constructor-arg name="description"><null /></constructor-arg>
+                        <constructor-arg name="type"><null /></constructor-arg>
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+    
     <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig">
-        <property name="admins" value="#{'${admins}'.split('\s*,\s*')}" />
-        <property name="idpAttribute" value="${attr.idpAttribute.name}" />
-        <property name="idpAttributeValue" value="${attr.idpAttribute.value}" />
-        <property name="testSpAttribute" value="${attr.testSp.name}" />
-        <property name="showOnServicesListAttribute" value="${attr.showOnServicesList.name}" />
-        <property name="adminsAttr" value="${attr.facilityAdmins.name}" />
-        <property name="oidcEnabled" value="${oidc.isEnabled}" />
-        <property name="langs" value="#{'${langs}'.split('\s*,\s*')}" />
+        <property name="perunAttributeDefinitionsMap" ref="definitionsMap"/>
+    </bean>
+
+    <bean id="config" class="cz.metacentrum.perun.spRegistration.persistence.configs.Config">
+        <property name="appConfig" ref="appConfig"/>
     </bean>
 
 </beans>

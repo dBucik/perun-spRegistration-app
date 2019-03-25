@@ -294,6 +294,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		Long facilityId = extractFacilityIdFromRequest(request);
 
 		log.debug("Fetching facility with ID: {} from Perun ", facilityId);
+
 		Facility actualFacility = perunConnector.getFacilityById(facilityId);
 		if (actualFacility == null) {
 			log.error("Facility with ID: {} does not exist in Perun", facilityId);

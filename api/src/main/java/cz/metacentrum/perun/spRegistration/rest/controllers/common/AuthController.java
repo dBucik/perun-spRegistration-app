@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.rest.controllers;
+package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
@@ -8,8 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
@@ -33,7 +32,7 @@ public class AuthController {
 	}
 
 
-	@RequestMapping(path = "/api/setUser", method = RequestMethod.GET)
+	@GetMapping(path = "/api/setUser")
 	public void setUser(HttpServletRequest req) throws RPCException {
 		String userEmailAttr = appConfig.getUserEmailAttr();
 		String extSourceProxy = appConfig.getExtSourceProxy();
@@ -54,7 +53,7 @@ public class AuthController {
 		}
 	}
 
-	@RequestMapping(path = "/api/getUser", method = RequestMethod.GET)
+	@GetMapping(path = "/api/getUser")
 	public User getUser(@SessionAttribute("user") User user) {
 		return user;
 	}

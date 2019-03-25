@@ -5,9 +5,14 @@ import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +28,7 @@ public class AppConfig {
 	private Set<Long> admins;
 	private String extSourceProxy;
 	private String userEmailAttr;
-	private final Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
+	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
 	private boolean oidcEnabled;
 	private List<String> langs = new ArrayList<>();
 
@@ -39,8 +44,9 @@ public class AppConfig {
 	private String headerHTML;
 	private long confirmationPeriodDays;
 	private long confirmationPeriodHours;
-	private String hashSalt;
+	private SecretKeySpec secret;
 	private boolean specifyAuthoritiesEnabled;
+	private String signaturesEndpointUrl;
 
 	public AppConfig() {
 		Resource enLang = new ClassPathResource("localization.properties");
@@ -193,12 +199,22 @@ public class AppConfig {
 		return confirmationPeriodHours;
 	}
 
-	public void setHashSalt(String hashSalt) {
-		this.hashSalt = hashSalt;
+	public void setSecret(String secret) {
+		secret = fixSecret(secret, 32);
+		MessageDigest sha;
+		try {
+			byte[] key = secret.getBytes(StandardCharsets.UTF_8);
+			sha = MessageDigest.getInstance("SHA-1");
+			key = sha.digest(key);
+			key = Arrays.copyOf(key, 16);
+			this.secret = new SecretKeySpec(key, "AES");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public String getHashSalt() {
-		return hashSalt;
+	public SecretKeySpec getSecret() {
+		return secret;
 	}
 
 	public void setSpecifyAuthoritiesEnabled(boolean specifyAuthoritiesEnabled) {
@@ -207,6 +223,18 @@ public class AppConfig {
 
 	public boolean getSpecifyAuthoritiesEnabled() {
 		return specifyAuthoritiesEnabled;
+	}
+
+	public void setPerunAttributeDefinitionsMap(Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap) {
+		this.perunAttributeDefinitionsMap = perunAttributeDefinitionsMap;
+	}
+
+	public String getSignaturesEndpointUrl() {
+		return signaturesEndpointUrl;
+	}
+
+	public void setSignaturesEndpointUrl(String signaturesEndpointUrl) {
+		this.signaturesEndpointUrl = signaturesEndpointUrl;
 	}
 
 	@Override
@@ -231,7 +259,7 @@ public class AppConfig {
 				", headerHTML='" + headerHTML + '\'' +
 				", confirmationPeriodDays='" + confirmationPeriodDays + '\'' +
 				", confirmationPeriodHours='" + confirmationPeriodHours + '\'' +
-				", hashSalt'" + hashSalt + '\'' +
+				", secret'" + secret + '\'' +
 				", specifyAuthoritiesEnabled='" + specifyAuthoritiesEnabled + '\'' +
 				'}';
 	}
@@ -252,5 +280,17 @@ public class AppConfig {
 
 	public boolean isAdmin (Long userId) {
 		return admins.contains(userId);
+	}
+
+	private String fixSecret(String s, int length) {
+		if (s.length() < length) {
+			int missingLength = length - s.length();
+			StringBuilder sBuilder = new StringBuilder(s);
+			for (int i = 0; i < missingLength; i++) {
+				sBuilder.append("A");
+			}
+			s = sBuilder.toString();
+		}
+		return s.substring(0, length);
 	}
 }
