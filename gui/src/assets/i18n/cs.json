@@ -89,6 +89,7 @@
     "MOVE_TO_PRODUCTION_APPROVE": "Schválit žádost",
     "DOCUMENT_SIGN_TITLE": "Podepsání žádosti o přesun do produkce",
     "DOCUMENT_SIGN_SUCCESS": "Žádost byla podepsána",
-    "DOCUMENT_SIGN_GO_TO_FACILITY_DETAIL": "Přejít na detail facility"
+    "DOCUMENT_SIGN_GO_TO_FACILITY_DETAIL": "Přejít na detail facility",
+    "MOVE_TO_PRODUCTION_IN_PROGRESS": "Žádost pro tuto facility čeká na schválení"
   }
 }

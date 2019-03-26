@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ApiService } from "./api.service";
 import { Observable } from "rxjs";
 import { Facility } from "../models/Facility";
+import { Request } from "../models/Request";
 
 @Injectable({
   providedIn: 'root'
@@ -28,11 +29,11 @@ export class FacilitiesService {
       return this.apiService.post('/moveToProduction/createRequest/' + id, emails);
   }
 
-  getFacilityDetailsWithHash(hash: string): Observable<Facility> {
-    return this.apiService.get('/moveToProduction/getFacilityDetails/' + hash);
+  getRequestDetailsWithHash(hash: string): Observable<Request> {
+    return this.apiService.get('/moveToProduction/getFacilityDetails/?code=' + hash);
   }
 
-  signApprovalForProduction(id: number, hash: string): Observable<boolean> {
-    return this.apiService.post('/moveToProduction/approve/' + id, hash);
+  signApprovalForProduction(hash: string): Observable<boolean> {
+    return this.apiService.post('/moveToProduction/approve', hash);
   }
 }

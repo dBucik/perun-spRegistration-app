@@ -5,13 +5,14 @@
       <h2 class="card-title">
         {{'FACILITIES.DOCUMENT_SIGN_TITLE' | translate}}
       </h2>
-      <h4 class="mt-4">{{'FACILITIES.DETAIL_TITLE' | translate}}{{facility.id}} - {{facility.name}}</h4>
+      <h4 class="mt-4">{{'FACILITIES.FACILITY_DETAIL_TITLE' | translate}}{{facility.id}} - {{facility.name}}</h4>
       {{'FACILITIES.DESCRIPTION' | translate}}: {{facility.description}}
 
-      <button class="ml-2" mat-raised-button color="accent" (click)="approveRequest()">
-        {{'FACILITIES.MOVE_TO_PRODUCTION_APPROVE' | translate}}
-      </button>
-
+      <div class="pull-right">
+        <button class="ml-2" mat-raised-button color="accent" (click)="approveRequest()">
+          {{'FACILITIES.MOVE_TO_PRODUCTION_APPROVE' | translate}}
+        </button>
+      </div>
     </div>
   </div>
 </div>

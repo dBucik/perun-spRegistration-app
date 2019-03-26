@@ -19,7 +19,7 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
     private router: Router,
     private snackBar: MatSnackBar,
     private translate: TranslateService,
-  ) { }
+  ) {}
 
   private sub : Subscription;
   loading = true;
@@ -30,12 +30,16 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.sub = this.route.queryParams.subscribe(params => {
       this.hash = params.hash;
-      this.facilitiesService.getFacilityDetailsWithHash(this.hash).subscribe(facility =>{
-        this.facility = facility;
-        this.loading = false;
-      }, error => {
-        this.loading = false;
-        console.log(error);
+      console.log(this.hash);
+      this.facilitiesService.getRequestDetailsWithHash(this.hash).subscribe(request =>{
+        console.log(request.reqId);
+        this.facilitiesService.getFacility(request.facilityId).subscribe(facility => {
+          this.facility = facility;
+          this.loading = false;
+        }, error => {
+          this.loading = false;
+          console.log(error);
+        });
       });
     });
   }
@@ -45,14 +49,14 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
   }
 
   approveRequest(): void{
-    this.facilitiesService.signApprovalForProduction(this.facility.id, this.hash).subscribe(req => {
+    this.facilitiesService.signApprovalForProduction(this.hash).subscribe(req => {
       this.translate.get('FACILITIES.DOCUMENT_SIGN_SUCCESS').subscribe(successMessage => {
         this.translate.get('FACILITIES.DOCUMENT_SIGN_GO_TO_FACILITY_DETAIL').subscribe(goToFacilityMessage =>{
           let snackBarRef = this.snackBar
             .open(successMessage, goToFacilityMessage, {duration: 5000});
 
           snackBarRef.onAction().subscribe(() => {
-            this.router.navigate(['/facility/detail/' + this.facility.id]);
+            this.router.navigate(['/facilities/detail/' + this.facility.id]);
           });
 
           this.router.navigate(['/']);

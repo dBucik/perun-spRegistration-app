@@ -24,7 +24,7 @@ const routes: Routes = [
     loadChildren: './facilities/facilities.module#FacilitiesModule'
   },
   {
-    path: 'documentSign',
+    path: 'sign',
     component: DocumentSignComponent
   },
   {

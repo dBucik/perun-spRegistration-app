@@ -5,5 +5,6 @@ export interface Facility {
   name: string,
   description: string,
   testEnv: boolean,
+  activeRequestId: number;
   attrs: Map<string, PerunAttribute>
 }

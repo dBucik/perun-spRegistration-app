@@ -89,6 +89,7 @@
     "MOVE_TO_PRODUCTION_APPROVE": "Approve this request",
     "DOCUMENT_SIGN_TITLE": "Sign request for move to production",
     "DOCUMENT_SIGN_SUCCESS": "Request was signed",
-    "DOCUMENT_SIGN_GO_TO_FACILITY_DETAIL": "go to facility detail"
+    "DOCUMENT_SIGN_GO_TO_FACILITY_DETAIL": "go to facility detail",
+    "MOVE_TO_PRODUCTION_IN_PROGRESS": "Request for this facility is waiting for approval"
   }
 }
