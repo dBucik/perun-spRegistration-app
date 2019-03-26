@@ -174,22 +174,6 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public Map<String, PerunAttribute> getFacilityAttributes(Long facilityId) throws RPCException {
-		log.debug("getFacilityAttributes({})", facilityId);
-		if (facilityId == null) {
-			throw new IllegalArgumentException("facilityId is null");
-		}
-		Map<String, Object> params = new LinkedHashMap<>();
-		params.put("facility", facilityId);
-
-		JSONArray res = makeRpcCallForArray(ATTRIBUTES_MANAGER, "getAttributes", params, false);
-		Map<String, PerunAttribute> attributeMap = MapperUtils.mapAttributes(res);
-
-		log.debug("getFacilityAttributes returns: {}", attributeMap);
-		return attributeMap;
-	}
-
-	@Override
 	public Map<String, PerunAttribute> getFacilityAttributes(Long facilityId, List<String> attrNames) throws RPCException {
 		log.debug("getFacilityAttributes(facilityId: {}, attrNames: {})", facilityId, attrNames);
 		if (facilityId == null || attrNames == null) {

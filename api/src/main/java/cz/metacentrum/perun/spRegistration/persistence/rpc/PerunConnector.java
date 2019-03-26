@@ -70,13 +70,6 @@ public interface PerunConnector {
 	PerunAttribute getFacilityAttribute(Long facilityId, String attrName) throws RPCException;
 
 	/**
-	 * Get all attributes of facility.
-	 * @param facilityId ID of facility.
-	 * @return Map (key = attribute name, value = attribute) of facility attributes.
-	 */
-	Map<String, PerunAttribute> getFacilityAttributes(Long facilityId) throws RPCException;
-
-	/**
 	 * Get specified attributes for facility.
 	 * @param facilityId ID of facility.
 	 * @param attrNames Names of attributes to be retrieved.
