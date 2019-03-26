@@ -59,4 +59,20 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl('facilities/moveToProduction/' + this.facility.id );
   }
 
+  deleteFacility(): void {
+
+  }
+
+  editFacility(): void{
+
+  }
+
+  addFacilityAdmin():void{
+
+  }
+
+  editAdmins(): void{
+
+  }
+
 }

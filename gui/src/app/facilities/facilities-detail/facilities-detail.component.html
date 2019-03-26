@@ -7,7 +7,7 @@
       </h2>
       {{'FACILITIES.DESCRIPTION' | translate}}: {{facility.description}}
 
-      <div *ngIf="facility.testEnv && !facility.activeRequestId" class="pull-right">
+      <div *ngIf="facility.testEnv" class="pull-right">
 
         <div *ngIf="!facility.activeRequestId">
           <button class="ml-2" mat-raised-button color="accent" (click)="moveToProduction()">
@@ -16,14 +16,18 @@
         </div>
 
         <div *ngIf="facility.activeRequestId">
-          <button class="ml-2" mat-raised-button disabled color="accent">
+          <div>
             {{'FACILITIES.MOVE_TO_PRODUCTION_IN_PROGRESS' | translate}}
-          </button>
+          </div>
+          <div class="pull-right">
+            <button class="ml-2" mat-raised-button
+                    [routerLink]="['/requests/detail', facility.activeRequestId]">
+              {{'FACILITIES.MOVE_TO_PRODUCTION_TO_REQUEST' | translate}}
+            </button>
+          </div>
         </div>
 
       </div>
-
-
 
       <h4 class="mt-4">{{'FACILITIES.FACILITY_ATTRIBUTES' | translate}}</h4>
 
@@ -40,6 +44,19 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-dark"></tr>
       </table>
+
+      <button class="ml-2" mat-raised-button color="accent" (click)="deleteFacility()">
+        {{'FACILITIES.DELETE_FACILITY' | translate}}
+      </button>
+      <button class="ml-2" mat-raised-button color="accent" (click)="editFacility()">
+        {{'FACILITIES.EDIT_FACILITY' | translate}}
+      </button>
+      <button class="ml-2" mat-raised-button color="accent" (click)="addFacilityAdmin()">
+        {{'FACILITIES.ADD_ADMIN' | translate}}
+      </button>
+      <button class="ml-2" mat-raised-button color="accent" (click)="editAdmins()">
+        {{'FACILITIES.EDIT_ADMIN' | translate}}
+      </button>
 
     </div>
   </div>

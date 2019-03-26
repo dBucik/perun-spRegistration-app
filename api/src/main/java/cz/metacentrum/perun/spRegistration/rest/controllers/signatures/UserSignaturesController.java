@@ -59,6 +59,9 @@ public class UserSignaturesController {
 											 @RequestBody String code) throws SpRegistrationApiException {
 		log.debug("signApprovalForProduction(user: {}, code: {})", user, code);
 		try {
+			if (code.startsWith("\"")) {
+				code = code.substring(1, code.length() - 1);
+			}
 			code = URLDecoder.decode(code, StandardCharsets.UTF_8.toString());
 			code = code.replaceAll(" ", "+");
 			return service.signTransferToProduction(user, code);
