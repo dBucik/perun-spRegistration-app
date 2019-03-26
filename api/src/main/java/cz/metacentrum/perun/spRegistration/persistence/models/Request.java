@@ -97,6 +97,9 @@ public class Request {
 	@JsonIgnore
 	public String getFacilityName() {
 		PerunAttribute attr = attributes.get("urn:perun:facility:attribute-def:def:serviceName");
+		if (attr == null) {
+			return null;
+		}
 		Map<String, String> value = attr.valueAsMap(false);
 		return value.get("en");
 	}
@@ -104,6 +107,9 @@ public class Request {
 	@JsonIgnore
 	public String getFacilityDescription() {
 		PerunAttribute attr = attributes.get("urn:perun:facility:attribute-def:def:serviceDescription");
+		if (attr == null) {
+			return null;
+		}
 		Map<String, String> value = attr.valueAsMap(false);
 		return value.get("en");
 	}

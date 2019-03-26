@@ -68,7 +68,6 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
 	private final Properties messagesProperties;
-	private final String adminsAttr;
 	private final Cipher cipher;
 
 	@Autowired
@@ -78,7 +77,6 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.messagesProperties = messagesProperties;
-		this.adminsAttr = appConfig.getAdminsAttr();
 		this.cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 	}
 
@@ -92,7 +90,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 		addProxyIdentifierAttr(attributes);
 
-		Request req = createRequest(null, userId, attributes);
+		Request req = createRequest(null, userId, attributes, RequestAction.REGISTER_NEW_SP);
 		validateCreatedRequestAndNotifyUser(req);
 
 		log.debug("createRegistrationRequest returns: {}", req.getReqId());
@@ -111,7 +109,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 			throw new UnauthorizedActionException("User is not registered as facility admin, cannot create request");
 		}
 
-		Request req = createRequest(facilityId, userId, attributes);
+		Request req = createRequest(facilityId, userId, attributes, RequestAction.UPDATE_FACILITY);
 		validateCreatedRequestAndNotifyUser(req);
 
 		log.debug("createFacilityChangesRequest returns: {}", req.getReqId());
@@ -129,7 +127,10 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 			throw new UnauthorizedActionException("User is not registered as facility admin, cannot create request");
 		}
 
-		Request req = createRequest(facilityId, userId, new ArrayList<>());
+		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
+		Map<String, PerunAttribute> facilityAttributes = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
+
+		Request req = createRequest(facilityId, userId, facilityAttributes, RequestAction.DELETE_FACILITY);
 		validateCreatedRequestAndNotifyUser(req);
 
 		log.debug("createRemovalRequest returns: {}", req.getReqId());
@@ -300,9 +301,11 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		Long activeRequestId = requestManager.getActiveRequestIdByFacilityId(facilityId);
 		facility.setActiveRequestId(activeRequestId);
 
-		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId);
+		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
+		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
 		facility.setAttrs(attrs);
-		boolean inTest = attrs.get(appConfig.getTestSpAttribute()).valueAsBoolean(false);
+		boolean inTest = attrs.get(appConfig.getTestSpAttribute())
+				.valueAsBoolean(false);
 		facility.setTestEnv(inTest);
 
 		log.debug("getDetailedFacility returns: {}", facility);
@@ -345,9 +348,13 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	/* PRIVATE METHODS */
 
-	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes) throws InternalErrorException, CreateRequestException {
+	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes, RequestAction action) throws InternalErrorException, CreateRequestException {
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
-		return createRequest(facilityId, userId, RequestAction.REGISTER_NEW_SP, convertedAttributes);
+		return createRequest(facilityId, userId, action, convertedAttributes);
+	}
+
+	private Request createRequest(Long facilityId, Long userId, Map<String, PerunAttribute> attributes, RequestAction action) throws InternalErrorException, CreateRequestException {
+		return createRequest(facilityId, userId, action, attributes);
 	}
 
 	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes) throws InternalErrorException, CreateRequestException {

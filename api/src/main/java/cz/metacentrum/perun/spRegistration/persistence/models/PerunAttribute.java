@@ -268,9 +268,11 @@ public class PerunAttribute {
 	private Boolean valueAsBoolean(Object value) {
 		if (value instanceof Boolean) {
 			return (Boolean) value;
+		} else if (value == null) {
+			return false;
 		}
 
-		return null;
+		return false;
 	}
 
 	private List<String> valueAsArray(Object value) {

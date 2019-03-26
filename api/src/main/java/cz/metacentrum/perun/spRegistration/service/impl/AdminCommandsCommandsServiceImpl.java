@@ -281,6 +281,10 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		request.setFacilityId(facility.getId());
 
 		log.info("Setting facility attributes");
+//		PerunAttribute testSpAttr = new PerunAttribute();
+//		testSpAttr.setDefinition(appConfig.getAttrDefinition(appConfig.getTestSpAttribute()));
+//		testSpAttr.setValue(true);
+//		request.getAttributes().put(appConfig.getTestSpAttribute(), testSpAttr);
 		boolean result = perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonArrayForPerun());
 		result = result && perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
 
