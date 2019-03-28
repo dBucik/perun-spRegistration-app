@@ -1,11 +1,13 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
+import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
@@ -54,6 +56,7 @@ import java.util.stream.Collectors;
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
+@SuppressWarnings("Duplicates")
 @Service("userService")
 public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
@@ -69,15 +72,17 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
+	private final Config config;
 	private final Properties messagesProperties;
 	private final Cipher cipher;
 
 	@Autowired
-	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
+	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
 										   AppConfig appConfig, Properties messagesProperties) throws NoSuchPaddingException, NoSuchAlgorithmException {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
+		this.config = config;
 		this.messagesProperties = messagesProperties;
 		this.cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 	}
@@ -311,6 +316,17 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		facility.setTestEnv(inTest);
 
 		log.debug("getDetailedFacility returns: {}", facility);
+		return facility;
+	}
+
+	@Override
+	public Facility getDetailedFacilityWithInputs(Long facilityId, Long userId) throws UnauthorizedActionException, RPCException, InternalErrorException {
+		Facility facility = getDetailedFacility(facilityId, userId);
+		for (Map.Entry<String, PerunAttribute> attr: facility.getAttrs().entrySet()) {
+			AttrInput input = config.getInputMap().get(attr.getKey());
+			attr.getValue().setInput(input);
+		}
+
 		return facility;
 	}
 

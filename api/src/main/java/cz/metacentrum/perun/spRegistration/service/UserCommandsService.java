@@ -124,6 +124,15 @@ public interface UserCommandsService {
 	Facility getDetailedFacility(Long facilityId, Long userId) throws UnauthorizedActionException, RPCException, InternalErrorException;
 
 	/**
+	 * Get detailed facility.
+	 * @param facilityId ID of facility.
+	 * @param userId ID of user.
+	 * @return Found facility.
+	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
+	 */
+	Facility getDetailedFacilityWithInputs(Long facilityId, Long userId) throws UnauthorizedActionException, RPCException, InternalErrorException;
+
+	/**
 	 * Add users as admins (managers) for facility in Perun
 	 * @param user user performing the action
 	 * @param facilityId ID of facility in Perun.
