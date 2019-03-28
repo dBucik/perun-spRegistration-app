@@ -118,14 +118,6 @@ public interface PerunConnector {
 	boolean addFacilityAdmin(Long facilityId, Long userId) throws RPCException;
 
 	/**
-	 * Remove user from admins (managers) of facility.
-	 * @param facilityId ID of facility.
-	 * @param userId ID of user.
-	 * @return True if everything went OK.
-	 */
-	boolean removeFacilityAdmin(Long facilityId, Long userId) throws RPCException;
-
-	/**
 	 * Fetch attribute definition by name.
 	 * @param name Name of the attribute.
 	 * @return Attribute definition

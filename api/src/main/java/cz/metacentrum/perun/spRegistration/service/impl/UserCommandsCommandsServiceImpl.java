@@ -65,7 +65,6 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	private static final String REQUESTED_MAIL_KEY = "requestedMail";
 	private static final String ACTION_KEY = "action";
 	private static final String ACTION_ADD_ADMIN = "ADD";
-	private static final String ACTION_REMOVE_ADMIN = "REMOVE";
 
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
@@ -360,17 +359,6 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		return res;
 	}
 
-	@Override
-	public boolean removeAdminsNotify(User user, Long facilityId, List<String> admins)
-			throws UnauthorizedActionException, RPCException, BadPaddingException, InvalidKeyException,
-			IllegalBlockSizeException, UnsupportedEncodingException, InternalErrorException {
-		log.debug("removeAdminsNotify(user: {}, facilityId: {}, admins: {}", user, facilityId, admins);
-		boolean res = addRemoveAdminsNotify(user, facilityId, admins, ACTION_REMOVE_ADMIN);
-
-		log.debug("removeAdminsNotify returns: {}", res);
-		return res;
-	}
-
 	private boolean addRemoveAdminsNotify(User user, Long facilityId, List<String> admins, String action)
 			throws UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, RPCException, UnsupportedEncodingException, InternalErrorException {
 		log.debug("addRemoveAdminsNotify(user: {}, facilityId: {}, admins: {}", user, facilityId, admins);
@@ -409,10 +397,10 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public boolean confirmAddRemoveAdmin(User user, String code)
+	public boolean confirmAddAdmin(User user, String code)
 			throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
 			ExpiredCodeException, RPCException {
-		log.debug("confirmAddRemoveAdmin({})", code);
+		log.debug("confirmAddAdmin({})", code);
 		JSONObject decrypted = decryptAddRemoveAdminCode(code);
 		boolean isExpired = isExpiredCode(decrypted);
 
@@ -426,13 +414,11 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		boolean result;
 		if (ACTION_ADD_ADMIN.equalsIgnoreCase(action)) {
 			result = perunConnector.addFacilityAdmin(facilityId, user.getId());
-		} else if (ACTION_REMOVE_ADMIN.equalsIgnoreCase(action)) {
-			result = perunConnector.removeFacilityAdmin(facilityId, user.getId());
 		} else {
 			throw new MalformedCodeException("No valid action has been found in code");
 		}
 
-		log.debug("confirmAddRemoveAdmin returns: {}", result);
+		log.debug("confirmAddAdmin returns: {}", result);
 		return result;
 	}
 

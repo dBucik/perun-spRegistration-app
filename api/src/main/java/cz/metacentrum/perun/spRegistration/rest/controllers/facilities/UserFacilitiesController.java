@@ -50,26 +50,14 @@ public class UserFacilitiesController {
 		}
 	}
 
-	@PostMapping(path = "/api/removeAdmins/{facilityId}")
-	public boolean removeAdmins(@SessionAttribute("user") User user,
-								@PathVariable("facilityId") Long facilityId,
-								@RequestBody List<String> adminEmails) throws SpRegistrationApiException {
-		log.debug("removeAdminsNotify(user: {}, facilityId: {}, adminEmails: {})", user.getId(), facilityId, adminEmails);
-		try {
-			return service.removeAdminsNotify(user, facilityId, adminEmails);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
-	@GetMapping(path = "/api/addRemoveAdmin/confirm", params = "code")
+	@GetMapping(path = "/api/addAdmin/confirm", params = "code")
 	public boolean addAdminConfirm(@SessionAttribute("user") User user,
 								   String code) throws SpRegistrationApiException {
 		log.debug("addAdminConfirm(user: {}, code: {})", user, code);
 		try {
 			code = URLDecoder.decode(code, StandardCharsets.UTF_8.toString());
 			code = code.replaceAll(" ", "+");
-			return service.confirmAddRemoveAdmin(user, code);
+			return service.confirmAddAdmin(user, code);
 		} catch (Exception e) {
 			throw new SpRegistrationApiException(e);
 		}

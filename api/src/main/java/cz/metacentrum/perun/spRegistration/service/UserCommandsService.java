@@ -134,20 +134,10 @@ public interface UserCommandsService {
 	boolean addAdminsNotify(User user, Long facilityId, List<String> admins) throws UnauthorizedActionException, RPCException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, UnsupportedEncodingException, InternalErrorException;
 
 	/**
-	 * Remove users from admins (managers) of facility in Perun.
-	 * @param user user performing the action
-	 * @param facilityId ID of facility in Perun.
-	 * @param admins List of emails to whom the notification should be sent
-	 * @return True if everything went OK.
-	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
-	 */
-	boolean removeAdminsNotify(User user, Long facilityId, List<String> admins) throws UnauthorizedActionException, RPCException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, UnsupportedEncodingException, InternalErrorException;
-
-	/**
 	 * Confirm request to be added or removed as a facility admin.
 	 * @param user user to be added or removed from facility admins
 	 * @param code code generated for the approval
 	 * @return True if everything went ok
 	 */
-	boolean confirmAddRemoveAdmin(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException, RPCException;
+	boolean confirmAddAdmin(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException, RPCException;
 }

@@ -264,18 +264,6 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public boolean removeFacilityAdmin(Long facilityId, Long userId) throws RPCException {
-		log.debug("removeFacilityAdmin(facilityId: {}, userId:{})", facilityId, userId);
-		if (facilityId == null || userId == null) {
-			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", userId: " + userId);
-		}
-		boolean result = addRemoveFacilityAdmin(facilityId, userId, false);
-
-		log.debug("removeFacilityAdmin returns: {}", result);
-		return result;
-	}
-
-	@Override
 	public Set<Long> getFacilityIdsWhereUserIsAdmin(Long userId) throws RPCException {
 		log.debug("getFacilityIdsWhereUserIsAdmin({})", userId);
 		if (userId == null) {
