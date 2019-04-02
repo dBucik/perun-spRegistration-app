@@ -1,7 +1,7 @@
 package cz.metacentrum.perun.spRegistration.persistence.configs;
 
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
-import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 

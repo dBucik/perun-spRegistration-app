@@ -12,7 +12,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
@@ -150,7 +150,8 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		log.debug("updateRequest(requestId: {}, userId: {}, attributes: {})", requestId, userId, attributes);
 		if (requestId == null || userId == null || attributes == null) {
 			log.error("Illegal input - requestId: {}, userId: {}, attributes: {}", requestId, userId, attributes);
-			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId + ", attributes: " + attributes);
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId +
+					", attributes: " + attributes);
 		}
 
 		Request request = fetchRequestAndValidate(requestId);
@@ -265,7 +266,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Long requestId = decrypted.getLong(REQUEST_ID_KEY);
-		boolean result = requestManager.addSignature(requestId, user.getId());
+		boolean result = requestManager.addSignature(requestId, user.getId(), user.getName());
 
 		log.debug("signTransferToProduction returns: {}", result);
 		return result;

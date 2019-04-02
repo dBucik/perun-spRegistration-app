@@ -1,5 +1,7 @@
 package cz.metacentrum.perun.spRegistration.persistence;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
@@ -7,11 +9,12 @@ import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.Mails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -163,5 +166,12 @@ public class Utils {
 
 		log.debug("updateRequestInDbAndNotifyUser() returns: {}", res);
 		return res;
+	}
+
+	public static String prettyPrintJsonString(JsonNode jsonNode) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		Object json = mapper.readValue(jsonNode.toString(), Object.class);
+
+		return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
 	}
 }

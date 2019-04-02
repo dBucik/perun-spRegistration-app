@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
@@ -50,11 +51,14 @@ public class UserFacilitiesController {
 		}
 	}
 
-	@GetMapping(path = "/api/addAdmin/confirm", params = "code")
+	@PostMapping(path = "/api/addAdmin/confirm")
 	public boolean addAdminConfirm(@SessionAttribute("user") User user,
-								   String code) throws SpRegistrationApiException {
+								   @RequestBody String code) throws SpRegistrationApiException {
 		log.debug("addAdminConfirm(user: {}, code: {})", user, code);
 		try {
+			if (code.startsWith("\"")) {
+				code = code.substring(1, code.length() - 1);
+			}
 			code = URLDecoder.decode(code, StandardCharsets.UTF_8.toString());
 			code = code.replaceAll(" ", "+");
 			return service.confirmAddAdmin(user, code);

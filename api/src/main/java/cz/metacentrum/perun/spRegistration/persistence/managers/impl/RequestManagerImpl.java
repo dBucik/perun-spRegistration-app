@@ -269,9 +269,9 @@ public class RequestManagerImpl implements RequestManager {
 	public Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException {
 		log.trace("PERS: getActiveRequestIdByFacilityId({})", facilityId);
 		if (facilityId == null) {
-			log.error("Illegal parameters passed: facilityId IS NULL");
-			throw new IllegalArgumentException();
+			return null;
 		}
+
 		List<Integer> allowedStatuses = Arrays.asList(RequestStatus.APPROVED.getAsInt(), RequestStatus.REJECTED.getAsInt());
 
 		String query = "SELECT id FROM " + REQUESTS_TABLE +
@@ -295,18 +295,19 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
-	public boolean addSignature(Long requestId, Long userId) {
-		log.trace("PERS: addSignature(requestId: {}, userId: {})", requestId, userId);
-		if (requestId == null || userId == null) {
-			log.error("Wrong parameters passed: (requestId: {}, user:Id {})", requestId, userId);
+	public boolean addSignature(Long requestId, Long userId, String userName) {
+		log.trace("PERS: addSignature(requestId: {}, userId: {}, userName: {})", requestId, userId, userName);
+		if (requestId == null || userId == null || userName == null || userName.isEmpty()) {
+			log.error("Wrong parameters passed: (requestId: {}, user:Id {}, userName: {})", requestId, userId, userName);
 			throw new IllegalArgumentException();
 		}
 		
 		String query = "INSERT INTO" + APPROVALS_TABLE +
-				"(request_id, user_id) VALUES (:request_id, :user_id)";
+				"(request_id, user_id, name) VALUES (:request_id, :user_id, :username)";
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("request_id", requestId);
 		params.addValue("user_id", userId);
+		params.addValue("username", userName);
 
 		int res = jdbcTemplate.update(query, params);
 		

@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.persistence.rpc;
+package cz.metacentrum.perun.spRegistration.persistence.connectors;
 
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;

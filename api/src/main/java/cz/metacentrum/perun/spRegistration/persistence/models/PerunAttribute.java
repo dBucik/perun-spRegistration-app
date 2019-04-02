@@ -87,6 +87,26 @@ public class PerunAttribute {
 		this.input = input;
 	}
 
+	public String valueAsString() {
+		return valueAsString(false);
+	}
+
+	public Long valueAsLong() {
+		return valueAsLong(false);
+	}
+
+	public Boolean valueAsBoolean() {
+		return valueAsBoolean(false);
+	}
+
+	public List<String> valueAsArray() {
+		return valueAsArray(false);
+	}
+
+	public Map<String,String> valueAsMap() {
+		return valueAsMap(false);
+	}
+
 	public String valueAsString(boolean isOldValue) {
 		if (isOldValue) {
 			return valueAsString(oldValue);

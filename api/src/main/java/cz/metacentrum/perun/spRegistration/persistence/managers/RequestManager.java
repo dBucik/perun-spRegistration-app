@@ -102,9 +102,10 @@ public interface RequestManager {
 	 * Add signature for moving to production
 	 * @param requestId id of request to be signed
 	 * @param userId id of user giving the signature
+	 * @param userName name of signing user
 	 * @return True if everything went OK
 	 */
-	boolean addSignature(Long requestId, Long userId);
+	boolean addSignature(Long requestId, Long userId, String userName);
 
 	/**
 	 * Get all approvals for transferring of service into production environment

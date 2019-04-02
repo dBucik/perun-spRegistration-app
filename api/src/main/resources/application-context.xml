@@ -240,7 +240,7 @@
         <constructor-arg name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="connector" class="cz.metacentrum.perun.spRegistration.persistence.rpc.impl.PerunConnectorRpc">
+    <bean id="connector" class="cz.metacentrum.perun.spRegistration.persistence.connectors.impl.PerunConnectorRpc">
         <property name="perunRpcUrl" value="${rpc.url}"/>
         <property name="perunRpcUser" value="${rpc.user}"/>
         <property name="perunRpcPassword" value="${rpc.password}"/>

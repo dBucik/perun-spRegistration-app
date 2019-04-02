@@ -234,7 +234,7 @@ public class RequestManagerTests {
 
 	@Test
 	public void addSignature() {
-		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser.getId() );
+		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName());
 
 		List<RequestSignature> found = requestManager.getRequestSignatures(req1.getReqId());
 
@@ -249,7 +249,7 @@ public class RequestManagerTests {
 
 	@Test
 	public void getRequestSignatures() {
-		requestManager.addSignature(req1.getReqId(), fakeUser.getId());
+		requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName());
 		approval1.setRequestId(req1.getReqId());
 
 		List<RequestSignature> res = requestManager.getRequestSignatures(approval1.getRequestId());
