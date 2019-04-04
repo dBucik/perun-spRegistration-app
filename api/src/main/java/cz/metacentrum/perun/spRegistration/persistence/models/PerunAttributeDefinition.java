@@ -37,6 +37,10 @@ public class PerunAttributeDefinition extends PerunEntity {
 	}
 
 	public static PerunAttributeDefinition fromPerunJson(JSONObject jsonObject) {
+		if (jsonObject == null || jsonObject.isEmpty()) {
+			return null;
+		}
+
 		Long id = jsonObject.getLong("id");
 		String friendlyName = jsonObject.getString("friendlyName");
 		String namespace = jsonObject.getString("namespace");

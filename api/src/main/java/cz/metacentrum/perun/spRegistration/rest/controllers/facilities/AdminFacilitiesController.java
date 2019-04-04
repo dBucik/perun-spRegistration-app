@@ -37,28 +37,4 @@ public class AdminFacilitiesController {
 			throw new SpRegistrationApiException(e);
 		}
 	}
-
-	@PostMapping(path = "/api/addAdmins/{facilityId}")
-	public boolean addAdmins(@SessionAttribute("user") User user,
-							 @PathVariable("facilityId") Long facilityId,
-							 @RequestBody List<Long> admins) throws SpRegistrationApiException {
-		log.debug("addAdmins(user: {}, facilityId: {}, admins: {})", user.getId(), facilityId, admins);
-		try {
-			return service.addAdmins(user.getId(), facilityId, admins);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
-
-	@PostMapping(path = "/api/removeAdmins/{facilityId}")
-	public boolean removeAdmins(@SessionAttribute("user") User user,
-								@PathVariable("facilityId") Long facilityId,
-								@RequestBody List<Long> admins) throws SpRegistrationApiException {
-		log.debug("removeAdmins(user: {}, facilityId: {}, admins: {})", user.getId(), facilityId, admins);
-		try {
-			return service.removeAdmins(user.getId(), facilityId, admins);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
-	}
 }

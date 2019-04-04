@@ -5,7 +5,7 @@ CREATE TABLE requests
 	status INTEGER NOT NULL,
 	action INTEGER NOT NULL,
 	requesting_user_id BIGINT NOT NULL,
-	attributes VARCHAR,
+	attributes TEXT,
 	modified_by BIGINT NOT NULL,
 	modified_at TIMESTAMP DEFAULT NOW()
 );
@@ -16,5 +16,6 @@ CREATE TABLE approvals
 (
 	request_id BIGINT NOT NULL,
 	user_id BIGINT NOT NULL,
+	name TEXT NOT NULL,
 	signed_at TIMESTAMP DEFAULT now()
 );

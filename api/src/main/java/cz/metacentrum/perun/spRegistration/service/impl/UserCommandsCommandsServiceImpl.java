@@ -1,16 +1,18 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
+import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
@@ -54,6 +56,7 @@ import java.util.stream.Collectors;
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
+@SuppressWarnings("Duplicates")
 @Service("userService")
 public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
@@ -63,19 +66,23 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	private static final String FACILITY_ID_KEY = "facilityId";
 	private static final String CREATED_AT_KEY = "createdAt";
 	private static final String REQUESTED_MAIL_KEY = "requestedMail";
+	private static final String ACTION_KEY = "action";
+	private static final String ACTION_ADD_ADMIN = "ADD";
 
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
+	private final Config config;
 	private final Properties messagesProperties;
 	private final Cipher cipher;
 
 	@Autowired
-	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
+	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
 										   AppConfig appConfig, Properties messagesProperties) throws NoSuchPaddingException, NoSuchAlgorithmException {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
+		this.config = config;
 		this.messagesProperties = messagesProperties;
 		this.cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 	}
@@ -143,7 +150,8 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		log.debug("updateRequest(requestId: {}, userId: {}, attributes: {})", requestId, userId, attributes);
 		if (requestId == null || userId == null || attributes == null) {
 			log.error("Illegal input - requestId: {}, userId: {}, attributes: {}", requestId, userId, attributes);
-			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId + ", attributes: " + attributes);
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId +
+					", attributes: " + attributes);
 		}
 
 		Request request = fetchRequestAndValidate(requestId);
@@ -158,7 +166,17 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 		log.debug("updating request");
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
-		request.setAttributes(convertedAttributes);
+		for (Map.Entry<String, PerunAttribute> pair: convertedAttributes.entrySet()) {
+			String key = pair.getKey();
+			PerunAttribute attr = pair.getValue();
+			if (request.getAttributes().containsKey(key)) {
+				request.getAttributes().get(key).setValue(attr.getValue());
+			} else {
+				request.getAttributes().put(key, attr);
+			}
+		}
+
+		request.setStatus(RequestStatus.WFA);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
@@ -233,7 +251,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	public Request getRequestDetailsForSignature(String code) throws InvalidKeyException,
 			BadPaddingException, IllegalBlockSizeException, MalformedCodeException, ExpiredCodeException {
 		log.debug("getRequestDetailsForSignature({})", code);
-		JSONObject decrypted = decryptCode(code);
+		JSONObject decrypted = decryptRequestCode(code);
 		boolean isExpired = isExpiredCode(decrypted);
 
 		if (isExpired) {
@@ -241,7 +259,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Long requestId = decrypted.getLong(REQUEST_ID_KEY);
-		Request result = requestManager.getRequestByReqId(requestId);
+		Request result = requestManager.getRequestById(requestId);
 
 		log.debug("getRequestDetailsForSignature returns: {}", result);
 		return result;
@@ -250,7 +268,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	@Override
 	public boolean signTransferToProduction(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException {
 		log.debug("signTransferToProduction(user: {}, code: {})", user, code);
-		JSONObject decrypted = decryptCode(code);
+		JSONObject decrypted = decryptRequestCode(code);
 		boolean isExpired = isExpiredCode(decrypted);
 
 		if (isExpired) {
@@ -258,7 +276,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Long requestId = decrypted.getLong(REQUEST_ID_KEY);
-		boolean result = requestManager.addSignature(requestId, user);
+		boolean result = requestManager.addSignature(requestId, user.getId(), user.getName());
 
 		log.debug("signTransferToProduction returns: {}", result);
 		return result;
@@ -313,6 +331,17 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
+	public Facility getDetailedFacilityWithInputs(Long facilityId, Long userId) throws UnauthorizedActionException, RPCException, InternalErrorException {
+		Facility facility = getDetailedFacility(facilityId, userId);
+		for (Map.Entry<String, PerunAttribute> attr: facility.getAttrs().entrySet()) {
+			AttrInput input = config.getInputMap().get(attr.getKey());
+			attr.getValue().setInput(input);
+		}
+
+		return facility;
+	}
+
+	@Override
 	public List<Request> getAllRequestsUserCanAccess(Long userId) throws RPCException {
 		log.debug("getAllRequestsUserCanAccess({})", userId);
 		if (userId == null) {
@@ -343,6 +372,80 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 				.collect(Collectors.toList());
 
 		log.debug("getAllFacilitiesWhereUserIsAdmin returns: {}", result);
+		return result;
+	}
+
+	@Override
+	public boolean addAdminsNotify(User user, Long facilityId, List<String> admins)
+			throws UnauthorizedActionException, RPCException, BadPaddingException, InvalidKeyException,
+			IllegalBlockSizeException, UnsupportedEncodingException, InternalErrorException {
+		log.debug("addAdminsNotify(user: {}, facilityId: {}, admins: {}", user, facilityId, admins);
+		boolean res = addRemoveAdminsNotify(user, facilityId, admins, ACTION_ADD_ADMIN);
+
+		log.debug("addAdminsNotify returns: {}", res);
+		return res;
+	}
+
+	private boolean addRemoveAdminsNotify(User user, Long facilityId, List<String> admins, String action)
+			throws UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, RPCException, UnsupportedEncodingException, InternalErrorException {
+		log.debug("addRemoveAdminsNotify(user: {}, facilityId: {}, admins: {}", user, facilityId, admins);
+		if (user == null || user.getId() == null || facilityId == null || admins == null || admins.isEmpty()) {
+			log.error("Wrong parameters passed(user: {}, facilityId: {}, admins: {})", user, facilityId, admins);
+			throw new IllegalArgumentException("Wrong parameters passed(user: " + user + ", facilityId: " + facilityId
+					+ ", admins: " + admins +")");
+		} else if (! isFacilityAdmin(facilityId, user.getId())) {
+			log.error("User cannot request adding admins to facility, user is not an admin");
+			throw new UnauthorizedActionException("User cannot request adding admins to facility, user is not an admin");
+		}
+
+		Map<String, String> mailsMap = new HashMap<>();
+		for (String adminEmail: admins) {
+			String code = createAddRemoveAdminCode(facilityId, adminEmail, action);
+			code = URLEncoder.encode(code, StandardCharsets.UTF_8.toString());
+			String link = appConfig.getAdminsEndpoint().concat("?").concat(code);
+			mailsMap.put(adminEmail, link);
+			log.debug("Generated code: {}", code); //TODO: remove
+		}
+
+		Facility facility = perunConnector.getFacilityById(facilityId);
+		if (facility == null) {
+			throw new InternalErrorException("Could not find facility for id: " + facilityId);
+		}
+
+		boolean res = true;
+		boolean isAddAdmins = ACTION_ADD_ADMIN.equalsIgnoreCase(action);
+		for (Map.Entry<String, String> entry: mailsMap.entrySet()) {
+			res = res && Mails.adminAddRemoveNotify(entry.getValue(), facility.getName(), entry.getKey(), isAddAdmins,
+					messagesProperties);
+		}
+
+		log.debug("addRemoveAdminsNotify returns: {}", res);
+		return res;
+	}
+
+	@Override
+	public boolean confirmAddAdmin(User user, String code)
+			throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
+			ExpiredCodeException, RPCException {
+		log.debug("confirmAddAdmin({})", code);
+		JSONObject decrypted = decryptAddRemoveAdminCode(code);
+		boolean isExpired = isExpiredCode(decrypted);
+
+		if (isExpired) {
+			throw new ExpiredCodeException("Code has expired");
+		}
+
+		Long facilityId = decrypted.getLong(FACILITY_ID_KEY);
+		String action = decrypted.getString(ACTION_KEY);
+
+		boolean result;
+		if (ACTION_ADD_ADMIN.equalsIgnoreCase(action)) {
+			result = perunConnector.addFacilityAdmin(facilityId, user.getId());
+		} else {
+			throw new MalformedCodeException("No valid action has been found in code");
+		}
+
+		log.debug("confirmAddAdmin returns: {}", result);
 		return result;
 	}
 
@@ -417,7 +520,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	}
 
 	private Request fetchRequestAndValidate(Long requestId) throws InternalErrorException {
-		Request request = requestManager.getRequestByReqId(requestId);
+		Request request = requestManager.getRequestById(requestId);
 		if (request == null) {
 			log.error("Could not retrieve request for id: {}", requestId);
 			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
@@ -450,7 +553,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 		Map<String, String> linksMap = new HashMap<>();
 		for (String authority: authorities) {
-			String code = createCode(request.getReqId(), request.getFacilityId(), authority);
+			String code = createRequestCode(request.getReqId(), request.getFacilityId(), authority);
 			code = URLEncoder.encode(code, StandardCharsets.UTF_8.toString());
 			String link = appConfig.getSignaturesEndpointUrl().concat("?").concat(code);
 			linksMap.put(authority, link);
@@ -460,7 +563,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		return linksMap;
 	}
 
-	private JSONObject decryptCode(String code)
+	private JSONObject decryptRequestCode(String code)
 			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException {
 		cipher.init(Cipher.DECRYPT_MODE, appConfig.getSecret());
 		Base64.Decoder b64dec = Base64.getDecoder();
@@ -474,7 +577,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 	}
 
-	private String createCode(Long requestId, Long facilityId, String requestedMail)
+	private String createRequestCode(Long requestId, Long facilityId, String requestedMail)
 			throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
 		cipher.init(Cipher.ENCRYPT_MODE, appConfig.getSecret());
 		JSONObject object = new JSONObject();
@@ -482,6 +585,35 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		object.put(FACILITY_ID_KEY, facilityId);
 		object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
 		object.put(REQUESTED_MAIL_KEY, requestedMail);
+
+		String strToEncrypt = object.toString();
+		Base64.Encoder b64enc = Base64.getEncoder();
+		byte[] encrypted = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
+		return b64enc.encodeToString(encrypted);
+	}
+
+	private JSONObject decryptAddRemoveAdminCode(String code)
+			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException {
+		cipher.init(Cipher.DECRYPT_MODE, appConfig.getSecret());
+		Base64.Decoder b64dec = Base64.getDecoder();
+		byte[] decrypted = cipher.doFinal(b64dec.decode(code));
+		String objInString = new String(decrypted);
+
+		try {
+			return new JSONObject(objInString);
+		} catch (JSONException e) {
+			throw new MalformedCodeException();
+		}
+	}
+
+	private String createAddRemoveAdminCode(Long facilityId, String requestedMail, String action)
+			throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+		cipher.init(Cipher.ENCRYPT_MODE, appConfig.getSecret());
+		JSONObject object = new JSONObject();
+		object.put(FACILITY_ID_KEY, facilityId);
+		object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
+		object.put(REQUESTED_MAIL_KEY, requestedMail);
+		object.put(ACTION_KEY, action);
 
 		String strToEncrypt = object.toString();
 		Base64.Encoder b64enc = Base64.getEncoder();

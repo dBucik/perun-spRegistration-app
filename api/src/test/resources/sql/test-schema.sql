@@ -19,5 +19,6 @@ CREATE TABLE approvals
 (
 	request_id BIGINT NOT NULL,
 	user_id BIGINT NOT NULL,
+	name TEXT NOT NULL,
 	signed_at TIMESTAMP DEFAULT now()
 );

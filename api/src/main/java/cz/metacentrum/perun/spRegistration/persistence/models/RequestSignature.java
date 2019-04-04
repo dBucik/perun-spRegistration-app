@@ -13,6 +13,7 @@ public class RequestSignature {
 	private Long requestId;
 	private Long userId;
 	private LocalDateTime signedAt;
+	private String name;
 
 	public Long getRequestId() {
 		return requestId;
@@ -38,12 +39,21 @@ public class RequestSignature {
 		this.signedAt = signedAt;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	@Override
 	public String toString() {
 		return "RequestSignature{" +
 				"requestId=" + requestId +
 				", userId=" + userId +
 				", signedAt=" + signedAt +
+				", name='" + name + '\'' +
 				'}';
 	}
 
@@ -54,11 +64,12 @@ public class RequestSignature {
 		RequestSignature that = (RequestSignature) o;
 		return Objects.equals(requestId, that.requestId) &&
 				Objects.equals(userId, that.userId) &&
-				Objects.equals(signedAt, that.signedAt);
+				Objects.equals(signedAt, that.signedAt) &&
+				Objects.equals(name, that.name);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(requestId, userId, signedAt);
+		return Objects.hash(requestId, userId, signedAt, name);
 	}
 }

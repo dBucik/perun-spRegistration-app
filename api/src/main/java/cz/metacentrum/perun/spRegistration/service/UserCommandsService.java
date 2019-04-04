@@ -122,4 +122,31 @@ public interface UserCommandsService {
 	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
 	 */
 	Facility getDetailedFacility(Long facilityId, Long userId) throws UnauthorizedActionException, RPCException, InternalErrorException;
+
+	/**
+	 * Get detailed facility.
+	 * @param facilityId ID of facility.
+	 * @param userId ID of user.
+	 * @return Found facility.
+	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
+	 */
+	Facility getDetailedFacilityWithInputs(Long facilityId, Long userId) throws UnauthorizedActionException, RPCException, InternalErrorException;
+
+	/**
+	 * Add users as admins (managers) for facility in Perun
+	 * @param user user performing the action
+	 * @param facilityId ID of facility in Perun.
+	 * @param admins List of emails to whom the notification should be sent
+	 * @return True if everything went OK.
+	 * @throws UnauthorizedActionException when user is not authorized to perform this action.
+	 */
+	boolean addAdminsNotify(User user, Long facilityId, List<String> admins) throws UnauthorizedActionException, RPCException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, UnsupportedEncodingException, InternalErrorException;
+
+	/**
+	 * Confirm request to be added or removed as a facility admin.
+	 * @param user user to be added or removed from facility admins
+	 * @param code code generated for the approval
+	 * @return True if everything went ok
+	 */
+	boolean confirmAddAdmin(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException, RPCException;
 }

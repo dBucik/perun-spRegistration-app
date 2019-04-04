@@ -3,7 +3,7 @@ package cz.metacentrum.perun.spRegistration.persistence.configs;
 import cz.metacentrum.perun.spRegistration.persistence.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
-import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 
 import java.util.List;
 import java.util.Properties;

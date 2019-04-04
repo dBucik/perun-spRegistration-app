@@ -1,14 +1,15 @@
-package cz.metacentrum.perun.spRegistration.persistence.rpc.impl;
+package cz.metacentrum.perun.spRegistration.persistence.connectors.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.metacentrum.perun.spRegistration.persistence.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.MapperUtils;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.persistence.rpc.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -264,18 +265,6 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public boolean removeFacilityAdmin(Long facilityId, Long userId) throws RPCException {
-		log.debug("removeFacilityAdmin(facilityId: {}, userId:{})", facilityId, userId);
-		if (facilityId == null || userId == null) {
-			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", userId: " + userId);
-		}
-		boolean result = addRemoveFacilityAdmin(facilityId, userId, false);
-
-		log.debug("removeFacilityAdmin returns: {}", result);
-		return result;
-	}
-
-	@Override
 	public Set<Long> getFacilityIdsWhereUserIsAdmin(Long userId) throws RPCException {
 		log.debug("getFacilityIdsWhereUserIsAdmin({})", userId);
 		if (userId == null) {
@@ -347,7 +336,7 @@ public class PerunConnectorRpc implements PerunConnector {
 				response = restTemplate.postForObject(actionUrl, map, JsonNode.class);
 			}
 
-			return (response != null) ? prettyPrintJsonString(response) : null;
+			return (response != null) ? Utils.prettyPrintJsonString(response) : null;
 		} catch (HttpClientErrorException ex) {
 			MediaType contentType = null;
 			if (ex.getResponseHeaders() != null) {
@@ -393,12 +382,5 @@ public class PerunConnectorRpc implements PerunConnector {
 			makeRpcCallForObject(FACILITIES_MANAGER, "removeAdmin", params, true);
 		}
 		return true;
-	}
-
-	private static String prettyPrintJsonString(JsonNode jsonNode) throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		Object json = mapper.readValue(jsonNode.toString(), Object.class);
-
-		return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
 	}
 }

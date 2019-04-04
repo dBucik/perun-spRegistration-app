@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.persistence.rpc;
+package cz.metacentrum.perun.spRegistration.persistence.connectors;
 
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
@@ -116,14 +116,6 @@ public interface PerunConnector {
 	 * @return True if everything went OK.
 	 */
 	boolean addFacilityAdmin(Long facilityId, Long userId) throws RPCException;
-
-	/**
-	 * Remove user from admins (managers) of facility.
-	 * @param facilityId ID of facility.
-	 * @param userId ID of user.
-	 * @return True if everything went OK.
-	 */
-	boolean removeFacilityAdmin(Long facilityId, Long userId) throws RPCException;
 
 	/**
 	 * Fetch attribute definition by name.
