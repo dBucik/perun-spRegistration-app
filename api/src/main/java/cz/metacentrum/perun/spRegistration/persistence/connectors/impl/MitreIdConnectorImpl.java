@@ -19,10 +19,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 
 public class MitreIdConnectorImpl implements MitreIdConnector {
 
@@ -41,37 +41,25 @@ public class MitreIdConnectorImpl implements MitreIdConnector {
 	private static final String ALLOW_INTROSPECTION = "allowIntrospection";
 	private static final String CONTACTS = "contacts";
 
-	//TODO: get endpoints and credentials from application-context.xm
-	//create method for sending requests to mitre
-	//add attribute for storing client ID (not client_id) in Perun
-	//create method to update that attribute
-
 	private final MitreIdAttrsConfig attrsConfig;
 
 	private final String username;
 	private final String password;
-	private final String getClientEndpoint;
-	private final String createClientEndpoint;
-	private final String updateClientEndpoint;
-	private final String deleteClientEndpoint;
+	private final String clientsEndpoint;
 
 	public MitreIdConnectorImpl(MitreIdAttrsConfig attrsConfig, String username, String password,
-								String getClientEndpoint, String createClientEndpoint, String updateClientEndpoint,
-								String deleteClientEndpoint) {
+								String clientsEndpoint) {
 		this.attrsConfig = attrsConfig;
 		this.username = username;
 		this.password = password;
-		this.getClientEndpoint = getClientEndpoint;
-		this.createClientEndpoint = createClientEndpoint;
-		this.updateClientEndpoint = updateClientEndpoint;
-		this.deleteClientEndpoint = deleteClientEndpoint;
+		this.clientsEndpoint = clientsEndpoint;
 	}
 
 	@Override
 	public MitreIdResponse createClient(Map<String, PerunAttribute> attrs) throws MitreIDApiException {
 		JSONObject body = updateJsonObject(null, attrs);
 
-		JSONObject response = makeCall(createClientEndpoint, body, RequestMethod.POST);
+		JSONObject response = makeCall(clientsEndpoint, body, RequestMethod.POST);
 		Long id = response.getLong(ID);
 		String clientId = response.getString(CLIENT_ID);
 		String clientSecret = response.getString(CLIENT_SECRET);
@@ -86,16 +74,16 @@ public class MitreIdConnectorImpl implements MitreIdConnector {
 
 	@Override
 	public boolean updateClient(Long id, Map<String, PerunAttribute> attrs) throws MitreIDApiException {
-		JSONObject actualClient = makeCall(getClientEndpoint + "/" + id, null, RequestMethod.GET);
+		JSONObject actualClient = makeCall(clientsEndpoint + "/" + id, null, RequestMethod.GET);
 		JSONObject newClient = updateJsonObject(actualClient, attrs);
-		JSONObject response = makeCall(updateClientEndpoint, newClient, RequestMethod.PUT);
+		JSONObject response = makeCall(clientsEndpoint, newClient, RequestMethod.PUT);
 
 		return response == null;
 	}
 
 	@Override
 	public boolean deleteClient(Long id) throws MitreIDApiException {
-		JSONObject response = makeCall(deleteClientEndpoint + "/" + id, null, RequestMethod.DELETE);
+		JSONObject response = makeCall(clientsEndpoint + "/" + id, null, RequestMethod.DELETE);
 		return response == null;
 	}
 
@@ -122,8 +110,8 @@ public class MitreIdConnectorImpl implements MitreIdConnector {
 		log.debug("makeCallForObject(endpoint: {}, body: {}", endpoint, body);
 
 		RestTemplate restTemplate = new RestTemplate();
-		List<ClientHttpRequestInterceptor> interceptors =
-				Collections.singletonList(new BasicAuthorizationInterceptor(username, password));
+		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+		interceptors.add(new BasicAuthorizationInterceptor(username, password));
 		restTemplate.setRequestFactory(new InterceptingClientHttpRequestFactory(restTemplate.getRequestFactory(), interceptors));
 
 		//make the call
@@ -131,10 +119,10 @@ public class MitreIdConnectorImpl implements MitreIdConnector {
 			JSONObject response = null;
 			switch (method) {
 				case POST: {
-					response = restTemplate.postForObject(endpoint, body.toString(), JSONObject.class);
+					response = restTemplate.postForObject(endpoint, body, JSONObject.class);
 				} break;
 				case PUT: {
-					restTemplate.put(endpoint, body.toString(), JSONObject.class);
+					restTemplate.put(endpoint, body, JSONObject.class);
 				} break;
 				case GET: {
 					response = restTemplate.getForEntity(endpoint, JSONObject.class).getBody();
@@ -146,7 +134,7 @@ public class MitreIdConnectorImpl implements MitreIdConnector {
 					throw new MitreIDApiException("Unsupported method: " + method);
 			}
 
-			log.debug("makeGetCall returns: {}", response);
+			log.debug("makeCall returns: {}", response);
 			return response;
 		} catch (HttpClientErrorException ex) {
 			MediaType contentType = null;

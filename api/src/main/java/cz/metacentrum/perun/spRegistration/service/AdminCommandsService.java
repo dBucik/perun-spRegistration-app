@@ -1,5 +1,6 @@
 package cz.metacentrum.perun.spRegistration.service;
 
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.MitreIDApiException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
@@ -27,7 +28,7 @@ public interface AdminCommandsService {
 	 * @throws CannotChangeStatusException when status of the request cannot be changed.
 	 */
 	boolean approveRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, RPCException;
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, RPCException, MitreIDApiException;
 
 	/**
 	 * Reject request.

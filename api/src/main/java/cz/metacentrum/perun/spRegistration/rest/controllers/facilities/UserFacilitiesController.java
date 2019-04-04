@@ -67,4 +67,15 @@ public class UserFacilitiesController {
 		}
 	}
 
+	@GetMapping(path = "/api/facilityWithInputs/{facilityId}")
+	public Facility getDetailedFacilityWithInputs(@SessionAttribute("user") User user,
+												  @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
+		log.debug("getDetailedFacilityWithInputs(user: {}, facilityId: {})", user, facilityId);
+		try {
+			return service.getDetailedFacilityWithInputs(facilityId, user.getId());
+		} catch (Exception e) {
+			throw new SpRegistrationApiException(e);
+		}
+	}
+
 }

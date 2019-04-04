@@ -2,11 +2,16 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.persistence.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.MitreIdConnector;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.MitreIDApiException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.MitreIdResponse;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
@@ -15,11 +20,13 @@ import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,19 +47,25 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 	private final AppConfig appConfig;
 	private final Properties messagesProperties;
 	private final String adminsAttr;
+	private final MitreIdAttrsConfig mitreIdAttrsConfig;
+	private final MitreIdConnector mitreIdConnector;
 
 	@Autowired
-	public AdminCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig, Properties messagesProperties) {
+	public AdminCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
+											AppConfig appConfig, Properties messagesProperties,
+											MitreIdAttrsConfig mitreIdAttrsConfig, MitreIdConnector mitreIdConnector) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.messagesProperties = messagesProperties;
 		this.adminsAttr = appConfig.getAdminsAttr();
+		this.mitreIdAttrsConfig = mitreIdAttrsConfig;
+		this.mitreIdConnector = mitreIdConnector;
 	}
 
 	@Override
 	public boolean approveRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, RPCException {
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, RPCException, MitreIDApiException {
 
 		log.debug("approveRequest(requestId: {}, userId: {})", requestId, userId);
 		if (requestId == null || userId == null) {
@@ -193,7 +206,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		return result;
 	}
 
-	private boolean finishRequestApproved(Request request) throws RPCException, InternalErrorException {
+	private boolean finishRequestApproved(Request request) throws RPCException, InternalErrorException, MitreIDApiException {
 		switch(request.getAction()) {
 			case REGISTER_NEW_SP:
 				return registerNewFacilityToPerun(request);
@@ -208,7 +221,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		return false;
 	}
 
-	private boolean registerNewFacilityToPerun(Request request) throws RPCException, InternalErrorException {
+	private boolean registerNewFacilityToPerun(Request request) throws RPCException, InternalErrorException, MitreIDApiException {
 		log.debug("registerNewFacilityToPerun({})", request);
 
 		Facility facility = new Facility(null);
@@ -233,18 +246,18 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		request.setFacilityId(facility.getId());
 
 		log.info("Setting facility attributes");
-//		PerunAttribute testSpAttr = new PerunAttribute();
-//		testSpAttr.setDefinition(appConfig.getAttrDefinition(appConfig.getTestSpAttribute()));
-//		testSpAttr.setValue(true);
-//		request.getAttributes().put(appConfig.getTestSpAttribute(), testSpAttr);
 		boolean result = perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonArrayForPerun());
 		result = result && perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
+
+		if (isOidc(request)) {
+			result = result && setClientIdAndMitreClientId(request);
+		}
 
 		log.debug("registerNewFacilityToPerun returns: {}", result);
 		return result;
 	}
 
-	private boolean updateFacilityInPerun(Request request) throws RPCException, InternalErrorException {
+	private boolean updateFacilityInPerun(Request request) throws RPCException, InternalErrorException, MitreIDApiException {
 		log.debug("updateFacilityInPerun({})", request);
 
 		Long facilityId = extractFacilityIdFromRequest(request);
@@ -281,11 +294,15 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 			perunConnector.updateFacilityInPerun(actualFacility.toJson());
 		}
 
+		log.debug("updating mitreid client");
+		PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId, mitreIdAttrsConfig.getMitreClientIdAttr());
+		result = result && mitreIdConnector.updateClient(mitreClientId.valueAsLong(), request.getAttributes());
+
 		log.debug("updateFacilityInPerun returns: {}", result);
 		return result;
 	}
 
-	private boolean deleteFacilityFromPerun(Request request) throws RPCException {
+	private boolean deleteFacilityFromPerun(Request request) throws RPCException, MitreIDApiException {
 		log.debug("deleteFacilityFromPerun({})", request);
 		Long facilityId = extractFacilityIdFromRequest(request);
 
@@ -294,6 +311,9 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		if (! result) {
 			log.error("Facility has not been removed");
 		}
+
+		PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId, mitreIdAttrsConfig.getMitreClientIdAttr());
+		result = result && mitreIdConnector.deleteClient(mitreClientId.valueAsLong());
 
 		log.debug("deleteFacilityFromPerun returns: {}", result);
 		return result;
@@ -329,5 +349,31 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		return facilityId;
+	}
+
+	private boolean isOidc(Request request) {
+		return request.getAttributes().containsKey(mitreIdAttrsConfig.getGrantTypesAttrs());
+	}
+
+	private boolean setClientIdAndMitreClientId(Request request) throws MitreIDApiException, RPCException {
+		log.debug("setClientIdAndMitreClientId({})", request);
+		MitreIdResponse response = mitreIdConnector.createClient(request.getAttributes());
+		log.debug("mitreid response: {}", response);
+
+		List<String> toFetch = new ArrayList<>();
+		toFetch.add(mitreIdAttrsConfig.getClientIdAttr());
+		toFetch.add(mitreIdAttrsConfig.getMitreClientIdAttr());
+
+		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(request.getFacilityId(), toFetch);
+		attrs.get(mitreIdAttrsConfig.getClientIdAttr()).setValue(response.getClientId());
+		attrs.get(mitreIdAttrsConfig.getMitreClientIdAttr()).setValue(response.getId());
+
+		JSONArray jsonArr = new JSONArray();
+		jsonArr.put(attrs.get(mitreIdAttrsConfig.getClientIdAttr()).toJson());
+		jsonArr.put(attrs.get(mitreIdAttrsConfig.getMitreClientIdAttr()).toJson());
+
+		boolean res = perunConnector.setFacilityAttributes(request.getFacilityId(), jsonArr);
+		log.debug("setClientIdAndMitreClientId returns: {}", res);
+		return res;
 	}
 }

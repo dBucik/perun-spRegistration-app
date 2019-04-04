@@ -8,8 +8,12 @@
 
     <context:component-scan base-package="cz.metacentrum.perun.spRegistration"/>
     <context:property-placeholder properties-ref="properties" order="1" ignore-unresolvable="true" />
-    <context:property-placeholder properties-ref="facilityServiceAttributes" order="2" />
-  
+    <context:property-placeholder properties-ref="facilityServiceAttributes" order="2" ignore-unresolvable="true"/>
+    <context:property-placeholder properties-ref="facilitySamlAttributes" order="3" ignore-unresolvable="true"/>
+    <context:property-placeholder properties-ref="facilityOidcAttributes" order="4" ignore-unresolvable="true"/>
+    <context:property-placeholder properties-ref="facilityOrganizationAttributes" order="5" ignore-unresolvable="true"/>
+    <context:property-placeholder properties-ref="facilityMembershipAttributes" order="6" />
+
     <mvc:interceptors>
       <bean id="userSettingInterceptor" class="cz.metacentrum.perun.spRegistration.rest.interceptors.UserSettingInterceptor"/>
     </mvc:interceptors>
@@ -17,13 +21,7 @@
     <bean id="defaultProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
-                <prop key="jdbc.driver">org.postgresql.Driver</prop>
-                <prop key="jdbc.url">jdbc:postgresql://127.0.0.1:5432/spregistration</prop>
-                <prop key="jdbc.username">spreg</prop>
-                <prop key="jdbc.password">spreg123</prop>
-                <prop key="rpc.url">https://perun-dev.cesnet.cz/ba/rpc/</prop>
-                <prop key="rpc.user">XYZ</prop>
-                <prop key="rpc.password">XYZ</prop>
+                <!-- APP -->
                 <prop key="admins">62692,61904,60838,65395</prop>
                 <prop key="attr.idpAttribute.value">XYZ</prop>
                 <prop key="attr.userEmail.name">urn:perun:user:attribute-def:def:preferredMail</prop>
@@ -38,9 +36,22 @@
                 <prop key="approval.confirmationPeriod.days">30</prop>
                 <prop key="approval.confirmationPeriod.hours">0</prop>
                 <prop key="approval.specify.authorities.enabled">true</prop>
-                <prop key="secret">kn15aokn@~lpq~nW!vYXm</prop>
                 <prop key="signatures.endpoint.URL">http://spreg.com/spreg/sign</prop>
                 <prop key="admins.endpoint.URL">http://spreg.com/spreg/admins</prop>
+                <prop key="secret">kn15aokn@~lpq~nW!vYXm</prop>
+                <!-- DATABASE -->
+                <prop key="jdbc.driver">org.postgresql.Driver</prop>
+                <prop key="jdbc.url">jdbc:postgresql://127.0.0.1:5432/spregistration</prop>
+                <prop key="jdbc.username">spreg</prop>
+                <prop key="jdbc.password">spreg123</prop>
+                <!-- PERUN RPC -->
+                <prop key="rpc.url">https://perun-dev.cesnet.cz/ba/rpc/</prop>
+                <prop key="rpc.user">XYZ</prop>
+                <prop key="rpc.password">XYZ</prop>
+                <!-- MITREID -->
+                <prop key="mitreid.username">user</prop>
+                <prop key="mitreid.password">pass</prop>
+                <prop key="mitreid.endpoint.clients">https://somewhere.com/oidc/api/clients</prop>
             </props>
         </property>
     </bean>
@@ -60,6 +71,9 @@
         <property name="properties">
             <props>
                 <!--DO NOT DISPLAY AND EDIT-->
+                <prop key="serviceIdInMitre.attrName">urn:perun:facility:attribute-def:def:serviceIdInMitre</prop>
+                <prop key="serviceIdInMitre.isDisplayed">false</prop>
+                <prop key="serviceIdInMitre.isEditable">false</prop>
                 <prop key="proxyIdentifiers.attrName">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
                 <prop key="proxyIdentifiers.isDisplayed">false</prop>
                 <prop key="proxyIdentifiers.isEditable">false</prop>
@@ -246,6 +260,13 @@
         <property name="perunRpcPassword" value="${rpc.password}"/>
     </bean>
 
+    <bean id="mitreConnector" class="cz.metacentrum.perun.spRegistration.persistence.connectors.impl.MitreIdConnectorImpl">
+        <constructor-arg name="attrsConfig" ref="mitreidAttrsConfig" />
+        <constructor-arg name="username" value="${mitreid.username}" />
+        <constructor-arg name="password" value="${mitreid.password}" />
+        <constructor-arg name="clientsEndpoint" value="${mitreid.endpoint.clients}" />
+    </bean>
+
     <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
     </bean>
@@ -302,6 +323,21 @@
         <constructor-arg name="attrsProps" ref="facilityMembershipAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
         <constructor-arg name="connector" ref="connector" />
+    </bean>
+
+    <bean id="mitreidAttrsConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig">
+        <property name="mitreClientIdAttr" value="${serviceIdInMitre.attrName}" />
+        <property name="clientIdAttr" value="${oidcClientId.attrName}" />
+        <property name="redirectUrisAttr" value="${oidcRedirectUris.attrName}" />
+        <property name="clientNameAttr" value="${serviceName.attrName}" />
+        <property name="clientDescriptionAttr" value="${serviceDescription.attrName}" />
+        <property name="requiredScopesAttr" value="${oidcRequiredScopes.attrName}" />
+        <property name="responseTypesAttr" value="${oidcResponseTypes.attrName}" />
+        <property name="grantTypesAttrs" value="${oidcGrantTypes.attrName}" />
+        <property name="contactAttr" value="${administratorContact.attrName}" />
+        <property name="informationUrlAttr" value="${informationURL.attrName}" />
+        <property name="allowIntrospectionAttr" value="${oidcAllowIntrospection.attrName}" />
+        <property name="privacyPolicyUriAttr" value="${privacyPolicyURL.attrName}" />
     </bean>
 
     <bean id="config" class="cz.metacentrum.perun.spRegistration.persistence.configs.Config">

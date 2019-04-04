@@ -9,6 +9,7 @@ public class MitreIdAttrsConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(MitreIdAttrsConfig.class);
 
+	private String mitreClientIdAttr;
 	private String clientIdAttr;
 	private String redirectUrisAttr;
 	private String clientNameAttr;
@@ -20,6 +21,14 @@ public class MitreIdAttrsConfig {
 	private String responseTypesAttr;
 	private String allowIntrospectionAttr;
 	private String privacyPolicyUriAttr;
+
+	public String getMitreClientIdAttr() {
+		return mitreClientIdAttr;
+	}
+
+	public void setMitreClientIdAttr(String mitreClientIdAttr) {
+		this.mitreClientIdAttr = mitreClientIdAttr;
+	}
 
 	public String getClientIdAttr() {
 		return clientIdAttr;

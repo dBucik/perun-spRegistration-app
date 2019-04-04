@@ -21,9 +21,8 @@ public class Application extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
-		AppConfig appConfig = context.getBean("config", AppConfig.class);
+		AppConfig appConfig = context.getBean("appConfig", AppConfig.class);
 		log.info("Application initialized");
 		log.info("Loaded app config: {}", appConfig);
-		context.close();
 	}
 }

@@ -166,7 +166,17 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 		log.debug("updating request");
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
-		request.setAttributes(convertedAttributes);
+		for (Map.Entry<String, PerunAttribute> pair: convertedAttributes.entrySet()) {
+			String key = pair.getKey();
+			PerunAttribute attr = pair.getValue();
+			if (request.getAttributes().containsKey(key)) {
+				request.getAttributes().get(key).setValue(attr.getValue());
+			} else {
+				request.getAttributes().put(key, attr);
+			}
+		}
+
+		request.setStatus(RequestStatus.WFA);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
