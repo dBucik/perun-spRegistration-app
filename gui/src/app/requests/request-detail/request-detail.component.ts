@@ -9,6 +9,7 @@ import {MatSnackBar} from "@angular/material";
 import {TranslateService} from "@ngx-translate/core";
 import {ConfigService} from "../../core/services/config.service";
 import {AppComponent} from "../../app.component";
+import {RequestSignature} from "../../core/models/RequestSignature";
 
 @Component({
     selector: 'app-request-detail',
@@ -33,6 +34,7 @@ export class RequestDetailComponent implements OnInit {
 
     loading = true;
     request: Request;
+    sign: string;
 
     @ViewChild('input')
     inputField: NgModel;
@@ -55,12 +57,25 @@ export class RequestDetailComponent implements OnInit {
         }
     }
 
+    getSignatures(){
+      this.requestsService.getSignatures(this.request.reqId).subscribe(signatures => {
+        this.sign = "";
+        for(let sign of signatures){
+          this.sign += sign.name + " (" + new Date(sign.signedAt).toLocaleString() + "), ";
+        }
+        if(this.sign != ""){
+          this.sign = this.sign.slice(0, this.sign.length - 2);
+        }
+      });
+    }
+
     ngOnInit() {
         this.sub = this.route.params.subscribe(params => {
             this.requestsService.getRequest(params['id']).subscribe(request => {
                 this.request = request;
                 this.loading = false;
                 this.mapAttributes();
+                this.getSignatures();
             }, error => {
                 this.loading = false;
                 console.log(error);

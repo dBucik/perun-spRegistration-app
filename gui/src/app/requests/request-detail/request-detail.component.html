@@ -6,12 +6,21 @@
         {{'REQUESTS.REQUEST_DETAIL_TITLE' | translate}}{{request.reqId}}
       </h2>
       {{'REQUESTS.REQUEST_DETAIL_STATUS' | translate}}
-      <!--<span [className]="request.status === 'NEW' ? 'new-request' : ''">-->
       <span>
-        {{request.status | translate}}
+        {{request.status | requestStatusPipe}}
       </span>
       <br/>
       {{'REQUESTS.REQUEST_DETAIL_EDITED' | translate}}{{request.modifiedAt | date}}
+      <br/>
+      <div *ngIf="request.action == 'MOVE_TO_PRODUCTION'">
+        <div *ngIf="sign == '' ">
+          {{'REQUESTS.SIGN_REQUEST_NO_SIGN' | translate}}
+        </div>
+        <div *ngIf="sign != '' ">
+          {{'REQUESTS.USERS_WHO_SIGNED' | translate}}{{sign}}
+        </div>
+      </div>
+
       <h4 class="mt-4">{{'REQUESTS.REQUEST_DETAIL_ITEMS' | translate}}</h4>
 
       <table mat-table [dataSource]="requestItems" class="w-100">
