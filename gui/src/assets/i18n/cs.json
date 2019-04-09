@@ -81,7 +81,12 @@
     "CHANGED_TO_WFC": "Status žádosti změnen na 'Čeká na změny'",
     "SHOW_MORE": "Ukáž víc",
     "SHOW_LESS": "Ukáž míň",
-    "COMMENTS_FROM_ADMIN": "Komentáře od administrátora"
+    "COMMENTS_FROM_ADMIN": "Komentáře od administrátora",
+    "SET_WFC": "Status nastaven na 'Čeká na změny'",
+    "APPROVED": "Žádost schválena",
+    "REJECTED": "Žádost zamítnuta",
+    "ARE_YOU_SURE_APPROVE": "Jste si jistý, že chcete schvalit tuhle žádost?",
+    "ARE_YOU_SURE_REJECT": "Jste si jistý, že chcete zamítnout tuhle žádost?"
   },
   "FACILITIES": {
     "TITLE": "Facility",

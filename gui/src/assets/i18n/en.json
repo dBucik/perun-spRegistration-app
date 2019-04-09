@@ -5,6 +5,8 @@
   "HOME_PAGE" : "Home",
   "LOGIN_MESSAGE": "For continuing to the application, please login.",
   "LOGIN": "Login",
+  "YES": "Yes",
+  "NO": "No",
   "ERROR": {
     "GENERAL_ERROR_TITLE": "Something went wrong.",
     "SERVER_DOWN": "Server is currently offline. Please try it again later."
@@ -81,7 +83,12 @@
     "CHANGED_TO_WFC": "Request status changed to 'Waiting for changes'",
     "SHOW_MORE": "Show more",
     "SHOW_LESS": "Show less",
-    "COMMENTS_FROM_ADMIN": "Comments from administrator"
+    "COMMENTS_FROM_ADMIN": "Comments from administrator",
+    "SET_WFC": "Status set for WFC",
+    "APPROVED": "Request approved",
+    "REJECTED": "Request rejected",
+    "ARE_YOU_SURE_APPROVE": "Are you sure you want to approve this request?",
+    "ARE_YOU_SURE_REJECT": "Are you sure you want to reject this request?"
   },
   "FACILITIES": {
     "TITLE": "Facilities",

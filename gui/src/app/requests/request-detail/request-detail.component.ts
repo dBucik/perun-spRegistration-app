@@ -5,11 +5,16 @@ import {Subscription} from "rxjs";
 import {Request} from "../../core/models/Request";
 import {NgModel} from "@angular/forms";
 import {PerunAttribute} from "../../core/models/PerunAttribute";
-import {MatSnackBar} from "@angular/material";
+import {MatDialog, MatSnackBar} from "@angular/material";
 import {TranslateService} from "@ngx-translate/core";
-import {ConfigService} from "../../core/services/config.service";
 import {AppComponent} from "../../app.component";
 import {RequestSignature} from "../../core/models/RequestSignature";
+import {RequestDetailDialogComponent} from "./request-detail-dialog/request-detail-dialog.component";
+
+export interface DialogData {
+  isApprove: boolean;
+  parent: RequestDetailComponent,
+}
 
 @Component({
     selector: 'app-request-detail',
@@ -19,6 +24,7 @@ import {RequestSignature} from "../../core/models/RequestSignature";
 export class RequestDetailComponent implements OnInit {
 
     constructor(
+        public dialog: MatDialog,
         private route: ActivatedRoute,
         private requestsService: RequestsService,
         private snackBar: MatSnackBar,
@@ -39,6 +45,9 @@ export class RequestDetailComponent implements OnInit {
     @ViewChild('input')
     inputField: NgModel;
 
+    successApproveMessage: string;
+    successRejectMessage: string;
+    successSetWFCMessage: string;
     noCommentErrorMessage: string;
 
     isUserAdmin: boolean;
@@ -81,55 +90,75 @@ export class RequestDetailComponent implements OnInit {
                 console.log(error);
             });
         });
-        //TODO add translation
         this.translate.get("REQUEST.REQUEST_ERROR").subscribe(value => this.noCommentErrorMessage = value);
+        this.translate.get("REQUEST.REJECTED").subscribe(value => this.successRejectMessage = value);
+        this.translate.get("REQUEST.APPROVED").subscribe(value => this.successApproveMessage = value);
+        this.translate.get("REQUEST.SET_WFC").subscribe(value => this.successSetWFCMessage = value);
         this.isUserAdmin = AppComponent.isUserAdmin();
-        //this.configService.isUserAdmin().subscribe(bool => this.isUserAdmin = bool);
     }
 
     ngOnDestroy(): void {
         this.sub.unsubscribe();
     }
 
+    openApproveDialog(): void {
+      const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
+        width: '250px',
+        data: {isApprove: true, parent: this}
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+      });
+    }
+
+    openRejectDialog(): void {
+      const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
+        width: '250px',
+        data: {isApprove: false, parent: this}
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+      });
+    }
+
     reject() {
-        if (this.isUserAdmin) {
-            this.requestsService.rejectRequest(this.request.reqId).subscribe(bool => {
-                this.snackBar.open(this.noCommentErrorMessage, null, {duration: 6000});
-            }, error => {
-                console.log("Error");
-                console.log(error);
-            });
-        }
+      this.requestsService.rejectRequest(this.request.reqId).subscribe(bool => {
+        this.snackBar.open(this.successRejectMessage, null, {duration: 6000});
+        this.ngOnInit()
+        }, error => {
+        console.log("Error");
+        console.log(error);
+      });
+
     }
 
     approve() {
-        if (this.isUserAdmin) {
-            this.requestsService.approveRequest(this.request.reqId).subscribe(bool => {
-                this.snackBar.open(this.noCommentErrorMessage, null, {duration: 6000});
-            }, error => {
-                console.log("Error");
-                console.log(error);
-            });
-        }
+      this.requestsService.approveRequest(this.request.reqId).subscribe(bool => {
+        this.snackBar.open(this.successApproveMessage, null, {duration: 6000});
+        this.ngOnInit()
+        }, error => {
+        console.log("Error");
+        console.log(error);
+      });
     }
 
     requestChanges() {
-        if (this.isUserAdmin) {
-            for (let item of this.requestItems) {
-                this.request.attributes[item.urn].comment = item.comment;
-            }
-            let array: Array<PerunAttribute> = [];
-            for (const [key, value] of Object.entries(this.request.attributes)) {
-                if ((value.comment != "") && (value.comment != null)) {
-                    array.push(value)
-                }
-            }
-            this.requestsService.askForChanges(this.request.reqId, array).subscribe(bool => {
-                this.snackBar.open(this.noCommentErrorMessage, null, {duration: 6000});
-            }, error => {
-                console.log("Error");
-                console.log(error);
-            });
+      for (let item of this.requestItems) {
+        this.request.attributes[item.urn].comment = item.comment;
+      }
+      let array: Array<PerunAttribute> = [];
+      for (const [key, value] of Object.entries(this.request.attributes)) {
+        if ((value.comment != "") && (value.comment != null)) {
+          array.push(value)
         }
+      }
+      this.requestsService.askForChanges(this.request.reqId, array).subscribe(bool => {
+        this.snackBar.open(this.successSetWFCMessage, null, {duration: 6000});
+      }, error => {
+        console.log("Error");
+        console.log(error);
+      });
     }
 }

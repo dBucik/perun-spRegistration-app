@@ -55,7 +55,7 @@
 
       <div class="mt-5">
         <button mat-raised-button *ngIf="isUserAdmin && (request.status=='WFA' || request.status=='WFC')" color="warn"
-                (click)="reject()">
+                (click)="openRejectDialog()">
           {{'REQUESTS.REQUEST_DETAIL_REJECT' | translate}}
         </button>
         <div class="pull-right">
@@ -68,7 +68,7 @@
             {{'REQUESTS.REQUEST_DETAIL_REQUEST_CHANGES' | translate}}
           </button>
           <button class="ml-2" *ngIf="isUserAdmin && (request.status=='WFA' || request.status=='WFC')" mat-raised-button
-                  color="accent" (click)="approve()">
+                  color="accent" (click)="openApproveDialog()">
             {{'REQUESTS.REQUEST_DETAIL_APPROVE' | translate}}
           </button>
         </div>
