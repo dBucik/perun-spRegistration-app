@@ -1,0 +1,10 @@
+<div class="pull-left">
+  <div mat-dialog-content>
+    <p>{{'FACILITIES.ARE_YOU_SURE_DELETE' | translate}}</p>
+    <p class="font-weight-bold">{{data.facilityName}}</p>
+  </div>
+  <div mat-dialog-actions class="mt-4">
+    <button mat-button (click)="onYesClick()">{{'YES' | translate}}</button>
+    <button mat-button (click)="onNoClick()">{{'NO' | translate}}</button>
+  </div>
+</div>

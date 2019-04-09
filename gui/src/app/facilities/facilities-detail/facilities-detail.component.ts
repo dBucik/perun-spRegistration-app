@@ -5,6 +5,14 @@ import {FacilitiesService} from "../../core/services/facilities.service";
 import {Facility} from "../../core/models/Facility";
 import {PerunAttribute} from "../../core/models/PerunAttribute";
 import {FacilityAttributeValuePipe} from "../facility-attribute-value.pipe";
+import {AppComponent} from "../../app.component";
+import {MatDialog} from "@angular/material";
+import {FacilitiesDetailDialogComponent} from "./facilities-detail-dialog/facilities-detail-dialog.component";
+
+export interface DialogData {
+  parent: FacilitiesDetailComponent,
+  facilityName: string
+}
 
 @Component({
   selector: 'app-facilities-detail',
@@ -17,6 +25,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private facilitiesService: FacilitiesService,
     private router: Router,
+    public dialog: MatDialog,
   ) { }
 
   private sub : Subscription;
@@ -27,8 +36,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   loading = true;
   facility: Facility;
 
-  //TODO load this from api when implemented
-  isUserAdmin : boolean = true;
+  isUserAdmin: boolean;
 
   private mapAttributes() {
     this.facilityAttributes = [];
@@ -49,6 +57,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
         console.log(error);
       });
     });
+    this.isUserAdmin = AppComponent.isUserAdmin();
   }
 
   ngOnDestroy(): void {
@@ -59,8 +68,20 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl('facilities/moveToProduction/' + this.facility.id );
   }
 
-  deleteFacility(): void {
+  openDeleteDialog(): void {
+    const dialogRef = this.dialog.open(FacilitiesDetailDialogComponent, {
+      width: '250px',
+      data: {parent: this, facilityName: this.facility.name}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
+  }
 
+  deleteFacility(): void {
+    this.facilitiesService.removeFacility(this.facility.id).subscribe(id => {
+      this.router.navigateByUrl('requests/detail/' + id);
+    });
   }
 
   editFacility(): void{

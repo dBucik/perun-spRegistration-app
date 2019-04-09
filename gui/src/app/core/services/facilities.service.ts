@@ -36,4 +36,8 @@ export class FacilitiesService {
   signApprovalForProduction(hash: string): Observable<boolean> {
     return this.apiService.post('/moveToProduction/approve', hash);
   }
+
+  removeFacility(id: number): Observable<number>{
+    return this.apiService.post('/remove/' + id);
+  }
 }

@@ -7,6 +7,7 @@ import { SharedModule } from "../shared/shared.module";
 import { FacilitiesDetailComponent } from './facilities-detail/facilities-detail.component';
 import {FacilityAttributeValuePipe} from "./facility-attribute-value.pipe";
 import { FacilityMoveToProductionComponent } from './facilities-detail/facility-move-to-production/facility-move-to-production.component';
+import { FacilitiesDetailDialogComponent } from './facilities-detail/facilities-detail-dialog/facilities-detail-dialog.component';
 
 @NgModule({
   imports: [
@@ -18,7 +19,11 @@ import { FacilityMoveToProductionComponent } from './facilities-detail/facility-
     FacilitiesOverviewComponent,
     FacilitiesDetailComponent,
     FacilityAttributeValuePipe,
-    FacilityMoveToProductionComponent
+    FacilityMoveToProductionComponent,
+    FacilitiesDetailDialogComponent
+  ],
+  entryComponents: [
+    FacilitiesDetailDialogComponent
   ]
 })
 export class FacilitiesModule { }
