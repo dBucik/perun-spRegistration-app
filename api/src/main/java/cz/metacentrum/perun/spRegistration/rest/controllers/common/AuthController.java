@@ -47,6 +47,7 @@ public class AuthController {
 		if (sub != null && !sub.isEmpty()) {
 			log.debug("found userId: {} ", sub);
 			User user = connector.getUserWithEmail(sub, extSourceProxy, userEmailAttr);
+			user.setAdmin(appConfig.isAdmin(user.getId()));
 			log.debug("found user: {}", user);
 
 			req.getSession().setAttribute("user", user);

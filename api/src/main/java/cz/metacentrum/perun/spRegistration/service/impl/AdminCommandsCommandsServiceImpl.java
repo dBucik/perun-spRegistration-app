@@ -147,7 +147,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
-		request.setAttributes(convertedAttributes);
+		request.updateAttributes(convertedAttributes);
 		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.WFC, messagesProperties, adminsAttr);
 
 		log.debug("askForChanges returns: {}", res);

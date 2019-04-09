@@ -1,5 +1,7 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -19,7 +21,11 @@ public class User extends PerunEntity {
 	private String lastName;
 	private String titleAfter;
 	private String email;
+
+	@JsonIgnore
 	private List<Long> facilitiesWhereAdmin;
+
+	@JsonProperty("isAdmin")
 	private boolean isAdmin;
 
 	public User(Long id, String titleBefore, String firstName, String middleName, String lastName, String titleAfter) {
@@ -96,7 +102,18 @@ public class User extends PerunEntity {
 	}
 
 	public String getName() {
-		return firstName + middleName + lastName;
+		StringJoiner joiner = new StringJoiner(" ");
+		if (firstName != null && !firstName.isEmpty()) {
+			joiner.add(firstName);
+		}
+		if (middleName != null && !middleName.isEmpty()) {
+			joiner.add(middleName);
+		}
+		if (lastName != null && !lastName.isEmpty()) {
+			joiner.add(lastName);
+		}
+
+		return joiner.toString();
 	}
 
 	public static User fromPerunJson(JSONObject json) {

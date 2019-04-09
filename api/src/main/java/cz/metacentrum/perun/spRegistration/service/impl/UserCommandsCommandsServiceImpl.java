@@ -116,6 +116,12 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 			throw new UnauthorizedActionException("User is not registered as facility admin, cannot create request");
 		}
 
+		Facility facility = perunConnector.getFacilityById(facilityId);
+		if (facility == null) {
+			log.error("Could not fetch facility for facilityId: {}", facilityId);
+			throw new InternalErrorException("Could not fetch facility for facilityId: " + facilityId);
+		}
+
 		Request req = createRequest(facilityId, userId, attributes, RequestAction.UPDATE_FACILITY);
 		validateCreatedRequestAndNotifyUser(req);
 
@@ -398,18 +404,20 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 			throw new UnauthorizedActionException("User cannot request adding admins to facility, user is not an admin");
 		}
 
+		Facility facility = perunConnector.getFacilityById(facilityId);
+		if (facility == null) {
+			throw new InternalErrorException("Could not find facility for id: " + facilityId);
+		}
+
 		Map<String, String> mailsMap = new HashMap<>();
 		for (String adminEmail: admins) {
 			String code = createAddRemoveAdminCode(facilityId, adminEmail, action);
 			code = URLEncoder.encode(code, StandardCharsets.UTF_8.toString());
-			String link = appConfig.getAdminsEndpoint().concat("?").concat(code);
+			String link = appConfig.getAdminsEndpoint()
+					.concat("?facilityName=").concat(facility.getName())
+					.concat("&code=").concat(code);
 			mailsMap.put(adminEmail, link);
 			log.debug("Generated code: {}", code); //TODO: remove
-		}
-
-		Facility facility = perunConnector.getFacilityById(facilityId);
-		if (facility == null) {
-			throw new InternalErrorException("Could not find facility for id: " + facilityId);
 		}
 
 		boolean res = true;
@@ -451,16 +459,19 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 	/* PRIVATE METHODS */
 
-	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes, RequestAction action) throws InternalErrorException, CreateRequestException {
+	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes, RequestAction action)
+			throws InternalErrorException, CreateRequestException {
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
 		return createRequest(facilityId, userId, action, convertedAttributes);
 	}
 
-	private Request createRequest(Long facilityId, Long userId, Map<String, PerunAttribute> attributes, RequestAction action) throws InternalErrorException, CreateRequestException {
+	private Request createRequest(Long facilityId, Long userId, Map<String, PerunAttribute> attributes, RequestAction action)
+			throws InternalErrorException, CreateRequestException {
 		return createRequest(facilityId, userId, action, attributes);
 	}
 
-	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes) throws InternalErrorException, CreateRequestException {
+	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes)
+			throws InternalErrorException, CreateRequestException {
 		log.debug("createRequest(facilityId: {}, userId: {}, action: {}, attributes: {})", facilityId, userId, action, attributes);
 		Request request = new Request();
 		request.setFacilityId(facilityId);
@@ -476,7 +487,6 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		if (requestId == null) {
 			log.error("Could not create request: {} in DB", request);
 			throw new InternalErrorException("Could not create request in DB");
-
 		}
 
 		request.setReqId(requestId);
@@ -542,7 +552,7 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	}
 
 	private Map<String, String> generateLinksForAuthorities(List<String> authorities, Request request)
-			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException {
+			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException, RPCException {
 		SecretKeySpec secret = appConfig.getSecret();
 		cipher.init(Cipher.ENCRYPT_MODE, secret);
 
@@ -551,11 +561,15 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 			authorities = Arrays.asList(prop.split(","));
 		}
 
+		Facility facility = perunConnector.getFacilityById(request.getFacilityId());
+
 		Map<String, String> linksMap = new HashMap<>();
 		for (String authority: authorities) {
 			String code = createRequestCode(request.getReqId(), request.getFacilityId(), authority);
 			code = URLEncoder.encode(code, StandardCharsets.UTF_8.toString());
-			String link = appConfig.getSignaturesEndpointUrl().concat("?").concat(code);
+			String link = appConfig.getSignaturesEndpointUrl()
+					.concat("?facilityName=").concat(facility.getName())
+					.concat("&code=").concat(code);
 			linksMap.put(authority, link);
 			log.debug("Generated code: {}", code); //TODO: remove
 		}

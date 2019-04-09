@@ -35,8 +35,8 @@ public class Mails {
 	private static final String PRODUCTION_USER_MESSAGE_KEY = "production.user.message";
 	private static final String APPROVAL_SUBJECT_KEY = "approval.subject";
 	private static final String APPROVAL_MESSAGE_KEY = "approval.message";
-	private static final String PRODUCTION_AUTHORITIES_MESSAGE_KEY = "production.authorities.subject";
-	private static final String PRODUCTION_AUTHORITIES_SUBJECT_KEY = "production.authorities.message";
+	private static final String PRODUCTION_AUTHORITIES_MESSAGE_KEY = "production.authorities.message";
+	private static final String PRODUCTION_AUTHORITIES_SUBJECT_KEY = "production.authorities.subject";
 	private static final String ADD_ADMIN_SUBJECT_KEY = "admins.add.subject";
 	private static final String ADD_ADMIN_MESSAGE_KEY = "admins.add.message";
 	private static final String REMOVE_ADMIN_SUBJECT_KEY = "admins.remove.subject";
@@ -215,6 +215,7 @@ public class Mails {
 		try {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(from));
+			message.setContent( msg, "text/html; charset=utf-8" );
 
 			StringJoiner recipients = new StringJoiner(",");
 			for (String recipient: to) {

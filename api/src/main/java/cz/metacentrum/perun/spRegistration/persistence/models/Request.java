@@ -78,6 +78,16 @@ public class Request {
 		this.attributes = attributes;
 	}
 
+	public void updateAttributes(Map<String, PerunAttribute> newAttributes) {
+		for (Map.Entry<String, PerunAttribute> entry: newAttributes.entrySet()) {
+			if (this.attributes.containsKey(entry.getKey())) {
+				this.attributes.get(entry.getKey()).setValue(entry.getValue());
+			} else {
+				this.attributes.put(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+
 	public Timestamp getModifiedAt() {
 		return modifiedAt;
 	}
