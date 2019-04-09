@@ -53,6 +53,13 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     this.noItemError = false;
   }
 
+  addValueNonEnpty(key: string, value: string){
+    this.values.push(value);
+    this.keys.push(key);
+    this.indexes.push(this.index++);
+    this.noItemError = false;
+  }
+
   getAttribute(): Attribute {
     let map = new Map();
 
@@ -141,15 +148,27 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     this.translatedDescription = this.applicationItem.description[browserLang];
     this.translatedName = this.applicationItem.displayName[browserLang];
 
-    if (this.applicationItem.allowedKeys != undefined && this.applicationItem.allowedKeys.length > 0) {
-      this.disableCustomKeys = true;
-
-      this.keys = this.applicationItem.allowedKeys;
-      for (let i = 0; i < this.keys.length; i++) {
-        this.values.push("");
-        this.indexes.push(this.index++);
+    //if (this.applicationItem.isEdit) {
+    if (this.applicationItem.oldValue != null){
+      let map: Map<string, string> = this.applicationItem.oldValue;
+      for (const [key, value] of Object.entries(map)) {
+        this.addValueNonEnpty(key, value);
       }
-      this.noItemError = false;
+    } else {
+      if (this.applicationItem.allowedKeys != undefined && this.applicationItem.allowedKeys.length > 0) {
+        this.disableCustomKeys = true;
+
+        this.keys = this.applicationItem.allowedKeys;
+        let map: Map<string, string> = this.applicationItem.oldValue;
+
+        //this.values.push(map.values());
+        for (let i = 0; i < this.keys.length; i++) {
+          //this.values.push(map.get());
+          this.values.push("");
+          this.indexes.push(this.index++);
+        }
+        this.noItemError = false;
+      }
     }
   }
 

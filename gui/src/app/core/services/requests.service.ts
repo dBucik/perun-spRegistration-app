@@ -50,6 +50,10 @@ export class RequestsService {
     return this.apiService.get(`/askApproval/${id}`);
   }
 
+  updateRequest(id: number, attributes: PerunAttribute[]): Observable<boolean>{
+    return this.apiService.post(`/update/${id}`, attributes)
+  }
+
   getSignatures(id: number): Observable<RequestSignature[]> {
     return this.apiService.get(`/viewApprovals/${id}`);
   }

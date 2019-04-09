@@ -63,7 +63,7 @@
     "REQUEST_CHANGES_COMMENT" : "Komentář",
     "REQUEST_ERROR" : "Něco se pokazilo",
     "SET_REQUEST_WFA" : "Změnit stav na 'Čeká na schválení'",
-    "EDIT_REQUEST" : "Upravit",
+    "EDIT_REQUEST" : "Upravit žádost",
     "USERS_WHO_SIGNED": "Uživatelé, kteří podepsali tuto žádost: ",
     "SIGN_REQUEST_NO_SIGN": "Tato žádost ještě nebyla nikým podepsána",
     "STATUSPIPE": {
@@ -77,7 +77,11 @@
       "UPDATE_FACILITY": "Upravit facility",
       "DELETE_FACILITY" : "Smazat facility",
       "MOVE_TO_PRODUCTION": "Přesunout do produkce"
-    }
+    },
+    "CHANGED_TO_WFC": "Status žádosti změnen na 'Čeká na změny'",
+    "SHOW_MORE": "Ukáž víc",
+    "SHOW_LESS": "Ukáž míň",
+    "COMMENTS_FROM_ADMIN": "Komentáře od administrátora"
   },
   "FACILITIES": {
     "TITLE": "Facility",

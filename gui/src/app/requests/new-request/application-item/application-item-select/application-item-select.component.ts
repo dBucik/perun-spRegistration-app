@@ -38,6 +38,9 @@ export class ApplicationItemSelectComponent implements RequestItem, OnInit {
       return true;
     }
 
+    // if ((this.values == this.applicationItem.oldValue) && (this.applicationItem.comment != "")){
+    //
+    // }
     return this.values.length > 0;
   }
 
@@ -52,5 +55,6 @@ export class ApplicationItemSelectComponent implements RequestItem, OnInit {
     let browserLang = this.translate.getDefaultLang();
     this.translatedDescription = this.applicationItem.description[browserLang];
     this.translatedName = this.applicationItem.displayName[browserLang];
+    this.values = this.applicationItem.oldValue;
   }
 }

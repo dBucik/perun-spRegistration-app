@@ -63,7 +63,7 @@
     "REQUEST_CHANGES_COMMENT" : "Comment",
     "REQUEST_ERROR" : "Some error happened",
     "SET_REQUEST_WFA" : "Set status to Waiting for approval",
-    "EDIT_REQUEST" : "Edit",
+    "EDIT_REQUEST" : "Edit request",
     "USERS_WHO_SIGNED": "Users who signed this request: ",
     "SIGN_REQUEST_NO_SIGN": "This request was not signed by anyone yet",
     "STATUSPIPE": {
@@ -75,9 +75,13 @@
     "ACTIONPIPE": {
       "REGISTER_NEW_SP": "Register new SP",
       "UPDATE_FACILITY": "Update facility",
-      "DELETE_FACILITY" : "Delete facility",
+      "DELETE_FACILITY": "Delete facility",
       "MOVE_TO_PRODUCTION": "Move to production"
-    }
+    },
+    "CHANGED_TO_WFC": "Request status changed to 'Waiting for changes'",
+    "SHOW_MORE": "Show more",
+    "SHOW_LESS": "Show less",
+    "COMMENTS_FROM_ADMIN": "Comments from administrator"
   },
   "FACILITIES": {
     "TITLE": "Facilities",

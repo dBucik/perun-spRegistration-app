@@ -10,4 +10,6 @@ export interface ApplicationItem {
   allowedKeys: string[];
   allowedValues: string[];
   comment: string;
+  oldValue: any;
+  isEdit: boolean;
 }

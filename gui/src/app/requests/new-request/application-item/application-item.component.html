@@ -1,30 +1,38 @@
-<!-- String -->
-<app-application-item-string
-  [applicationItem]="applicationItem"
-  *ngIf="applicationItem.type === 'java.lang.String' || applicationItem.type === 'java.lang.LargeString'">
-</app-application-item-string>
+<div class="row">
+  <div [class.col-8]="applicationItem.isEdit" [class.col-12]="!applicationItem.isEdit" >
+    <!-- String -->
+    <app-application-item-string
+      [applicationItem]="applicationItem"
+      *ngIf="applicationItem.type === 'java.lang.String' || applicationItem.type === 'java.lang.LargeString'">
+    </app-application-item-string>
 
-<!-- Boolean -->
-<app-application-item-boolean
-  [applicationItem]="applicationItem"
-  *ngIf="applicationItem.type === 'java.lang.Boolean'">
-</app-application-item-boolean>
+    <!-- Boolean -->
+    <app-application-item-boolean
+      [applicationItem]="applicationItem"
+      *ngIf="applicationItem.type === 'java.lang.Boolean'">
+    </app-application-item-boolean>
 
-<!-- ArrayList without allowed values-->
-<app-application-item-list
-  [applicationItem]="applicationItem"
-  *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues === null">
-</app-application-item-list>
+    <!-- ArrayList without allowed values-->
+    <app-application-item-list
+      [applicationItem]="applicationItem"
+      *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues === null">
+    </app-application-item-list>
 
-<!-- ArrayList with allowed values-->
-<app-application-item-select
-  [applicationItem]="applicationItem"
-  *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues !== null">
-</app-application-item-select>
+    <!-- ArrayList with allowed values-->
+    <app-application-item-select
+      [applicationItem]="applicationItem"
+      *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues !== null">
+    </app-application-item-select>
 
-<!-- HashMap -->
-<app-application-item-map
-  [applicationItem]="applicationItem"
-  *ngIf="applicationItem.type === 'java.util.LinkedHashMap'">
-</app-application-item-map>
-
+    <!-- HashMap -->
+    <app-application-item-map
+      [applicationItem]="applicationItem"
+      *ngIf="applicationItem.type === 'java.util.LinkedHashMap'">
+    </app-application-item-map>
+  </div>
+  <div *ngIf="applicationItem.isEdit" class="col-4">
+    <label>
+      <span *ngIf="applicationItem.comment" class="alert alert-warning" role="alert">{{applicationItem.comment}}</span>
+    </label>
+  </div>
+</div>

@@ -32,6 +32,9 @@ export class ApplicationItemStringComponent implements RequestItem, OnInit {
   }
 
   hasCorrectValue(): boolean {
+    if ((this.value == this.applicationItem.oldValue) && ((this.applicationItem.comment != null))){
+      return false
+    }
     return this.inputField.valid;
   }
 
@@ -46,5 +49,6 @@ export class ApplicationItemStringComponent implements RequestItem, OnInit {
     let browserLang = this.translate.getDefaultLang();
     this.translatedDescription = this.applicationItem.description[browserLang];
     this.translatedName = this.applicationItem.displayName[browserLang];
+    this.value = this.applicationItem.oldValue;
   }
 }

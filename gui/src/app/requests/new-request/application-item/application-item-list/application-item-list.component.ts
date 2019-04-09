@@ -73,6 +73,9 @@ export class ApplicationItemListComponent implements RequestItem {
     let browserLang = this.translate.getDefaultLang();
     this.translatedDescription = this.applicationItem.description[browserLang];
     this.translatedName = this.applicationItem.displayName[browserLang];
+    if (this.applicationItem.oldValue != null){
+      this.values = this.applicationItem.oldValue;
+    }
   }
 
   onFormSubmitted(): void {
