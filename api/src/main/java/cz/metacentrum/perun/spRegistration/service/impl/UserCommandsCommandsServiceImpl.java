@@ -214,19 +214,14 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
 		}
 
-		Map<String, PerunAttribute> attributes = fac.getAttrs();
-		String listAttrName = appConfig.getShowOnServicesListAttribute();
-		String testSpAttrName = appConfig.getTestSpAttribute();
+		Map<String, PerunAttribute> filteredAttributes = new HashMap<>();
+		for (Map.Entry<String, PerunAttribute> entry : fac.getAttrs().entrySet()) {
+			if (entry.getValue().getValue() != null) {
+				filteredAttributes.put(entry.getKey(), entry.getValue());
+			}
+		}
 
-		PerunAttribute listAttr = attributes.get(listAttrName);
-		listAttr.setOldValue(listAttr.getValue());
-		listAttr.setValue(true);
-
-		PerunAttribute testSpAttr = attributes.get(testSpAttrName);
-		listAttr.setOldValue(testSpAttr.getValue());
-		listAttr.setValue(false);
-
-		Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, fac.getAttrs());
+		Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, filteredAttributes);
 		if (req == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
