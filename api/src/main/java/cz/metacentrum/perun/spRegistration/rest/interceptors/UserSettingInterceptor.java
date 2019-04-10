@@ -59,6 +59,7 @@ public class UserSettingInterceptor implements HandlerInterceptor {
 		if (sub != null && !sub.isEmpty()) {
 			log.info("found userId: {} ", sub);
 			User user = connector.getUserWithEmail(sub, extSourceProxy, userEmailAttr);
+			user.setAdmin(appConfig.isAdmin(user.getId()));
 			log.info("found user: {}", user);
 
 			request.getSession().setAttribute("user", user);
