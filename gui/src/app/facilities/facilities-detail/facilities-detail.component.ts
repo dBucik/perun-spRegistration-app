@@ -4,7 +4,6 @@ import {Subscription} from "rxjs";
 import {FacilitiesService} from "../../core/services/facilities.service";
 import {Facility} from "../../core/models/Facility";
 import {PerunAttribute} from "../../core/models/PerunAttribute";
-import {FacilityAttributeValuePipe} from "../facility-attribute-value.pipe";
 import {AppComponent} from "../../app.component";
 import {MatDialog} from "@angular/material";
 import {FacilitiesDetailDialogComponent} from "./facilities-detail-dialog/facilities-detail-dialog.component";
@@ -51,6 +50,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
       this.facilitiesService.getFacility(params['id']).subscribe(facility => {
         this.facility = facility;
         this.mapAttributes();
+        this.isUserAdmin = AppComponent.isUserAdmin();
         this.loading = false;
       }, error => {
         this.loading = false;
@@ -89,7 +89,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   }
 
   addFacilityAdmin():void{
-
+    this.router.navigateByUrl('facilities/addAdmin/' + this.facility.id );
   }
 
   editAdmins(): void{
