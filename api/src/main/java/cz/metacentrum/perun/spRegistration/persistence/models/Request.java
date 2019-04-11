@@ -78,10 +78,17 @@ public class Request {
 		this.attributes = attributes;
 	}
 
-	public void updateAttributes(Map<String, PerunAttribute> newAttributes) {
+	public void updateAttributes(Map<String, PerunAttribute> newAttributes, boolean clearComment) {
 		for (Map.Entry<String, PerunAttribute> entry: newAttributes.entrySet()) {
 			if (this.attributes.containsKey(entry.getKey())) {
-				this.attributes.get(entry.getKey()).setValue(entry.getValue());
+				PerunAttribute oldAttr = this.attributes.get(entry.getKey());
+				PerunAttribute newAttr = entry.getValue();
+				oldAttr.setValue(newAttr.getValue());
+				if (! clearComment) {
+					oldAttr.setComment(newAttr.getComment());
+				} else {
+					oldAttr.setComment(null);
+				}
 			} else {
 				this.attributes.put(entry.getKey(), entry.getValue());
 			}

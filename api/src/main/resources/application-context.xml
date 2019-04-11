@@ -77,7 +77,7 @@
                 <prop key="proxyIdentifiers.attrName">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
                 <prop key="proxyIdentifiers.isDisplayed">false</prop>
                 <prop key="proxyIdentifiers.isEditable">false</prop>
-                <prop key="showOnServicesList.attrName">urn:perun:facility:attribute-def:def:isTestSp</prop>
+                <prop key="showOnServicesList.attrName">urn:perun:facility:attribute-def:def:showOnServiceList</prop>
                 <prop key="showOnServicesList.isDisplayed">false</prop>
                 <prop key="showOnServicesList.isEditable">false</prop>
                 <prop key="isTestSp.attrName">urn:perun:facility:attribute-def:def:isTestSp</prop>
