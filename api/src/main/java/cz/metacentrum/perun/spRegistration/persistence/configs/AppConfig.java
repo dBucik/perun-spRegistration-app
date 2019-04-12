@@ -288,7 +288,7 @@ public class AppConfig {
 		return perunAttributeDefinitionsMap.get(fullName);
 	}
 
-	public boolean isAdmin (Long userId) {
+	public boolean isAppAdmin(Long userId) {
 		return admins.contains(userId);
 	}
 

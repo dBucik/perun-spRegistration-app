@@ -34,14 +34,14 @@ public interface RequestManager {
 	 * @param request Request object with updated data.
 	 * @return True if everything went OK.
 	 */
-	boolean updateRequest(Request request);
+	boolean updateRequest(Request request) throws InternalErrorException;
 
 	/**
 	 * Delete request from DB.
 	 * @param reqId ID of Request to be deleted.
 	 * @return True if everything went OK.
 	 */
-	boolean deleteRequest(Long reqId);
+	boolean deleteRequest(Long reqId) throws InternalErrorException;
 
 	/**
 	 * Get request specified by ID.
@@ -105,7 +105,7 @@ public interface RequestManager {
 	 * @param userName name of signing user
 	 * @return True if everything went OK
 	 */
-	boolean addSignature(Long requestId, Long userId, String userName);
+	boolean addSignature(Long requestId, Long userId, String userName) throws InternalErrorException;
 
 	/**
 	 * Get all approvals for transferring of service into production environment

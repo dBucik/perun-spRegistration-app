@@ -1,9 +1,9 @@
 package cz.metacentrum.perun.spRegistration.persistence.connectors.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.metacentrum.perun.spRegistration.persistence.Utils;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.ConnectorUtils;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.MapperUtils;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.InterceptingClientHttpRequestFactory;
 import org.springframework.http.client.support.BasicAuthorizationInterceptor;
@@ -25,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -63,103 +65,110 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public Facility createFacilityInPerun(JSONObject facilityJson) throws RPCException {
-		log.debug("createFacilityInPerun({})", facilityJson);
+	public Facility createFacilityInPerun(JSONObject facilityJson) throws ConnectorException {
+		log.trace("createFacilityInPerun({})", facilityJson);
 		if (facilityJson == null) {
 			throw new IllegalArgumentException("facilityJson is null");
 		}
+
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityJson);
 
-		JSONObject res = makeRpcCallForObject(FACILITIES_MANAGER, "createFacility", params, true);
+		JSONObject res = new JSONObject(makeRpcPostCall(FACILITIES_MANAGER, "createFacility", params));
 		Facility facility = MapperUtils.mapFacility(res);
 
-		log.debug("createFacilityInPerun returns: {}", facility);
+		log.trace("createFacilityInPerun() returns: {}", facility);
 		return facility;
 	}
 
 	@Override
-	public Facility updateFacilityInPerun(JSONObject facilityJson) throws RPCException {
-		log.debug("updateFacilityInPerun({})", facilityJson);
+	public Facility updateFacilityInPerun(JSONObject facilityJson) throws ConnectorException {
+		log.trace("updateFacilityInPerun({})", facilityJson);
 		if (facilityJson == null) {
 			throw new IllegalArgumentException("facilityJson is null");
 		}
+
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityJson);
 
-		JSONObject res = makeRpcCallForObject(FACILITIES_MANAGER, "updateFacility", params, true);
+		JSONObject res = new JSONObject(makeRpcPostCall(FACILITIES_MANAGER, "updateFacility", params));
 		Facility facility = MapperUtils.mapFacility(res);
 
-		log.debug("updateFacilityInPerun returns: {}", facility);
+		log.trace("updateFacilityInPerun() returns: {}", facility);
 		return facility;
 	}
 
 	@Override
-	public boolean deleteFacilityFromPerun(Long facilityId) throws RPCException {
-		log.debug("deleteFacilityFromPerun({})", facilityId);
+	public boolean deleteFacilityFromPerun(Long facilityId) throws ConnectorException {
+		log.trace("deleteFacilityFromPerun({})", facilityId);
 		if (facilityId == null) {
 			throw new IllegalArgumentException("facilityId is null");
 		}
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityId);
 
-		makeRpcCallForObject(FACILITIES_MANAGER, "deleteFacility", params, false);
+		boolean successful = null != makeRpcPostCall(FACILITIES_MANAGER, "deleteFacility", params);
 
-		log.debug("deleteFacilityFromPerun returns: {}", true);
-		return true;
+		log.trace("deleteFacilityFromPerun() returns: {}", successful);
+		return successful;
 	}
 
 	@Override
-	public Facility getFacilityById(Long facilityId) throws RPCException {
-		log.debug("getFacilityById({})", facilityId);
+	public Facility getFacilityById(Long facilityId) throws ConnectorException {
+		log.trace("getFacilityById({})", facilityId);
 		if (facilityId == null) {
 			throw new IllegalArgumentException("facilityId is null");
 		}
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("id", facilityId);
 
-		JSONObject res = makeRpcCallForObject(FACILITIES_MANAGER, "getFacilityById", params, false);
+		JSONObject res = makeRpcGetCallForObject(FACILITIES_MANAGER, "getFacilityById", params);
 		Facility facility = MapperUtils.mapFacility(res);
 
-		log.debug("getFacilityById returns: {}", facility);
+		log.trace("getFacilityById() returns: {}", facility);
 		return facility;
 	}
 
 	@Override
-	public List<Facility> getFacilitiesViaSearcher(Map<String, String> attributesWithSearchingValues) throws RPCException {
-		log.debug("getFacilitiesViaSearcher({})", attributesWithSearchingValues);
-		if (attributesWithSearchingValues == null) {
-			throw new IllegalArgumentException("attributesWithSearchingValues is null");
+	public List<Facility> getFacilitiesByProxyIdentifier(String proxyIdentifierAttr, String proxyIdentifier) throws ConnectorException {
+		log.trace("getFacilitiesByProxyIdentifier(proxyIdentifierAttr: {}, proxyIdentifier: {})",
+				proxyIdentifierAttr, proxyIdentifier);
+		if (proxyIdentifierAttr == null || proxyIdentifier == null) {
+			throw new IllegalArgumentException("Illegal input: proxyIdentifierAttr: " + proxyIdentifierAttr +
+					", proxyIdentifier: " + proxyIdentifier);
 		}
+
 		Map<String, Object> params = new LinkedHashMap<>();
+		Map<String, String> attributesWithSearchingValues = new HashMap<>();
+		attributesWithSearchingValues.put(proxyIdentifierAttr, proxyIdentifier);
 		params.put("attributesWithSearchingValues", attributesWithSearchingValues);
 
-		JSONArray res = makeRpcCallForArray(SEARCHER, "getFacilities", params, false);
+		JSONArray res = makeRpcGetCallForArray(SEARCHER, "getFacilities", params);
 		List<Facility> facilities = MapperUtils.mapFacilities(res);
 
-		log.debug("getFacilitiesViaSearcher returns: {}", facilities);
+		log.trace("getFacilitiesByProxyIdentifier() returns: {}", facilities);
 		return facilities;
 	}
 
 	@Override
-	public List<Facility> getFacilitiesWhereUserIsAdmin(Long userId) throws RPCException {
-		log.debug("getFacilitiesWhereUserIsAdmin({})", userId);
+	public List<Facility> getFacilitiesWhereUserIsAdmin(Long userId) throws ConnectorException {
+		log.trace("getFacilitiesWhereUserIsAdmin({})", userId);
 		if (userId == null) {
 			throw new IllegalArgumentException("userId is null");
 		}
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("user", userId);
 
-		JSONArray res = makeRpcCallForArray(FACILITIES_MANAGER, "getFacilitiesWhereUserIsAdmin", params, false);
+		JSONArray res = makeRpcGetCallForArray(FACILITIES_MANAGER, "getFacilitiesWhereUserIsAdmin", params);
 		List<Facility> facilities = MapperUtils.mapFacilities(res);
 
-		log.debug("getFacilitiesWhereUserIsAdmin returns: {}", facilities);
+		log.trace("getFacilitiesWhereUserIsAdmin() returns: {}", facilities);
 		return facilities;
 	}
 
 	@Override
-	public PerunAttribute getFacilityAttribute(Long facilityId, String attrName) throws RPCException {
-		log.debug("getFacilityAttribute(facilityId: {}, attrName: {})", facilityId, attrName);
+	public PerunAttribute getFacilityAttribute(Long facilityId, String attrName) throws ConnectorException {
+		log.trace("getFacilityAttribute(facilityId: {}, attrName: {})", facilityId, attrName);
 		if (facilityId == null || attrName == null) {
 			throw new IllegalArgumentException("Illegal input: facilityId: " + facilityId + ", attrName: " + attrName);
 		}
@@ -167,33 +176,34 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("attributeName", attrName);
 
-		JSONObject res = makeRpcCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params, false);
+		JSONObject res = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
 		PerunAttribute attribute = MapperUtils.mapAttribute(res);
 
-		log.debug("getFacilityAttribute returns: {}", attribute);
+		log.trace("getFacilityAttribute() returns: {}", attribute);
 		return attribute;
 	}
 
 	@Override
-	public Map<String, PerunAttribute> getFacilityAttributes(Long facilityId, List<String> attrNames) throws RPCException {
-		log.debug("getFacilityAttributes(facilityId: {}, attrNames: {})", facilityId, attrNames);
+	public Map<String, PerunAttribute> getFacilityAttributes(Long facilityId, List<String> attrNames) throws ConnectorException {
+		log.trace("getFacilityAttributes(facilityId: {}, attrNames: {})", facilityId, attrNames);
 		if (facilityId == null || attrNames == null) {
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", attrNames" + attrNames);
 		}
+
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityId);
 		params.put("attrNames", attrNames);
 
-		JSONArray res = makeRpcCallForArray(ATTRIBUTES_MANAGER, "getAttributes", params, false);
+		JSONArray res = makeRpcGetCallForArray(ATTRIBUTES_MANAGER, "getAttributes", params);
 		Map<String, PerunAttribute> attributeMap = MapperUtils.mapAttributes(res);
 
-		log.debug("getFacilityAttributes returns: {}", attributeMap);
+		log.trace("getFacilityAttributes() returns: {}", attributeMap);
 		return attributeMap;
 	}
 
 	@Override
-	public boolean setFacilityAttribute(Long facilityId, JSONObject attrJson) throws RPCException {
-		log.debug("setFacilityAttribute(facilityId: {}, attrJson: {})", facilityId, attrJson);
+	public boolean setFacilityAttribute(Long facilityId, JSONObject attrJson) throws ConnectorException {
+		log.trace("setFacilityAttribute(facilityId: {}, attrJson: {})", facilityId, attrJson);
 		if (facilityId == null || attrJson == null) {
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", attrJson" + attrJson);
 		}
@@ -201,15 +211,15 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("attribute", attrJson);
 
-		makeRpcCallForArray(ATTRIBUTES_MANAGER, "setAttribute", params, true);
+		boolean successful = null != makeRpcPostCall(ATTRIBUTES_MANAGER, "setAttribute", params);
 
-		log.debug("setFacilityAttribute returns: {}", true);
-		return true;
+		log.trace("setFacilityAttribute() returns: {}", successful);
+		return successful;
 	}
 
 	@Override
-	public boolean setFacilityAttributes(Long facilityId, JSONArray attrsJsons) throws RPCException {
-		log.debug("setFacilityAttributes(facilityId: {}, attrsJsons: {})", facilityId, attrsJsons);
+	public boolean setFacilityAttributes(Long facilityId, JSONArray attrsJsons) throws ConnectorException {
+		log.trace("setFacilityAttributes(facilityId: {}, attrsJsons: {})", facilityId, attrsJsons);
 		if (facilityId == null || attrsJsons == null) {
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", attrJsons" + attrsJsons);
 		}
@@ -217,15 +227,15 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("attributes", attrsJsons);
 
-		makeRpcCallForArray(ATTRIBUTES_MANAGER, "setAttributes", params, true);
+		boolean successful = null != makeRpcPostCall(ATTRIBUTES_MANAGER, "setAttributes", params);
 
-		log.debug("setFacilityAttributes returns: {}", true);
-		return true;
+		log.trace("setFacilityAttributes() returns: {}", successful);
+		return successful;
 	}
 
 	@Override
-	public User getUserWithEmail(String extLogin, String extSourceName, String userEmailAttr) throws RPCException {
-		log.debug("getUserWithEmail({})", extLogin);
+	public User getUserWithEmail(String extLogin, String extSourceName, String userEmailAttr) throws ConnectorException {
+		log.trace("getUserWithEmail({})", extLogin);
 		if (extLogin == null || extLogin.isEmpty()) {
 			throw new IllegalArgumentException("userId is null");
 		}
@@ -234,39 +244,48 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("extSourceName", extSourceName);
 		params.put("extLogin", extLogin);
 
-		JSONObject res = makeRpcCallForObject(USERS_MANAGER, "getUserByExtSourceNameAndExtLogin", params, false);
+		JSONObject res = makeRpcGetCallForObject(USERS_MANAGER, "getUserByExtSourceNameAndExtLogin", params);
 		if (res == null) {
-			throw new RPCException("Should not found more than one user");
+			throw new ConnectorException("Should not found more than one user");
 		}
+
 		User user = MapperUtils.mapUser(res, false);
-		params.clear();
-		params.put("user", user.getId().intValue());
-		params.put("attributeName", userEmailAttr);
+		if (user != null) {
+			params.clear();
+			params.put("user", user.getId().intValue());
+			params.put("attributeName", userEmailAttr);
 
-		JSONObject attr = makeRpcCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params, false);
-		PerunAttribute attribute = MapperUtils.mapAttribute(attr);
+			JSONObject attr = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
+			PerunAttribute attribute = MapperUtils.mapAttribute(attr);
+			if (attribute != null) {
+				user.setEmail(attribute.valueAsString());
+			}
+		}
 
-		user.setEmail(attribute.valueAsString(false));
-
-		log.debug("getUserWithEmail returns: {}", user);
+		log.trace("getUserWithEmail() returns: {}", user);
 		return user;
 	}
 
 	@Override
-	public boolean addFacilityAdmin(Long facilityId, Long userId) throws RPCException {
-		log.debug("addFacilityAdmin(facilityId: {}, userId:{})", facilityId, userId);
+	public boolean addFacilityAdmin(Long facilityId, Long userId) throws ConnectorException {
+		log.trace("addFacilityAdmin(facilityId: {}, userId:{})", facilityId, userId);
 		if (facilityId == null || userId == null) {
 			throw new IllegalArgumentException("Illegal input - facilityId: " + facilityId + ", userId: " + userId);
 		}
-		boolean result = addRemoveFacilityAdmin(facilityId, userId, true);
 
-		log.debug("addFacilityAdmin returns: {}", result);
-		return result;
+		Map<String, Object> params = new LinkedHashMap<>();
+		params.put("facility", facilityId);
+		params.put("user", userId);
+
+		boolean res = null != makeRpcPostCall(FACILITIES_MANAGER, "addAdmin", params);
+
+		log.trace("addFacilityAdmin() returns: {}", res);
+		return res;
 	}
 
 	@Override
-	public Set<Long> getFacilityIdsWhereUserIsAdmin(Long userId) throws RPCException {
-		log.debug("getFacilityIdsWhereUserIsAdmin({})", userId);
+	public Set<Long> getFacilityIdsWhereUserIsAdmin(Long userId) throws ConnectorException {
+		log.trace("getFacilityIdsWhereUserIsAdmin({})", userId);
 		if (userId == null) {
 			throw new IllegalArgumentException("userId is null");
 		}
@@ -274,51 +293,54 @@ public class PerunConnectorRpc implements PerunConnector {
 		Set<Long> ids = new HashSet<>();
 		facilities.forEach(f -> ids.add(f.getId()));
 
-		log.debug("getFacilityIdsWhereUserIsAdmin returns: {}", ids);
+		log.trace("getFacilityIdsWhereUserIsAdmin() returns: {}", ids);
 		return ids;
 	}
 
 	@Override
-	public PerunAttributeDefinition getAttributeDefinition(String attributeName) throws RPCException {
-		log.debug("getAttributeDefinition({})", attributeName);
+	public PerunAttributeDefinition getAttributeDefinition(String attributeName) throws ConnectorException {
+		log.trace("getAttributeDefinition({})", attributeName);
 		if (attributeName == null) {
 			throw new IllegalArgumentException("attributeName is null");
 		}
+
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("attributeName", attributeName);
 
-		JSONObject res = makeRpcCallForObject(ATTRIBUTES_MANAGER, "getAttributeDefinition", params, false);
-		PerunAttributeDefinition definition = PerunAttributeDefinition.fromPerunJson(res);
+		JSONObject res = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttributeDefinition", params);
+		PerunAttributeDefinition definition = MapperUtils.mapAttrDefinition(res);
 
-		log.debug("getAttributeDefinition returns: {}", definition);
+		log.trace("getAttributeDefinition() returns: {}", definition);
 		return definition;
 	}
 
-	private JSONObject makeRpcCallForObject(String manager, String method, Map<String, Object> map, boolean post) throws RPCException {
-		log.debug("makeRpcCallForObject(manager: {}, method: {}, map: {}", manager, method, map);
-		String response = makeRpcCall(manager, method, map, post);
+	private JSONObject makeRpcGetCallForObject(String manager, String method, Map<String, Object> map) throws ConnectorException {
+		log.trace("makeRpcGetCallForObject(manager: {}, method: {}, map: {}", manager, method, map);
+		String response = makeRpcGetCall(manager, method, map);
 		if (response == null || response.equalsIgnoreCase("null")) {
 			return null;
 		}
+
 		JSONObject result = new JSONObject(response);
 
-		log.debug("makeRpcCallForObject returns: {}",result);
+		log.trace("makeRpcCallForObject() returns: {}",result);
 		return result;
 	}
 
-	private JSONArray makeRpcCallForArray(String manager, String method, Map<String, Object> map, boolean post) throws RPCException {
-		log.debug("makeRpcCallForArray(manager: {}, method: {}, map: {}", manager, method, map);
-		String response = makeRpcCall(manager, method, map, post);
+	private JSONArray makeRpcGetCallForArray(String manager, String method, Map<String, Object> map) throws ConnectorException {
+		log.trace("makeRpcCallForArray(manager: {}, method: {}, map: {}", manager, method, map);
+		String response = makeRpcGetCall(manager, method, map);
 		if (response == null || response.equalsIgnoreCase("null")) {
 			return null;
 		}
 		JSONArray result = new JSONArray(response);
 
-		log.debug("makeRpcCallForArray returns: {}",result);
+		log.trace("makeRpcGetCallForArray() returns: {}",result);
 		return result;
 	}
 
-	private String makeRpcCall(String manager, String method, Map<String, Object> map, boolean post) throws RPCException {
+	private String makeRpcGetCall(String manager, String method, Map<String, Object> map) throws ConnectorException {
+		log.trace("makeRpcGetCall(manager: {}, method: {}, map: {})", manager, method, map);
 		//prepare basic auth
 		RestTemplate restTemplate = new RestTemplate();
 		List<ClientHttpRequestInterceptor> interceptors =
@@ -326,40 +348,46 @@ public class PerunConnectorRpc implements PerunConnector {
 		restTemplate.setRequestFactory(new InterceptingClientHttpRequestFactory(restTemplate.getRequestFactory(), interceptors));
 		String actionUrl = perunRpcUrl + "/json/" + manager + '/' + method;
 
-		//make the call
 		try {
-			JsonNode response;
-			if (post) {
-				HttpEntity<String> entity = prepareJsonBody(map);
-				response = restTemplate.postForObject(actionUrl, entity, JsonNode.class);
-			} else {
-				response = restTemplate.postForObject(actionUrl, map, JsonNode.class);
-			}
+			ResponseEntity<JsonNode> response = restTemplate.getForEntity(actionUrl, JsonNode.class, map);
 
-			return (response != null) ? Utils.prettyPrintJsonString(response) : null;
+			String result = (response != null && response.getBody() != null) ?
+					Utils.prettyPrintJsonString(response.getBody()) : null;
+			log.trace("makeRpcGetCall() returns: {}", result);
+			return result;
 		} catch (HttpClientErrorException ex) {
-			MediaType contentType = null;
-			if (ex.getResponseHeaders() != null) {
-				contentType = ex.getResponseHeaders().getContentType();
-			}
-			String body = ex.getResponseBodyAsString();
-			if (contentType != null && "json".equals(contentType.getSubtype())) {
-				try {
-					new ObjectMapper().readValue(body, JsonNode.class).path("message").asText();
-				} catch (IOException e) {
-					log.error("cannot parse error message from JSON", e);
-				}
-			} else {
-				log.error(ex.getMessage());
-			}
-			throw new RPCException("cannot connect to Perun RPC: {}" + ex.getMessage() , ex);
+			return ConnectorUtils.dealWithHttpClientErrorException(ex, "Could not connect to Perun RPC");
 		} catch (IOException e) {
 			log.error("cannot parse response to String", e);
-			throw new RPCException("cannot connect to Perun RPC", e);
+			throw new ConnectorException("cannot connect to Perun RPC", e);
+		}
+	}
+
+	private String makeRpcPostCall(String manager, String method, Map<String, Object> map) throws ConnectorException {
+		log.trace("makeRpcPostCall(manager: {}, method: {}, params: {})", manager, method, map);
+		RestTemplate restTemplate = new RestTemplate();
+		List<ClientHttpRequestInterceptor> interceptors =
+				Collections.singletonList(new BasicAuthorizationInterceptor(perunRpcUser, perunRpcPassword));
+		restTemplate.setRequestFactory(new InterceptingClientHttpRequestFactory(restTemplate.getRequestFactory(), interceptors));
+		String actionUrl = perunRpcUrl + "/json/" + manager + '/' + method;
+
+		try {
+			HttpEntity<String> entity = prepareJsonBody(map);
+			JsonNode response = restTemplate.postForObject(actionUrl, entity, JsonNode.class);
+
+			String result = (response != null) ? Utils.prettyPrintJsonString(response) : null;
+			log.trace("makeRpcPostCall() returns: {}", result);
+			return result;
+		} catch (HttpClientErrorException ex) {
+			return ConnectorUtils.dealWithHttpClientErrorException(ex, "Could not connect to Perun RPC");
+		} catch (IOException e) {
+			log.error("cannot parse response to String", e);
+			throw new ConnectorException("cannot connect to Perun RPC", e);
 		}
 	}
 
 	private HttpEntity<String> prepareJsonBody(Map<String, Object> map) {
+		log.trace("prepareJsonBody({})", map);
 		JSONObject obj = new JSONObject();
 		for (Map.Entry<String, Object> entry: map.entrySet()) {
 			obj.put(entry.getKey(), entry.getValue());
@@ -368,19 +396,9 @@ public class PerunConnectorRpc implements PerunConnector {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
-		return new HttpEntity<>(obj.toString(), headers);
+		HttpEntity<String> result = new HttpEntity<>(obj.toString(), headers);
+		log.trace("prepareJsonBody() returns: {}", result);
+		return result;
 	}
 
-	private boolean addRemoveFacilityAdmin(Long facilityId, Long userId, boolean add) throws RPCException {
-		Map<String, Object> params = new LinkedHashMap<>();
-		params.put("facility", facilityId);
-		params.put("user", userId);
-
-		if (add) {
-			makeRpcCallForObject(FACILITIES_MANAGER, "addAdmin", params, true);
-		} else {
-			makeRpcCallForObject(FACILITIES_MANAGER, "removeAdmin", params, true);
-		}
-		return true;
-	}
 }

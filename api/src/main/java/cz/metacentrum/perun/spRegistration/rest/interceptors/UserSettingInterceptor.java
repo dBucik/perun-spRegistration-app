@@ -1,7 +1,7 @@
 package cz.metacentrum.perun.spRegistration.rest.interceptors;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class UserSettingInterceptor implements HandlerInterceptor {
 		return true;
 	}
 
-	private void setUser(HttpServletRequest request) throws RPCException {
+	private void setUser(HttpServletRequest request) throws ConnectorException {
 		String userEmailAttr = appConfig.getUserEmailAttr();
 		String extSourceProxy = appConfig.getExtSourceProxy();
 		log.info("settingUser");
@@ -59,7 +59,7 @@ public class UserSettingInterceptor implements HandlerInterceptor {
 		if (sub != null && !sub.isEmpty()) {
 			log.info("found userId: {} ", sub);
 			User user = connector.getUserWithEmail(sub, extSourceProxy, userEmailAttr);
-			user.setAdmin(appConfig.isAdmin(user.getId()));
+			user.setAdmin(appConfig.isAppAdmin(user.getId()));
 			log.info("found user: {}", user);
 
 			request.getSession().setAttribute("user", user);

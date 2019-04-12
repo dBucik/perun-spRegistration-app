@@ -1,10 +1,13 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.requests;
 
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
-import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,47 +33,51 @@ public class AdminRequestsController {
 	}
 
 	@GetMapping(path = "/api/allRequests")
-	public List<Request> allRequests(@SessionAttribute("user") User user) throws SpRegistrationApiException {
+	public List<Request> allRequests(@SessionAttribute("user") User user)
+			throws UnauthorizedActionException
+	{
 		log.debug("allRequests({})", user.getId());
-		try {
-			return service.getAllRequests(user.getId());
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
+
+		List<Request> requestList = service.getAllRequests(user.getId());
+		log.trace("allRequests() returns: {}", requestList);
+		return requestList;
 	}
 
 	@PostMapping(path = "/api/approve/{requestId}")
 	public boolean approveRequest(@SessionAttribute("user") User user,
-								  @PathVariable("requestId") Long requestId) throws SpRegistrationApiException {
+								  @PathVariable("requestId") Long requestId)
+			throws ConnectorException, CannotChangeStatusException, InternalErrorException, UnauthorizedActionException
+	{
 		log.debug("approveRequest(user: {}, requestId: {})", user.getId(), requestId);
-		try {
-			return service.approveRequest(requestId, user.getId());
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
+		
+		boolean successful = service.approveRequest(requestId, user.getId());
+		log.trace("approveRequest() returns: {}", successful);
+		return successful;
 	}
 
 	@PostMapping(path = "/api/reject/{requestId}")
 	public boolean rejectRequest(@SessionAttribute("user") User user,
 								 @PathVariable("requestId") Long requestId,
-								 @RequestBody String message) throws SpRegistrationApiException {
+								 @RequestBody String message)
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException
+	{
 		log.debug("rejectRequest(user: {}, requestId: {}, message: {})", user.getId(), requestId, message);
-		try {
-			return service.rejectRequest(requestId, user.getId(), message);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
+		
+		boolean successful = service.rejectRequest(requestId, user.getId(), message);
+		log.trace("rejectRequest() returns: {}", successful);
+		return successful;
 	}
 
 	@PostMapping(path = "/api/askForChanges/{requestId}")
 	public boolean askForChanges(@SessionAttribute("user") User user,
 								 @PathVariable("requestId") Long requestId,
-								 @RequestBody List<PerunAttribute> attributes) throws SpRegistrationApiException {
+								 @RequestBody List<PerunAttribute> attributes)
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException
+	{
 		log.debug("askForChanges(user: {}, requestId: {}, attributes: {})", user.getId(), requestId, attributes);
-		try {
-			return service.askForChanges(requestId, user.getId(), attributes);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
+		
+		boolean successful = service.askForChanges(requestId, user.getId(), attributes);
+		log.trace("askForChanges() returns: {}", successful);
+		return successful;
 	}
 }

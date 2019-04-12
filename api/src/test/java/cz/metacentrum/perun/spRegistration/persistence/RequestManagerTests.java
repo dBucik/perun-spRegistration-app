@@ -88,7 +88,7 @@ public class RequestManagerTests {
 	private void prepareRequests() {
 		req1 = new Request();
 		req1.setAction(RequestAction.REGISTER_NEW_SP);
-		req1.setStatus(RequestStatus.WFA);
+		req1.setStatus(RequestStatus.WAITING_FOR_APPROVAL);
 		req1.setFacilityId(null);
 		req1.setModifiedBy(1L);
 		req1.setAttributes(Collections.singletonMap(attr1.getFullName(), attr1));
@@ -96,7 +96,7 @@ public class RequestManagerTests {
 
 		req2 = new Request();
 		req2.setAction(RequestAction.UPDATE_FACILITY);
-		req2.setStatus(RequestStatus.WFA);
+		req2.setStatus(RequestStatus.WAITING_FOR_APPROVAL);
 		req2.setFacilityId(2L);
 		req2.setModifiedBy(2L);
 		req2.setAttributes(Collections.singletonMap(attr2.getFullName(), attr2));
@@ -126,7 +126,7 @@ public class RequestManagerTests {
 	public void createRequest() throws CreateRequestException, InternalErrorException {
 		Request request = new Request();
 		request.setAction(RequestAction.REGISTER_NEW_SP);
-		request.setStatus(RequestStatus.WFA);
+		request.setStatus(RequestStatus.WAITING_FOR_APPROVAL);
 		request.setFacilityId(null);
 		request.setModifiedBy(3L);
 		request.setReqUserId(3L);
@@ -141,7 +141,7 @@ public class RequestManagerTests {
 	}
 
 	@Test
-	public void updateRequest() {
+	public void updateRequest() throws InternalErrorException {
 		req1.setAction(RequestAction.DELETE_FACILITY);
 		req1.setStatus(RequestStatus.APPROVED);
 		req1.setFacilityId(3L);
@@ -155,7 +155,7 @@ public class RequestManagerTests {
 	}
 
 	@Test
-	public void deleteRequest() {
+	public void deleteRequest() throws InternalErrorException {
 		requestManager.deleteRequest(req1.getReqId());
 		List<Request> inDb = requestManager.getAllRequests();
 
@@ -233,7 +233,7 @@ public class RequestManagerTests {
 	}
 
 	@Test
-	public void addSignature() {
+	public void addSignature() throws InternalErrorException {
 		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName());
 
 		List<RequestSignature> found = requestManager.getRequestSignatures(req1.getReqId());
@@ -248,7 +248,7 @@ public class RequestManagerTests {
 	}
 
 	@Test
-	public void getRequestSignatures() {
+	public void getRequestSignatures() throws InternalErrorException {
 		requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName());
 		approval1.setRequestId(req1.getReqId());
 

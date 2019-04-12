@@ -7,9 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -78,23 +76,6 @@ public class Request {
 		this.attributes = attributes;
 	}
 
-	public void updateAttributes(Map<String, PerunAttribute> newAttributes, boolean clearComment) {
-		for (Map.Entry<String, PerunAttribute> entry: newAttributes.entrySet()) {
-			if (this.attributes.containsKey(entry.getKey())) {
-				PerunAttribute oldAttr = this.attributes.get(entry.getKey());
-				PerunAttribute newAttr = entry.getValue();
-				oldAttr.setValue(newAttr.getValue());
-				if (! clearComment) {
-					oldAttr.setComment(newAttr.getComment());
-				} else {
-					oldAttr.setComment(null);
-				}
-			} else {
-				this.attributes.put(entry.getKey(), entry.getValue());
-			}
-		}
-	}
-
 	public Timestamp getModifiedAt() {
 		return modifiedAt;
 	}
@@ -117,7 +98,7 @@ public class Request {
 		if (attr == null) {
 			return null;
 		}
-		Map<String, String> value = attr.valueAsMap(false);
+		Map<String, String> value = attr.valueAsMap();
 		return value.get("en");
 	}
 
@@ -127,7 +108,7 @@ public class Request {
 		if (attr == null) {
 			return null;
 		}
-		Map<String, String> value = attr.valueAsMap(false);
+		Map<String, String> value = attr.valueAsMap();
 		return value.get("en");
 	}
 
@@ -147,7 +128,7 @@ public class Request {
 
 	/**
 	 * Convert attributes to JSON format suitable for storing into Perun.
-	 * @return JSON with attributes.
+	 * @return JSON with attributes or null.
 	 */
 	@JsonIgnore
 	public JSONArray getAttributesAsJsonArrayForPerun() {
@@ -163,8 +144,17 @@ public class Request {
 		return res;
 	}
 
-	public List<String> getAdmins(String attrKey) {
-		return Collections.singletonList(attributes.get(attrKey).valueAsString(false));
+	/**
+	 * Extract administrator contact from attributes
+	 * @param attrKey name of attribute containing administrator contact
+	 * @return Administrator contact
+	 */
+	public String getAdminContact(String attrKey) {
+		if (attributes == null || !attributes.containsKey(attrKey) || attributes.get(attrKey) == null) {
+			return null;
+		}
+
+		return attributes.get(attrKey).valueAsString();
 	}
 
 	@Override
@@ -200,5 +190,24 @@ public class Request {
 		if (facilityId!= null) res *= 31 * facilityId;
 
 		return (int) res;
+	}
+
+	public void updateAttributes(Map<String, PerunAttribute> attrsToUpdate, boolean clearComment) {
+		for (Map.Entry<String, PerunAttribute> entry: attrsToUpdate.entrySet()) {
+			if (this.attributes.containsKey(entry.getKey())) {
+				PerunAttribute old = this.attributes.get(entry.getKey());
+				old.setValue(entry.getValue().getValue());
+				if (clearComment) {
+					old.setComment(null);
+				} else {
+					old.setComment(entry.getValue().getComment());
+				}
+			} else {
+				this.attributes.put(entry.getKey(), entry.getValue());
+				if (clearComment) {
+					entry.getValue().setComment(null);
+				}
+			}
+		}
 	}
 }
