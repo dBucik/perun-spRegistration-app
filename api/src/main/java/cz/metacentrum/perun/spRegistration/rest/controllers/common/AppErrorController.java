@@ -18,13 +18,13 @@ public class AppErrorController implements ErrorController {
 
 	@GetMapping(value = "/error")
 	public String handleError(HttpServletRequest request) {
-		log.debug("handleError({})", request.getRequestURL());
+		log.trace("handleError({})", request.getRequestURL());
 		return "forward:/index.html";
 	}
 
 	@Override
 	public String getErrorPath() {
-		log.debug("getErrorPath()");
+		log.trace("getErrorPath()");
 		return "/error";
 	}
 }

@@ -1,7 +1,7 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import org.slf4j.Logger;
@@ -33,21 +33,24 @@ public class AuthController {
 
 
 	@GetMapping(path = "/api/setUser")
-	public void setUser(HttpServletRequest req) throws RPCException {
+	public void setUser(HttpServletRequest req) throws ConnectorException {
+		log.trace("setUser()");
 		String userEmailAttr = appConfig.getUserEmailAttr();
 		String extSourceProxy = appConfig.getExtSourceProxy();
 		log.debug("settingUser");
 		String sub;
 		if (devEnabled) {
 			sub = req.getHeader("fake-usr-hdr");
+			log.debug("setting fake user: {}", sub);
 		} else {
 			sub = req.getRemoteUser();
+			log.debug("setting user: {}", sub);
 		}
 
 		if (sub != null && !sub.isEmpty()) {
 			log.debug("found userId: {} ", sub);
 			User user = connector.getUserWithEmail(sub, extSourceProxy, userEmailAttr);
-			user.setAdmin(appConfig.isAdmin(user.getId()));
+			user.setAdmin(appConfig.isAppAdmin(user.getId()));
 			log.debug("found user: {}", user);
 
 			req.getSession().setAttribute("user", user);
@@ -56,6 +59,7 @@ public class AuthController {
 
 	@GetMapping(path = "/api/getUser")
 	public User getUser(@SessionAttribute("user") User user) {
+		log.trace("getUser() returns: {}", user);
 		return user;
 	}
 

@@ -9,8 +9,8 @@ public enum RequestStatus {
 
 	APPROVED,
 	REJECTED,
-	WFA,
-	WFC;
+	WAITING_FOR_APPROVAL,
+	WAITING_FOR_CHANGES;
 
 	/**
 	 * Convert Enum value to INTEGER representation (used in DB).
@@ -20,8 +20,8 @@ public enum RequestStatus {
 		switch (this) {
 			case APPROVED: return 1;
 			case REJECTED: return 2;
-			case WFA: return 3;
-			case WFC: return 4;
+			case WAITING_FOR_APPROVAL: return 3;
+			case WAITING_FOR_CHANGES: return 4;
 			default: return -1;
 		}
 	}
@@ -35,8 +35,8 @@ public enum RequestStatus {
 		switch (i) {
 			case 1: return APPROVED;
 			case 2: return REJECTED;
-			case 3: return WFA;
-			case 4: return WFC;
+			case 3: return WAITING_FOR_APPROVAL;
+			case 4: return WAITING_FOR_CHANGES;
 			default: return null;
 		}
 	}

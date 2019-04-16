@@ -1,16 +1,14 @@
 package cz.metacentrum.perun.spRegistration.persistence.connectors.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.ConnectorUtils;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.MitreIdConnector;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.MitreIDApiException;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.MitreIdResponse;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.InterceptingClientHttpRequestFactory;
 import org.springframework.http.client.support.BasicAuthorizationInterceptor;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +53,7 @@ public class MitreIdConnectorImpl implements MitreIdConnector {
 	}
 
 	@Override
-	public MitreIdResponse createClient(Map<String, PerunAttribute> attrs) throws MitreIDApiException {
+	public MitreIdResponse createClient(Map<String, PerunAttribute> attrs) throws ConnectorException {
 		JSONObject body = updateJsonObject(null, attrs);
 
 		JSONObject response = makeCall(clientsEndpoint, body, RequestMethod.POST);
@@ -73,7 +70,7 @@ public class MitreIdConnectorImpl implements MitreIdConnector {
 	}
 
 	@Override
-	public boolean updateClient(Long id, Map<String, PerunAttribute> attrs) throws MitreIDApiException {
+	public boolean updateClient(Long id, Map<String, PerunAttribute> attrs) throws ConnectorException {
 		JSONObject actualClient = makeCall(clientsEndpoint + "/" + id, null, RequestMethod.GET);
 		JSONObject newClient = updateJsonObject(actualClient, attrs);
 		JSONObject response = makeCall(clientsEndpoint, newClient, RequestMethod.PUT);
@@ -82,7 +79,7 @@ public class MitreIdConnectorImpl implements MitreIdConnector {
 	}
 
 	@Override
-	public boolean deleteClient(Long id) throws MitreIDApiException {
+	public boolean deleteClient(Long id) throws ConnectorException {
 		JSONObject response = makeCall(clientsEndpoint + "/" + id, null, RequestMethod.DELETE);
 		return response == null;
 	}
@@ -106,8 +103,8 @@ public class MitreIdConnectorImpl implements MitreIdConnector {
 		return obj;
 	}
 
-	private JSONObject makeCall(String endpoint, JSONObject body, RequestMethod method) throws MitreIDApiException {
-		log.debug("makeCallForObject(endpoint: {}, body: {}", endpoint, body);
+	private JSONObject makeCall(String endpoint, JSONObject body, RequestMethod method) throws ConnectorException {
+		log.trace("makeCallForObject(endpoint: {}, body: {}", endpoint, body);
 
 		RestTemplate restTemplate = new RestTemplate();
 		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
@@ -131,27 +128,13 @@ public class MitreIdConnectorImpl implements MitreIdConnector {
 					restTemplate.delete(endpoint);
 				} break;
 				default:
-					throw new MitreIDApiException("Unsupported method: " + method);
+					throw new ConnectorException("Unsupported method: " + method);
 			}
 
-			log.debug("makeCall returns: {}", response);
+			log.trace("makeCall returns: {}", response);
 			return response;
 		} catch (HttpClientErrorException ex) {
-			MediaType contentType = null;
-			if (ex.getResponseHeaders() != null) {
-				contentType = ex.getResponseHeaders().getContentType();
-			}
-			String exBody = ex.getResponseBodyAsString();
-			if (contentType != null && "json".equals(contentType.getSubtype())) {
-				try {
-					new ObjectMapper().readValue(exBody, JsonNode.class).path("message").asText();
-				} catch (IOException e) {
-					log.error("cannot parse error message from JSON", e);
-				}
-			} else {
-				log.error(ex.getMessage());
-			}
-			throw new MitreIDApiException("cannot connect to MitreID API: {}" + ex.getMessage() , ex);
+			return new JSONObject(ConnectorUtils.dealWithHttpClientErrorException(ex, "Could not connect to mitreid"));
 		}
 	}
 }

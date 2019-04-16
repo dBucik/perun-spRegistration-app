@@ -1,21 +1,28 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.facilities;
 
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
-import cz.metacentrum.perun.spRegistration.service.exceptions.SpRegistrationApiException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 import java.util.List;
 
 @RestController
@@ -30,51 +37,57 @@ public class UserFacilitiesController {
 	}
 
 	@GetMapping(path = "/api/userFacilities")
-	public List<Facility> userFacilities(@SessionAttribute("user") User user) throws SpRegistrationApiException {
+	public List<Facility> userFacilities(@SessionAttribute("user") User user)
+			throws ConnectorException
+	{
 		log.debug("userFacilities({})", user.getId());
-		try {
-			return service.getAllFacilitiesWhereUserIsAdmin(user.getId());
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
+		List<Facility> facilityList = service.getAllFacilitiesWhereUserIsAdmin(user.getId());
+
+		log.trace("userFacilities() returns: {}", facilityList);
+		return facilityList;
 	}
 
 	@PostMapping(path = "/api/addAdmins/{facilityId}")
 	public boolean addAdmins(@SessionAttribute("user") User user,
 							 @PathVariable("facilityId") Long facilityId,
-							 @RequestBody List<String> adminEmails) throws SpRegistrationApiException {
+							 @RequestBody List<String> adminEmails)
+			throws BadPaddingException, InvalidKeyException, ConnectorException, IllegalBlockSizeException,
+			UnsupportedEncodingException, InternalErrorException, UnauthorizedActionException
+	{
 		log.debug("addAdminsNotify(user: {}, facilityId: {}, adminEmails: {})", user.getId(), facilityId, adminEmails);
-		try {
-			return service.addAdminsNotify(user, facilityId, adminEmails);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
+		boolean successful = service.addAdminsNotify(user, facilityId, adminEmails);
+
+		log.trace("addAdmins() returns: {}", successful);
+		return successful;
 	}
 
 	@PostMapping(path = "/api/addAdmin/confirm")
 	public boolean addAdminConfirm(@SessionAttribute("user") User user,
-								   @RequestBody String code) throws SpRegistrationApiException {
+								   @RequestBody String code)
+			throws UnsupportedEncodingException, BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
+			MalformedCodeException, InvalidKeyException, ConnectorException
+	{
 		log.debug("addAdminConfirm(user: {}, code: {})", user, code);
-		try {
-			if (code.startsWith("\"")) {
-				code = code.substring(1, code.length() - 1);
-			}
-			code = URLDecoder.decode(code, StandardCharsets.UTF_8.toString());
-			return service.confirmAddAdmin(user, code);
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
+		if (code.startsWith("\"")) {
+			code = code.substring(1, code.length() - 1);
 		}
+		code = URLDecoder.decode(code, StandardCharsets.UTF_8.toString());
+
+		boolean successful = service.confirmAddAdmin(user, code);
+		log.trace("addAdminConfirm() returns: {}", successful);
+		return successful;
 	}
 
 	@GetMapping(path = "/api/facilityWithInputs/{facilityId}")
 	public Facility getDetailedFacilityWithInputs(@SessionAttribute("user") User user,
-												  @PathVariable("facilityId") Long facilityId) throws SpRegistrationApiException {
+												  @PathVariable("facilityId") Long facilityId)
+			throws UnauthorizedActionException, InternalErrorException, ConnectorException
+	{
 		log.debug("getDetailedFacilityWithInputs(user: {}, facilityId: {})", user, facilityId);
-		try {
-			return service.getDetailedFacilityWithInputs(facilityId, user.getId());
-		} catch (Exception e) {
-			throw new SpRegistrationApiException(e);
-		}
+		Facility facility = service.getDetailedFacilityWithInputs(facilityId, user.getId());
+
+		log.trace("getDetailedFacilityWithInputs() returns: {}", facility);
+		return facility;
 	}
 
 }

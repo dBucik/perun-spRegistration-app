@@ -87,7 +87,16 @@ public class Facility extends PerunEntity {
 		return res;
 	}
 
+	/**
+	 * Convert JSON from perun to facility object
+	 * @param json JSON from Perun
+	 * @return Facility object or null
+	 */
 	public static Facility fromPerunJson(JSONObject json) {
+		if (json == null || json.isEmpty() || json.equals(JSONObject.NULL)) {
+			return null;
+		}
+
 		Long id = json.getLong("id");
 		String name = json.getString("name");
 		String description = json.optString("description", "");

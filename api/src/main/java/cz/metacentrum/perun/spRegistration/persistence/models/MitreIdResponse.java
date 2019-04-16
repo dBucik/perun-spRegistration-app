@@ -2,6 +2,11 @@ package cz.metacentrum.perun.spRegistration.persistence.models;
 
 import java.util.Objects;
 
+/**
+ * Response from MitreID API. Holds interesting information from response that should be processed.
+ *
+ * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ */
 public class MitreIdResponse {
 
 	private Long id;

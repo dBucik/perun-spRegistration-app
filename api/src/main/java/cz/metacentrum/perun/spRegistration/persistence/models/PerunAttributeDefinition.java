@@ -37,7 +37,7 @@ public class PerunAttributeDefinition extends PerunEntity {
 	}
 
 	public static PerunAttributeDefinition fromPerunJson(JSONObject jsonObject) {
-		if (jsonObject == null || jsonObject.isEmpty()) {
+		if (jsonObject == null || jsonObject.isEmpty() || jsonObject.equals(JSONObject.NULL)) {
 			return null;
 		}
 

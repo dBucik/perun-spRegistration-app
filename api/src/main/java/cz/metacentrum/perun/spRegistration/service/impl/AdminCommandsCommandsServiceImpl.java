@@ -1,12 +1,11 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
-import cz.metacentrum.perun.spRegistration.persistence.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.MitreIdConnector;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.MitreIDApiException;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.RPCException;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.MitreIdResponse;
@@ -14,19 +13,18 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
+import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +44,6 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
 	private final Properties messagesProperties;
-	private final String adminsAttr;
 	private final MitreIdAttrsConfig mitreIdAttrsConfig;
 	private final MitreIdConnector mitreIdConnector;
 
@@ -58,20 +55,18 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.messagesProperties = messagesProperties;
-		this.adminsAttr = appConfig.getAdminsAttr();
 		this.mitreIdAttrsConfig = mitreIdAttrsConfig;
 		this.mitreIdConnector = mitreIdConnector;
 	}
 
 	@Override
 	public boolean approveRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, RPCException, MitreIDApiException {
-
-		log.debug("approveRequest(requestId: {}, userId: {})", requestId, userId);
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, ConnectorException {
+		log.trace("approveRequest(requestId: {}, userId: {})", requestId, userId);
 		if (requestId == null || userId == null) {
 			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
 			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
-		} else if (! appConfig.isAdmin(userId)) {
+		} else if (! appConfig.isAppAdmin(userId)) {
 			log.error("User is not authorized to approve request");
 			throw new UnauthorizedActionException("User is not authorized to approve request");
 		}
@@ -80,31 +75,42 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
 			throw new InternalErrorException("Could not fetch request with ID: " + requestId + " from database");
-		} else if (! RequestStatus.WFA.equals(request.getStatus())) {
+		} else if (! RequestStatus.WAITING_FOR_APPROVAL.equals(request.getStatus())) {
 			log.error("Cannot approve request, request not marked as WAITING_FOR_APPROVAL");
 			throw new CannotChangeStatusException("Cannot approve request, request not marked as WAITING_FOR_APPROVAL");
 		}
 
-		if (! finishRequestApproved(request)) {
-			log.error("Could not finish approving request");
-			return false;
+		boolean requestProcessed = processApprovedRequest(request);
+
+		request.setStatus(RequestStatus.APPROVED);
+		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
+		boolean requestUpdated = requestManager.updateRequest(request);
+
+		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.APPROVED,
+				request.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+
+		boolean successful = (requestProcessed && requestUpdated && notificationSent);
+
+		if (! successful) {
+			log.error("some operations failed: requestProcessed: {}, requestUpdated: {}, notificationSent: {} for request: {}",
+					requestProcessed, requestUpdated, notificationSent, request);
+		} else {
+			log.info("Request processed, request updated, notification sent");
 		}
 
-		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.APPROVED, messagesProperties, adminsAttr);
-
-		log.debug("updateRequestInDbAndNotifyUser() returns: {}", res);
-		return res;
+		log.trace("approveRequest() returns: {}", successful);
+		return successful;
 	}
 
 	@Override
 	public boolean rejectRequest(Long requestId, Long userId, String message)
 			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException {
 
-		log.debug("rejectRequest(requestId: {}, userId: {}, message: {})", requestId, userId, message);
+		log.trace("rejectRequest(requestId: {}, userId: {}, message: {})", requestId, userId, message);
 		if (requestId == null || userId == null) {
 			log.error("Illegal input - requestId: {}, userId: {}", requestId, userId);
 			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
-		} else if (! appConfig.isAdmin(userId)) {
+		} else if (! appConfig.isAppAdmin(userId)) {
 			log.error("User is not authorized to reject request");
 			throw new UnauthorizedActionException("User is not authorized to reject request");
 		}
@@ -113,26 +119,43 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
 			throw new InternalErrorException("Could not fetch request with ID: " + requestId + " from database");
-		} else if (! RequestStatus.WFA.equals(request.getStatus())) {
+		} else if (! RequestStatus.WAITING_FOR_APPROVAL.equals(request.getStatus())) {
 			log.error("Cannot reject request, request not marked as WAITING_FOR_APPROVAL");
 			throw new CannotChangeStatusException("Cannot reject request, request not marked as WAITING_FOR_APPROVAL");
 		}
 
-		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.REJECTED, messagesProperties, adminsAttr);
+		request.setStatus(RequestStatus.REJECTED);
+		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
-		log.debug("updateRequestInDbAndNotifyUser() returns: {}", res);
-		return res;
+		log.debug("updatingRequest");
+		boolean requestUpdated = requestManager.updateRequest(request);
+
+		log.debug("sendingNotification");
+		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.APPROVED,
+				request.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+
+		boolean successful = (requestUpdated && notificationSent);
+
+		if (! successful) {
+			log.error("some operations failed: requestUpdated: {}, notificationSent: {} for request: {}",
+					requestUpdated, notificationSent, request);
+		} else {
+			log.info("Request updated, notification sent");
+		}
+
+		log.trace("rejectRequest() returns: {}", successful);
+		return successful;
 	}
 
 	@Override
 	public boolean askForChanges(Long requestId, Long userId, List<PerunAttribute> attributes)
 			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException {
 
-		log.debug("askForChanges(requestId: {}, userId: {}, attributes: {})", requestId, userId, attributes);
+		log.trace("askForChanges(requestId: {}, userId: {}, attributes: {})", requestId, userId, attributes);
 		if (requestId == null || userId == null || attributes == null) {
 			log.error("Illegal input - requestId: {}, userId: {}, attributes: {}", requestId, userId, attributes);
 			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId + ", attributes: " + attributes);
-		} else if (! appConfig.isAdmin(userId)) {
+		} else if (! appConfig.isAppAdmin(userId)) {
 			log.error("User is not authorized to ask for changes");
 			throw new UnauthorizedActionException("User is not authorized to ask for changes");
 		}
@@ -141,72 +164,89 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
 			throw new InternalErrorException("Could not fetch request with ID: " + requestId + " from database");
-		} else if (! RequestStatus.WFA.equals(request.getStatus())) {
+		} else if (! RequestStatus.WAITING_FOR_APPROVAL.equals(request.getStatus())) {
 			log.error("Cannot ask for changes, request not marked as WAITING_FOR_APPROVAL");
 			throw new CannotChangeStatusException("Cannot ask for changes, request not marked as WAITING_FOR_APPROVAL");
 		}
 
 		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
-		request.updateAttributes(convertedAttributes);
-		boolean res = Utils.updateRequestAndNotifyUser(requestManager, request, RequestStatus.WFC, messagesProperties, adminsAttr);
+		request.updateAttributes(convertedAttributes, false);
 
-		log.debug("askForChanges returns: {}", res);
-		return res;
+		request.setStatus(RequestStatus.WAITING_FOR_CHANGES);
+		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
+
+		log.debug("updatingRequest");
+		boolean requestUpdated = requestManager.updateRequest(request);
+
+		log.debug("sendingNotification");
+		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.WAITING_FOR_CHANGES,
+				request.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+
+		boolean successful = (requestUpdated && notificationSent);
+
+		if (! successful) {
+			log.error("some operations failed: requestUpdated: {}, notificationSent: {} for request: {}",
+					requestUpdated, notificationSent, request);
+		} else {
+			log.info("Request updated, notification sent");
+		}
+
+		log.trace("askForChanges() returns: {}", successful);
+		return successful;
 	}
 
 	@Override
 	public List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException {
-		log.debug("getApprovalsOfProductionTransfer(requestId: {}, userId: {})", requestId, userId);
+		log.trace("getApprovalsOfProductionTransfer(requestId: {}, userId: {})", requestId, userId);
 		if (userId == null || requestId == null) {
 			log.error("Illegal input - requestId: {}, userId: {} " , requestId, userId);
 			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
-		} else if (! appConfig.isAdmin(userId)) {
+		} else if (! appConfig.isAppAdmin(userId)) {
 			log.error("User is not authorized to view approvals");
 			throw new UnauthorizedActionException("User is not authorized to view approvals");
 		}
 
 		List<RequestSignature> result = requestManager.getRequestSignatures(requestId);
-		log.debug("getApprovalsOfProductionTransfer returns: {}", result);
+		log.trace("getApprovalsOfProductionTransfer returns: {}", result);
 		return result;
 	}
 
 	@Override
-	public List<Request> getAllRequests(Long adminId) throws UnauthorizedActionException {
-		log.debug("getAllRequests({})", adminId);
-		if (adminId == null) {
-			log.error("Illegal input - adminId is null");
-			throw new IllegalArgumentException("Illegal input - adminId is null");
-		} else if (! appConfig.isAdmin(adminId)) {
+	public List<Request> getAllRequests(Long userId) throws UnauthorizedActionException {
+		log.trace("getAllRequests({})", userId);
+		if (userId == null) {
+			log.error("Illegal input - userId is null");
+			throw new IllegalArgumentException("Illegal input - userId is null");
+		} else if (! appConfig.isAppAdmin(userId)) {
 			log.error("User cannot list all requests, user is not an admin");
 			throw new UnauthorizedActionException("User cannot list all requests, user is not an admin");
 		}
 
 		List<Request> result = requestManager.getAllRequests();
 
-		log.debug("getAllRequests returns: {}", result);
+		log.trace("getAllRequests returns: {}", result);
 		return result;
 	}
 
 	@Override
-	public List<Facility> getAllFacilities(Long adminId) throws UnauthorizedActionException, RPCException {
-		log.debug("getAllFacilities({})", adminId);
-		if (adminId == null) {
-			log.error("Illegal input - adminId is null");
-			throw new IllegalArgumentException("Illegal input - adminId is null");
-		} else if (! appConfig.isAdmin(adminId)) {
+	public List<Facility> getAllFacilities(Long userId) throws UnauthorizedActionException, ConnectorException {
+		log.trace("getAllFacilities({})", userId);
+		if (userId == null) {
+			log.error("Illegal input - userId is null");
+			throw new IllegalArgumentException("Illegal input - userId is null");
+		} else if (! appConfig.isAppAdmin(userId)) {
 			log.error("User cannot list all facilities, user not an admin");
 			throw new UnauthorizedActionException("User cannot list all facilities, user not an admin");
 		}
 
-		Map<String, String> params = new HashMap<>();
-		params.put(appConfig.getIdpAttribute(), appConfig.getIdpAttributeValue());
-		List<Facility> result = perunConnector.getFacilitiesViaSearcher(params);
+		List<Facility> result = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getIdpAttribute(),
+				appConfig.getIdpAttributeValue());
 
-		log.debug("getAllFacilities returns: {}", result);
+		log.trace("getAllFacilities returns: {}", result);
 		return result;
 	}
 
-	private boolean finishRequestApproved(Request request) throws RPCException, InternalErrorException, MitreIDApiException {
+	private boolean processApprovedRequest(Request request) throws InternalErrorException, ConnectorException {
 		switch(request.getAction()) {
 			case REGISTER_NEW_SP:
 				return registerNewFacilityToPerun(request);
@@ -221,8 +261,8 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		return false;
 	}
 
-	private boolean registerNewFacilityToPerun(Request request) throws RPCException, InternalErrorException, MitreIDApiException {
-		log.debug("registerNewFacilityToPerun({})", request);
+	private boolean registerNewFacilityToPerun(Request request) throws InternalErrorException, ConnectorException {
+		log.trace("registerNewFacilityToPerun({})", request);
 
 		Facility facility = new Facility(null);
 		String newName = request.getFacilityName();
@@ -241,99 +281,121 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		if (facility == null) {
 			log.error("Creating facility in Perun failed");
 			throw new InternalErrorException("Creating facility in Perun failed");
+		} else {
+			log.info("Created facility: {}", facility);
 		}
-
 		request.setFacilityId(facility.getId());
 
-		log.info("Setting facility attributes");
-		boolean result = perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonArrayForPerun());
-		result = result && perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
+		log.info("Setting requesting user as facility admin");
+		boolean adminSet = perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
 
+		Map<String, PerunAttribute> additionalAttributes;
 		if (isOidc(request)) {
-			result = result && setClientIdAndMitreClientId(request);
+			log.debug("Creating client in mitreId");
+			MitreIdResponse mitreResponse = mitreIdConnector.createClient(request.getAttributes());
+			additionalAttributes = prepareNewFacilityAttributes(true, false, mitreResponse);
+		} else {
+			additionalAttributes = prepareNewFacilityAttributes(true, false, null);
 		}
 
-		log.debug("registerNewFacilityToPerun returns: {}", result);
-		return result;
+		request.updateAttributes(additionalAttributes, true);
+
+		log.info("Setting facility attributes");
+		boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonArrayForPerun());
+
+		boolean successful = adminSet && attributesSet;
+		if (!successful) {
+			log.error("Some operations failed - adminSet: {}, attributesSet: {}", adminSet, attributesSet);
+		} else {
+			log.info("Facility is all set up");
+		}
+
+		log.trace("registerNewFacilityToPerun returns: {}", successful);
+		return successful;
 	}
 
-	private boolean updateFacilityInPerun(Request request) throws RPCException, InternalErrorException, MitreIDApiException {
-		log.debug("updateFacilityInPerun({})", request);
-
+	private boolean updateFacilityInPerun(Request request) throws InternalErrorException, ConnectorException {
+		log.trace("updateFacilityInPerun({})", request);
 		Long facilityId = extractFacilityIdFromRequest(request);
 
 		log.debug("Fetching facility with ID: {} from Perun ", facilityId);
-
 		Facility actualFacility = perunConnector.getFacilityById(facilityId);
 		if (actualFacility == null) {
 			log.error("Facility with ID: {} does not exist in Perun", facilityId);
 			throw new InternalErrorException("Facility with ID: " + facilityId + " does not exist in Perun");
 		}
 
+		log.info("Updating facility name and description");
+		boolean facilityCoreUpdated = updateFacilityNameAndDesc(actualFacility, request);
+
 		log.info("Setting facility attributes");
-		boolean result = perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonArrayForPerun());
+		boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(),
+				request.getAttributesAsJsonArrayForPerun());
 
-		String newName = request.getFacilityName();
-		String newDesc = request.getFacilityDescription();
-
-		boolean changed = false;
-		if (newName != null && !actualFacility.getName().equals(newName)) {
-			log.debug("Update facility name requested");
-			actualFacility.setName(newName);
-			changed = true;
+		boolean mitreIdUpdated = true;
+		if (isOidc(request)) {
+			log.info("Updating mitreId client");
+			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
+					mitreIdAttrsConfig.getMitreClientIdAttr());
+			mitreIdUpdated = mitreIdConnector.updateClient(mitreClientId.valueAsLong(), request.getAttributes());
 		}
 
-		if (newDesc != null && !actualFacility.getDescription().equals(newDesc)) {
-			log.debug("Update facility description requested");
-			actualFacility.setDescription(newDesc);
-			changed = true;
+		boolean successful = facilityCoreUpdated && attributesSet && mitreIdUpdated;
+		if (!successful) {
+			if (isOidc(request)) {
+				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}, mitreIdUpdated: {}",
+						facilityCoreUpdated, attributesSet, mitreIdUpdated);
+			} else {
+				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}",
+						facilityCoreUpdated, attributesSet);
+			}
 		}
 
-		if (changed) {
-			log.debug("Updating facility name and/or description");
-			perunConnector.updateFacilityInPerun(actualFacility.toJson());
-		}
 
-		log.debug("updating mitreid client");
-		PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId, mitreIdAttrsConfig.getMitreClientIdAttr());
-		result = result && mitreIdConnector.updateClient(mitreClientId.valueAsLong(), request.getAttributes());
-
-		log.debug("updateFacilityInPerun returns: {}", result);
-		return result;
+		log.trace("updateFacilityInPerun returns: {}", successful);
+		return successful;
 	}
 
-	private boolean deleteFacilityFromPerun(Request request) throws RPCException, MitreIDApiException {
-		log.debug("deleteFacilityFromPerun({})", request);
+	private boolean deleteFacilityFromPerun(Request request) throws ConnectorException {
+		log.trace("deleteFacilityFromPerun({})", request);
 		Long facilityId = extractFacilityIdFromRequest(request);
 
 		log.info("Removing facility with ID: {} from Perun", facilityId);
-		boolean result = perunConnector.deleteFacilityFromPerun(facilityId);
-		if (! result) {
-			log.error("Facility has not been removed");
+		boolean facilityRemoved = perunConnector.deleteFacilityFromPerun(facilityId);
+		boolean mitreIdRemoved = true;
+
+		if (isOidc(request)) {
+			log.info("Removing client from mitreId");
+			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
+					mitreIdAttrsConfig.getMitreClientIdAttr());
+			mitreIdRemoved = mitreIdConnector.deleteClient(mitreClientId.valueAsLong());
 		}
 
-		PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId, mitreIdAttrsConfig.getMitreClientIdAttr());
-		result = result && mitreIdConnector.deleteClient(mitreClientId.valueAsLong());
+		boolean successful = facilityRemoved && mitreIdRemoved;
+		if (!successful) {
+			if (isOidc(request)) {
+				log.error("Some operations failed - facilityRemoved: {}, mitreIdRemoved: {}",
+						facilityRemoved, mitreIdRemoved);
+			} else {
+				log.error("Some operations failed - facilityRemoved: {}", facilityRemoved);
+			}
+		}
 
-		log.debug("deleteFacilityFromPerun returns: {}", result);
-		return result;
+		log.trace("deleteFacilityFromPerun returns: {}", successful);
+		return successful;
 	}
 
-	private boolean moveToProduction(Request request) throws RPCException {
-		log.debug("requestMoveToProduction({})", request);
-		log.info("Updating facility attributes");
-		boolean res;
-		PerunAttribute testSp = perunConnector.getFacilityAttribute(
-				request.getFacilityId(), appConfig.getTestSpAttribute());
-		testSp.setValue(false);
-		res = perunConnector.setFacilityAttribute(request.getFacilityId(), testSp.toJson());
-		PerunAttribute displayOnList = perunConnector.getFacilityAttribute(
-				request.getFacilityId(), appConfig.getShowOnServicesListAttribute());
-		displayOnList.setValue(true);
-		res = res && perunConnector.setFacilityAttribute(request.getFacilityId(), displayOnList.toJson());
+	private boolean moveToProduction(Request request) throws ConnectorException {
+		log.trace("requestMoveToProduction({})", request);
 
-		log.debug("requestMoveToProduction returns: {}", res);
-		return res;
+		log.info("Updating facility attributes");
+		Map<String, PerunAttribute> attributeMap = prepareNewFacilityAttributes(false, true, null);
+		request.updateAttributes(attributeMap, true);
+
+		boolean updated = perunConnector.setFacilityAttributes(request.getFacilityId(), request.getAttributesAsJsonArrayForPerun());
+
+		log.trace("requestMoveToProduction returns: {}", updated);
+		return updated;
 	}
 
 	private Long extractFacilityIdFromRequest(Request request) {
@@ -352,28 +414,67 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 	}
 
 	private boolean isOidc(Request request) {
-		return request.getAttributes().containsKey(mitreIdAttrsConfig.getGrantTypesAttrs());
+		log.trace("isOidc({})", request);
+
+		boolean isOidc = request.getAttributes().containsKey(mitreIdAttrsConfig.getGrantTypesAttrs());
+		log.trace("isOidc() returns: {}", isOidc);
+		return isOidc;
 	}
 
-	private boolean setClientIdAndMitreClientId(Request request) throws MitreIDApiException, RPCException {
-		log.debug("setClientIdAndMitreClientId({})", request);
-		MitreIdResponse response = mitreIdConnector.createClient(request.getAttributes());
-		log.debug("mitreid response: {}", response);
+	private Map<String, PerunAttribute> prepareNewFacilityAttributes(boolean testSp, boolean showOnList, MitreIdResponse mitreResponse) {
+		log.trace("prepareNewFacilityAttributes(testSp: {}, showOnList: {}, mitreResponse: {})",
+				testSp, showOnList, mitreResponse);
 
-		List<String> toFetch = new ArrayList<>();
-		toFetch.add(mitreIdAttrsConfig.getClientIdAttr());
-		toFetch.add(mitreIdAttrsConfig.getMitreClientIdAttr());
+		Map<String, PerunAttribute> attributesMap = new HashMap<>();
 
-		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(request.getFacilityId(), toFetch);
-		attrs.get(mitreIdAttrsConfig.getClientIdAttr()).setValue(response.getClientId());
-		attrs.get(mitreIdAttrsConfig.getMitreClientIdAttr()).setValue(response.getId());
+		PerunAttributeDefinition testSpAttrDef = appConfig.getAttrDefinition(appConfig.getTestSpAttribute());
+		PerunAttribute isTestSpAttr = new PerunAttribute(testSpAttrDef, testSp);
 
-		JSONArray jsonArr = new JSONArray();
-		jsonArr.put(attrs.get(mitreIdAttrsConfig.getClientIdAttr()).toJson());
-		jsonArr.put(attrs.get(mitreIdAttrsConfig.getMitreClientIdAttr()).toJson());
+		PerunAttributeDefinition showOnListAttrDef = appConfig.getAttrDefinition(appConfig.getShowOnServicesListAttribute());
+		PerunAttribute showOnServicesListAttr = new PerunAttribute(showOnListAttrDef, showOnList);
 
-		boolean res = perunConnector.setFacilityAttributes(request.getFacilityId(), jsonArr);
-		log.debug("setClientIdAndMitreClientId returns: {}", res);
-		return res;
+		if (mitreResponse != null) {
+			PerunAttributeDefinition oidcClientIdDef = appConfig.getAttrDefinition(mitreIdAttrsConfig.getClientIdAttr());
+			PerunAttribute oidcClientIdAttr = new PerunAttribute(oidcClientIdDef, mitreResponse.getClientId());
+
+			PerunAttributeDefinition mitreClientIdDef = appConfig.getAttrDefinition(mitreIdAttrsConfig.getClientIdAttr());
+			PerunAttribute mitreClientIdAttr = new PerunAttribute(mitreClientIdDef, mitreResponse.getId());
+
+			attributesMap.put(oidcClientIdAttr.getFullName(), oidcClientIdAttr);
+			attributesMap.put(mitreClientIdAttr.getFullName(), mitreClientIdAttr);
+		}
+		attributesMap.put(isTestSpAttr.getFullName(), isTestSpAttr);
+		attributesMap.put(showOnServicesListAttr.getFullName(), showOnServicesListAttr);
+
+		log.trace("prepareNewFacilityAttributes() returns: {}", attributesMap);
+		return attributesMap;
+	}
+
+	private boolean updateFacilityNameAndDesc(Facility actualFacility, Request request) throws ConnectorException {
+		log.trace("updateFacilityNameAndDesc(actualFacility: {}, request: {})", actualFacility, request);
+		String newName = request.getFacilityName();
+		String newDesc = request.getFacilityDescription();
+		boolean changed = false;
+		boolean successful = true;
+
+		if (newName != null && !actualFacility.getName().equals(newName)) {
+			log.debug("Update facility name requested");
+			actualFacility.setName(newName);
+			changed = true;
+		}
+
+		if (newDesc != null && !actualFacility.getDescription().equals(newDesc)) {
+			log.debug("Update facility description requested");
+			actualFacility.setDescription(newDesc);
+			changed = true;
+		}
+
+		if (changed) {
+			log.debug("Updating facility name and/or description");
+			successful = null != perunConnector.updateFacilityInPerun(actualFacility.toJson());
+		}
+
+		log.trace("updateFacilityNameAndDesc() returns: {}", successful);
+		return successful;
 	}
 }

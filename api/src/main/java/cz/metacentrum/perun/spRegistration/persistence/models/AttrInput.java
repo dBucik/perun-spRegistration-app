@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Input for attribute. Holds configuration of inputs like if it is required, should be displayed etc.
+ *
+ * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ */
 public class AttrInput {
 
 	private String name;

@@ -39,8 +39,6 @@ public class Mails {
 	private static final String PRODUCTION_AUTHORITIES_SUBJECT_KEY = "production.authorities.subject";
 	private static final String ADD_ADMIN_SUBJECT_KEY = "admins.add.subject";
 	private static final String ADD_ADMIN_MESSAGE_KEY = "admins.add.message";
-	private static final String REMOVE_ADMIN_SUBJECT_KEY = "admins.remove.subject";
-	private static final String REMOVE_ADMIN_MESSAGE_KEY = "admins.remove.message";
 	private static final String FOOTER_KEY = "footer";
 
 	private static final String REQUEST_ID_FIELD = "%REQUEST_ID%";
@@ -49,15 +47,15 @@ public class Mails {
 	private static final String APPROVAL_LINK_FIELD = "%APPROVAL_LINK%";
 	private static final String USER_INFO_FIELD = "%USER_INFO%";
 
-	public static boolean requestStatusUpdateUserNotify(Long requestId, RequestStatus status, List<String> recipients,
+	public static boolean requestStatusUpdateUserNotify(Long requestId, RequestStatus status, String administratorContact,
 														Properties props) {
-		return requestStatusUpdateUserNotify(requestId, status, recipients, null, props);
+		return requestStatusUpdateUserNotify(requestId, status, administratorContact, null, props);
 	}
 
-	public static boolean requestStatusUpdateUserNotify(Long requestId, RequestStatus status, List<String> recipients,
+	public static boolean requestStatusUpdateUserNotify(Long requestId, RequestStatus status, String administratorContact,
 														String additionalMessage, Properties props) {
-		log.debug("requestStatusUpdateUserNotify(requestId: {}, status: {}, recipients: {}, additionalMessage: {}, props: {})",
-				requestId, status, recipients, additionalMessage, props);
+		log.debug("requestStatusUpdateUserNotify(requestId: {}, status: {}, administratorContact: {}, additionalMessage: {}, props: {})",
+				requestId, status, administratorContact, additionalMessage, props);
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
@@ -74,19 +72,19 @@ public class Mails {
 			message = message.replaceAll(NEW_STATUS_FIELD, status.toString());
 		}
 		if (additionalMessage != null && !additionalMessage.isEmpty()) {
-			message = message.concat("\n").concat(additionalMessage);
+			message = message.concat("<br/>").concat(additionalMessage);
 		}
 
-		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
+		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
 
-		boolean res = sendMail(host, from, recipients, subject, message);
+		boolean res = sendMail(host, from, Collections.singletonList(administratorContact), subject, message);
 		log.debug("requestStatusUpdateUserNotify() returns: {}", res);
 		return res;
 	}
 
-	public static boolean userCreateRequestNotify(Long requestId, String serviceName, List<String> recipients, Properties props) {
-		log.debug("userCreateRequestNotify(requestId: {}, serviceName: {}, recipients: {}, props: {})",
-				requestId, serviceName, recipients, props);
+	public static boolean userCreateRequestNotify(Long requestId, String serviceName, String recipient, Properties props) {
+		log.debug("userCreateRequestNotify(requestId: {}, serviceName: {}, recipient: {}, props: {})",
+				requestId, serviceName, recipient, props);
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
@@ -103,16 +101,16 @@ public class Mails {
 		if (message.contains(SERVICE_NAME_FIELD)) {
 			message = message.replaceAll(SERVICE_NAME_FIELD, serviceName);
 		}
-		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
+		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
 
-		boolean res = sendMail(host, from, recipients, subject, message);
+		boolean res = sendMail(host, from, Collections.singletonList(recipient), subject, message);
 		log.debug("userCreateRequestNotify() returns: {}", res);
 		return res;
 	}
 
-	public static boolean transferToProductionUserNotify(Long requestId, String serviceName, List<String> recipients, Properties props) {
-		log.debug("transferToProductionUserNotify(requestId: {}, serviceName: {}, recipients: {}, props: {})",
-				requestId, serviceName, recipients, props);
+	public static boolean transferToProductionUserNotify(Long requestId, String serviceName, String recipient, Properties props) {
+		log.debug("transferToProductionUserNotify(requestId: {}, serviceName: {}, recipient: {}, props: {})",
+				requestId, serviceName, recipient, props);
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
@@ -129,9 +127,9 @@ public class Mails {
 		if (message.contains(SERVICE_NAME_FIELD)) {
 			message = message.replaceAll(SERVICE_NAME_FIELD, serviceName);
 		}
-		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
+		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
 
-		boolean res = sendMail(host, from, recipients, subject, message);
+		boolean res = sendMail(host, from, Collections.singletonList(recipient), subject, message);
 		log.debug("transferToProductionUserNotify() returns: {}", res);
 		return res;
 	}
@@ -154,7 +152,7 @@ public class Mails {
 		if (message.contains(APPROVAL_LINK_FIELD)) {
 			message = message.replaceAll(APPROVAL_LINK_FIELD, approvalLink);
 		}
-		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
+		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
 
 		boolean res = sendMail(host, from, Collections.singletonList(recipient), subject, message);
 		log.debug("authoritiesApproveProductionTransferNotify() returns: {}", res);
@@ -178,7 +176,7 @@ public class Mails {
 		if (message.contains(USER_INFO_FIELD)) {
 			message = message.replaceAll(USER_INFO_FIELD, userId.toString());
 		}
-		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
+		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
 		List<String> admins = Arrays.asList(props.getProperty(ADMINS_MAILS).split(","));
 
 		boolean res = sendMail(host, from, admins, subject, message);
@@ -186,21 +184,21 @@ public class Mails {
 		return res;
 	}
 
-	public static boolean adminAddRemoveNotify(String approvalLink, String serviceName, String recipient, boolean isAddAdmins, Properties props) {
+	public static boolean adminAddRemoveNotify(String approvalLink, String serviceName, String recipient, Properties props) {
 		log.debug("adminAddRemoveNotify(approvalLink: {}, recipient: {}, props: {})",
 				approvalLink, recipient, props);
 		String host = props.getProperty(HOST_KEY);
 		String from = props.getProperty(FROM_KEY);
 
-		String subject = props.getProperty((isAddAdmins) ? ADD_ADMIN_SUBJECT_KEY : REMOVE_ADMIN_SUBJECT_KEY);
-		String message = props.getProperty((isAddAdmins) ? ADD_ADMIN_MESSAGE_KEY : REMOVE_ADMIN_MESSAGE_KEY);
+		String subject = props.getProperty(ADD_ADMIN_SUBJECT_KEY);
+		String message = props.getProperty(ADD_ADMIN_MESSAGE_KEY);
 		if (message.contains(SERVICE_NAME_FIELD)) {
 			message = message.replaceAll(SERVICE_NAME_FIELD, serviceName);
 		}
 		if (message.contains(APPROVAL_LINK_FIELD)) {
 			message = message.replaceAll(APPROVAL_LINK_FIELD, approvalLink);
 		}
-		message = message.concat("\n").concat(props.getProperty(FOOTER_KEY));
+		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
 
 		boolean res = sendMail(host, from, Collections.singletonList(recipient), subject, message);
 		log.debug("adminAddRemoveNotify() returns: {}", res);
@@ -237,6 +235,7 @@ public class Mails {
 			Transport.send(message);
 		} catch (MessagingException e) {
 			log.debug("sendMail() returns: FALSE");
+			return false;
 		}
 
 		log.debug("sendMail() returns: TRUE");

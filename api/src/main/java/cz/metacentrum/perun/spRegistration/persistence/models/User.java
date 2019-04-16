@@ -25,7 +25,7 @@ public class User extends PerunEntity {
 	@JsonIgnore
 	private List<Long> facilitiesWhereAdmin;
 
-	@JsonProperty("isAdmin")
+	@JsonProperty("isAppAdmin")
 	private boolean isAdmin;
 
 	public User(Long id, String titleBefore, String firstName, String middleName, String lastName, String titleAfter) {
@@ -101,6 +101,10 @@ public class User extends PerunEntity {
 		isAdmin = admin;
 	}
 
+	/**
+	 * Get name of user
+	 * @return Composed name
+	 */
 	public String getName() {
 		StringJoiner joiner = new StringJoiner(" ");
 		if (firstName != null && !firstName.isEmpty()) {
@@ -116,17 +120,10 @@ public class User extends PerunEntity {
 		return joiner.toString();
 	}
 
-	public static User fromPerunJson(JSONObject json) {
-		Long id = json.getLong("id");
-		String firstName = json.optString("firstName", "");
-		String middleName = json.optString("middleName", "");
-		String lastName = json.optString("lastName", "");
-		String titleBefore = json.optString("titleBefore", "");
-		String titleAfter = json.optString("titleAfter", "");
-
-		return new User(id, titleBefore, firstName, middleName, lastName, titleAfter);
-	}
-
+	/**
+	 * Get full name with titles
+	 * @return Composed name with titles
+	 */
 	public String getFullName() {
 		StringJoiner joiner = new StringJoiner(" ");
 		if (titleBefore != null && !titleBefore.isEmpty()) {
@@ -148,6 +145,26 @@ public class User extends PerunEntity {
 		return joiner.toString();
 	}
 
+	/**
+	 * Parse user from JSON obtained from Perun
+	 * @param json JSON from Perun
+	 * @return User or null
+	 */
+	public static User fromPerunJson(JSONObject json) {
+		if (json == null || json.isEmpty() || json.equals(JSONObject.NULL)) {
+			return null;
+		}
+
+		Long id = json.getLong("id");
+		String firstName = json.optString("firstName", "");
+		String middleName = json.optString("middleName", "");
+		String lastName = json.optString("lastName", "");
+		String titleBefore = json.optString("titleBefore", "");
+		String titleAfter = json.optString("titleAfter", "");
+
+		return new User(id, titleBefore, firstName, middleName, lastName, titleAfter);
+	}
+
 	@Override
 	public String toString() {
 		return "User{" +
@@ -159,7 +176,7 @@ public class User extends PerunEntity {
 				", titleAfter='" + titleAfter + '\'' +
 				", email='" + email + '\'' +
 				", facilitiesWhereAdmin=" + facilitiesWhereAdmin +
-				", isAdmin=" + isAdmin +
+				", isAppAdmin=" + isAdmin +
 				'}';
 	}
 

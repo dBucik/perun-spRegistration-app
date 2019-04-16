@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Representation of attribute from Perun.
+ *
+ * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ */
 public class PerunAttribute {
 
 	private final static String STRING_TYPE = "java.lang.String";
@@ -37,6 +42,15 @@ public class PerunAttribute {
 		this.oldValue = oldValue;
 		this.comment = comment;
 		this.input = input;
+	}
+
+	public PerunAttribute(PerunAttributeDefinition attributeDefinition, Object value) {
+		this.definition = attributeDefinition;
+		this.fullName = attributeDefinition.getFullName();
+		this.value = value;
+		this.oldValue = null;
+		this.comment = null;
+		this.input = null;
 	}
 
 	public PerunAttributeDefinition getDefinition() {
@@ -107,46 +121,10 @@ public class PerunAttribute {
 		return valueAsMap(false);
 	}
 
-	public String valueAsString(boolean isOldValue) {
-		if (isOldValue) {
-			return valueAsString(oldValue);
-		} else {
-			return valueAsString(value);
-		}
-	}
-
-	public Long valueAsLong(boolean isOldValue) {
-		if (isOldValue) {
-			return valueAsLong(oldValue);
-		} else {
-			return valueAsLong(value);
-		}
-	}
-
-	public Boolean valueAsBoolean(boolean isOldValue) {
-		if (isOldValue) {
-			return valueAsBoolean(oldValue);
-		} else {
-			return valueAsBoolean(value);
-		}
-	}
-
-	public List<String> valueAsArray(boolean isOldValue) {
-		if (isOldValue) {
-			return valueAsArray(oldValue);
-		} else {
-			return valueAsArray(value);
-		}
-	}
-
-	public Map<String,String> valueAsMap(boolean isOldValue) {
-		if (isOldValue) {
-			return valueAsMap(oldValue);
-		} else {
-			return valueAsMap(value);
-		}
-	}
-
+	/**
+	 * Convert to JSON object
+	 * @return JSON Object
+	 */
 	public JSONObject toJson() {
 		JSONObject json = definition.toJson();
 		putValue(json, "value", definition.getType(), false);
@@ -154,6 +132,10 @@ public class PerunAttribute {
 		return json;
 	}
 
+	/**
+	 * Convert to JSON object in format for DB
+	 * @return JSON Object
+	 */
 	public JSONObject toJsonForDb() {
 		JSONObject obj = new JSONObject();
 		obj.put("type", definition.getType());
@@ -164,7 +146,16 @@ public class PerunAttribute {
 		return obj;
 	}
 
+	/**
+	 * Parse from JSON obtained from Perun
+	 * @param json JSON from Perun
+	 * @return PerunAttribute or null
+	 */
 	public static PerunAttribute fromJsonOfPerun(JSONObject json) {
+		if (json == null || json.isEmpty() || json.equals(JSONObject.NULL)) {
+			return null;
+		}
+
 		PerunAttributeDefinition definition = PerunAttributeDefinition.fromPerunJson(json);
 
 		Object value = getValue(json, "value", definition.getType());
@@ -175,8 +166,24 @@ public class PerunAttribute {
 		return attr;
 	}
 
+	/**
+	 * Parse from JSON obtained from DB
+	 * @param name name attribute (full urn)
+	 * @param json JSON from DB
+	 * @param attributeDefinitionMap map containing attribute definitions
+	 * @param inputMap map containing inputs
+	 * @return PerunAttribute or null
+	 */
 	public static PerunAttribute fromJsonOfDb(String name, JSONObject json, Map<String,
 			PerunAttributeDefinition> attributeDefinitionMap, Map<String, AttrInput> inputMap) {
+		if (name == null || name.isEmpty() ||
+				json == null || json.isEmpty() || json.equals(JSONObject.NULL) ||
+				attributeDefinitionMap == null || attributeDefinitionMap.isEmpty() ||
+				inputMap == null || inputMap.isEmpty() ||
+				!attributeDefinitionMap.containsKey(name) || ! inputMap.containsKey(name)) {
+			return null;
+		}
+
 		String type = json.getString("type");
 		Object newValue = getValue(json, "newValue", type);
 		Object oldValue = getValue(json, "oldValue", type);
@@ -186,6 +193,76 @@ public class PerunAttribute {
 		AttrInput input = inputMap.get(name);
 
 		return new PerunAttribute(def, name, newValue, oldValue, comment, input);
+	}
+
+	@Override
+	public String toString() {
+		return "PerunAttribute{" +
+				"definition=" + definition +
+				", value=" + value +
+				", oldValue=" + oldValue +
+				", comment='" + comment + '\'' +
+				", fullName='" + fullName + '\'' +
+				", input=" + input +
+				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		PerunAttribute that = (PerunAttribute) o;
+		return Objects.equals(definition, that.definition) &&
+				Objects.equals(value, that.value) &&
+				Objects.equals(oldValue, that.oldValue) &&
+				Objects.equals(comment, that.comment) &&
+				Objects.equals(fullName, that.fullName) &&
+				Objects.equals(input, that.input);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(definition, value, oldValue, comment, fullName, input);
+	}
+
+	private String valueAsString(boolean isOldValue) {
+		if (isOldValue) {
+			return valueAsString(oldValue);
+		} else {
+			return valueAsString(value);
+		}
+	}
+
+	private Long valueAsLong(boolean isOldValue) {
+		if (isOldValue) {
+			return valueAsLong(oldValue);
+		} else {
+			return valueAsLong(value);
+		}
+	}
+
+	private Boolean valueAsBoolean(boolean isOldValue) {
+		if (isOldValue) {
+			return valueAsBoolean(oldValue);
+		} else {
+			return valueAsBoolean(value);
+		}
+	}
+
+	private List<String> valueAsArray(boolean isOldValue) {
+		if (isOldValue) {
+			return valueAsArray(oldValue);
+		} else {
+			return valueAsArray(value);
+		}
+	}
+
+	private Map<String,String> valueAsMap(boolean isOldValue) {
+		if (isOldValue) {
+			return valueAsMap(oldValue);
+		} else {
+			return valueAsMap(value);
+		}
 	}
 
 	private void putValue(JSONObject json, String key, String type, boolean isOldValue) {
@@ -334,35 +411,5 @@ public class PerunAttribute {
 		}
 
 		return null;
-	}
-
-	@Override
-	public String toString() {
-		return "PerunAttribute{" +
-				"definition=" + definition +
-				", value=" + value +
-				", oldValue=" + oldValue +
-				", comment='" + comment + '\'' +
-				", fullName='" + fullName + '\'' +
-				", input=" + input +
-				'}';
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		PerunAttribute that = (PerunAttribute) o;
-		return Objects.equals(definition, that.definition) &&
-				Objects.equals(value, that.value) &&
-				Objects.equals(oldValue, that.oldValue) &&
-				Objects.equals(comment, that.comment) &&
-				Objects.equals(fullName, that.fullName) &&
-				Objects.equals(input, that.input);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(definition, value, oldValue, comment, fullName, input);
 	}
 }
