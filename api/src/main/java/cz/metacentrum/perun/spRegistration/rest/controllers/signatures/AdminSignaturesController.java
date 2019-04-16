@@ -33,8 +33,8 @@ public class AdminSignaturesController {
 	{
 		log.debug("getApprovals(user: {}, requestId: {})", user.getId(), requestId);
 
-		List<RequestSignature> signatureList = service.getApprovalsOfProductionTransfer(requestId, user.getId());
-		log.trace("getApprovals() returns: {}", signatureList);
-		return signatureList;
+		List<RequestSignature> signaturesList = service.getApprovalsOfProductionTransfer(requestId, user.getId());
+		log.trace("getApprovals() returns: {}", signaturesList);
+		return signaturesList;
 	}
 }

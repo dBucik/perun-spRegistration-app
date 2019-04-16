@@ -321,7 +321,7 @@ public class RequestManagerImpl implements RequestManager {
 	public Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException {
 		log.trace("getActiveRequestIdByFacilityId({})", facilityId);
 		if (facilityId == null) {
-			throw new IllegalArgumentException("facilityId is null");
+			return null;
 		}
 
 		List<Integer> allowedStatuses = Arrays.asList(RequestStatus.APPROVED.getAsInt(), RequestStatus.REJECTED.getAsInt());
