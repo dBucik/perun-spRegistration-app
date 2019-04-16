@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -32,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * Connects to Perun via RPC.
@@ -347,9 +349,18 @@ public class PerunConnectorRpc implements PerunConnector {
 				Collections.singletonList(new BasicAuthorizationInterceptor(perunRpcUser, perunRpcPassword));
 		restTemplate.setRequestFactory(new InterceptingClientHttpRequestFactory(restTemplate.getRequestFactory(), interceptors));
 		String actionUrl = perunRpcUrl + "/json/" + manager + '/' + method;
+		if (!map.isEmpty()) {
+			StringJoiner joiner = new StringJoiner("&");
+			for (Map.Entry<String, Object> entry : map.entrySet()) {
+				joiner.add(entry.getKey() + "=" + entry.getValue());
+			}
+			actionUrl += ("?" + joiner.toString());
+		}
 
 		try {
-			ResponseEntity<JsonNode> response = restTemplate.getForEntity(actionUrl, JsonNode.class, map);
+			HttpHeaders headers = new HttpHeaders();
+			HttpEntity<?> entity = new HttpEntity<>(headers);
+			ResponseEntity<JsonNode> response = restTemplate.exchange(actionUrl, HttpMethod.GET, entity, JsonNode.class);
 
 			String result = (response != null && response.getBody() != null) ?
 					Utils.prettyPrintJsonString(response.getBody()) : null;
