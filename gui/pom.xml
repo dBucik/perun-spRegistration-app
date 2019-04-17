@@ -41,6 +41,25 @@
                         </goals>
                     </execution>
                     <execution>
+                        <id>npm install replace-in-file</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install replace-in-file</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>replace</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run replaceBuild -- ${angular.api.url}</arguments>
+                            <workingDirectory>.</workingDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>npm run build</id>
                         <goals>
                             <goal>npm</goal>
@@ -55,7 +74,14 @@
                             <goal>npm</goal>
                         </goals>
                         <configuration>
-                            <arguments>run ng build -- ${angular.build.profile} ${angular.deploy.url} ${angular.base.href}</arguments>
+                            <arguments>run ng build --
+                                --${angular.build.profile}
+                                --deploy-url=${angular.deploy.url}
+                                --base-href=${angular.base.href}
+                            </arguments>
+                            <environmentVariables>
+                                <api_url>${angular.api.url}</api_url>
+                            </environmentVariables>
                         </configuration>
                         <phase>generate-resources</phase>
                     </execution>

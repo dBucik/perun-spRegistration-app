@@ -36,10 +36,12 @@
 
         <!-- APP PROPERTIES -->
         <server.port>8080</server.port>
+        <server.url>http://cloud99b.cerit-sc.cz</server.url>
         <server.contextPath>/spreg</server.contextPath>
-        <angular.build.profile>--prod</angular.build.profile>
-        <angular.deploy.url>--deploy-url=${server.contextPath}/</angular.deploy.url>
-        <angular.base.href>--base-href=${server.contextPath}/</angular.base.href>
+        <angular.build.profile>prod</angular.build.profile>
+        <angular.deploy.url>${server.contextPath}/</angular.deploy.url>
+        <angular.base.href>${server.contextPath}/</angular.base.href>
+        <angular.api.url>${server.url}/${server.contextPath}/api</angular.api.url>
         <logging.path>/var/log/perun-spreg</logging.path>
         <logging.file>perun-spreg.debug</logging.file>
         <dev.enabled>false</dev.enabled>
