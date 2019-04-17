@@ -56,7 +56,6 @@
                         </goals>
                         <configuration>
                             <arguments>run replaceBuild -- ${angular.api.url}</arguments>
-                            <workingDirectory>.</workingDirectory>
                         </configuration>
                     </execution>
                     <execution>
