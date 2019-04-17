@@ -41,7 +41,7 @@
         <angular.build.profile>prod</angular.build.profile>
         <angular.deploy.url>${server.contextPath}/</angular.deploy.url>
         <angular.base.href>${server.contextPath}/</angular.base.href>
-        <angular.api.url>${server.url}/${server.contextPath}/api</angular.api.url>
+        <angular.api.url>${server.url}${server.contextPath}/api</angular.api.url>
         <logging.path>/var/log/perun-spreg</logging.path>
         <logging.file>perun-spreg.debug</logging.file>
         <dev.enabled>false</dev.enabled>
