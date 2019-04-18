@@ -75,11 +75,11 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private final Config config;
 	private final Properties messagesProperties;
 	private final Cipher cipher;
-	private final MitreIdAttrsConfig mitreidAttrsConfig;
+
 
 	@Autowired
 	public UserCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
-								   MitreIdAttrsConfig mitreIdAttrsConfig, AppConfig appConfig, Properties messagesProperties)
+								   AppConfig appConfig, Properties messagesProperties)
 			throws NoSuchPaddingException, NoSuchAlgorithmException {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
@@ -87,7 +87,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		this.config = config;
 		this.messagesProperties = messagesProperties;
 		this.cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-		this.mitreidAttrsConfig = mitreIdAttrsConfig;
 	}
 
 	@Override
@@ -169,7 +168,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
 		List<String> keptAttrs = initKeptAttrs();
-		if (ServiceUtils.isOidcAttributes(attrs, mitreidAttrsConfig)) {
+		if (ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttrName())) {
 			keptAttrs.addAll(config.getOidcInputs()
 					.stream()
 					.map(AttrInput::getName)
@@ -373,8 +372,9 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
+
 		List<String> keptAttrs = initKeptAttrs();
-		if (ServiceUtils.isOidcFacility(facility, mitreidAttrsConfig)) {
+		if (ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttrName())) {
 			keptAttrs.addAll(config.getOidcInputs()
 					.stream()
 					.map(AttrInput::getName)

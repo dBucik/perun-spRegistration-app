@@ -290,7 +290,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		boolean adminSet = perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
 
 		Map<String, PerunAttribute> additionalAttributes;
-		if (ServiceUtils.isOidcRequest(request, mitreIdAttrsConfig)) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 			log.debug("Creating client in mitreId");
 			MitreIdResponse mitreResponse = mitreIdConnector.createClient(request.getAttributes());
 			additionalAttributes = prepareNewFacilityAttributes(true, false, mitreResponse);
@@ -333,7 +333,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 				request.getAttributesAsJsonArrayForPerun());
 
 		boolean mitreIdUpdated = true;
-		if (ServiceUtils.isOidcRequest(request, mitreIdAttrsConfig)) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 			log.info("Updating mitreId client");
 			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
 					mitreIdAttrsConfig.getMitreClientIdAttr());
@@ -342,7 +342,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean successful = facilityCoreUpdated && attributesSet && mitreIdUpdated;
 		if (!successful) {
-			if (ServiceUtils.isOidcRequest(request, mitreIdAttrsConfig)) {
+			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}, mitreIdUpdated: {}",
 						facilityCoreUpdated, attributesSet, mitreIdUpdated);
 			} else {
@@ -364,7 +364,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		boolean facilityRemoved = perunConnector.deleteFacilityFromPerun(facilityId);
 		boolean mitreIdRemoved = true;
 
-		if (ServiceUtils.isOidcRequest(request, mitreIdAttrsConfig)) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 			log.info("Removing client from mitreId");
 			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
 					mitreIdAttrsConfig.getMitreClientIdAttr());
@@ -373,7 +373,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean successful = facilityRemoved && mitreIdRemoved;
 		if (!successful) {
-			if (ServiceUtils.isOidcRequest(request, mitreIdAttrsConfig)) {
+			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 				log.error("Some operations failed - facilityRemoved: {}, mitreIdRemoved: {}",
 						facilityRemoved, mitreIdRemoved);
 			} else {
