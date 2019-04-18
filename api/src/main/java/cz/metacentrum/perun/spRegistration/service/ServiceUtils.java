@@ -57,7 +57,11 @@ public class ServiceUtils {
 	 * @return True if is OIDC service request, false otherwise.
 	 */
 	public static boolean isOidcRequest(Request request, MitreIdAttrsConfig mitreIdAttrsConfig) {
-		return request.getAttributes().containsKey(mitreIdAttrsConfig.getGrantTypesAttrs());
+		if (request.getAttributes().containsKey(mitreIdAttrsConfig.getGrantTypesAttrs())) {
+			return null != request.getAttributes().get(mitreIdAttrsConfig.getGrantTypesAttrs()).getValue();
+		}
+
+		return false;
 	}
 
 	/**
@@ -67,7 +71,11 @@ public class ServiceUtils {
 	 * @return True if is OIDC service, false otherwise.
 	 */
 	public static boolean isOidcFacility(Facility facility, MitreIdAttrsConfig mitreIdAttrsConfig) {
-		return facility.getAttrs().containsKey(mitreIdAttrsConfig.getGrantTypesAttrs());
+		if (facility.getAttrs().containsKey(mitreIdAttrsConfig.getGrantTypesAttrs())) {
+			return null != facility.getAttrs().get(mitreIdAttrsConfig.getGrantTypesAttrs()).getValue();
+		}
+
+		return false;
 	}
 
 	/**
@@ -77,6 +85,10 @@ public class ServiceUtils {
 	 * @return True if attributes are of OIDC service, false otherwise.
 	 */
 	public static boolean isOidcAttributes(Map<String, PerunAttribute> attributes, MitreIdAttrsConfig mitreIdAttrsConfig) {
-		return attributes.containsKey(mitreIdAttrsConfig.getGrantTypesAttrs());
+		if (attributes.containsKey(mitreIdAttrsConfig.getGrantTypesAttrs())) {
+			return null != attributes.get(mitreIdAttrsConfig.getGrantTypesAttrs()).getValue();
+		}
+
+		return false;
 	}
 }
