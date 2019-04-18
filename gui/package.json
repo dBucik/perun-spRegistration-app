@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "replaceBuild": "node ./replace_build.js ",
+    "replaceApiUrl": "node ./replace_api_url.js ",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
