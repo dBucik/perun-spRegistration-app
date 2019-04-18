@@ -58,9 +58,9 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("Duplicates")
 @Service("userService")
-public class UserCommandsCommandsServiceImpl implements UserCommandsService {
+public class UserCommandsServiceImpl implements UserCommandsService {
 
-	private static final Logger log = LoggerFactory.getLogger(UserCommandsCommandsServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(UserCommandsServiceImpl.class);
 
 	private static final String REQUEST_ID_KEY = "requestId";
 	private static final String FACILITY_ID_KEY = "facilityId";
@@ -75,8 +75,8 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	private final Cipher cipher;
 
 	@Autowired
-	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
-										   AppConfig appConfig, Properties messagesProperties) throws NoSuchPaddingException, NoSuchAlgorithmException {
+	public UserCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
+								   AppConfig appConfig, Properties messagesProperties) throws NoSuchPaddingException, NoSuchAlgorithmException {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;

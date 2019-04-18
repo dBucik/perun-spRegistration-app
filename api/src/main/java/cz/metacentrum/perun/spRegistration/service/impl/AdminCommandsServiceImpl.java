@@ -36,9 +36,9 @@ import java.util.Properties;
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
 @Service("adminService")
-public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
+public class AdminCommandsServiceImpl implements AdminCommandsService {
 
-	private static final Logger log = LoggerFactory.getLogger(AdminCommandsCommandsServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(AdminCommandsServiceImpl.class);
 
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
@@ -48,9 +48,9 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 	private final MitreIdConnector mitreIdConnector;
 
 	@Autowired
-	public AdminCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
-											AppConfig appConfig, Properties messagesProperties,
-											MitreIdAttrsConfig mitreIdAttrsConfig, MitreIdConnector mitreIdConnector) {
+	public AdminCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
+									AppConfig appConfig, Properties messagesProperties,
+									MitreIdAttrsConfig mitreIdAttrsConfig, MitreIdConnector mitreIdConnector) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
