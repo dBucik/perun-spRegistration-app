@@ -349,21 +349,13 @@ public class PerunConnectorRpc implements PerunConnector {
 				Collections.singletonList(new BasicAuthorizationInterceptor(perunRpcUser, perunRpcPassword));
 		restTemplate.setRequestFactory(new InterceptingClientHttpRequestFactory(restTemplate.getRequestFactory(), interceptors));
 		String actionUrl = perunRpcUrl + "/json/" + manager + '/' + method;
-		if (!map.isEmpty()) {
-			StringJoiner joiner = new StringJoiner("&");
-			for (Map.Entry<String, Object> entry : map.entrySet()) {
-				joiner.add(entry.getKey() + "=" + entry.getValue());
-			}
-			actionUrl += ("?" + joiner.toString());
-		}
 
 		try {
-			HttpHeaders headers = new HttpHeaders();
-			HttpEntity<?> entity = new HttpEntity<>(headers);
-			ResponseEntity<JsonNode> response = restTemplate.exchange(actionUrl, HttpMethod.GET, entity, JsonNode.class);
+			//we will use post as perun has a complicated way to use get requests...
+			//sending post will always succeed and deliver the parameters
+			JsonNode response = restTemplate.postForObject(actionUrl, map, JsonNode.class);
 
-			String result = (response != null && response.getBody() != null) ?
-					Utils.prettyPrintJsonString(response.getBody()) : null;
+			String result = (response != null) ? Utils.prettyPrintJsonString(response) : null;
 			log.trace("makeRpcGetCall() returns: {}", result);
 			return result;
 		} catch (HttpClientErrorException ex) {
