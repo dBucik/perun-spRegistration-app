@@ -290,7 +290,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		boolean adminSet = perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
 
 		Map<String, PerunAttribute> additionalAttributes;
-		if (isOidc(request)) {
+		if (ServiceUtils.isOidcRequest(request, mitreIdAttrsConfig)) {
 			log.debug("Creating client in mitreId");
 			MitreIdResponse mitreResponse = mitreIdConnector.createClient(request.getAttributes());
 			additionalAttributes = prepareNewFacilityAttributes(true, false, mitreResponse);
@@ -333,7 +333,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 				request.getAttributesAsJsonArrayForPerun());
 
 		boolean mitreIdUpdated = true;
-		if (isOidc(request)) {
+		if (ServiceUtils.isOidcRequest(request, mitreIdAttrsConfig)) {
 			log.info("Updating mitreId client");
 			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
 					mitreIdAttrsConfig.getMitreClientIdAttr());
@@ -342,7 +342,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean successful = facilityCoreUpdated && attributesSet && mitreIdUpdated;
 		if (!successful) {
-			if (isOidc(request)) {
+			if (ServiceUtils.isOidcRequest(request, mitreIdAttrsConfig)) {
 				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}, mitreIdUpdated: {}",
 						facilityCoreUpdated, attributesSet, mitreIdUpdated);
 			} else {
@@ -364,7 +364,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		boolean facilityRemoved = perunConnector.deleteFacilityFromPerun(facilityId);
 		boolean mitreIdRemoved = true;
 
-		if (isOidc(request)) {
+		if (ServiceUtils.isOidcRequest(request, mitreIdAttrsConfig)) {
 			log.info("Removing client from mitreId");
 			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
 					mitreIdAttrsConfig.getMitreClientIdAttr());
@@ -373,7 +373,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean successful = facilityRemoved && mitreIdRemoved;
 		if (!successful) {
-			if (isOidc(request)) {
+			if (ServiceUtils.isOidcRequest(request, mitreIdAttrsConfig)) {
 				log.error("Some operations failed - facilityRemoved: {}, mitreIdRemoved: {}",
 						facilityRemoved, mitreIdRemoved);
 			} else {
@@ -411,14 +411,6 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		return facilityId;
-	}
-
-	private boolean isOidc(Request request) {
-		log.trace("isOidc({})", request);
-
-		boolean isOidc = request.getAttributes().containsKey(mitreIdAttrsConfig.getGrantTypesAttrs());
-		log.trace("isOidc() returns: {}", isOidc);
-		return isOidc;
 	}
 
 	private Map<String, PerunAttribute> prepareNewFacilityAttributes(boolean testSp, boolean showOnList, MitreIdResponse mitreResponse) {
