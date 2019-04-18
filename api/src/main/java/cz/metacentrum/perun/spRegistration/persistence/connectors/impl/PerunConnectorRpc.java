@@ -145,7 +145,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		attributesWithSearchingValues.put(proxyIdentifierAttr, proxyIdentifier);
 		params.put("attributesWithSearchingValues", attributesWithSearchingValues);
 
-		JSONArray res = makeRpcGetCallForArray(SEARCHER, "getFacilities", params);
+		JSONArray res = new JSONArray(makeRpcPostCall(SEARCHER, "getFacilities", params));
 		List<Facility> facilities = MapperUtils.mapFacilities(res);
 
 		log.trace("getFacilitiesByProxyIdentifier() returns: {}", facilities);
