@@ -12,6 +12,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.Mails;
@@ -326,6 +327,27 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		log.trace("signTransferToProduction returns: {}", signed);
 		return signed;
+	}
+
+	@Override
+	public List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException, InternalErrorException {
+		log.trace("getApprovalsOfProductionTransfer(requestId: {}, userId: {})", requestId, userId);
+		if (userId == null || requestId == null) {
+			log.error("Illegal input - requestId: {}, userId: {} " , requestId, userId);
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
+		}
+
+		Request request = getDetailedRequest(requestId, userId);
+		if (request == null) {
+			log.error("Could not find request for ID: {}", requestId);
+		} else if (!isAdminInRequest(request.getReqUserId(), userId) && !appConfig.isAppAdmin(userId)) {
+			log.error("User: {} is not authorized to view request: {}", userId, requestId);
+			throw new UnauthorizedActionException("You are not allowed to display details of this request");
+		}
+
+		List<RequestSignature> result = requestManager.getRequestSignatures(requestId);
+		log.trace("getApprovalsOfProductionTransfer returns: {}", result);
+		return result;
 	}
 
 	@Override

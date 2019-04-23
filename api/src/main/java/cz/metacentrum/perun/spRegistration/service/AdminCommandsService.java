@@ -55,14 +55,6 @@ public interface AdminCommandsService {
 			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException;
 
 	/**
-	 * Get approvals for request to transfer to production.
-	 * @param requestId ID of request.
-	 * @param userId ID of user (ADMIN) displaying the approvals.
-	 * @return List of approvals.
-	 */
-	List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException;
-
-	/**
 	 * Get all requests stored in system.
 	 * @param adminId ID of admin.
 	 * @return List of found requests.

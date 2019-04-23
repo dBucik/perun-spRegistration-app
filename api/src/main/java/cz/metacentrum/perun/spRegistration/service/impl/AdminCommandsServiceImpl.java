@@ -196,22 +196,6 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 	}
 
 	@Override
-	public List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException {
-		log.trace("getApprovalsOfProductionTransfer(requestId: {}, userId: {})", requestId, userId);
-		if (userId == null || requestId == null) {
-			log.error("Illegal input - requestId: {}, userId: {} " , requestId, userId);
-			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
-		} else if (! appConfig.isAppAdmin(userId)) {
-			log.error("User is not authorized to view approvals");
-			throw new UnauthorizedActionException("User is not authorized to view approvals");
-		}
-
-		List<RequestSignature> result = requestManager.getRequestSignatures(requestId);
-		log.trace("getApprovalsOfProductionTransfer returns: {}", result);
-		return result;
-	}
-
-	@Override
 	public List<Request> getAllRequests(Long userId) throws UnauthorizedActionException {
 		log.trace("getAllRequests({})", userId);
 		if (userId == null) {
