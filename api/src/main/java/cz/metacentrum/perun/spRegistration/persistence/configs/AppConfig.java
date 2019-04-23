@@ -48,6 +48,7 @@ public class AppConfig {
 	private boolean specifyAuthoritiesEnabled;
 	private String signaturesEndpointUrl;
 	private String adminsEndpoint;
+	private String entityIdAttrName;
 
 	public AppConfig() {
 		Resource enLang = new ClassPathResource("localization.properties");
@@ -244,6 +245,14 @@ public class AppConfig {
 
 	public String getAdminsEndpoint() {
 		return adminsEndpoint;
+	}
+
+	public String getEntityIdAttrName() {
+		return entityIdAttrName;
+	}
+
+	public void setEntityIdAttrName(String entityIdAttrName) {
+		this.entityIdAttrName = entityIdAttrName;
 	}
 
 	@Override

@@ -41,21 +41,12 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>npm install replace-in-file</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>install replace-in-file</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>replace</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
                         <configuration>
-                            <arguments>run replaceBuild -- ${angular.api.url}</arguments>
+                            <arguments>run replaceApiUrl -- ${angular.api.url}</arguments>
                         </configuration>
                     </execution>
                     <execution>

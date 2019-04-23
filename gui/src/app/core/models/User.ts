@@ -7,5 +7,5 @@ export interface User {
   fullName: string;
   email: string;
   facilitiesWhereUserIsAdmin: number[];
-  isAdmin: boolean;
+  isAppAdmin: boolean;
 }

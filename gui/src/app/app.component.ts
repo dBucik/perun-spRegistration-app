@@ -100,7 +100,7 @@ export class AppComponent implements OnInit {
           this.logoUrl = pageConfig.logoUrl;
           this.footerHtml = pageConfig.footerHtml;
 
-          this.isAdmin = AppComponent.user.isAdmin;
+          this.isAdmin = AppComponent.user.isAppAdmin;
           this.loading = false;
       });
     });
@@ -114,7 +114,7 @@ export class AppComponent implements OnInit {
   }
 
   public static isUserAdmin() : boolean {
-    return this.user.isAdmin;
+    return this.user.isAppAdmin;
   }
 
   public static getPageConfig() : PageConfig {

@@ -2,6 +2,7 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
+import cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -58,9 +60,9 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("Duplicates")
 @Service("userService")
-public class UserCommandsCommandsServiceImpl implements UserCommandsService {
+public class UserCommandsServiceImpl implements UserCommandsService {
 
-	private static final Logger log = LoggerFactory.getLogger(UserCommandsCommandsServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(UserCommandsServiceImpl.class);
 
 	private static final String REQUEST_ID_KEY = "requestId";
 	private static final String FACILITY_ID_KEY = "facilityId";
@@ -74,9 +76,11 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 	private final Properties messagesProperties;
 	private final Cipher cipher;
 
+
 	@Autowired
-	public UserCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
-										   AppConfig appConfig, Properties messagesProperties) throws NoSuchPaddingException, NoSuchAlgorithmException {
+	public UserCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
+								   AppConfig appConfig, Properties messagesProperties)
+			throws NoSuchPaddingException, NoSuchAlgorithmException {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
@@ -162,7 +166,23 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 
 		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
-		Map<String, PerunAttribute> facilityAttributes = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
+		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
+		List<String> keptAttrs = initKeptAttrs();
+		if (ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttrName())) {
+			keptAttrs.addAll(config.getOidcInputs()
+					.stream()
+					.map(AttrInput::getName)
+					.collect(Collectors.toList())
+			);
+		} else {
+			keptAttrs.addAll(config.getSamlInputs()
+					.stream()
+					.map(AttrInput::getName)
+					.collect(Collectors.toList())
+			);
+		}
+
+		Map<String, PerunAttribute> facilityAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
 
 		Request req = createRequest(facilityId, userId, RequestAction.DELETE_FACILITY, facilityAttributes);
 		if (req == null || req.getReqId() != null) {
@@ -352,7 +372,23 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
-		facility.setAttrs(attrs);
+
+		List<String> keptAttrs = initKeptAttrs();
+		if (ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttrName())) {
+			keptAttrs.addAll(config.getOidcInputs()
+					.stream()
+					.map(AttrInput::getName)
+					.collect(Collectors.toList())
+			);
+		} else {
+			keptAttrs.addAll(config.getSamlInputs()
+					.stream()
+					.map(AttrInput::getName)
+					.collect(Collectors.toList())
+			);
+		}
+
+		facility.setAttrs(ServiceUtils.filterFacilityAttrs(attrs, keptAttrs));
 
 		boolean inTest = attrs.get(appConfig.getTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
@@ -400,10 +436,16 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 		}
 
 		List<Facility> userFacilities = perunConnector.getFacilitiesWhereUserIsAdmin(userId);
+		Map<Long, Facility> userFacilitiesMap = new HashMap<>();
+		for (Facility facility: userFacilities) {
+			userFacilitiesMap.put(facility.getId(), facility);
+		}
+
 		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getIdpAttribute(),
 				appConfig.getIdpAttributeValue());
-		List<Facility> filteredFacilities = userFacilities.stream()
-				.filter(proxyFacilities::contains)
+
+		List<Facility> filteredFacilities = proxyFacilities.stream()
+				.filter(facility -> userFacilitiesMap.containsKey(facility.getId()))
 				.collect(Collectors.toList());
 
 		log.trace("getAllFacilitiesWhereUserIsAdmin returns: {}", filteredFacilities);
@@ -704,5 +746,23 @@ public class UserCommandsCommandsServiceImpl implements UserCommandsService {
 
 		log.trace("filterAttributes() returns: {}", filteredAttributes);
 		return filteredAttributes;
+	}
+
+	private List<String> initKeptAttrs() {
+		List<String> keptAttrs = new ArrayList<>();
+		keptAttrs.addAll(config.getServiceInputs()
+				.stream()
+				.map(AttrInput::getName)
+				.collect(Collectors.toList()));
+		keptAttrs.addAll(config.getOrganizationInputs()
+				.stream()
+				.map(AttrInput::getName)
+				.collect(Collectors.toList()));
+		keptAttrs.addAll(config.getMembershipInputs()
+				.stream()
+				.map(AttrInput::getName)
+				.collect(Collectors.toList()));
+
+		return keptAttrs;
 	}
 }

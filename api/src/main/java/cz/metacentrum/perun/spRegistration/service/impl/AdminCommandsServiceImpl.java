@@ -36,9 +36,9 @@ import java.util.Properties;
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
 @Service("adminService")
-public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
+public class AdminCommandsServiceImpl implements AdminCommandsService {
 
-	private static final Logger log = LoggerFactory.getLogger(AdminCommandsCommandsServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(AdminCommandsServiceImpl.class);
 
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
@@ -48,9 +48,9 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 	private final MitreIdConnector mitreIdConnector;
 
 	@Autowired
-	public AdminCommandsCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
-											AppConfig appConfig, Properties messagesProperties,
-											MitreIdAttrsConfig mitreIdAttrsConfig, MitreIdConnector mitreIdConnector) {
+	public AdminCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
+									AppConfig appConfig, Properties messagesProperties,
+									MitreIdAttrsConfig mitreIdAttrsConfig, MitreIdConnector mitreIdConnector) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
@@ -290,7 +290,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		boolean adminSet = perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
 
 		Map<String, PerunAttribute> additionalAttributes;
-		if (isOidc(request)) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 			log.debug("Creating client in mitreId");
 			MitreIdResponse mitreResponse = mitreIdConnector.createClient(request.getAttributes());
 			additionalAttributes = prepareNewFacilityAttributes(true, false, mitreResponse);
@@ -333,7 +333,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 				request.getAttributesAsJsonArrayForPerun());
 
 		boolean mitreIdUpdated = true;
-		if (isOidc(request)) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 			log.info("Updating mitreId client");
 			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
 					mitreIdAttrsConfig.getMitreClientIdAttr());
@@ -342,7 +342,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 
 		boolean successful = facilityCoreUpdated && attributesSet && mitreIdUpdated;
 		if (!successful) {
-			if (isOidc(request)) {
+			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}, mitreIdUpdated: {}",
 						facilityCoreUpdated, attributesSet, mitreIdUpdated);
 			} else {
@@ -364,7 +364,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		boolean facilityRemoved = perunConnector.deleteFacilityFromPerun(facilityId);
 		boolean mitreIdRemoved = true;
 
-		if (isOidc(request)) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 			log.info("Removing client from mitreId");
 			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
 					mitreIdAttrsConfig.getMitreClientIdAttr());
@@ -373,7 +373,7 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 
 		boolean successful = facilityRemoved && mitreIdRemoved;
 		if (!successful) {
-			if (isOidc(request)) {
+			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 				log.error("Some operations failed - facilityRemoved: {}, mitreIdRemoved: {}",
 						facilityRemoved, mitreIdRemoved);
 			} else {
@@ -411,14 +411,6 @@ public class AdminCommandsCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		return facilityId;
-	}
-
-	private boolean isOidc(Request request) {
-		log.trace("isOidc({})", request);
-
-		boolean isOidc = request.getAttributes().containsKey(mitreIdAttrsConfig.getGrantTypesAttrs());
-		log.trace("isOidc() returns: {}", isOidc);
-		return isOidc;
 	}
 
 	private Map<String, PerunAttribute> prepareNewFacilityAttributes(boolean testSp, boolean showOnList, MitreIdResponse mitreResponse) {

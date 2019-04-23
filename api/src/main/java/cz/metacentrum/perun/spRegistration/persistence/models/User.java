@@ -93,6 +93,7 @@ public class User extends PerunEntity {
 		this.facilitiesWhereAdmin = facilitiesWhereAdmin;
 	}
 
+	@JsonIgnore
 	public boolean isAdmin() {
 		return isAdmin;
 	}
