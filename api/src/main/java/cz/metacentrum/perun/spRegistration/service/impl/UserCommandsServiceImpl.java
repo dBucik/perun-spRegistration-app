@@ -101,7 +101,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		log.info("Creating request");
 		Request req = createRequest(null, userId, attributes, RequestAction.REGISTER_NEW_SP);
-		if (req == null || req.getReqId() != null) {
+		if (req == null || req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
@@ -137,7 +137,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Request req = createRequest(facilityId, userId, attributes, RequestAction.UPDATE_FACILITY);
-		if (req == null || req.getReqId() != null) {
+		if (req == null || req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
@@ -185,7 +185,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, PerunAttribute> facilityAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
 
 		Request req = createRequest(facilityId, userId, RequestAction.DELETE_FACILITY, facilityAttributes);
-		if (req == null || req.getReqId() != null) {
+		if (req == null || req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
