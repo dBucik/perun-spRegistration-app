@@ -418,7 +418,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException("userId is null");
 		}
 
-		List<Request> requests = requestManager.getAllRequestsByUserId(userId);
+		List<Request> requests = new ArrayList<>(requestManager.getAllRequestsByUserId(userId));
+
 		Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
 		requests.addAll(requestManager.getAllRequestsByFacilityIds(whereAdmin));
 
@@ -435,18 +436,30 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException("userId is null");
 		}
 
-		List<Facility> userFacilities = perunConnector.getFacilitiesWhereUserIsAdmin(userId);
-		Map<Long, Facility> userFacilitiesMap = new HashMap<>();
-		for (Facility facility: userFacilities) {
-			userFacilitiesMap.put(facility.getId(), facility);
-		}
-
+		List<Facility> filteredFacilities = new ArrayList<>();
 		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getIdpAttribute(),
 				appConfig.getIdpAttributeValue());
 
-		List<Facility> filteredFacilities = proxyFacilities.stream()
-				.filter(facility -> userFacilitiesMap.containsKey(facility.getId()))
-				.collect(Collectors.toList());
+		if (proxyFacilities == null) {
+			log.debug("No facilities found with proxy identifier: {}", appConfig.getIdpAttributeValue());
+		} else {
+			List<Facility> userFacilities = perunConnector.getFacilitiesWhereUserIsAdmin(userId);
+
+			if (userFacilities == null) {
+				log.debug("No facilities found for user: {}", userId);
+			} else {
+				Map<Long, Facility> userFacilitiesMap = new HashMap<>();
+
+				for (Facility facility : userFacilities) {
+					userFacilitiesMap.put(facility.getId(), facility);
+				}
+
+				filteredFacilities.addAll(proxyFacilities.stream()
+						.filter(facility -> userFacilitiesMap.containsKey(facility.getId()))
+						.collect(Collectors.toList())
+				);
+			}
+		}
 
 		log.trace("getAllFacilitiesWhereUserIsAdmin returns: {}", filteredFacilities);
 		return filteredFacilities;
