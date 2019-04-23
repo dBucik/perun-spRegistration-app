@@ -276,7 +276,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		Map<String, PerunAttribute> additionalAttributes;
 		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
 			log.debug("Creating client in mitreId");
-			MitreIdResponse mitreResponse = mitreIdConnector.createClient(request.getAttributes());
+			// TODO: uncomment when connector implemented
+			MitreIdResponse mitreResponse = null; // mitreIdConnector.createClient(request.getAttributes());
 			additionalAttributes = prepareNewFacilityAttributes(true, false, mitreResponse);
 		} else {
 			additionalAttributes = prepareNewFacilityAttributes(true, false, null);
@@ -321,7 +322,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			log.info("Updating mitreId client");
 			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
 					mitreIdAttrsConfig.getMitreClientIdAttr());
-			mitreIdUpdated = mitreIdConnector.updateClient(mitreClientId.valueAsLong(), request.getAttributes());
+			// TODO: uncomment when connector implemented
+			//mitreIdUpdated = mitreIdConnector.updateClient(mitreClientId.valueAsLong(), request.getAttributes());
 		}
 
 		boolean successful = facilityCoreUpdated && attributesSet && mitreIdUpdated;
@@ -352,7 +354,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			log.info("Removing client from mitreId");
 			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
 					mitreIdAttrsConfig.getMitreClientIdAttr());
-			mitreIdRemoved = mitreIdConnector.deleteClient(mitreClientId.valueAsLong());
+			// TODO: uncomment when connector implemented
+			// mitreIdRemoved = mitreIdConnector.deleteClient(mitreClientId.valueAsLong());
 		}
 
 		boolean successful = facilityRemoved && mitreIdRemoved;
