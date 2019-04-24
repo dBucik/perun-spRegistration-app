@@ -12,6 +12,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.service.Mails;
@@ -101,7 +102,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		log.info("Creating request");
 		Request req = createRequest(null, userId, attributes, RequestAction.REGISTER_NEW_SP);
-		if (req == null || req.getReqId() != null) {
+		if (req == null || req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
@@ -137,7 +138,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Request req = createRequest(facilityId, userId, attributes, RequestAction.UPDATE_FACILITY);
-		if (req == null || req.getReqId() != null) {
+		if (req == null || req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
@@ -185,7 +186,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, PerunAttribute> facilityAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
 
 		Request req = createRequest(facilityId, userId, RequestAction.DELETE_FACILITY, facilityAttributes);
-		if (req == null || req.getReqId() != null) {
+		if (req == null || req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
@@ -329,6 +330,27 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
+	public List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException, InternalErrorException {
+		log.trace("getApprovalsOfProductionTransfer(requestId: {}, userId: {})", requestId, userId);
+		if (userId == null || requestId == null) {
+			log.error("Illegal input - requestId: {}, userId: {} " , requestId, userId);
+			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
+		}
+
+		Request request = getDetailedRequest(requestId, userId);
+		if (request == null) {
+			log.error("Could not find request for ID: {}", requestId);
+		} else if (!isAdminInRequest(request.getReqUserId(), userId) && !appConfig.isAppAdmin(userId)) {
+			log.error("User: {} is not authorized to view request: {}", userId, requestId);
+			throw new UnauthorizedActionException("You are not allowed to display details of this request");
+		}
+
+		List<RequestSignature> result = requestManager.getRequestSignatures(requestId);
+		log.trace("getApprovalsOfProductionTransfer returns: {}", result);
+		return result;
+	}
+
+	@Override
 	public Request getDetailedRequest(Long requestId, Long userId)
 			throws UnauthorizedActionException, InternalErrorException {
 		log.trace("getDetailedRequest(requestId: {}, userId: {})", requestId, userId);
@@ -418,7 +440,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException("userId is null");
 		}
 
-		List<Request> requests = requestManager.getAllRequestsByUserId(userId);
+		List<Request> requests = new ArrayList<>(requestManager.getAllRequestsByUserId(userId));
+
 		Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
 		requests.addAll(requestManager.getAllRequestsByFacilityIds(whereAdmin));
 
@@ -435,18 +458,30 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException("userId is null");
 		}
 
-		List<Facility> userFacilities = perunConnector.getFacilitiesWhereUserIsAdmin(userId);
-		Map<Long, Facility> userFacilitiesMap = new HashMap<>();
-		for (Facility facility: userFacilities) {
-			userFacilitiesMap.put(facility.getId(), facility);
-		}
-
+		List<Facility> filteredFacilities = new ArrayList<>();
 		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getIdpAttribute(),
 				appConfig.getIdpAttributeValue());
 
-		List<Facility> filteredFacilities = proxyFacilities.stream()
-				.filter(facility -> userFacilitiesMap.containsKey(facility.getId()))
-				.collect(Collectors.toList());
+		if (proxyFacilities == null) {
+			log.debug("No facilities found with proxy identifier: {}", appConfig.getIdpAttributeValue());
+		} else {
+			List<Facility> userFacilities = perunConnector.getFacilitiesWhereUserIsAdmin(userId);
+
+			if (userFacilities == null) {
+				log.debug("No facilities found for user: {}", userId);
+			} else {
+				Map<Long, Facility> userFacilitiesMap = new HashMap<>();
+
+				for (Facility facility : userFacilities) {
+					userFacilitiesMap.put(facility.getId(), facility);
+				}
+
+				filteredFacilities.addAll(proxyFacilities.stream()
+						.filter(facility -> userFacilitiesMap.containsKey(facility.getId()))
+						.collect(Collectors.toList())
+				);
+			}
+		}
 
 		log.trace("getAllFacilitiesWhereUserIsAdmin returns: {}", filteredFacilities);
 		return filteredFacilities;

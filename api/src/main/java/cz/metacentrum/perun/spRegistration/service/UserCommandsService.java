@@ -5,6 +5,7 @@ import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorExcep
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
@@ -90,6 +91,14 @@ public interface UserCommandsService {
 	 * @return True if everything went OK
 	 */
 	boolean signTransferToProduction(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException, InternalErrorException;
+
+	/**
+	 * Get approvals for request to transfer to production.
+	 * @param requestId ID of request.
+	 * @param userId ID of user (ADMIN) displaying the approvals.
+	 * @return List of approvals.
+	 */
+	List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException, InternalErrorException;
 
 	/**
 	 * Get all facilities from Perun where user is admin (manager).

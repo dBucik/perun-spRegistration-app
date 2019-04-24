@@ -3,6 +3,7 @@ package cz.metacentrum.perun.spRegistration.rest.controllers.signatures;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
@@ -85,5 +86,16 @@ public class UserSignaturesController {
 
 		log.trace("signApprovalForProduction() returns: {}", successful);
 		return successful;
+	}
+
+	@GetMapping(path = "/api/viewApprovals/{requestId}")
+	public List<RequestSignature> getApprovals(@SessionAttribute("user") User user,
+											   @PathVariable("requestId") Long requestId)
+			throws UnauthorizedActionException, InternalErrorException {
+		log.debug("getApprovals(user: {}, requestId: {})", user.getId(), requestId);
+
+		List<RequestSignature> signaturesList = service.getApprovalsOfProductionTransfer(requestId, user.getId());
+		log.trace("getApprovals() returns: {}", signaturesList);
+		return signaturesList;
 	}
 }
