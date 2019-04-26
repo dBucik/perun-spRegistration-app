@@ -95,7 +95,7 @@ public interface UserCommandsService {
 	/**
 	 * Get approvals for request to transfer to production.
 	 * @param requestId ID of request.
-	 * @param userId ID of user (ADMIN) displaying the approvals.
+	 * @param userId ID of user displaying the approvals.
 	 * @return List of approvals.
 	 */
 	List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException, InternalErrorException;

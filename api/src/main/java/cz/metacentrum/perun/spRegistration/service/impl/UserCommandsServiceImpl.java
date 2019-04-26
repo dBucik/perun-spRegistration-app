@@ -311,7 +311,9 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public boolean signTransferToProduction(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException, InternalErrorException {
+	public boolean signTransferToProduction(User user, String code)
+			throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
+			ExpiredCodeException, InternalErrorException {
 		log.trace("signTransferToProduction(user: {}, code: {})", user, code);
 		JSONObject decrypted = decryptRequestCode(code);
 		boolean isExpired = isExpiredCode(decrypted);
@@ -330,19 +332,21 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId) throws UnauthorizedActionException, InternalErrorException {
+	public List<RequestSignature> getApprovalsOfProductionTransfer(Long requestId, Long userId)
+			throws UnauthorizedActionException, InternalErrorException {
 		log.trace("getApprovalsOfProductionTransfer(requestId: {}, userId: {})", requestId, userId);
 		if (userId == null || requestId == null) {
 			log.error("Illegal input - requestId: {}, userId: {} " , requestId, userId);
 			throw new IllegalArgumentException("Illegal input - requestId: " + requestId + ", userId: " + userId);
 		}
 
-		Request request = getDetailedRequest(requestId, userId);
+		Request request = requestManager.getRequestById(requestId);
 		if (request == null) {
-			log.error("Could not find request for ID: {}", requestId);
-		} else if (!isAdminInRequest(request.getReqUserId(), userId) && !appConfig.isAppAdmin(userId)) {
-			log.error("User: {} is not authorized to view request: {}", userId, requestId);
-			throw new UnauthorizedActionException("You are not allowed to display details of this request");
+			log.error("Could not retrieve request for id: {}", requestId);
+			throw new InternalErrorException("Could not retrieve request for id: " + requestId);
+		} else if (!appConfig.isAppAdmin(userId) && !isAdminInRequest(request.getReqUserId(), userId)) {
+			log.error("User is not authorized to view approvals");
+			throw new UnauthorizedActionException("User is not authorized to view approvals");
 		}
 
 		List<RequestSignature> result = requestManager.getRequestSignatures(requestId);
@@ -420,7 +424,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public Facility getDetailedFacilityWithInputs(Long facilityId, Long userId) throws UnauthorizedActionException, ConnectorException, InternalErrorException {
+	public Facility getDetailedFacilityWithInputs(Long facilityId, Long userId)
+			throws UnauthorizedActionException, ConnectorException, InternalErrorException {
 		log.trace("getDetailedFacilityWithInputs(facilityId: {}, userId: {})", facilityId, userId);
 		Facility facility = getDetailedFacility(facilityId, userId);
 		for (Map.Entry<String, PerunAttribute> attr: facility.getAttrs().entrySet()) {
