@@ -97,7 +97,11 @@ public class RequestManagerImpl implements RequestManager {
 			throw new InternalErrorException("Only one request should have been inserted");
 		}
 
-		Long generatedId = (Long) key.getKey();
+		Number generatedKey = key.getKey();
+		Long generatedId = null;
+		if (generatedKey != null) {
+			generatedId = generatedKey.longValue();
+		}
 
 		log.trace("createRequest() returns: {}", generatedId);
 		return generatedId;
