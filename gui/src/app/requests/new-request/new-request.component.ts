@@ -1,8 +1,8 @@
-import {Component, OnInit, QueryList, ViewChildren} from '@angular/core';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {ConfigService} from "../../core/services/config.service";
 import {ApplicationItem} from "../../core/models/ApplicationItem";
 import {RequestsService} from "../../core/services/requests.service";
-import {MatSnackBar} from "@angular/material";
+import {MatHorizontalStepper, MatSnackBar} from "@angular/material";
 import {TranslateService} from "@ngx-translate/core";
 import {PerunAttribute} from "../../core/models/PerunAttribute";
 import {RequestCreationStepComponent} from "./request-creation-step/request-creation-step.component";
@@ -24,6 +24,9 @@ export class NewRequestComponent implements OnInit {
 
   @ViewChildren(RequestCreationStepComponent)
   steps: QueryList<RequestCreationStepComponent>;
+
+  @ViewChild(MatHorizontalStepper)
+  stepper: MatHorizontalStepper;
 
   serviceSelected : string;
 
@@ -104,13 +107,14 @@ export class NewRequestComponent implements OnInit {
     console.log(perunAttributes);
 
     this.requestsService.createRegistrationRequest(perunAttributes).subscribe(requestId => {
-      let snackBarRef = this.snackBar
-        .open(this.successfullySubmittedText, this.successActionText, {duration: this.snackBarDurationMs});
-
-      snackBarRef.onAction().subscribe(() => {
-        this.router.navigate(['/requests/detail/' + requestId]);
-      });
-      this.router.navigate(['/']);
+      // let snackBarRef = this.snackBar
+      //   .open(this.successfullySubmittedText, this.successActionText, {duration: this.snackBarDurationMs});
+      //
+      // snackBarRef.onAction().subscribe(() => {
+      //   this.router.navigate(['/requests/detail/' + requestId]);
+      //});
+      this.router.navigate(['/requests/detail/' + requestId]);
+      //this.router.navigate(['/']);
     });
   }
 
@@ -153,5 +157,9 @@ export class NewRequestComponent implements OnInit {
 
     console.log(sortedItems);
     return sortedItems;
+  }
+
+  previousStep(){
+    this.stepper.previous();
   }
 }

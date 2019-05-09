@@ -9,7 +9,8 @@
   "NO": "No",
   "ERROR": {
     "GENERAL_ERROR_TITLE": "Something went wrong.",
-    "SERVER_DOWN": "Server is currently offline. Please try it again later."
+    "SERVER_DOWN": "Server is currently offline. Please try it again later.",
+  "CLOSE": "Close"
   },
   "MENU": {
     "HOME": "Home",
@@ -45,11 +46,11 @@
     "LIST_VALUE": "Value",
     "NEW_TITLE": "Register new service",
     "NEW_INVALID_VALUE" : "Given value is invalid!",
-    "NEW_SELECT_TYPE": "Select service type:",
+    "NEW_SELECT_TYPE": "Select authentication protocol (SAML 2.0 / OpenID Connect)",
     "NEW_FILL_ATTRS": "Fill information:",
     "NEW_VALUES_ERROR_MESSAGE": "Please, fill out all of the required fields.",
     "NEW_DUPLICIT_KEYS_ERROR" : "Keys must be unique!",
-    "NEW_NO_VALUE_ERROR": "At least one value must be filled!",
+    "NEW_NO_VALUE_ERROR": "All values must be filled!",
     "NEW_NEXT_STEP": "Next",
     "NEW_PREVIOUS_STEP": "Previous",
     "REQUEST_SAVE": "Save",
@@ -88,11 +89,12 @@
     "SHOW_MORE": "Show more",
     "SHOW_LESS": "Show less",
     "COMMENTS_FROM_ADMIN": "Comments from administrator",
-    "SET_WFC": "Status set for WFC",
+    "SET_WFC": "Status set to 'Waiting for changes'",
     "APPROVED": "Request approved",
     "REJECTED": "Request rejected",
     "ARE_YOU_SURE_APPROVE": "Are you sure you want to approve this request?",
-    "ARE_YOU_SURE_REJECT": "Are you sure you want to reject this request?"
+    "ARE_YOU_SURE_REJECT": "Are you sure you want to reject this request?",
+    "ARE_YOU_SURE_SET_WFC": "Are you sure you want to set status to 'Waiting for changes'?"
   },
   "FACILITIES": {
     "TITLE": "Facilities",

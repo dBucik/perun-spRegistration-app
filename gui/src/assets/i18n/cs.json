@@ -7,7 +7,8 @@
   "LOGIN": "Přihlásit se",
   "ERROR": {
     "GENERAL_ERROR_TITLE": "Něco se pokazilo.",
-    "SERVER_DOWN": "Aplikace momentálně není dostupná. Zkuste to prosím později."
+    "SERVER_DOWN": "Aplikace momentálně není dostupná. Zkuste to prosím později.",
+  "CLOSE": "Zavřít"
   },
   "MENU": {
     "HOME": "Domů",
@@ -43,11 +44,11 @@
     "LIST_VALUE": "Hodnota",
     "NEW_TITLE": "Registrovat novou žádost",
     "NEW_INVALID_VALUE" : "Zadaná hodnota je neplatná!",
-    "NEW_SELECT_TYPE": "Vyberte typ služby:",
+    "NEW_SELECT_TYPE": "Vyberte autentifikační protokol (SAML 2.0 / OpenID Connect)",
     "NEW_FILL_ATTRS": "Vyplňte informace:",
     "NEW_VALUES_ERROR_MESSAGE": "Prosím vyplňte všechna povinná pole.",
     "NEW_DUPLICIT_KEYS_ERROR" : "Hodnota klíče musí být unikátní!",
-    "NEW_NO_VALUE_ERROR": "Alespoň jedna hodnota musí být vyplněna!",
+    "NEW_NO_VALUE_ERROR": "Všechny hodnoty musí být vyplněny!",
     "NEW_NEXT_STEP": "Dále",
     "NEW_PREVIOUS_STEP": "Zpět",
     "REQUEST_SAVE": "Uložit",
@@ -90,7 +91,8 @@
     "APPROVED": "Žádost schválena",
     "REJECTED": "Žádost zamítnuta",
     "ARE_YOU_SURE_APPROVE": "Jste si jistý, že chcete schvalit tuhle žádost?",
-    "ARE_YOU_SURE_REJECT": "Jste si jistý, že chcete zamítnout tuhle žádost?"
+    "ARE_YOU_SURE_REJECT": "Jste si jistý, že chcete zamítnout tuhle žádost?",
+    "ARE_YOU_SURE_SET_WFC": "Jste si jistý, že chcete nastavit status na 'Čeká na změny'?"
   },
   "FACILITIES": {
     "TITLE": "Facility",

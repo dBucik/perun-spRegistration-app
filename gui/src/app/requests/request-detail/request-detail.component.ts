@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {RequestsService} from "../../core/services/requests.service";
 import {Subscription} from "rxjs";
 import {Request} from "../../core/models/Request";
@@ -13,6 +13,7 @@ import {RequestDetailDialogComponent} from "./request-detail-dialog/request-deta
 
 export interface DialogData {
   isApprove: boolean;
+  isSetWFC: boolean;
   parent: RequestDetailComponent,
 }
 
@@ -29,6 +30,7 @@ export class RequestDetailComponent implements OnInit {
         private requestsService: RequestsService,
         private snackBar: MatSnackBar,
         private translate: TranslateService,
+        private router: Router
     ) {
 
     }
@@ -86,10 +88,10 @@ export class RequestDetailComponent implements OnInit {
                 console.log(error);
             });
         });
-        this.translate.get("REQUEST.REQUEST_ERROR").subscribe(value => this.noCommentErrorMessage = value);
-        this.translate.get("REQUEST.REJECTED").subscribe(value => this.successRejectMessage = value);
-        this.translate.get("REQUEST.APPROVED").subscribe(value => this.successApproveMessage = value);
-        this.translate.get("REQUEST.SET_WFC").subscribe(value => this.successSetWFCMessage = value);
+        this.translate.get("REQUESTS.REQUEST_ERROR").subscribe(value => this.noCommentErrorMessage = value);
+        this.translate.get("REQUESTS.REJECTED").subscribe(value => this.successRejectMessage = value);
+        this.translate.get("REQUESTS.APPROVED").subscribe(value => this.successApproveMessage = value);
+        this.translate.get("REQUESTS.SET_WFC").subscribe(value => this.successSetWFCMessage = value);
         this.isUserAdmin = AppComponent.isUserAdmin();
     }
 
@@ -99,8 +101,8 @@ export class RequestDetailComponent implements OnInit {
 
     openApproveDialog(): void {
       const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
-        width: '250px',
-        data: {isApprove: true, parent: this}
+        width: '400px',
+        data: {isApprove: true, isSetWFC: false, parent: this}
       });
 
       dialogRef.afterClosed().subscribe(result => {
@@ -110,8 +112,19 @@ export class RequestDetailComponent implements OnInit {
 
     openRejectDialog(): void {
       const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
-        width: '250px',
-        data: {isApprove: false, parent: this}
+        width: '400px',
+        data: {isApprove: false, isSetWFC: false, parent: this}
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+      });
+    }
+
+    openSetWFCDialog(): void {
+      const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
+        width: '400px',
+        data: {isApprove: false, isSetWFC: true, parent: this}
       });
 
       dialogRef.afterClosed().subscribe(result => {
@@ -122,7 +135,7 @@ export class RequestDetailComponent implements OnInit {
     reject() {
       this.requestsService.rejectRequest(this.request.reqId).subscribe(bool => {
         this.snackBar.open(this.successRejectMessage, null, {duration: 6000});
-        this.ngOnInit()
+        this.router.navigate(['/requests/allRequests']);
         }, error => {
         console.log("Error");
         console.log(error);
@@ -133,7 +146,7 @@ export class RequestDetailComponent implements OnInit {
     approve() {
       this.requestsService.approveRequest(this.request.reqId).subscribe(bool => {
         this.snackBar.open(this.successApproveMessage, null, {duration: 6000});
-        this.ngOnInit()
+        this.router.navigate(['/requests/allRequests']);
         }, error => {
         console.log("Error");
         console.log(error);
@@ -152,6 +165,7 @@ export class RequestDetailComponent implements OnInit {
       }
       this.requestsService.askForChanges(this.request.reqId, array).subscribe(bool => {
         this.snackBar.open(this.successSetWFCMessage, null, {duration: 6000});
+        this.ngOnInit()
       }, error => {
         console.log("Error");
         console.log(error);

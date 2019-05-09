@@ -22,20 +22,32 @@ export class RequestDetailDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onYesClick(): void{
-    if (this.data.isApprove){
+  onYesClick(): void {
+    if (this.data.isApprove) {
       this.data.parent.approve();
-    } else {
-      this.data.parent.reject();
+      this.dialogRef.close();
+      return
     }
+    if (this.data.isSetWFC) {
+      this.data.parent.requestChanges();
+      this.dialogRef.close();
+      return;
+    }
+    this.data.parent.reject();
+    this.dialogRef.close();
   }
 
   ngOnInit() {
     if (this.data.isApprove) {
-      this.translate.get("REQUEST.ARE_YOU_SURE_APPROVE").subscribe(value => this.areUsure = value);
-    } else {
-      this.translate.get("REQUEST.ARE_YOU_SURE_REJECT").subscribe(value => this.areUsure = value);
+      this.translate.get('REQUESTS.ARE_YOU_SURE_APPROVE').subscribe(value => this.areUsure = value);
+      return
     }
+    if (this.data.isSetWFC) {
+      this.translate.get('REQUESTS.ARE_YOU_SURE_SET_WFC').subscribe(value => this.areUsure = value);
+      return;
+    }
+    this.translate.get('REQUESTS.ARE_YOU_SURE_REJECT').subscribe(value => this.areUsure = value);
+
   }
 
 }

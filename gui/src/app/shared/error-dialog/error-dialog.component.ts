@@ -10,4 +10,8 @@ export class ErrorDialogComponent {
 
   constructor(public dialogRef : MatDialogRef<ErrorDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public messagesToShow: String[]) { }
+
+  close(): void{
+    this.dialogRef.close();
+  }
 }

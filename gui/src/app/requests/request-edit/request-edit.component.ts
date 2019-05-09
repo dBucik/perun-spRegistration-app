@@ -81,11 +81,11 @@ export class RequestEditComponent implements OnInit {
 
     console.log(perunAttributes);
 
-    this.requestsService.updateRequest(this.request.reqId, perunAttributes).subscribe(requestId => {
+    this.requestsService.updateRequest(this.request.reqId, perunAttributes).subscribe(boolean => {
       let snackBarRef = this.snackBar
         .open(this.successfullySubmittedText, this.successActionText, {duration: this.snackBarDurationMs});
       snackBarRef.onAction().subscribe(() => {
-        this.router.navigate(['/requests/detail/' + requestId]);
+        this.router.navigate(['/requests/detail/' + this.request.reqId]);
       });
       this.router.navigate(['/']);
     });

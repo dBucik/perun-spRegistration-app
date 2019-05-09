@@ -86,6 +86,16 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     return false;
   }
 
+  private allValuesAreFilled(): boolean {
+    for (const value of this.values) {
+      if (value.trim().length == 0) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   hasCorrectValue(): boolean {
     // reset errors
     this.duplicitKeysError = false;
@@ -96,7 +106,7 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     if (!this.applicationItem.required && this.values.length === 0) {
       return true;
     } else {
-      if (this.disableCustomKeys && !this.isFilledAtLeastOneValue()) {
+      if (this.disableCustomKeys && !this.allValuesAreFilled()) {
         this.noValueError = true;
         return false;
       }

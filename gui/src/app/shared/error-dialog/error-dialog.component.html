@@ -2,7 +2,10 @@
   {{'ERROR.GENERAL_ERROR_TITLE' | translate}}
 </h1>
 <div mat-dialog-content>
-  <p *ngFor="let error of messagesToShow">
-    {{error}}
-  </p>
+  <div *ngFor="let error of messagesToShow">
+    <div [innerHTML]="error"></div>
+  </div>
 </div>
+<button mat-raised-button (click)="close()">
+  {{"CLOSE" | translate}}
+</button>

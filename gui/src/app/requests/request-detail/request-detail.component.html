@@ -86,7 +86,7 @@
                   *ngIf="(isUserAdmin && request.status=='WAITING_FOR_APPROVAL') || (request.status=='WAITING_FOR_CHANGES')">
             {{'REQUESTS.EDIT_REQUEST' | translate}}
           </button>
-          <button class="ml-2" mat-raised-button color="accent" (click)="requestChanges()"
+          <button class="ml-2" mat-raised-button color="accent" (click)="openSetWFCDialog()"
                   *ngIf="isUserAdmin && request.status=='WAITING_FOR_APPROVAL'">
             {{'REQUESTS.REQUEST_DETAIL_REQUEST_CHANGES' | translate}}
           </button>

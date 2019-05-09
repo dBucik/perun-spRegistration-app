@@ -1,9 +1,13 @@
-<div class="pull-left">
+<div>
   <div mat-dialog-content>
     <p>{{areUsure}}</p>
   </div>
-  <div mat-dialog-actions>
-    <button mat-button (click)="onYesClick()">{{'YES' | translate}}</button>
-    <button mat-button (click)="onNoClick()">{{'NO' | translate}}</button>
+  <div class="row">
+    <div class="col-sm-3">
+    </div>
+    <div class="col-sm-6">
+      <button mat-button (click)="onYesClick()">{{'YES' | translate}}</button>
+      <button mat-button (click)="onNoClick()">{{'NO' | translate}}</button>
+    </div>
   </div>
 </div>
