@@ -16,7 +16,6 @@
         <constructor-arg name="dataSource" ref="testDataSource"/>
     </bean>
 
-
     <bean id="defaultProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean"/>
 
     <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
@@ -82,6 +81,10 @@
             </map>
         </constructor-arg>
     </bean>
+
+    <bean id="enLocale" class="org.springframework.beans.factory.config.PropertiesFactoryBean" />
+
+    <bean id="csLocale" class="org.springframework.beans.factory.config.PropertiesFactoryBean" />
     
     <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig">
         <property name="perunAttributeDefinitionsMap" ref="definitionsMap"/>
