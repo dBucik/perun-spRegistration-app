@@ -7,8 +7,10 @@
       </h2>
       {{'FACILITIES.MOVE_TO_PRODUCTION_DESCRIPTION' | translate}}
 
-      <div *ngIf="isEmailEnabled">
-        <mat-form-field class="chip-list">
+      <div class="mt-4">
+        <mat-checkbox class="example-margin" [(ngModel)]="emailEnabled">{{'FACILITIES.MOVE_TO_PRODUCTION_EMAIL' | translate}}</mat-checkbox>
+
+        <mat-form-field class="chip-list" *ngIf="emailEnabled">
           <mat-chip-list #chipList
                          [disabled]="!emailEnabled">
             <mat-chip *ngFor="let email of emails" [selectable]="false"
@@ -23,8 +25,6 @@
                    (matChipInputTokenEnd)="add($event)">
           </mat-chip-list>
         </mat-form-field>
-
-        <mat-checkbox class="example-margin" [(ngModel)]="emailEnabled">{{'FACILITIES.MOVE_TO_PRODUCTION_EMAIL' | translate}}</mat-checkbox>
       </div>
 
       <div class="pull-right">

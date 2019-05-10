@@ -29,7 +29,6 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
   loading = true;
 
   facility: Facility;
-  isEmailEnabled: boolean;
   emails: string[];
   emailEnabled = false;
 
@@ -39,7 +38,6 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
     this.sub = this.route.params.subscribe(params => {
       this.facilitiesService.getFacility(params['id']).subscribe(facility => {
         this.configService.isAuthoritiesEnabled().subscribe(response =>{
-            this.isEmailEnabled = response;
             this.facility = facility;
             this.emails = [];
             this.loading = false;
