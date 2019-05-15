@@ -43,7 +43,7 @@
         <!-- MySQL driver -->
         <dependency>
             <groupId>mysql</groupId>
-            <artifactId>mysql-perunConnector-java</artifactId>
+            <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
         </dependency>
 
