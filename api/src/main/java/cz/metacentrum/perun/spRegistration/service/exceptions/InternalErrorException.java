@@ -1,5 +1,10 @@
 package cz.metacentrum.perun.spRegistration.service.exceptions;
 
+/**
+ * Exception thrown when some internal error (database inconsistency...) occurs.
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 public class InternalErrorException extends Exception {
 
 	public InternalErrorException() {

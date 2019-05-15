@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringJoiner;
 
+/**
+ * Utility class for sending email notifications.
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 @SuppressWarnings("Duplicates")
 public class Mails {
 

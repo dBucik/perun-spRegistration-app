@@ -5,6 +5,11 @@ import org.json.JSONObject;
 
 import java.util.Objects;
 
+/**
+ * Attribute definition from Perun.
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 public class PerunAttributeDefinition extends PerunEntity {
 
 	private String friendlyName;

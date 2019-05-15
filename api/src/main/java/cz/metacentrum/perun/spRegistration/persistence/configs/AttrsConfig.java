@@ -8,19 +8,24 @@ import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * Configuration class of attribute inputs
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 public class AttrsConfig {
 
 	private List<AttrInput> inputs;
 
-	public AttrsConfig(AppConfig appConfig, PerunConnector connector, Properties attrsProps) throws ConnectorException {
-		inputs = Utils.initializeAttributes(connector, appConfig, attrsProps);
+	public AttrsConfig(AppConfig appConfig, PerunConnector perunConnector, Properties attrsProps) throws ConnectorException {
+		inputs = Utils.initializeAttributes(perunConnector, appConfig, attrsProps);
 	}
 
-	public List<AttrInput> getInputs() {
+	List<AttrInput> getInputs() {
 		return inputs;
 	}
 
-	public void setInputs(List<AttrInput> inputs) {
+	void setInputs(List<AttrInput> inputs) {
 		this.inputs = inputs;
 	}
 

@@ -22,31 +22,39 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+/**
+ * Class with application configuration
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 public class AppConfig {
 
-	private String idpAttribute;
-	private String idpAttributeValue;
-	private String adminsAttr;
-	private Set<Long> admins;
-	private String extSourceProxy;
-	private String userEmailAttr;
-	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
+	private Set<Long> appAdminIds;
+	private String loginExtSource;
+	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap;
 	private boolean oidcEnabled;
-	private List<String> langs = new ArrayList<>();
-	private PerunConnector connector;
-	private String showOnServicesListAttribute;
-	private String testSpAttribute;
+	private List<String> availableLanguages;
+	private PerunConnector perunConnector;
+	private String showOnServicesListAttributeName;
+	private String isTestSpAttributeName;
+	private String entityIdAttributeName;
+	private String proxyIdentifierAttributeName;
+	private String proxyIdentifierAttributeValue;
+	private String adminsAttributeName;
+	private String userEmailAttributeName;
+
 	private String footerHTML;
 	private String headerLogo;
 	private String headerTitle;
 	private String headerHTML;
+
 	private long confirmationPeriodDays;
 	private long confirmationPeriodHours;
 	private SecretKeySpec secret;
 	private boolean specifyAuthoritiesEnabled;
 	private String signaturesEndpointUrl;
 	private String adminsEndpoint;
-	private String entityIdAttrName;
+
 	private Properties enLocale;
 	private Properties csLocale;
 
@@ -71,30 +79,33 @@ public class AppConfig {
 		if (csLocale != null) {
 			this.enLocale.putAll(csLocale);
 		}
+
+		this.perunAttributeDefinitionsMap = new HashMap<>();
+		this.availableLanguages = new ArrayList<>();
 	}
 
-	public String getIdpAttribute() {
-		return idpAttribute;
+	public String getProxyIdentifierAttributeName() {
+		return proxyIdentifierAttributeName;
 	}
 
-	public void setIdpAttribute(String idpAttribute) {
-		this.idpAttribute = idpAttribute;
+	public void setProxyIdentifierAttributeName(String proxyIdentifierAttributeName) {
+		this.proxyIdentifierAttributeName = proxyIdentifierAttributeName;
 	}
 
-	public String getIdpAttributeValue() {
-		return idpAttributeValue;
+	public String getProxyIdentifierAttributeValue() {
+		return proxyIdentifierAttributeValue;
 	}
 
-	public void setIdpAttributeValue(String idpAttributeValue) {
-		this.idpAttributeValue = idpAttributeValue;
+	public void setProxyIdentifierAttributeValue(String proxyIdentifierAttributeValue) {
+		this.proxyIdentifierAttributeValue = proxyIdentifierAttributeValue;
 	}
 
-	public Set<Long> getAdmins() {
-		return Collections.unmodifiableSet(admins);
+	public Set<Long> getAppAdminIds() {
+		return Collections.unmodifiableSet(appAdminIds);
 	}
 
-	public void setAdmins(Set<Long> admins) {
-		this.admins = admins;
+	public void setAppAdminIds(Set<Long> appAdminIds) {
+		this.appAdminIds = appAdminIds;
 	}
 
 	public boolean isOidcEnabled() {
@@ -105,64 +116,60 @@ public class AppConfig {
 		this.oidcEnabled = oidcEnabled;
 	}
 
-	public List<String> getLangs() {
-		return langs;
+	public List<String> getAvailableLanguages() {
+		return availableLanguages;
 	}
 
-	public void setLangs(List<String> langs) {
-		this.langs = langs;
+	public void setAvailableLanguages(List<String> availableLanguages) {
+		this.availableLanguages = availableLanguages;
 	}
 
-	public PerunConnector getConnector() {
-		return connector;
+	public PerunConnector getPerunConnector() {
+		return perunConnector;
 	}
 
-	public void setConnector(PerunConnector connector) {
-		this.connector = connector;
+	public void setPerunConnector(PerunConnector perunConnector) {
+		this.perunConnector = perunConnector;
 	}
 
-	public String getTestSpAttribute() {
-		return testSpAttribute;
+	public String getIsTestSpAttributeName() {
+		return isTestSpAttributeName;
 	}
 
-	public void setTestSpAttribute(String testSpAttribute) {
-		this.testSpAttribute = testSpAttribute;
+	public void setIsTestSpAttributeName(String isTestSpAttributeName) {
+		this.isTestSpAttributeName = isTestSpAttributeName;
 	}
 
-	public String getShowOnServicesListAttribute() {
-		return showOnServicesListAttribute;
+	public String getShowOnServicesListAttributeName() {
+		return showOnServicesListAttributeName;
 	}
 
-	public void setShowOnServicesListAttribute(String showOnServicesListAttribute) {
-		this.showOnServicesListAttribute = showOnServicesListAttribute;
+	public void setShowOnServicesListAttributeName(String showOnServicesListAttributeName) {
+		this.showOnServicesListAttributeName = showOnServicesListAttributeName;
 	}
 
-	public Map<String, PerunAttributeDefinition> getPerunAttributeDefinitionsMap() {
-		return perunAttributeDefinitionsMap;
+	public String getAdminsAttributeName() {
+		return adminsAttributeName;
 	}
 
-	public String getAdminsAttr() {
-		return adminsAttr;
+	public void setAdminsAttributeName(String adminsAttributeName) {
+		this.adminsAttributeName = adminsAttributeName;
 	}
 
-	public void setAdminsAttr(String adminsAttr) {
-		this.adminsAttr = adminsAttr;
+	public String getLoginExtSource() {
+		return loginExtSource;
 	}
 
-	public String getExtSourceProxy() {
-		return extSourceProxy;
+	public void setLoginExtSource(String loginExtSource) {
+		this.loginExtSource = loginExtSource;
 	}
 
-	public void setExtSourceProxy(String extSourceProxy) {
-		this.extSourceProxy = extSourceProxy;
+	public String getUserEmailAttributeName() {
+		return userEmailAttributeName;
 	}
 
-	public String getUserEmailAttr() {
-		return userEmailAttr;
-	}
-
-	public void setUserEmailAttr(String userEmailAttr) {
-		this.userEmailAttr = userEmailAttr;
+	public void setUserEmailAttributeName(String userEmailAttributeName) {
+		this.userEmailAttributeName = userEmailAttributeName;
 	}
 
 	public String getFooterHTML() {
@@ -218,7 +225,7 @@ public class AppConfig {
 	}
 
 	public void setSecret(String secret) {
-		secret = fixSecret(secret, 32);
+		secret = fixSecret(secret);
 		MessageDigest sha;
 		try {
 			byte[] key = secret.getBytes(StandardCharsets.UTF_8);
@@ -239,50 +246,54 @@ public class AppConfig {
 		this.specifyAuthoritiesEnabled = specifyAuthoritiesEnabled;
 	}
 
-	public void setPerunAttributeDefinitionsMap(Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap) {
-		this.perunAttributeDefinitionsMap = perunAttributeDefinitionsMap;
+	public Map<String, PerunAttributeDefinition> getPerunAttributeDefinitionsMap() {
+		return perunAttributeDefinitionsMap;
 	}
 
-	public void setSignaturesEndpointUrl(String signaturesEndpointUrl) {
-		this.signaturesEndpointUrl = signaturesEndpointUrl;
+	public void setPerunAttributeDefinitionsMap(Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap) {
+		this.perunAttributeDefinitionsMap = perunAttributeDefinitionsMap;
 	}
 
 	public String getSignaturesEndpointUrl() {
 		return signaturesEndpointUrl;
 	}
 
-	public void setAdminsEndpoint(String adminsEndpoint) {
-		this.adminsEndpoint = adminsEndpoint;
+	public void setSignaturesEndpointUrl(String signaturesEndpointUrl) {
+		this.signaturesEndpointUrl = signaturesEndpointUrl;
 	}
 
 	public String getAdminsEndpoint() {
 		return adminsEndpoint;
 	}
 
-	public String getEntityIdAttrName() {
-		return entityIdAttrName;
+	public void setAdminsEndpoint(String adminsEndpoint) {
+		this.adminsEndpoint = adminsEndpoint;
 	}
 
-	public void setEntityIdAttrName(String entityIdAttrName) {
-		this.entityIdAttrName = entityIdAttrName;
+	public String getEntityIdAttributeName() {
+		return entityIdAttributeName;
+	}
+
+	public void setEntityIdAttributeName(String entityIdAttributeName) {
+		this.entityIdAttributeName = entityIdAttributeName;
 	}
 
 	@Override
 	public String toString() {
-		return "idpAttribute: '" + idpAttribute + "'\n" +
-				"idpAttributeValue: '" + idpAttributeValue + "'\n" +
-				"adminsAttr: '" + adminsAttr + "'\n" +
-				"admins=" + admins + "'\n" +
-				"extSourceProxy: '" + extSourceProxy + "'\n" +
-				"userEmailAttr: '" + userEmailAttr + "'\n" +
+		return "proxyIdentifierAttributeName: '" + proxyIdentifierAttributeName + "'\n" +
+				"proxyIdentifierAttributeValue: '" + proxyIdentifierAttributeValue + "'\n" +
+				"adminsAttributeName: '" + adminsAttributeName + "'\n" +
+				"appAdminIds: " + appAdminIds + "'\n" +
+				"loginExtSource: '" + loginExtSource + "'\n" +
+				"userEmailAttributeName: '" + userEmailAttributeName + "'\n" +
 				"perunAttributeDefinitionsMap: " + perunAttributeDefinitionsMap + "'\n" +
 				"oidcEnabled=" + oidcEnabled + "'\n" +
-				"langs=" + langs + "'\n" +
+				"availableLanguages=" + availableLanguages + "'\n" +
 				"enLocale=" + enLocale + "'\n" +
 				"csLocale=" + csLocale + "'\n" +
-				"connector=" + connector + "'\n" +
-				"showOnServicesListAttribute: '" + showOnServicesListAttribute + "'\n" +
-				"testSpAttribute: '" + testSpAttribute + "'\n" +
+				"perunConnector=" + perunConnector + "'\n" +
+				"showOnServicesListAttributeName: '" + showOnServicesListAttributeName + "'\n" +
+				"isTestSpAttributeName: '" + isTestSpAttributeName + "'\n" +
 				"footerHTML: '" + footerHTML + "'\n" +
 				"headerLogo: '" + headerLogo + "'\n" +
 				"headerTitle: '" + headerTitle + "'\n" +
@@ -310,18 +321,18 @@ public class AppConfig {
 	}
 
 	public boolean isAppAdmin(Long userId) {
-		return admins.contains(userId);
+		return appAdminIds.contains(userId);
 	}
 
-	private String fixSecret(String s, int length) {
-		if (s.length() < length) {
-			int missingLength = length - s.length();
+	private String fixSecret(String s) {
+		if (s.length() < 32) {
+			int missingLength = 32 - s.length();
 			StringBuilder sBuilder = new StringBuilder(s);
 			for (int i = 0; i < missingLength; i++) {
-				sBuilder.append("A");
+				sBuilder.append('A');
 			}
 			s = sBuilder.toString();
 		}
-		return s.substring(0, length);
+		return s.substring(0, 32);
 	}
 }

@@ -3,8 +3,11 @@ package cz.metacentrum.perun.spRegistration.persistence.configs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-
+/**
+ * Configuration class for MITREid connection. Contains mapping of attributes.
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 public class MitreIdAttrsConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(MitreIdAttrsConfig.class);
@@ -118,8 +121,4 @@ public class MitreIdAttrsConfig {
 		this.privacyPolicyUriAttr = privacyPolicyUriAttr;
 	}
 
-	@PostConstruct
-	public void init() {
-
-	}
 }

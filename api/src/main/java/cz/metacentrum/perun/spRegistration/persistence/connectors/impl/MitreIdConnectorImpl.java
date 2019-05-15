@@ -21,6 +21,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implementation of connector to MITREid server.
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 public class MitreIdConnectorImpl implements MitreIdConnector {
 
 	private static final Logger log = LoggerFactory.getLogger(MitreIdConnectorImpl.class);

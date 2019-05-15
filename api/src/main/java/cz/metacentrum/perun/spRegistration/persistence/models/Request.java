@@ -15,7 +15,7 @@ import java.util.Objects;
  * Class represents request made by user. It contains all the data that needs to be stored.
  * It also keeps track of the modification time.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class Request {
 

@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Generic configuration class containing all other configuration classes.
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 public class Config {
 
 	private static final Logger log = LoggerFactory.getLogger(Config.class);

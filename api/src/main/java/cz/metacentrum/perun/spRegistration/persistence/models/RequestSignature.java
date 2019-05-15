@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * Approval for request of transferring service into production environment.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class RequestSignature {
 

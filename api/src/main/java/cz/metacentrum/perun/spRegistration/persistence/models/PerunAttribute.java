@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * Representation of attribute from Perun.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class PerunAttribute {
 

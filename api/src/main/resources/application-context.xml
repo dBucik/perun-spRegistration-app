@@ -3,8 +3,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <context:component-scan base-package="cz.metacentrum.perun.spRegistration"/>
     <context:property-placeholder properties-ref="properties" order="1" ignore-unresolvable="true" />
@@ -14,6 +15,8 @@
     <context:property-placeholder properties-ref="facilityOrganizationAttributes" order="5" ignore-unresolvable="true"/>
     <context:property-placeholder properties-ref="facilityMembershipAttributes" order="6" />
 
+    <tx:annotation-driven proxy-target-class="true" />
+
     <mvc:interceptors>
       <bean id="userSettingInterceptor" class="cz.metacentrum.perun.spRegistration.rest.interceptors.UserSettingInterceptor"/>
     </mvc:interceptors>
@@ -22,14 +25,14 @@
         <property name="properties">
             <props>
                 <!-- APP -->
-                <prop key="admins">0,1,2,3</prop>
+                <prop key="appAdminIds">0,1,2,3</prop>
                 <prop key="extSource.proxy.entityId">https://login.cesnet.cz/idp/</prop>
                 <prop key="oidc.isEnabled">true</prop>
-                <prop key="langs">en,cs</prop>
+                <prop key="availableLanguages">en,cs</prop>
                 <prop key="host.url">http://spreg.com/spreg</prop>
                 <prop key="secret">secretSaltGoesHere123!X$</prop>
                 <!-- ATTRS -->
-                <prop key="attr.idpAttribute.value">XYZ</prop>
+                <prop key="attr.proxyIdentifierAttributeName.value">XYZ</prop>
                 <prop key="attr.userEmail.name">urn:perun:user:attribute-def:def:preferredMail</prop>
                 <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
                 <!-- APPROVALS -->
@@ -75,7 +78,7 @@
     <bean id="messagesProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
-                <prop key="admins.emails">admins@test.com,adminsMailingList@test.com</prop>
+                <prop key="appAdminIds.emails">appAdminIds@test.com,adminsMailingList@test.com</prop>
                 <prop key="host">localhost</prop>
                 <prop key="from">test@mail.com</prop>
                 <prop key="footer">&lt;br/&gt; &lt;br/&gt;Best regards, &lt;br/&gt; test.mail.com &lt;br/&gt; service registration</prop>
@@ -90,8 +93,8 @@
                 <prop key="production.authorities.subject">Approve transfer to production: %SERVICE_NAME%</prop>
                 <prop key="production.authorities.message">For approval of moving service %SERVICE_NAME% to production visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
                 <prop key="moveToProduction.authorities">${approval.defaultAuthorities.mails}</prop>
-                <prop key="admins.add.subject">Approve request to become admin: %SERVICE_NAME%</prop>
-                <prop key="admins.add.message">For approval of becoming admin of %SERVICE_NAME% visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
+                <prop key="appAdminIds.add.subject">Approve request to become admin: %SERVICE_NAME%</prop>
+                <prop key="appAdminIds.add.message">For approval of becoming admin of %SERVICE_NAME% visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
             </props>
         </property>
         <property name="locations">
@@ -131,7 +134,12 @@
         <constructor-arg name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="connector" class="cz.metacentrum.perun.spRegistration.persistence.connectors.impl.PerunConnectorRpc">
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="perunConnector" class="cz.metacentrum.perun.spRegistration.persistence.connectors.impl.PerunConnectorRpc">
         <property name="perunRpcUrl" value="${rpc.url}"/>
         <property name="perunRpcUser" value="${rpc.user}"/>
         <property name="perunRpcPassword" value="${rpc.password}"/>
@@ -149,17 +157,17 @@
     </bean>
 
     <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig">
-        <property name="connector" ref="connector" />
-        <property name="admins" value="#{'${admins}'.split('\s*,\s*')}" />
-        <property name="idpAttribute" value="${proxyIdentifiers.attrName}" />
-        <property name="idpAttributeValue" value="${attr.idpAttribute.value}" />
-        <property name="testSpAttribute" value="${isTestSp.attrName}" />
-        <property name="showOnServicesListAttribute" value="${showOnServicesList.attrName}" />
-        <property name="adminsAttr" value="${attr.facilityAdmins.name}" />
-        <property name="userEmailAttr" value="${attr.userEmail.name}" />
-        <property name="extSourceProxy" value="${extSource.proxy.entityId}" />
+        <property name="perunConnector" ref="perunConnector" />
+        <property name="appAdminIds" value="#{'${appAdminIds}'.split('\s*,\s*')}" />
+        <property name="proxyIdentifierAttributeName" value="${proxyIdentifiers.attrName}" />
+        <property name="proxyIdentifierAttributeValue" value="${attr.proxyIdentifierAttributeName.value}" />
+        <property name="isTestSpAttributeName" value="${isTestSp.attrName}" />
+        <property name="showOnServicesListAttributeName" value="${showOnServicesList.attrName}" />
+        <property name="adminsAttributeName" value="${attr.facilityAdmins.name}" />
+        <property name="userEmailAttributeName" value="${attr.userEmail.name}" />
+        <property name="loginExtSource" value="${extSource.proxy.entityId}" />
         <property name="oidcEnabled" value="${oidc.isEnabled}" />
-        <property name="langs" value="#{'${langs}'.split('\s*,\s*')}" />
+        <property name="availableLanguages" value="#{'${availableLanguages}'.split('\s*,\s*')}" />
         <property name="footerHTML" value="${app.footer.html}" />
         <property name="headerHTML" value="${app.header.html}" />
         <property name="headerTitle" value="${app.header.title}" />
@@ -169,38 +177,38 @@
         <property name="specifyAuthoritiesEnabled" value="${approval.allowToSpecifyOwn}" />
         <property name="secret" value="${secret}" />
         <property name="signaturesEndpointUrl" value="${host.url}/sign"/>
-        <property name="adminsEndpoint" value="${host.url}/admins"/>
-        <property name="entityIdAttrName" value="${entityID.attrName}"/>
+        <property name="adminsEndpoint" value="${host.url}/appAdminIds"/>
+        <property name="entityIdAttributeName" value="${entityID.attrName}"/>
     </bean>
 
     <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
         <constructor-arg name="attrsProps" ref="facilityServiceAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
-        <constructor-arg name="connector" ref="connector" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilityOrganizationConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
         <constructor-arg name="attrsProps" ref="facilityOrganizationAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
-        <constructor-arg name="connector" ref="connector" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilitySamlConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
         <constructor-arg name="attrsProps" ref="facilitySamlAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
-        <constructor-arg name="connector" ref="connector" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilityOidcConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
         <constructor-arg name="attrsProps" ref="facilityOidcAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
-        <constructor-arg name="connector" ref="connector" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilityMembershipConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
         <constructor-arg name="attrsProps" ref="facilityMembershipAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
-        <constructor-arg name="connector" ref="connector" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="mitreidAttrsConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig">

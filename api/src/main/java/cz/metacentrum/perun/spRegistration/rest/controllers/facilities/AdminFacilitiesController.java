@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.util.List;
 
+/**
+ * Controller handling ADMIN actions related to Facilities.
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 @RestController
 public class AdminFacilitiesController {
 

@@ -1,8 +1,9 @@
 package cz.metacentrum.perun.spRegistration.service.exceptions;
 
 /**
+ * Exception represents malformed format of the validation code for signing requests / approving administrators.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class MalformedCodeException extends Exception {
 

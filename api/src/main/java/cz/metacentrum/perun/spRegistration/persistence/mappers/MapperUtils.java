@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * MapperUtils class for mapping objects from RPC responses.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class MapperUtils {
 

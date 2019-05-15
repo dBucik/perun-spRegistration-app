@@ -47,8 +47,8 @@ public class UserSettingInterceptor implements HandlerInterceptor {
 	}
 
 	private void setUser(HttpServletRequest request) throws ConnectorException, InternalErrorException {
-		String userEmailAttr = appConfig.getUserEmailAttr();
-		String extSourceProxy = appConfig.getExtSourceProxy();
+		String userEmailAttr = appConfig.getUserEmailAttributeName();
+		String extSourceProxy = appConfig.getLoginExtSource();
 		log.info("settingUser");
 		String sub;
 		if (devEnabled) {
