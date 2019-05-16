@@ -1,4 +1,4 @@
-CREATE TABLE requests
+CREATE TABLE IF NOT EXISTS requests
 (
 	id BIGSERIAL CONSTRAINT requests_pkey PRIMARY KEY,
 	facility_id BIGINT,
@@ -10,9 +10,9 @@ CREATE TABLE requests
 	modified_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE UNIQUE index requests_id_uindex ON requests (id);
+CREATE UNIQUE index IF NOT EXISTS requests_id_uindex ON requests (id);
 
-CREATE TABLE approvals
+CREATE TABLE IF NOT EXISTS approvals
 (
 	request_id BIGINT NOT NULL,
 	user_id BIGINT NOT NULL,
