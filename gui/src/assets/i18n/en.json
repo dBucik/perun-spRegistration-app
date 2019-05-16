@@ -118,7 +118,7 @@
     "MOVE_TO_PRODUCTION_DESCRIPTION" : "You are applying for a move facility to production. Fill in the following form.",
     "SUBMIT_BUTTON" : "Submit",
     "MOVE_TO_PRODUCTION_SUCCESS": "Request was created",
-    "MOVE_TO_PRODUCTION_EMAIL": "I want specify emails",
+    "MOVE_TO_PRODUCTION_EMAIL": "I want to specify emails",
     "EMAIL_DESCRIPTION": "Fill in emails, for approving an email press button Enter",
     "EMAIL_ERROR_FILL": "Fill in an email!",
     "EMAIL_ERROR_CORRECT": "Fill in an correct email!",
