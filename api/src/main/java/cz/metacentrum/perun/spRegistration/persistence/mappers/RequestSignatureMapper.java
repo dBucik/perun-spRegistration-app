@@ -11,7 +11,7 @@ import java.sql.SQLException;
 /**
  * Mapper for RequestSignature object. Maps result retrieved from DB to RequestSignature object.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class RequestSignatureMapper implements RowMapper<RequestSignature> {
 

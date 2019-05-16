@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Controller handling authentication
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 @RestController
 public class AuthController {
 
@@ -35,8 +40,8 @@ public class AuthController {
 	@GetMapping(path = "/api/setUser")
 	public void setUser(HttpServletRequest req) throws ConnectorException {
 		log.trace("setUser()");
-		String userEmailAttr = appConfig.getUserEmailAttr();
-		String extSourceProxy = appConfig.getExtSourceProxy();
+		String userEmailAttr = appConfig.getUserEmailAttributeName();
+		String extSourceProxy = appConfig.getLoginExtSource();
 		log.debug("settingUser");
 		String sub;
 		if (devEnabled) {

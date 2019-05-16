@@ -27,7 +27,7 @@ import java.util.Properties;
 /**
  * Utility class for persistence layer
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class Utils {
 

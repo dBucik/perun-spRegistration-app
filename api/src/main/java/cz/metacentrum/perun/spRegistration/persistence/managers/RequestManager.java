@@ -5,18 +5,16 @@ import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Interface for working with the Request in the database.
+ * Interface for working with the Request object in the database.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public interface RequestManager {
 

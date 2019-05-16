@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Service layer with methods specific for Admins.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public interface AdminCommandsService {
 

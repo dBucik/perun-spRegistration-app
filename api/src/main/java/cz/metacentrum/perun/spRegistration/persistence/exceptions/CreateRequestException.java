@@ -1,9 +1,10 @@
 package cz.metacentrum.perun.spRegistration.persistence.exceptions;
 
 /**
- * Exception representing that active requests exist when wanted to create another request
+ * Exception represents that active requests exists for the given service.
+ * Only one request can be active at the same time for one service.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class CreateRequestException extends Exception {
 

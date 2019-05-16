@@ -1,7 +1,6 @@
 package cz.metacentrum.perun.spRegistration.service;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
@@ -16,7 +15,7 @@ import java.util.Map;
 /**
  * Utility class containing methods for services.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class ServiceUtils {
 

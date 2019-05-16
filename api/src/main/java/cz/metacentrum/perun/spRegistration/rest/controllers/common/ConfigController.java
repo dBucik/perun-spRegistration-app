@@ -15,6 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller handling requests for obtaining configuration
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 @RestController
 public class ConfigController {
 
@@ -61,9 +66,9 @@ public class ConfigController {
 
 	@GetMapping(path = "/api/config/langs")
 	public List<String> getLangs() {
-		List<String> langs = config.getAppConfig().getLangs();
+		List<String> langs = config.getAppConfig().getAvailableLanguages();
 
-		log.trace("getLangs() returns: {}", langs);
+		log.trace("getAvailableLanguages() returns: {}", langs);
 		return langs;
 	}
 

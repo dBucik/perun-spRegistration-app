@@ -20,6 +20,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +29,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
-@SuppressWarnings("Duplicates")
-//TODO: transactions
+/**
+ * Implementation of Request Manager. Works with DB and Request objects.
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
+@EnableTransactionManagement
 public class RequestManagerImpl implements RequestManager {
 
 	private static final Logger log = LoggerFactory.getLogger(RequestManagerImpl.class);
@@ -59,6 +65,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public Long createRequest(Request request) throws InternalErrorException, CreateRequestException {
 		log.trace("createRequest({})", request);
 		if (request == null) {
@@ -108,6 +115,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public boolean updateRequest(Request request) throws InternalErrorException {
 		log.trace("updateRequest({})", request);
 		if (request == null) {
@@ -146,6 +154,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public boolean deleteRequest(Long reqId) throws InternalErrorException {
 		log.trace("deleteRequest({})", reqId);
 		if (reqId == null) {
@@ -176,6 +185,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public Request getRequestById(Long reqId) {
 		log.trace("getRequestById({})", reqId);
 		if (reqId == null) {
@@ -198,6 +208,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public List<Request> getAllRequests() {
 		log.trace("getAllRequests()");
 
@@ -212,6 +223,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public List<Request> getAllRequestsByUserId(Long userId) {
 		log.trace("getAllRequestsByUserId({})", userId);
 		if (userId == null) {
@@ -234,6 +246,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public List<Request> getAllRequestsByStatus(RequestStatus status) {
 		log.trace("getAllRequestsByStatus({})", status);
 		if (status == null) {
@@ -256,6 +269,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public List<Request> getAllRequestsByAction(RequestAction action) {
 		log.trace("getAllRequestsByAction({})", action);
 		if (action == null) {
@@ -278,6 +292,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public List<Request> getAllRequestsByFacilityId(Long facilityId) {
 		log.trace("getAllRequestsByFacilityId({})", facilityId);
 		if (facilityId == null) {
@@ -300,6 +315,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public List<Request> getAllRequestsByFacilityIds(Set<Long> facilityIds) {
 		log.trace("getAllRequestsByFacilityIds({})", facilityIds);
 		if (facilityIds == null || facilityIds.isEmpty()) {
@@ -322,6 +338,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException {
 		log.trace("getActiveRequestIdByFacilityId({})", facilityId);
 		if (facilityId == null) {
@@ -354,6 +371,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public boolean addSignature(Long requestId, Long userId, String userName) throws InternalErrorException {
 		log.trace("addSignature(requestId: {}, userId: {}, userName: {})", requestId, userId, userName);
 		if (requestId == null || userId == null || userName == null || userName.isEmpty()) {
@@ -386,6 +404,7 @@ public class RequestManagerImpl implements RequestManager {
 	}
 
 	@Override
+	@Transactional
 	public List<RequestSignature> getRequestSignatures(Long requestId) {
 		log.trace("getRequestSignatures({})", requestId);
 		if (requestId == null) {

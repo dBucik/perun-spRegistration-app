@@ -28,6 +28,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.util.List;
 
+/**
+ * Controller handling USER actions related to Signatures.
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
 @RestController
 public class UserSignaturesController {
 

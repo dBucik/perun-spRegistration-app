@@ -2,7 +2,6 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
-import cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
@@ -51,13 +50,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * Implementation of UserCommandsService.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 @SuppressWarnings("Duplicates")
 @Service("userService")
@@ -109,7 +107,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		log.info("Sending mail notification");
 		boolean notificationSent = Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(),
-				req.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+				req.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
 
 		if (! notificationSent) {
 			log.error("Some operations failed - notificationsSent: false");
@@ -145,7 +143,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		log.info("Sending mail notification");
 		boolean notificationSent = Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(),
-				req.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+				req.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
 
 		if (! notificationSent) {
 			log.error("Some operations failed - notificationsSent: false");
@@ -169,7 +167,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
 		List<String> keptAttrs = initKeptAttrs();
-		if (ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttrName())) {
+		if (ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttributeName())) {
 			keptAttrs.addAll(config.getOidcInputs()
 					.stream()
 					.map(AttrInput::getName)
@@ -193,7 +191,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		log.info("Sending mail notification");
 		boolean notificationSent = Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(),
-				req.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+				req.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
 
 		if (! notificationSent) {
 			log.error("Some operations failed - notificationsSent: false");
@@ -234,7 +232,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		log.info("Sending mail notification");
 		boolean notificationSent = Mails.requestStatusUpdateUserNotify(requestId, request.getStatus(),
-				request.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+				request.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
 
 		boolean successful = requestUpdated && notificationSent;
 		if (!successful) {
@@ -274,7 +272,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		boolean userNotificationSent = Mails.transferToProductionUserNotify(req.getReqId(), req.getFacilityName(),
-				req.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+				req.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
 
 		int authorityNotificationsSent = sendAuthoritiesNotifications(authorities, req);
 
@@ -400,7 +398,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
 
 		List<String> keptAttrs = initKeptAttrs();
-		if (ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttrName())) {
+		if (ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttributeName())) {
 			keptAttrs.addAll(config.getOidcInputs()
 					.stream()
 					.map(AttrInput::getName)
@@ -416,7 +414,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		facility.setAttrs(ServiceUtils.filterFacilityAttrs(attrs, keptAttrs));
 
-		boolean inTest = attrs.get(appConfig.getTestSpAttribute()).valueAsBoolean();
+		boolean inTest = attrs.get(appConfig.getIsTestSpAttributeName()).valueAsBoolean();
 		facility.setTestEnv(inTest);
 
 		log.trace("getDetailedFacility returns: {}", facility);
@@ -464,11 +462,11 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		List<Facility> filteredFacilities = new ArrayList<>();
-		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getIdpAttribute(),
-				appConfig.getIdpAttributeValue());
+		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getProxyIdentifierAttributeName(),
+				appConfig.getProxyIdentifierAttributeValue());
 
 		if (proxyFacilities == null) {
-			log.debug("No facilities found with proxy identifier: {}", appConfig.getIdpAttributeValue());
+			log.debug("No facilities found with proxy identifier: {}", appConfig.getProxyIdentifierAttributeValue());
 		} else {
 			List<Facility> userFacilities = perunConnector.getFacilitiesWhereUserIsAdmin(userId);
 
@@ -604,8 +602,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 	private PerunAttribute generateProxyIdentifierAttr() {
 		log.trace("generateProxyIdentifierAttr()");
-		String identifierAttrName = appConfig.getIdpAttribute();
-		String value = appConfig.getIdpAttributeValue();
+		String identifierAttrName = appConfig.getProxyIdentifierAttributeName();
+		String value = appConfig.getProxyIdentifierAttributeValue();
 
 		PerunAttribute identifierAttr = new PerunAttribute();
 		identifierAttr.setFullName(identifierAttrName);

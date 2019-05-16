@@ -2,7 +2,7 @@ package cz.metacentrum.perun.spRegistration.service.exceptions;
 
 /**
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class ExpiredCodeException extends Exception {
 

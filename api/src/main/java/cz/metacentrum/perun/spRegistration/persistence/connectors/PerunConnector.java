@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Connects to Perun and obtains information.
  *
- * @author Dominik František Bučík <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public interface PerunConnector {
 

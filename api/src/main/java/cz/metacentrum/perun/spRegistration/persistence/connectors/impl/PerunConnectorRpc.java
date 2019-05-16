@@ -3,22 +3,20 @@ package cz.metacentrum.perun.spRegistration.persistence.connectors.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import cz.metacentrum.perun.spRegistration.persistence.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.ConnectorUtils;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.MapperUtils;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.InterceptingClientHttpRequestFactory;
 import org.springframework.http.client.support.BasicAuthorizationInterceptor;
@@ -33,12 +31,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 
 /**
  * Connects to Perun via RPC.
  *
- * @author Dominik František Bučík bucik@ics.muni.cz
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class PerunConnectorRpc implements PerunConnector {
 
@@ -52,7 +49,6 @@ public class PerunConnectorRpc implements PerunConnector {
 	private static final String FACILITIES_MANAGER = "facilitiesManager";
 	private static final String ATTRIBUTES_MANAGER = "attributesManager";
 	private static final String SEARCHER = "searcher";
-
 
 	public void setPerunRpcUrl(String perunRpcUrl) {
 		this.perunRpcUrl = perunRpcUrl;

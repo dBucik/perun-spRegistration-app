@@ -3,7 +3,7 @@ package cz.metacentrum.perun.spRegistration.persistence.enums;
 /**
  * Action associated with request.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public enum RequestAction {
 

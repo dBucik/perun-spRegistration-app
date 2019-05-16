@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Utils class used by connectors.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 public class ConnectorUtils {
 

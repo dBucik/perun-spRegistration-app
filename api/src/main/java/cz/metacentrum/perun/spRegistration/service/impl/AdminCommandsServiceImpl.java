@@ -12,7 +12,6 @@ import cz.metacentrum.perun.spRegistration.persistence.models.MitreIdResponse;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
 import cz.metacentrum.perun.spRegistration.service.Mails;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
@@ -33,7 +32,7 @@ import java.util.Properties;
 /**
  * Implementation of AdminCommandsService.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
  */
 @Service("adminService")
 public class AdminCommandsServiceImpl implements AdminCommandsService {
@@ -87,7 +86,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		boolean requestUpdated = requestManager.updateRequest(request);
 
 		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.APPROVED,
-				request.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+				request.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
 
 		boolean successful = (requestProcessed && requestUpdated && notificationSent);
 
@@ -132,7 +131,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		log.debug("sendingNotification");
 		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.APPROVED,
-				request.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+				request.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
 
 		boolean successful = (requestUpdated && notificationSent);
 
@@ -180,7 +179,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		log.debug("sendingNotification");
 		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.WAITING_FOR_CHANGES,
-				request.getAdminContact(appConfig.getAdminsAttr()), messagesProperties);
+				request.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
 
 		boolean successful = (requestUpdated && notificationSent);
 
@@ -223,8 +222,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			throw new UnauthorizedActionException("User cannot list all facilities, user not an admin");
 		}
 
-		List<Facility> result = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getIdpAttribute(),
-				appConfig.getIdpAttributeValue());
+		List<Facility> result = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getProxyIdentifierAttributeName(),
+				appConfig.getProxyIdentifierAttributeValue());
 
 		log.trace("getAllFacilities returns: {}", result);
 		return result;
@@ -274,7 +273,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		boolean adminSet = perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
 
 		Map<String, PerunAttribute> additionalAttributes;
-		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttributeName())) {
 			log.debug("Creating client in mitreId");
 			// TODO: uncomment when connector implemented
 			MitreIdResponse mitreResponse = null; // mitreIdConnector.createClient(request.getAttributes());
@@ -318,7 +317,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 				request.getAttributesAsJsonArrayForPerun());
 
 		boolean mitreIdUpdated = true;
-		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttributeName())) {
 			log.info("Updating mitreId client");
 			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
 					mitreIdAttrsConfig.getMitreClientIdAttr());
@@ -328,7 +327,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean successful = facilityCoreUpdated && attributesSet && mitreIdUpdated;
 		if (!successful) {
-			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
+			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttributeName())) {
 				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}, mitreIdUpdated: {}",
 						facilityCoreUpdated, attributesSet, mitreIdUpdated);
 			} else {
@@ -350,7 +349,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		boolean facilityRemoved = perunConnector.deleteFacilityFromPerun(facilityId);
 		boolean mitreIdRemoved = true;
 
-		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttributeName())) {
 			log.info("Removing client from mitreId");
 			PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId,
 					mitreIdAttrsConfig.getMitreClientIdAttr());
@@ -360,7 +359,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean successful = facilityRemoved && mitreIdRemoved;
 		if (!successful) {
-			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttrName())) {
+			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttributeName())) {
 				log.error("Some operations failed - facilityRemoved: {}, mitreIdRemoved: {}",
 						facilityRemoved, mitreIdRemoved);
 			} else {
@@ -406,10 +405,10 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		Map<String, PerunAttribute> attributesMap = new HashMap<>();
 
-		PerunAttributeDefinition testSpAttrDef = appConfig.getAttrDefinition(appConfig.getTestSpAttribute());
+		PerunAttributeDefinition testSpAttrDef = appConfig.getAttrDefinition(appConfig.getIsTestSpAttributeName());
 		PerunAttribute isTestSpAttr = new PerunAttribute(testSpAttrDef, testSp);
 
-		PerunAttributeDefinition showOnListAttrDef = appConfig.getAttrDefinition(appConfig.getShowOnServicesListAttribute());
+		PerunAttributeDefinition showOnListAttrDef = appConfig.getAttrDefinition(appConfig.getShowOnServicesListAttributeName());
 		PerunAttribute showOnServicesListAttr = new PerunAttribute(showOnListAttrDef, showOnList);
 
 		if (mitreResponse != null) {

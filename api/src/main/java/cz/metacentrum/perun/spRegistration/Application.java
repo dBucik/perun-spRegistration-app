@@ -1,7 +1,6 @@
 package cz.metacentrum.perun.spRegistration;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +12,16 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ImportResource;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
+/**
+ * Core application class. Initializes the application an logs some configurations.
+ *
+ * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ */
+@SpringBootApplication(exclude = {
+		DataSourceAutoConfiguration.class,
+		DataSourceTransactionManagerAutoConfiguration.class,
+		HibernateJpaAutoConfiguration.class
+})
 @ImportResource("classpath*:application-context.xml")
 public class Application extends SpringBootServletInitializer {
 

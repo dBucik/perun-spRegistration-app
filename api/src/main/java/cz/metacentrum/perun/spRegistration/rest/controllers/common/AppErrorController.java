@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * Controller handling errors
+ *
  * @author Vojtech Sassmann <vojtech.sassmann@gmail.com>
  */
 @Controller
