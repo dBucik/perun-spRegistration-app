@@ -32,7 +32,8 @@
                 <prop key="host.url">http://spreg.com/spreg</prop>
                 <prop key="secret">secretSaltGoesHere123!X$</prop>
                 <!-- ATTRS -->
-                <prop key="attr.proxyIdentifierAttributeName.value">XYZ</prop>
+                <prop key="attr.proxyIdentifierAttribute.name">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
+                <prop key="attr.proxyIdentifierAttribute.value">XYZ</prop>
                 <prop key="attr.userEmail.name">urn:perun:user:attribute-def:def:preferredMail</prop>
                 <prop key="attr.facilityAdmins.name">urn:perun:facility:attribute-def:def:administratorContact</prop>
                 <!-- APPROVALS -->
@@ -159,8 +160,8 @@
     <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig">
         <property name="perunConnector" ref="perunConnector" />
         <property name="appAdminIds" value="#{'${appAdminIds}'.split('\s*,\s*')}" />
-        <property name="proxyIdentifierAttributeName" value="${proxyIdentifiers.attrName}" />
-        <property name="proxyIdentifierAttributeValue" value="${attr.proxyIdentifierAttributeName.value}" />
+        <property name="proxyIdentifierAttributeName" value="${attr.proxyIdentifierAttribute.name}" />
+        <property name="proxyIdentifierAttributeValue" value="${attr.proxyIdentifierAttribute.value}" />
         <property name="isTestSpAttributeName" value="${isTestSp.attrName}" />
         <property name="showOnServicesListAttributeName" value="${showOnServicesList.attrName}" />
         <property name="adminsAttributeName" value="${attr.facilityAdmins.name}" />
