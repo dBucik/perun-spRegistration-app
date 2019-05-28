@@ -77,7 +77,7 @@
       "APPROVED": "Schváleno",
       "REJECTED": "Zamítnuto",
       "WFA": "Čeká na schválení",
-      "WFC": "Změny jsou byly vyžádány administrátorem"
+      "WFC": "Změny byly vyžádány administrátorem"
     },
     "ACTIONPIPE": {
       "REGISTER_NEW_SP": "Registrace nové služby",
@@ -94,8 +94,8 @@
     "REJECTED": "Žádost zamítnuta",
     "ARE_YOU_SURE_APPROVE": "Jste si jistý, že chcete schvalit tuhle žádost?",
     "ARE_YOU_SURE_REJECT": "Jste si jistý, že chcete zamítnout tuhle žádost?",
-    "ARE_YOU_SURE_SET_WFC": "Jste si jistý, že chcete nastavit status na 'Čeká na změny'?",
-    "NO_COMMENT": "Hodnota je v pořádku"
+    "NO_COMMENT": "Hodnota je v pořádku",
+    "ARE_YOU_SURE_SET_WFC": "Jste si jistý, že chcete vyžádát změny?"
   },
   "FACILITIES": {
     "TITLE": "Facility",
