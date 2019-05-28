@@ -130,7 +130,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		boolean requestUpdated = requestManager.updateRequest(request);
 
 		log.debug("sendingNotification");
-		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.APPROVED,
+		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.REJECTED,
 				request.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
 
 		boolean successful = (requestUpdated && notificationSent);
