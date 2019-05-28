@@ -7,10 +7,10 @@ export class RequestItemValuePipe implements PipeTransform {
 
   transform(value: any, args?: any): any {
     if(value.toString() == 'true'){
-      return '<i class="material-icons">done</i>';
+      return '<i class="material-icons green">done</i>';
     }
     if(value.toString() == 'false'){
-      return '<i class="material-icons">clear</i>';
+      return '<i class="material-icons red">clear</i>';
     }
     if(value instanceof Array){
       let output = '';
