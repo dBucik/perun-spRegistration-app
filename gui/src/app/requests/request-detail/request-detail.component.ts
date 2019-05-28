@@ -55,7 +55,7 @@ export class RequestDetailComponent implements OnInit {
     successSetWFCMessage: string;
     noCommentErrorMessage: string;
 
-    isUserAdmin: boolean;
+    isApplicationAdmin: boolean;
 
     private mapAttributes() {
         this.requestItems = [];
@@ -66,7 +66,8 @@ export class RequestDetailComponent implements OnInit {
                 "value": item.value,
                 "oldValue": item.oldValue,
                 "name": item.definition.displayName,
-                "comment": item.comment
+                "comment": item.comment,
+                "description": item.definition.description,
             });
         }
     }
@@ -92,7 +93,7 @@ export class RequestDetailComponent implements OnInit {
         this.translate.get("REQUESTS.REJECTED").subscribe(value => this.successRejectMessage = value);
         this.translate.get("REQUESTS.APPROVED").subscribe(value => this.successApproveMessage = value);
         this.translate.get("REQUESTS.SET_WFC").subscribe(value => this.successSetWFCMessage = value);
-        this.isUserAdmin = AppComponent.isUserAdmin();
+        this.isApplicationAdmin = AppComponent.isApplicationAdmin();
     }
 
     ngOnDestroy(): void {

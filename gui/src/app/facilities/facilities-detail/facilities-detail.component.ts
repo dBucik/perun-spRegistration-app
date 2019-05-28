@@ -30,7 +30,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   private sub : Subscription;
 
   displayedColumns: string[] = ['fullname', 'value'];
-  facilityAttributes: PerunAttribute[];
+  facilityAttributes: any[];
 
   loading = true;
   facility: Facility;
@@ -41,7 +41,14 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     this.facilityAttributes = [];
       for (let urn of Object.keys(this.facility.attrs)) {
         let item = this.facility.attrs[urn];
-        this.facilityAttributes.push(new PerunAttribute(item.value, item.definition.displayName));
+        this.facilityAttributes.push(
+          {
+            "urn": urn,
+            "value": item.value,
+            "name": item.definition.displayName,
+            "description": item.definition.description,
+          }
+        );
     }
   }
 
@@ -50,14 +57,14 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
       this.facilitiesService.getFacility(params['id']).subscribe(facility => {
         this.facility = facility;
         this.mapAttributes();
-        this.isUserAdmin = AppComponent.isUserAdmin();
+        this.isUserAdmin = AppComponent.isApplicationAdmin();
         this.loading = false;
       }, error => {
         this.loading = false;
         console.log(error);
       });
     });
-    this.isUserAdmin = AppComponent.isUserAdmin();
+    this.isUserAdmin = AppComponent.isApplicationAdmin();
   }
 
   ngOnDestroy(): void {

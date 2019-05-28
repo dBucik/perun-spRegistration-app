@@ -113,7 +113,7 @@ export class AppComponent implements OnInit {
     })
   }
 
-  public static isUserAdmin() : boolean {
+  public static isApplicationAdmin() : boolean {
     return this.user.isAppAdmin;
   }
 

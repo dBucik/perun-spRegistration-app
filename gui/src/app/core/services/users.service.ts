@@ -13,7 +13,7 @@ export class UsersService {
   ) { }
 
   isUserAdmin() : Observable<boolean> {
-      return this.apiService.get('/config/isUserAdmin');
+      return this.apiService.get('/config/isApplicationAdmin');
   }
 
   getUser(): Observable<User> {
