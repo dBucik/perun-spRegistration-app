@@ -60,8 +60,8 @@
 
 ### Run the project
 - run backend (API):
-  - if you want to run it from IDEA, open configuraiton of run environment (select box on left of "play" button), click on edit configurations and select "Application". There add following to the "override parameters" section (key -> value):
-    -  server.port -> 8081
+  - if you want to run it from IDEA, open configuration of run environment (select box on left of "play" button), click on edit configurations and select "Application". There add following to the "override parameters" section (key -> value):
+    - server.port -> 8081
     - server.servlet.context-path -> /spreg
     - dev.enabled -> true
     - note: If you do not have the "Application" run environment there, navigate in project structure to "api/src/main/java/cz/metacentrum/perun/spRegistration" and right click on the Application.class file. Then hit "Run 'Application'"
@@ -69,21 +69,15 @@
   - if you want to run it from terminal, navigate to the directory with project files. In the project go to the "api" direcotry. Then execute following command: "mvn clean spring-boot:run -Dserver.port=8081 -Dserver.servlet.context-path=/spreg -Ddev.enabled=true". To kill the process hit Ctrl + C.
 
 - run frontend (GUI):
-  - navigate to the directory with project files. Then go to the "gui" directory. To run the frontend execute following command: "ng serve --public-host http://localhost:4200 --deployUrl=/spreg/ --baseHref=/spreg/".
+  - navigate to the directory with project files. Then go to the "gui" directory. To run the frontend execute following command: "ng serve --deployUrl=/spreg/ --baseHref=/spreg/".
 
 ### Access the page with application
 - open your browser and navigate to the "http://localhost:4200/spreg".
 
 ## Build for production
-- navigate to the project directory and execute "mvn clean package -Dprod=True"
-- after the build has finished go to the api/target directory. You will have to place the "spreg.war" file to the /var/lib/tomcat8/webapps folder on the machine. Logs are available via "tail -f /var/log/tomcat8/catalina.out"
+- navigate to the project directory and execute "mvn clean package -Dserver.url=url_of_host"
+- after the build has finished go to the api/target directory. You will have to place the "spreg.war" file to the /var/lib/tomcat8/webapps folder on the machine. Logs are available via "tail -f /var/log/tomcat8/spreg-app.log" or in your catalina home dir.
 
 
 ## Facilities in Perun
 - If you want to add facility that should be displayed as yours, you have to create it in Perun (perun-dev.cesnet.cz/fed/gui). Go to the Facility Manager taband create facility. Important thing is to set attribute "ProxyIdentifiers" of the facility to value "identifier1" It should be then available in list of facilities
-
-
-
-	
-
-
