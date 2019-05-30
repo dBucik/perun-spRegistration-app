@@ -446,7 +446,9 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		List<Request> requests = new ArrayList<>(requestManager.getAllRequestsByUserId(userId));
 
 		Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
-		requests.addAll(requestManager.getAllRequestsByFacilityIds(whereAdmin));
+		if (whereAdmin != null && !whereAdmin.isEmpty()) {
+			requests.addAll(requestManager.getAllRequestsByFacilityIds(whereAdmin));
+		}
 
 		List<Request> unique = new ArrayList<>(new HashSet<>(requests));
 		log.trace("getAllRequestsUserCanAccess returns: {}", unique);

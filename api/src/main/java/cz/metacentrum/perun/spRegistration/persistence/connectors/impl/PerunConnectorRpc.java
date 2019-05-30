@@ -287,7 +287,12 @@ public class PerunConnectorRpc implements PerunConnector {
 		if (userId == null) {
 			throw new IllegalArgumentException("userId is null");
 		}
+
 		List<Facility> facilities = getFacilitiesWhereUserIsAdmin(userId);
+		if (facilities == null) {
+			return new HashSet<>();
+		}
+
 		Set<Long> ids = new HashSet<>();
 		facilities.forEach(f -> ids.add(f.getId()));
 
