@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, DoCheck, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {RequestsService} from "../../core/services/requests.service";
 import {Subscription} from "rxjs";
@@ -22,7 +22,7 @@ export interface DialogData {
     templateUrl: './request-detail.component.html',
     styleUrls: ['./request-detail.component.scss']
 })
-export class RequestDetailComponent implements OnInit {
+export class RequestDetailComponent implements OnInit, DoCheck {
 
     constructor(
         public dialog: MatDialog,
@@ -38,7 +38,7 @@ export class RequestDetailComponent implements OnInit {
     private sub: Subscription;
     //TODO edit datatype
     requestItems: any[];
-    displayedColumns: string[] = ['name', 'value', 'comment'];
+    displayedColumns: string[] = ['name', 'value'];
 
     loading = true;
     request: Request;
@@ -62,12 +62,13 @@ export class RequestDetailComponent implements OnInit {
         for (let urn of Object.keys(this.request.attributes)) {
             let item = this.request.attributes[urn];
             this.requestItems.push({
-                "urn": urn,
-                "value": item.value,
-                "oldValue": item.oldValue,
-                "name": item.definition.displayName,
-                "comment": item.comment,
-                "description": item.definition.description,
+              "urn": urn,
+              "value": item.value,
+              "oldValue": item.oldValue,
+              "name": item.definition.displayName,
+              "comment": item.comment,
+              "description": item.definition.description,
+              'type': item.definition.type,
             });
         }
     }
@@ -98,6 +99,16 @@ export class RequestDetailComponent implements OnInit {
 
     ngOnDestroy(): void {
         this.sub.unsubscribe();
+    }
+
+    ngDoCheck(): void {
+      if (this.request !== undefined && this.request !== null) {
+        if (this.request.status !== 'APPROVED' && this.request.status !== 'REJECTED') {
+          this.displayedColumns = ['name', 'value', 'comment'];
+        } else {
+          this.displayedColumns = ['name', 'value'];
+        }
+      }
     }
 
     openApproveDialog(): void {
@@ -173,7 +184,27 @@ export class RequestDetailComponent implements OnInit {
       });
     }
 
-  changeArrow(){
-    this.icon = !this.icon;
-  }
+    isUndefined(item) {
+      //TODO: extract to one common method, also used in facility-detail
+      const value = item.value;
+      if (item.type === 'java.lang.Boolean') {
+        return false;
+      }
+
+      if (value === undefined || value === null) {
+        return true;
+      } else {
+        if (value instanceof Array || value instanceof String) {
+          return value.length === 0;
+        } else if (value instanceof Object) {
+          return value.constructor === Object && Object.entries(value).length === 0
+        }
+
+        return false;
+      }
+    }
+
+    changeArrow(){
+      this.icon = !this.icon;
+    }
 }

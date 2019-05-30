@@ -51,17 +51,24 @@
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>{{'REQUESTS.REQUEST_DETAIL_ITEM_NAME' | translate}}</th>
           <td mat-cell *matCellDef="let item" class="font-thick">
-            <mat-icon [matTooltip]="item.description" class="font-weight-lighter">help</mat-icon>
             {{item.name}}
+            <span>
+              <mat-icon [matTooltip]="item.description" class="text-muted fs-1">help</mat-icon>
+            </span>
           </td>
         </ng-container>
         <ng-container matColumnDef="value">
           <th mat-header-cell *matHeaderCellDef>{{'REQUESTS.REQUEST_DETAIL_ITEM_VALUE' | translate}}</th>
           <td mat-cell *matCellDef="let item">
-            <span [outerHTML]="item.value | requestItemValue"></span>
+            <div *ngIf="isUndefined(item); else notNullValue" class="font-italic text-muted">
+              {{'UNDEFINED' | translate}}
+            </div>
+            <ng-template #notNullValue>
+              <span [outerHTML]="item | requestItemValue"></span>
+            </ng-template>
           </td>
         </ng-container>
-        <ng-container matColumnDef="comment">
+        <ng-container matColumnDef="comment" *ngIf="request.status !== 'APPROVED' && request.status !== 'REJECTED'">
           <th mat-header-cell *matHeaderCellDef>{{'REQUESTS.REQUEST_CHANGES_COMMENT' | translate}}</th>
           <td mat-cell *matCellDef="let item">
             <mat-form-field *ngIf="isApplicationAdmin" class="w-100">

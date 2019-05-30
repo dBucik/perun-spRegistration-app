@@ -51,7 +51,9 @@ export class NewRequestComponent implements OnInit {
     this.configService.isOidcEnabled().subscribe(isEnabled => {
       this.oidcEnabled = isEnabled;
       this.loading = false;
-      this.samlSelected();
+      if (!isEnabled) {
+        this.samlSelected();
+      }
     },error => {
       this.loading = false;
       console.log(error);
