@@ -39,7 +39,17 @@ public class PerunAttribute {
 		this.definition = definition;
 		this.fullName = fullName;
 		this.value = value;
+		if (definition != null && BOOLEAN_TYPE.equals(definition.getType())) {
+			if (value == null) {
+				this.value = false;
+			}
+		}
 		this.oldValue = oldValue;
+		if (definition != null && BOOLEAN_TYPE.equals(definition.getType())) {
+			if (oldValue == null) {
+				this.oldValue = false;
+			}
+		}
 		this.comment = comment;
 		this.input = input;
 	}
@@ -47,7 +57,11 @@ public class PerunAttribute {
 	public PerunAttribute(PerunAttributeDefinition attributeDefinition, Object value) {
 		this.definition = attributeDefinition;
 		this.fullName = attributeDefinition.getFullName();
-		this.value = value;
+		if (definition != null && BOOLEAN_TYPE.equals(definition.getType())) {
+			if (value == null) {
+				this.value = false;
+			}
+		}
 		this.oldValue = null;
 		this.comment = null;
 		this.input = null;
