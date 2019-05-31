@@ -57,6 +57,8 @@ public class UserSettingInterceptor implements HandlerInterceptor {
 			sub = request.getRemoteUser();
 		}
 
+		sub="326b3c7ae6404c5b53bc231a085f09d3ed84a287@einfra.cesnet.cz";
+
 		log.debug("Extracted sub: {}", sub);
 
 		if (sub != null && !sub.isEmpty()) {

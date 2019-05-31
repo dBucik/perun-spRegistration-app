@@ -1,6 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {faDatabase, faEnvelopeOpen, faPlus} from "@fortawesome/free-solid-svg-icons";
-import {RequestsService} from "../core/services/requests.service";
+import {Component} from '@angular/core';
+import {faClipboardList, faNotesMedical, faServer} from "@fortawesome/free-solid-svg-icons";
 
 @Component({
   selector: 'app-main-menu',
@@ -9,9 +8,9 @@ import {RequestsService} from "../core/services/requests.service";
 })
 export class MainMenuComponent {
 
-  requestsIcon = faEnvelopeOpen;
-  facilitiesIcon = faDatabase;
-  newRequestIcon = faPlus;
+  requestsIcon = faClipboardList;
+  facilitiesIcon = faServer;
+  newRequestIcon = faNotesMedical;
 
   value = "asdf";
 }

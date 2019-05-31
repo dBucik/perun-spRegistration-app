@@ -6,11 +6,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class RequestItemValuePipe implements PipeTransform {
 
   transform(value: any, args?: any): any {
-    if(value.toString() == 'true'){
-      return '<i class="material-icons">done</i>';
-    }
-    if(value.toString() == 'false'){
-      return '<i class="material-icons">clear</i>';
+    if (typeof value === 'boolean') {
+      if (!value) {
+        return '<i class="material-icons red">clear</i>';
+      } else {
+        return '<i class="material-icons green">done</i>';
+      }
     }
     if(value instanceof Array){
       let output = '';
@@ -21,7 +22,7 @@ export class RequestItemValuePipe implements PipeTransform {
           output += `<div>${val}</div>`;
         }
       }
-      return output;
+      return `<div class="pad1">${output}</div>`;
     }
     if(value instanceof Object){
       let output = '';
@@ -32,7 +33,7 @@ export class RequestItemValuePipe implements PipeTransform {
           output += `<div>${key} :  ${value[key]}</div>`;
         }
       }
-      return output;
+      return `<div class="pad1">${output}</div>`;
     }
     if(value.toString().match("^(http|https)://")){
       return `<a target="_blank" href="${value}">${value}</a>`;

@@ -94,7 +94,8 @@
     "REJECTED": "Žádost zamítnuta",
     "ARE_YOU_SURE_APPROVE": "Jste si jistý, že chcete schvalit tuhle žádost?",
     "ARE_YOU_SURE_REJECT": "Jste si jistý, že chcete zamítnout tuhle žádost?",
-    "ARE_YOU_SURE_SET_WFC": "Jste si jistý, že chcete nastavit status na 'Čeká na změny'?"
+    "ARE_YOU_SURE_SET_WFC": "Jste si jistý, že chcete nastavit status na 'Čeká na změny'?",
+    "NO_COMMENT": "Hodnota je v pořádku"
   },
   "FACILITIES": {
     "TITLE": "Facility",

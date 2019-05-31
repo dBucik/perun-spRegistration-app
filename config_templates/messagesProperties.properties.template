@@ -1,0 +1,35 @@
+############################################################################
+## Messages configuration template. Contains all of the available options ##
+## for configuring the email notifications sent by the application.       ##
+## notice: for newLine use &lt;br/&gt;                                    ##
+## ---------------------------------------------------------------------- ##
+## tags:                                                                  ##
+## %REQUEST_ID% - will be replaced by ID of request                       ##
+## %NEW_STATUS% - will be replaced by new status of request               ##
+## %APPROVAL_LINK% - will be replaced by link for request approval        ##
+## %USER_INFO% - will be replaced by information about user (name)        ##
+############################################################################
+
+#appAdminIds.emails=    # Coma separated list of application administrator emails
+#host                   # SMTP host for sending mails
+#from                   # Message FROM field
+#footer                 # Footer of the messages
+
+#create.subject=               # Subject of message when notification is sent to user about created request
+#create.subject=               # Message body when notification is sent to user about created request
+
+#update.subject=               # Subject of message when notification is sent to user about updated request
+#update.subject=               # Message body when notification is sent to user about updated request
+
+#production.user.subject=      # Subject of message when notification is sent to user when moving to production has been requested
+#production.user.message=      # Message body when notification is sent to user when moving to production has been requested
+
+#production.authorities.subject=      # Subject of message when notification is sent to authority when moving to production has been requested
+#production.authorities.message=      # Message body when notification is sent to authority when moving to production has been requested
+#moveToProduction.authorities=        # Coma separated list of authorities emails 
+
+#approval.subject=      # Subject of message when notification is sent to app admin when moving to production has been requested
+#approval.message=      # Message body when notification is sent to app admin when moving to production has been requested
+
+#appAdminIds.add.subject=       # Subject of message when notification is sent to user when asked to become service administrator
+#appAdminIds.add.message=       # Message body when notification is sent to user when asked to become service administrator
