@@ -47,7 +47,6 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
             "value": item.value,
             "name": item.definition.displayName,
             "description": item.definition.description,
-            'type': item.definition.type,
           }
         );
     }
@@ -100,13 +99,8 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
 
   }
 
-  isUndefined(item) {
+  isUndefined(value) {
     //TODO: extract to one common method, also used in request-detail
-    const value = item.value;
-    if (item.type === 'java.lang.Boolean') {
-      return false;
-    }
-
     if (value === undefined || value === null) {
       return true;
     } else {

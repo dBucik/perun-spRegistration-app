@@ -96,7 +96,8 @@
     "REJECTED": "Request rejected",
     "ARE_YOU_SURE_APPROVE": "Are you sure you want to approve this request?",
     "ARE_YOU_SURE_REJECT": "Are you sure you want to reject this request?",
-    "ARE_YOU_SURE_SET_WFC": "Are you sure you want to set status to 'Waiting for changes'?"
+    "ARE_YOU_SURE_SET_WFC": "Are you sure you want to set status to 'Waiting for changes'?",
+    "NO_COMMENT": "Value is OK"
   },
   "FACILITIES": {
     "TITLE": "Facilities",

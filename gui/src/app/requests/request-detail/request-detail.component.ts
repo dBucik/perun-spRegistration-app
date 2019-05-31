@@ -68,7 +68,6 @@ export class RequestDetailComponent implements OnInit, DoCheck {
               "name": item.definition.displayName,
               "comment": item.comment,
               "description": item.definition.description,
-              'type': item.definition.type,
             });
         }
     }
@@ -184,13 +183,8 @@ export class RequestDetailComponent implements OnInit, DoCheck {
       });
     }
 
-    isUndefined(item) {
+    isUndefined(value) {
       //TODO: extract to one common method, also used in facility-detail
-      const value = item.value;
-      if (item.type === 'java.lang.Boolean') {
-        return false;
-      }
-
       if (value === undefined || value === null) {
         return true;
       } else {

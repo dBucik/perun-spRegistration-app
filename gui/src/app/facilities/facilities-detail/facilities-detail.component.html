@@ -44,11 +44,11 @@
         <ng-container matColumnDef="value" >
           <th mat-header-cell *matHeaderCellDef>{{'FACILITIES.FACILITY_DETAIL_ITEM_VALUE' | translate}}</th>
           <td mat-cell *matCellDef="let item">
-            <div *ngIf="isUndefined(item); else notNull" class="font-italic text-muted">
+            <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
               {{'UNDEFINED' | translate}}
             </div>
-            <ng-template #notNull>
-              <span [outerHTML]="item | facilityAttributeValue"></span>
+            <ng-template #notNullValue>
+              <span [outerHTML]="item.value | facilityAttributeValue"></span>
             </ng-template>
           </td>
         </ng-container>

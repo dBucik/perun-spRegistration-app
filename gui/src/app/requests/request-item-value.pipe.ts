@@ -5,14 +5,11 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class RequestItemValuePipe implements PipeTransform {
 
-  transform(item: any, args?: any): any {
-    const value = item.value;
-
-    if (item.type === 'java.lang.Boolean') {
-      if (value === null || value.toString() == 'false') {
+  transform(value: any, args?: any): any {
+    if (typeof value === 'boolean') {
+      if (!value) {
         return '<i class="material-icons red">clear</i>';
-      }
-      if (value.toString() == 'true') {
+      } else {
         return '<i class="material-icons green">done</i>';
       }
     }
