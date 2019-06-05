@@ -3,6 +3,7 @@ import { ApiService } from "./api.service";
 import { Observable } from "rxjs";
 import { Facility } from "../models/Facility";
 import { Request } from "../models/Request";
+import {PerunAttribute} from "../models/PerunAttribute";
 
 @Injectable({
   providedIn: 'root'
@@ -47,5 +48,13 @@ export class FacilitiesService {
 
   addAdminConfirm(hash: string): Observable<boolean> {
     return this.apiService.post('/addAdmin/confirm', hash);
+  }
+
+  changeFacility(id: number, perunAttributes: PerunAttribute[]): Observable<number>{
+    return this.apiService.post('/changeFacility/' + id, perunAttributes);
+  }
+
+  getFacilityWithInputs(id: number): Observable<Facility> {
+    return this.apiService.get('/facilityWithInputs/' + id);
   }
 }

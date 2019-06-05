@@ -86,8 +86,8 @@
       "MOVE_TO_PRODUCTION": "Přesunout do produkce"
     },
     "CHANGED_TO_WFC": "Status žádosti změnen na 'Čeká na změny'",
-    "SHOW_MORE": "Ukáž víc",
-    "SHOW_LESS": "Ukáž míň",
+    "SHOW_MORE": "Zobrazit víc",
+    "SHOW_LESS": "Zobrazit míň",
     "COMMENTS_FROM_ADMIN": "Komentáře od administrátora",
     "SET_WFC": "Status nastaven na 'Čeká na změny'",
     "APPROVED": "Žádost schválena",
@@ -111,6 +111,7 @@
     "DELETE_FACILITY": "Odebrat Službu",
     "EDIT_FACILITY": "Editovat Službu",
     "ADD_ADMIN": "Přidat administrátora",
+    "EDIT_ADMIN": "Změnit administrátora",
     "MOVE_TO_PRODUCTION" : "Přesunout do produkce",
     "MOVE_TO_PRODUCTION_TITLE_1" : "Přesunout Službu #",
     "MOVE_TO_PRODUCTION_TITLE_2" : "do produkce",
@@ -120,7 +121,7 @@
     "MOVE_TO_PRODUCTION_EMAIL": "Chci vyplnit emaily",
     "EMAIL_DESCRIPTION": "Vyplňte emaily, pro potvrzení emalu stiskněte klávesu Enter",
     "EMAIL_ERROR_FILL": "Vyplňte alespoň jeden email!",
-    "EMAIL_ERROR_CORRECT": "Vyplňte korektní email!",
+    "EMAIL_ERROR_CORRECT": "Vyplňte korektní email{{'REQUESTS.NEW_SELECT_TYPE' | translate}!",
     "MOVE_TO_PRODUCTION_TO_REQUEST": "Přejít na žádost",
     "MOVE_TO_PRODUCTION_APPROVE": "Schválit žádost",
     "DOCUMENT_SIGN_TITLE": "Podepsání žádosti o přesun do produkce",
@@ -133,6 +134,11 @@
     "ADD_ADMINS_DESCRIPTION": "Vyplňte emaily uživatelů, kteří se mají stát adminy",
     "ADD_ADMIN_SIGN_TITLE": "Chcete se se stát facility adminem",
     "ADD_ADMIN_SIGN_SUBMIT": "Ano, chci se stát facility adminem",
-    "ADD_ADMIN_SUCCES": "Stal jste se adminem"
+    "ADD_ADMIN_SUCCES": "Stal jste se adminem",
+    "NEW_VALUES_ERROR_MESSAGE": "Vyskytla se chyba",
+    "SUCCESSFULLY_SUBMITTED_MESSAGE": "Facility byla uložená",
+    "SUCCESSFULLY_SUBMITTED_ACTION": "Zobraz",
+    "WRONGLY_FILLED_ITEM": "Jedna nebo víc polí není vyplněna správne",
+    "ERROR_REQUEST_ALREADY_EXISTS": "Pro tuhle službu, již existuje žádost na její editaci"
   }
 }

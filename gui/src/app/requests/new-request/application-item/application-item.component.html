@@ -31,8 +31,8 @@
     </app-application-item-map>
   </div>
   <div *ngIf="applicationItem.isEdit" class="col-4">
-    <label>
-      <span *ngIf="applicationItem.comment" class="alert alert-warning" role="alert">{{applicationItem.comment}}</span>
-    </label>
+    <div *ngIf="applicationItem.comment" class="alert alert-warning" role="alert">
+      {{applicationItem.comment}}
+    </div>
   </div>
 </div>

@@ -28,6 +28,12 @@ import {
 import { ErrorDialogComponent } from './error-dialog/error-dialog.component';
 import { NotFoundPageComponent } from './not-found-page/not-found-page.component';
 import { NotAuthorizedPageComponent } from './not-authorized-page/not-authorized-page.component';
+import {ApplicationItemComponent} from "../requests/new-request/application-item/application-item.component";
+import {ApplicationItemStringComponent} from "../requests/new-request/application-item/application-item-string/application-item-string.component";
+import {ApplicationItemBooleanComponent} from "../requests/new-request/application-item/application-item-boolean/application-item-boolean.component";
+import {ApplicationItemListComponent} from "../requests/new-request/application-item/application-item-list/application-item-list.component";
+import {ApplicationItemMapComponent} from "../requests/new-request/application-item/application-item-map/application-item-map.component";
+import {ApplicationItemSelectComponent} from "../requests/new-request/application-item/application-item-select/application-item-select.component";
 
 @NgModule({
   imports: [
@@ -64,7 +70,13 @@ import { NotAuthorizedPageComponent } from './not-authorized-page/not-authorized
     PerunFooterComponent,
     ErrorDialogComponent,
     NotFoundPageComponent,
-    NotAuthorizedPageComponent
+    NotAuthorizedPageComponent,
+    ApplicationItemComponent,
+    ApplicationItemStringComponent,
+    ApplicationItemBooleanComponent,
+    ApplicationItemListComponent,
+    ApplicationItemMapComponent,
+    ApplicationItemSelectComponent,
   ],
   exports: [
     FontAwesomeModule,
@@ -95,7 +107,8 @@ import { NotAuthorizedPageComponent } from './not-authorized-page/not-authorized
     MatChipsModule,
     MatMenuModule,
     MatMenuModule,
-    MatBadgeModule
+    MatBadgeModule,
+    ApplicationItemComponent
   ],
   entryComponents: [
     ErrorDialogComponent

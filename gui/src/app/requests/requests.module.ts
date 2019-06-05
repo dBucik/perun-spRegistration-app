@@ -31,12 +31,6 @@ import { RequestActionPipe } from './request-action.pipe';
   declarations: [
     RequestsOverviewComponent,
     NewRequestComponent,
-    ApplicationItemComponent,
-    ApplicationItemStringComponent,
-    ApplicationItemBooleanComponent,
-    ApplicationItemListComponent,
-    ApplicationItemMapComponent,
-    ApplicationItemSelectComponent,
     RequestDetailComponent,
     RequestItemValuePipe,
     RequestCreationStepComponent,

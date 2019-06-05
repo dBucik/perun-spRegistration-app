@@ -53,7 +53,7 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     this.noItemError = false;
   }
 
-  addValueNonEmpty(key: string, value: string){
+  addValueNonEmpty(key: string, value: string) {
     this.values.push(value);
     this.keys.push(key);
     this.indexes.push(this.index++);
@@ -102,15 +102,17 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     this.noValueError = false;
 
     console.log(this.values);
-
+    // if (this.applicationItem.required && !this.allValuesAreFilled()){
+    //   console.log("here");
+    //   return false;
+    // }
     if (!this.applicationItem.required && this.values.length === 0) {
       return true;
     } else {
       if (this.disableCustomKeys && !this.allValuesAreFilled()) {
         this.noValueError = true;
         return false;
-      }
-      else if (this.values.length === 0) {
+      } else if (this.values.length === 0) {
         return false;
       }
     }
@@ -158,20 +160,18 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     this.translatedDescription = this.applicationItem.description[browserLang];
     this.translatedName = this.applicationItem.displayName[browserLang];
 
-    //if (this.applicationItem.isEdit) {
-    if (this.applicationItem.oldValue != null){
+    if (this.applicationItem.oldValue != null) {
       let map: Map<string, string> = this.applicationItem.oldValue;
       for (const [key, value] of Object.entries(map)) {
         this.addValueNonEmpty(key, value);
       }
-    } else {
-      if (this.applicationItem.allowedKeys != undefined && this.applicationItem.allowedKeys.length > 0) {
-        this.disableCustomKeys = true;
+    }
+    if (this.applicationItem.allowedKeys != undefined && this.applicationItem.allowedKeys.length > 0) {
+      this.disableCustomKeys = true;
 
+      if (this.values.length == 0) {
         this.keys = this.applicationItem.allowedKeys;
-        let map: Map<string, string> = this.applicationItem.oldValue;
 
-        //this.values.push(map.values());
         for (let i = 0; i < this.keys.length; i++) {
           //this.values.push(map.get());
           this.values.push("");

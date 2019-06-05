@@ -113,6 +113,7 @@
     "DELETE_FACILITY": "Remove service",
     "EDIT_FACILITY": "Modify settings",
     "ADD_ADMIN": "Add administrator",
+    "EDIT_ADMIN": "Edit administrator",
     "MOVE_TO_PRODUCTION" : "Move to production",
     "MOVE_TO_PRODUCTION_TITLE_1" : "Transfer service #",
     "MOVE_TO_PRODUCTION_TITLE_2" : "to production",
@@ -135,6 +136,11 @@
     "ADD_ADMINS_DESCRIPTION": "Fill in form below with emails of desired users",
     "ADD_ADMIN_SIGN_TITLE": "Do you really want to become an admin of facility",
     "ADD_ADMIN_SIGN_SUBMIT": "Yes, I want to become facility admin",
-    "ADD_ADMIN_SUCCES": "You were added as admin"
+    "ADD_ADMIN_SUCCES": "You were added as admin",
+    "NEW_VALUES_ERROR_MESSAGE": "error",
+    "SUCCESSFULLY_SUBMITTED_MESSAGE": "Facility has been submitted",
+    "SUCCESSFULLY_SUBMITTED_ACTION": "Show",
+    "WRONGLY_FILLED_ITEM": "One or more fields are not filled correctly",
+    "ERROR_REQUEST_ALREADY_EXISTS": "Request to change this service already exists"
   }
 }
