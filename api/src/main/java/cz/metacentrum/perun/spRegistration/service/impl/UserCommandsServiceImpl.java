@@ -519,7 +519,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			log.error("Some operations failed - newAdminsNotificationsSent: {} out of {}",
 					newAdminsNotificationsSent, admins.size());
 		} else {
-			log.info("Notifications sent to authorities");
+			log.info("Notifications sent to requested admins");
 		}
 
 		log.debug("addAdminsNotify returns: {}", successful);

@@ -209,7 +209,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("attribute", attrJson);
 
-		boolean successful = null != makeRpcPostCall(ATTRIBUTES_MANAGER, "setAttribute", params);
+		boolean successful = null == makeRpcPostCall(ATTRIBUTES_MANAGER, "setAttribute", params);
 
 		log.trace("setFacilityAttribute() returns: {}", successful);
 		return successful;
@@ -225,7 +225,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("attributes", attrsJsons);
 
-		boolean successful = null != makeRpcPostCall(ATTRIBUTES_MANAGER, "setAttributes", params);
+		boolean successful = null == makeRpcPostCall(ATTRIBUTES_MANAGER, "setAttributes", params);
 
 		log.trace("setFacilityAttributes() returns: {}", successful);
 		return successful;
@@ -275,7 +275,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("user", userId);
 
-		boolean res = null != makeRpcPostCall(FACILITIES_MANAGER, "addAdmin", params);
+		boolean res = null == makeRpcPostCall(FACILITIES_MANAGER, "addAdmin", params);
 
 		log.trace("addFacilityAdmin() returns: {}", res);
 		return res;
