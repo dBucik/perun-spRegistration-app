@@ -35,7 +35,7 @@
         <tr
           mat-row
           *matRowDef="let row; columns: displayedColumns;"
-          [routerLink]="['/requests/detail', row.reqId]"
+          [routerLink]="['/auth/requests/detail', row.reqId]"
           class="hover-dark clickable">
         </tr>
       </table>

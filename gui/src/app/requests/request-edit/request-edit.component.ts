@@ -85,7 +85,7 @@ export class RequestEditComponent implements OnInit {
       let snackBarRef = this.snackBar
         .open(this.successfullySubmittedText, this.successActionText, {duration: this.snackBarDurationMs});
       snackBarRef.onAction().subscribe(() => {
-        this.router.navigate(['/requests/detail/' + this.request.reqId]);
+        this.router.navigate(['/auth/requests/detail/' + this.request.reqId]);
       });
       this.router.navigate(['/']);
     });

@@ -5,31 +5,37 @@ import {NotFoundPageComponent} from "./shared/not-found-page/not-found-page.comp
 import {NotAuthorizedPageComponent} from "./shared/not-authorized-page/not-authorized-page.component";
 import {LoginComponent} from "./login/login.component";
 import {DocumentSignComponent} from "./document-sign/document-sign.component";
+import {PreauthComponent} from "./login/preauth/preauth.component";
 
 const routes: Routes = [
+
   {
     path: '',
-    component: MainMenuComponent,
-  },
-  {
-    path: 'login',
     component: LoginComponent,
   },
   {
-    path: 'requests',
+    path: 'auth',
+    component: MainMenuComponent,
+  },
+  {
+    path: 'auth/requests',
     loadChildren: './requests/requests.module#RequestsModule'
   },
   {
-    path: 'facilities',
+    path: 'auth/facilities',
     loadChildren: './facilities/facilities.module#FacilitiesModule'
   },
   {
-    path: 'sign',
+    path: 'auth/sign',
     component: DocumentSignComponent
   },
   {
-    path: 'notAuthorized',
+    path: 'auth/notAuthorized',
     component: NotAuthorizedPageComponent
+  },
+  {
+    path: 'preauth',
+    component: PreauthComponent,
   },
   {
     path: '**',

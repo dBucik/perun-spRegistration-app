@@ -13,7 +13,7 @@
       <a routerLink="" class="site-title ml-2">
        {{ appTitle }}
       </a>
-      <div class="user-info">
+      <div class="user-info" *ngIf="getUser() !== undefined">
 <!--        TODO: Prepared dropdown if needed in future-->
 <!--        <div class="dropdown">-->
 <!--          <button mat-icon-button class="dropdown-toggle" type="button" id="userDropDownButton" data-toggle="dropdown">-->
@@ -29,7 +29,7 @@
           person
         </mat-icon>
         <div>
-          {{user.fullName}}
+          {{getUser().fullName}}
         </div>
       </div>
     </mat-toolbar-row>
@@ -44,51 +44,51 @@
                [fixedTopGap]="64"
   >
     <ul class="navbar-nav">
-      <li class="nav-item p-2" [class.active]="currentUrl !== undefined && currentUrl === '/'">
-        <a class="no-hover-decoration" routerLink="" (click)="closeSideBar()">
+      <li class="nav-item p-2" [class.active]="currentUrl !== undefined && currentUrl === '/auth'">
+        <a class="no-hover-decoration" routerLink="/auth" (click)="closeSideBar()">
           {{'MENU.HOME' | translate}}
         </a>
       </li>
-      <li *ngIf="isAdmin !== undefined && isAdmin"
+      <li *ngIf="getUser() !== undefined && getUser().isAppAdmin"
           class="nav-item p-2" [class.active]="currentUrl !== undefined && currentUrl === '/'">
         {{'MENU.ADMIN' | translate}}
         <ul class="navbar-nav pt-1">
           <li
-            *ngIf="isAdmin !== undefined && isAdmin"
-            class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/requests/allRequests'">
-            <a class="no-hover-decoration" routerLink="requests/allRequests" (click)="closeSideBar()">
+            *ngIf="getUser().isAppAdmin"
+            class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/auth/requests/allRequests'">
+            <a class="no-hover-decoration" routerLink="auth/requests/allRequests" (click)="closeSideBar()">
               {{'MENU.ALL_REQUESTS' | translate}}
             </a>
           </li>
           <li
-            *ngIf="isAdmin !== undefined && isAdmin"
-            class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/facilities'">
-            <a class="no-hover-decoration" routerLink="facilities/allFacilities" (click)="closeSideBar()">
+            *ngIf="getUser().isAppAdmin"
+            class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/auth/facilities'">
+            <a class="no-hover-decoration" routerLink="auth/facilities/allFacilities" (click)="closeSideBar()">
               {{'MENU.ALL_FACILITIES' | translate}}
             </a>
           </li>
         </ul>
       </li>
-      <li class="nav-item p-2" [class.active]="currentUrl !== undefined && currentUrl === '/requests'">
+      <li class="nav-item p-2" [class.active]="currentUrl !== undefined && currentUrl === '/auth/requests'">
         {{'MENU.REQUESTS' | translate}}
         <ul class="navbar-nav pt-1">
-          <li class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/requests/myRequests'">
-            <a class="no-hover-decoration" routerLink="/requests/myRequests" (click)="closeSideBar()">
+          <li class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/auth/requests/myRequests'">
+            <a class="no-hover-decoration" routerLink="/auth/requests/myRequests" (click)="closeSideBar()">
               {{'MENU.MY_REQUESTS' | translate}}
             </a>
           </li>
         </ul>
       </li>
-      <li class="nav-item pt-0 pl-2 pr-2 pb-2" [class.active]="currentUrl !== undefined && currentUrl === '/facilities/myServices'">
+      <li class="nav-item pt-0 pl-2 pr-2 pb-2" [class.active]="currentUrl !== undefined && currentUrl === '/auth/facilities/myServices'">
         {{'MENU.SERVICES' | translate}}
         <ul class="navbar-nav pt-1">
-          <li class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/facilities/myServices'">
-            <a class="no-hover-decoration" routerLink="/facilities/myServices" (click)="closeSideBar()">
+          <li class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/auth/facilities/myServices'">
+            <a class="no-hover-decoration" routerLink="/auth/facilities/myServices" (click)="closeSideBar()">
               {{'MENU.MY_SERVICES' | translate}}
             </a>
           </li>
-          <li class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/requests/new'">
-            <a class="no-hover-decoration" routerLink="requests/new" (click)="closeSideBar()">
+          <li class="nav-item pl-2 pb-1" [class.active]="currentUrl !== undefined && currentUrl === '/auth/requests/new'">
+            <a class="no-hover-decoration" routerLink="auth/requests/new" (click)="closeSideBar()">
               {{'MENU.REGISTER_SERVICE' | translate}}
             </a>
           </li>
