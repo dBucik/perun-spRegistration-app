@@ -65,7 +65,7 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
               .open(successMessage, goToRequestMessage, {duration: 5000});
 
             snackBarRef.onAction().subscribe(() => {
-                this.router.navigate(['/requests/detail/' + reqid]);
+                this.router.navigate(['/auth/requests/detail/' + reqid]);
             });
 
             this.router.navigate(['/']);

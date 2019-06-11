@@ -19,4 +19,8 @@ export class UsersService {
   getUser(): Observable<User> {
     return this.apiService.get('/getUser');
   }
+
+  setUser(): Observable<boolean> {
+    return this.apiService.get('/setUser');
+  }
 }

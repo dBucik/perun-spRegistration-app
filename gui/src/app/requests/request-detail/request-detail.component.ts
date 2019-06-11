@@ -146,7 +146,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     reject() {
       this.requestsService.rejectRequest(this.request.reqId).subscribe(bool => {
         this.snackBar.open(this.successRejectMessage, null, {duration: 6000});
-        this.router.navigate(['/requests/allRequests']);
+        this.router.navigate(['/auth/requests/allRequests']);
         }, error => {
         console.log("Error");
         console.log(error);
@@ -157,7 +157,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     approve() {
       this.requestsService.approveRequest(this.request.reqId).subscribe(bool => {
         this.snackBar.open(this.successApproveMessage, null, {duration: 6000});
-        this.router.navigate(['/requests/allRequests']);
+        this.router.navigate(['/auth/requests/allRequests']);
         }, error => {
         console.log("Error");
         console.log(error);

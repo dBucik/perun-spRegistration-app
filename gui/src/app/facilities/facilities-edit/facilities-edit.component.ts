@@ -102,7 +102,7 @@ export class FacilitiesEditComponent implements OnInit {
       let snackBarRef = this.snackBar
         .open(this.successfullySubmittedText, this.successActionText, {duration: this.snackBarDurationMs});
       snackBarRef.onAction().subscribe(() => {
-        this.router.navigate(['/requests/detail/' + requestId]);
+        this.router.navigate(['/auth/requests/detail/' + requestId]);
       });
       this.router.navigate(['/']);
     });

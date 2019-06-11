@@ -13,6 +13,7 @@ import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginComponent } from './login/login.component';
 import { DocumentSignComponent } from './document-sign/document-sign.component';
+import { PreauthComponent } from './login/preauth/preauth.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -23,6 +24,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppComponent,
     LoginComponent,
     DocumentSignComponent,
+    PreauthComponent,
   ],
   imports: [
     AppRoutingModule,
