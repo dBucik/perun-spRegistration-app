@@ -57,6 +57,7 @@ public class PerunAttribute {
 	public PerunAttribute(PerunAttributeDefinition attributeDefinition, Object value) {
 		this.definition = attributeDefinition;
 		this.fullName = attributeDefinition.getFullName();
+		this.value = value;
 		if (definition != null && BOOLEAN_TYPE.equals(definition.getType())) {
 			if (value == null) {
 				this.value = false;
@@ -324,6 +325,9 @@ public class PerunAttribute {
 	}
 
 	private static Object getValue(JSONObject json, String key, String type) {
+		if (json.get(key) == JSONObject.NULL && BOOLEAN_TYPE.equals(type)) {
+			return false;
+		}
 		if (json.get(key) == JSONObject.NULL) {
 			return null;
 		}
