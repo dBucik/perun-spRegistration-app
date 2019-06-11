@@ -92,8 +92,8 @@
                 <prop key="production.authorities.subject">Approve transfer to production: %SERVICE_NAME%</prop>
                 <prop key="production.authorities.message">For approval of moving service %SERVICE_NAME% to production visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
                 <prop key="moveToProduction.authorities">${approval.defaultAuthorities.mails}</prop>
-                <prop key="appAdminIds.add.subject">Approve request to become admin: %SERVICE_NAME%</prop>
-                <prop key="appAdminIds.add.message">For approval of becoming admin of %SERVICE_NAME% visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
+                <prop key="admins.add.subject">Approve request to become admin: %SERVICE_NAME%</prop>
+                <prop key="admins.add.message">For approval of becoming admin of %SERVICE_NAME% visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
             </props>
         </property>
         <property name="locations">
@@ -176,7 +176,7 @@
         <property name="specifyAuthoritiesEnabled" value="${approval.allowToSpecifyOwn}" />
         <property name="secret" value="${secret}" />
         <property name="signaturesEndpointUrl" value="${host.url}/sign"/>
-        <property name="adminsEndpoint" value="${host.url}/appAdminIds"/>
+        <property name="adminsEndpoint" value="${host.url}/facilities/addAdmin/sign"/>
         <property name="entityIdAttributeName" value="${entityID.attrName}"/>
     </bean>
 

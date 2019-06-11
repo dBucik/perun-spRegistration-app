@@ -18,9 +18,9 @@ export class FacilityAttributeValuePipe implements PipeTransform {
       let output = '';
       for(let val of value){
         if(val.toString().match("^(http|https)://")){
-          output += `<div><a target="_blank" href="${value}">${value}</a></div>`;
+          output += `<div><a target="_blank" href="${val}">${val}</a></div>`;
         } else {
-          output += `<div>${value}</div>`;
+          output += `<div>${val}</div>`;
         }
       }
       return `<div class="pad1">${output}</div>`;
