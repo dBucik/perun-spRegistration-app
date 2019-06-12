@@ -3,7 +3,6 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {Subscription} from "rxjs";
 import {FacilitiesService} from "../../core/services/facilities.service";
 import {Facility} from "../../core/models/Facility";
-import {PerunAttribute} from "../../core/models/PerunAttribute";
 import {AppComponent} from "../../app.component";
 import {MatDialog} from "@angular/material";
 import {FacilitiesDetailDialogComponent} from "./facilities-detail-dialog/facilities-detail-dialog.component";
@@ -76,12 +75,9 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   }
 
   openDeleteDialog(): void {
-    const dialogRef = this.dialog.open(FacilitiesDetailDialogComponent, {
-      width: '250px',
+    this.dialog.open(FacilitiesDetailDialogComponent, {
+      width: '400px',
       data: {parent: this, facilityName: this.facility.name}
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
     });
   }
 

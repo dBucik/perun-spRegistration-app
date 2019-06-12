@@ -11,7 +11,10 @@ export class FacilitiesDetailDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<FacilitiesDetailDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+    @Inject(MAT_DIALOG_DATA) public data: DialogData
+  ) { }
+
+  ngOnInit() { }
 
   onNoClick(): void {
     this.dialogRef.close();
@@ -19,8 +22,7 @@ export class FacilitiesDetailDialogComponent implements OnInit {
 
   onYesClick(): void{
     this.data.parent.deleteFacility();
+    this.dialogRef.close();
   }
 
-  ngOnInit() {
-  }
 }

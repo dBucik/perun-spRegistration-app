@@ -111,35 +111,23 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     }
 
     openApproveDialog(): void {
-      const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
+      this.dialog.open(RequestDetailDialogComponent, {
         width: '400px',
         data: {isApprove: true, isSetWFC: false, parent: this}
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
       });
     }
 
     openRejectDialog(): void {
-      const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
+      this.dialog.open(RequestDetailDialogComponent, {
         width: '400px',
         data: {isApprove: false, isSetWFC: false, parent: this}
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
       });
     }
 
     openSetWFCDialog(): void {
-      const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
+      this.dialog.open(RequestDetailDialogComponent, {
         width: '400px',
         data: {isApprove: false, isSetWFC: true, parent: this}
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
       });
     }
 

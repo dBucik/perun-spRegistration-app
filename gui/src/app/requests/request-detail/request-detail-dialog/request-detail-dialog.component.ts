@@ -13,10 +13,20 @@ export class RequestDetailDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<RequestDetailDialogComponent>,
     private translate: TranslateService,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-  }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData
+  ) { }
 
-  areUsure: string;
+  promptText: string;
+
+  ngOnInit() {
+    if (this.data.isApprove) {
+      this.translate.get('REQUESTS.ARE_YOU_SURE_APPROVE').subscribe(value => this.promptText = value);
+    } else if (this.data.isSetWFC) {
+      this.translate.get('REQUESTS.ARE_YOU_SURE_SET_WFC').subscribe(value => this.promptText = value);
+    } else {
+      this.translate.get('REQUESTS.ARE_YOU_SURE_REJECT').subscribe(value => this.promptText = value);
+    }
+  }
 
   onNoClick(): void {
     this.dialogRef.close();
@@ -25,29 +35,13 @@ export class RequestDetailDialogComponent implements OnInit {
   onYesClick(): void {
     if (this.data.isApprove) {
       this.data.parent.approve();
-      this.dialogRef.close();
       return
-    }
-    if (this.data.isSetWFC) {
+    } else if (this.data.isSetWFC) {
       this.data.parent.requestChanges();
-      this.dialogRef.close();
-      return;
+    } else {
+      this.data.parent.reject();
     }
-    this.data.parent.reject();
     this.dialogRef.close();
-  }
-
-  ngOnInit() {
-    if (this.data.isApprove) {
-      this.translate.get('REQUESTS.ARE_YOU_SURE_APPROVE').subscribe(value => this.areUsure = value);
-      return
-    }
-    if (this.data.isSetWFC) {
-      this.translate.get('REQUESTS.ARE_YOU_SURE_SET_WFC').subscribe(value => this.areUsure = value);
-      return;
-    }
-    this.translate.get('REQUESTS.ARE_YOU_SURE_REJECT').subscribe(value => this.areUsure = value);
-
   }
 
 }
