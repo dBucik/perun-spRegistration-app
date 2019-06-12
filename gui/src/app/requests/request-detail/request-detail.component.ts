@@ -43,7 +43,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     loading = true;
     request: Request;
     signatures: RequestSignature[];
-    columns: string[] = ['name', 'signedAt'];
+    columns: string[] = ['name', 'signedAt', 'approved'];
     expansionPanelDisabled: boolean = true;
     icon: boolean = true;
 

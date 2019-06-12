@@ -21,13 +21,22 @@ public class ServiceUtils {
 
 	public static final Logger log = LoggerFactory.getLogger(ServiceUtils.class);
 
+	public static Map<Long, Facility> transformListToMapFacilities(List<Facility> list) {
+		Map<Long, Facility> convertedFacilities = new HashMap<>();
+		for (Facility f: list) {
+			convertedFacilities.put(f.getId(), f);
+		}
+
+		return convertedFacilities;
+	}
+
 	/**
 	 * Transform list of attributes to map. Also add definitions to attributes.
 	 * @param attributes Attributes
 	 * @param appConfig config containing definitions map
 	 * @return converted attributes as map
 	 */
-	public static Map<String, PerunAttribute> transformListToMap(List<PerunAttribute> attributes, AppConfig appConfig) {
+	public static Map<String, PerunAttribute> transformListToMapAttrs(List<PerunAttribute> attributes, AppConfig appConfig) {
 		Map<String, PerunAttribute> convertedAttributes = new HashMap<>();
 		for (PerunAttribute a: attributes) {
 			PerunAttributeDefinition def = appConfig.getAttrDefinition(a.getFullName());

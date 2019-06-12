@@ -34,8 +34,12 @@ export class FacilitiesService {
     return this.apiService.get('/moveToProduction/getFacilityDetails/?code=' + hash);
   }
 
-  signApprovalForProduction(hash: string): Observable<boolean> {
+  approveTransferToProduction(hash: string): Observable<boolean> {
     return this.apiService.post('/moveToProduction/approve', hash);
+  }
+
+  rejectTransferToProduction(hash: string): Observable<boolean> {
+    return this.apiService.post('/moveToProduction/reject', hash);
   }
 
   removeFacility(id: number): Observable<number> {

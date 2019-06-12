@@ -221,7 +221,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		log.info("Updating request");
-		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
+		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMapAttrs(attributes, appConfig);
 		request.updateAttributes(convertedAttributes, true);
 
 		request.setStatus(RequestStatus.WAITING_FOR_APPROVAL);
@@ -309,7 +309,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public boolean signTransferToProduction(User user, String code)
+	public boolean signTransferToProduction(User user, String code, boolean approved)
 			throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
 			ExpiredCodeException, InternalErrorException {
 		log.trace("signTransferToProduction(user: {}, code: {})", user, code);
@@ -323,7 +323,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		Long requestId = decrypted.getLong(REQUEST_ID_KEY);
 		log.debug("Fetching request for id: {}", requestId);
-		boolean signed = requestManager.addSignature(requestId, user.getId(), user.getName());
+		boolean signed = requestManager.addSignature(requestId, user.getId(), user.getName(), approved);
 
 		log.trace("signTransferToProduction returns: {}", signed);
 		return signed;
@@ -466,6 +466,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		List<Facility> filteredFacilities = new ArrayList<>();
 		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getProxyIdentifierAttributeName(),
 				appConfig.getProxyIdentifierAttributeValue());
+		List<Facility> testFacilities = perunConnector.getFacilitiesByAttribute(appConfig.getIsTestSpAttributeName(), "true");
+		Map<Long, Facility> testFacilitiesMap = ServiceUtils.transformListToMapFacilities(testFacilities);
 
 		if (proxyFacilities == null) {
 			log.debug("No facilities found with proxy identifier: {}", appConfig.getProxyIdentifierAttributeValue());
@@ -485,6 +487,12 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 						.filter(facility -> userFacilitiesMap.containsKey(facility.getId()))
 						.collect(Collectors.toList())
 				);
+			}
+		}
+
+		for (Facility f: filteredFacilities) {
+			if (testFacilitiesMap.containsKey(f.getId())) {
+				f.setTestEnv(true);
 			}
 		}
 
@@ -550,7 +558,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes, RequestAction action)
 			throws InternalErrorException, CreateRequestException {
-		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
+		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMapAttrs(attributes, appConfig);
 		return createRequest(facilityId, userId, action, convertedAttributes);
 	}
 

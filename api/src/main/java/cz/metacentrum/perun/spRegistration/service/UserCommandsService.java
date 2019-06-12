@@ -88,9 +88,10 @@ public interface UserCommandsService {
 	 * Add signature for transfer to production
 	 * @param user user signing the request
 	 * @param code hash of request
+	 * @param approved TRUE if approved, FALSE if rejected
 	 * @return True if everything went OK
 	 */
-	boolean signTransferToProduction(User user, String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException, InternalErrorException;
+	boolean signTransferToProduction(User user, String code, boolean approved) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException, InternalErrorException;
 
 	/**
 	 * Get approvals for request to transfer to production.

@@ -169,7 +169,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			throw new CannotChangeStatusException("Cannot ask for changes, request not marked as WAITING_FOR_APPROVAL");
 		}
 
-		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMap(attributes, appConfig);
+		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMapAttrs(attributes, appConfig);
 		request.updateAttributes(convertedAttributes, false);
 
 		request.setStatus(RequestStatus.WAITING_FOR_CHANGES);
@@ -223,15 +223,22 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			throw new UnauthorizedActionException("User cannot list all facilities, user not an admin");
 		}
 
-		List<Facility> result = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getProxyIdentifierAttributeName(),
+		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getProxyIdentifierAttributeName(),
 				appConfig.getProxyIdentifierAttributeValue());
+		Map<Long, Facility> proxyFacilitiesMap = ServiceUtils.transformListToMapFacilities(proxyFacilities);
+		List<Facility> testFacilities = perunConnector.getFacilitiesByAttribute(appConfig.getIsTestSpAttributeName(), "true");
+		Map<Long, Facility> testFacilitiesMap = ServiceUtils.transformListToMapFacilities(testFacilities);
 
-		if (result == null) {
-			result = new ArrayList<>();
+		for (Map.Entry<Long, Facility> entry: testFacilitiesMap.entrySet()) {
+			Long facId = entry.getKey();
+			if (proxyFacilitiesMap.containsKey(facId)) {
+				Facility testFacility = proxyFacilitiesMap.get(facId);
+				testFacility.setTestEnv(true);
+			}
 		}
 
-		log.trace("getAllFacilities returns: {}", result);
-		return result;
+		log.trace("getAllFacilities returns: {}", proxyFacilities);
+		return proxyFacilities;
 	}
 
 	private boolean processApprovedRequest(Request request) throws InternalErrorException, ConnectorException {

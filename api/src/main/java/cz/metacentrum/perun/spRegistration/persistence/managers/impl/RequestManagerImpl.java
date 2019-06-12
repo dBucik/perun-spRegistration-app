@@ -372,8 +372,10 @@ public class RequestManagerImpl implements RequestManager {
 
 	@Override
 	@Transactional
-	public boolean addSignature(Long requestId, Long userId, String userName) throws InternalErrorException {
-		log.trace("addSignature(requestId: {}, userId: {}, userName: {})", requestId, userId, userName);
+	public boolean addSignature(Long requestId, Long userId, String userName, boolean approved)
+			throws InternalErrorException {
+		log.trace("addSignature(requestId: {}, userId: {}, userName: {}, approved: {})",
+				requestId, userId, userName, approved);
 		if (requestId == null || userId == null || userName == null || userName.isEmpty()) {
 			log.error("Wrong parameters passed: (requestId: {}, user:Id {}, userName: {})", requestId, userId, userName);
 			throw new IllegalArgumentException();
@@ -381,13 +383,14 @@ public class RequestManagerImpl implements RequestManager {
 		
 		String query = new StringJoiner(" ")
 				.add("INSERT INTO").add(APPROVALS_TABLE)
-				.add("(request_id, user_id, name) VALUES (:request_id, :user_id, :username)")
+				.add("(request_id, user_id, name, approved) VALUES (:request_id, :user_id, :username, :approved)")
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("request_id", requestId);
 		params.addValue("user_id", userId);
 		params.addValue("username", userName);
+		params.addValue("approved", approved);
 
 		int updatedCount = jdbcTemplate.update(query, params);
 

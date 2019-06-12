@@ -317,6 +317,24 @@ public class PerunConnectorRpc implements PerunConnector {
 		return definition;
 	}
 
+	@Override
+	public List<Facility> getFacilitiesByAttribute(String attrName, String attrValue) throws ConnectorException {
+		log.trace("getFacilitiesByAttribute(attrName: {}, attrValue: {})", attrName, attrName);
+		if (attrName == null) {
+			throw new IllegalArgumentException("attrName is null");
+		}
+
+		Map<String, Object> params = new LinkedHashMap<>();
+		params.put("attributeName", attrName);
+		params.put("attributeValue", attrValue);
+
+		JSONArray res = makeRpcGetCallForArray(FACILITIES_MANAGER, "getFacilitiesByAttribute", params);
+		List<Facility> facilities = MapperUtils.mapFacilities(res);
+
+		log.trace("getFacilitiesByAttribute() returns: {}", facilities);
+		return facilities;
+	}
+
 	private JSONObject makeRpcGetCallForObject(String manager, String method, Map<String, Object> map) throws ConnectorException {
 		log.trace("makeRpcGetCallForObject(manager: {}, method: {}, map: {}", manager, method, map);
 		String response = makeRpcGetCall(manager, method, map);

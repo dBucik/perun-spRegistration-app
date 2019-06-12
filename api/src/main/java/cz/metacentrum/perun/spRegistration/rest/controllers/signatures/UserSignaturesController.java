@@ -77,19 +77,25 @@ public class UserSignaturesController {
 	}
 
 	@PostMapping(path = "/api/moveToProduction/approve")
-	public boolean signApprovalForProduction(@SessionAttribute("user") User user,
-											 @RequestBody String code)
+	public boolean approveProductionTransfer(@SessionAttribute("user") User user, @RequestBody String code)
 			throws UnsupportedEncodingException, BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
 			MalformedCodeException, InternalErrorException, InvalidKeyException
 	{
-		log.debug("signApprovalForProduction(user: {}, code: {})", user, code);
-		if (code.startsWith("\"")) {
-			code = code.substring(1, code.length() - 1);
-		}
-		code = URLDecoder.decode(code, StandardCharsets.UTF_8.toString());
-		boolean successful = service.signTransferToProduction(user, code);
+		log.debug("approveProductionTransfer(user: {}, code: {})", user, code);
+		boolean successful = signTransferToProduction(code, user, true);
+		log.trace("approveProductionTransfer() returns: {}", successful);
+		return successful;
+	}
 
-		log.trace("signApprovalForProduction() returns: {}", successful);
+	@PostMapping(path = "/api/moveToProduction/reject")
+	public boolean rejectProductionTransfer(@SessionAttribute("user") User user, @RequestBody String code)
+			throws UnsupportedEncodingException, BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
+			MalformedCodeException, InternalErrorException, InvalidKeyException
+	{
+		log.debug("rejectProductionTransfer(user: {}, code: {})", user, code);
+		boolean successful = signTransferToProduction(code, user, false);
+
+		log.trace("rejectProductionTransfer() returns: {}", successful);
 		return successful;
 	}
 
@@ -102,5 +108,13 @@ public class UserSignaturesController {
 		List<RequestSignature> signaturesList = service.getApprovalsOfProductionTransfer(requestId, user.getId());
 		log.trace("getApprovals() returns: {}", signaturesList);
 		return signaturesList;
+	}
+
+	private boolean signTransferToProduction(String code, User user, boolean approved) throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException, MalformedCodeException, InternalErrorException, InvalidKeyException, UnsupportedEncodingException {
+		if (code.startsWith("\"")) {
+			code = code.substring(1, code.length() - 1);
+		}
+		code = URLDecoder.decode(code, StandardCharsets.UTF_8.toString());
+		return service.signTransferToProduction(user, code, approved);
 	}
 }
