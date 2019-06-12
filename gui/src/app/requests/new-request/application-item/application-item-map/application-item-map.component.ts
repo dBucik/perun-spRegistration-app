@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
-import {RequestItem} from "../../RequestItem";
+import {RequestItem} from "../../../../core/models/RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
 import {NgForm} from "@angular/forms";
 import {TranslateService} from "@ngx-translate/core";

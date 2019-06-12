@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {ApplicationItem} from "../../../core/models/ApplicationItem";
-import {RequestItem} from "../RequestItem";
+import {RequestItem} from "../../../core/models/RequestItem";
 import {Attribute} from "../../../core/models/Attribute";
 import {ApplicationItemStringComponent} from "./application-item-string/application-item-string.component";
 import {ApplicationItemBooleanComponent} from "./application-item-boolean/application-item-boolean.component";

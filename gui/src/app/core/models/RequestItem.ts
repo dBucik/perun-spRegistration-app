@@ -1,4 +1,4 @@
-import {Attribute} from "../../core/models/Attribute";
+import {Attribute} from "./Attribute";
 
 export interface RequestItem {
 
