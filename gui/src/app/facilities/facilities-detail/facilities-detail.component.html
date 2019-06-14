@@ -21,7 +21,7 @@
           </div>
           <div class="pull-right">
             <button class="ml-2" mat-raised-button
-                    [routerLink]="['/requests/detail', facility.activeRequestId]">
+                    [routerLink]="['/auth/requests/detail', facility.activeRequestId]">
               {{'FACILITIES.MOVE_TO_PRODUCTION_TO_REQUEST' | translate}}
             </button>
           </div>
@@ -62,7 +62,7 @@
           {{'FACILITIES.DELETE_FACILITY' | translate}}
         </button>
         <div class="pull-right">
-          <button class="ml-2" mat-raised-button [routerLink]="['/facilities/edit', facility.id]">
+          <button class="ml-2" mat-raised-button [routerLink]="['/auth/facilities/edit', facility.id]">
             {{'FACILITIES.EDIT_FACILITY' | translate}}
           </button>
           <button class="ml-2" mat-raised-button (click)="addFacilityAdmin()">

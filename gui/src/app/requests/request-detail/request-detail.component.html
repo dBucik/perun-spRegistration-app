@@ -99,7 +99,7 @@
           {{'REQUESTS.REQUEST_DETAIL_REJECT' | translate}}
         </button>
         <div class="pull-right">
-          <button class="ml-2" mat-raised-button [routerLink]="['/requests/editRequest', request.reqId]"
+          <button class="ml-2" mat-raised-button [routerLink]="['/auth/requests/editRequest', request.reqId]"
                   *ngIf="(isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL') || (request.status=='WAITING_FOR_CHANGES')">
             {{'REQUESTS.EDIT_REQUEST' | translate}}
           </button>
