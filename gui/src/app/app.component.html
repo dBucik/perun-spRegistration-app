@@ -13,7 +13,7 @@
       <a routerLink="" class="site-title ml-2">
        {{ appTitle }}
       </a>
-      <div class="user-info">
+      <div class="user-info" *ngIf="getUser() !== undefined">
 <!--        TODO: Prepared dropdown if needed in future-->
 <!--        <div class="dropdown">-->
 <!--          <button mat-icon-button class="dropdown-toggle" type="button" id="userDropDownButton" data-toggle="dropdown">-->
