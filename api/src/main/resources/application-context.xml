@@ -18,7 +18,10 @@
     <tx:annotation-driven proxy-target-class="true" />
 
     <mvc:interceptors>
-      <bean id="userSettingInterceptor" class="cz.metacentrum.perun.spRegistration.rest.interceptors.UserSettingInterceptor"/>
+        <mvc:interceptor>
+            <mvc:mapping path="/auth/**" />
+            <bean id="userSettingInterceptor" class="cz.metacentrum.perun.spRegistration.rest.interceptors.UserSettingInterceptor"/>
+        </mvc:interceptor>
     </mvc:interceptors>
 
     <bean id="defaultProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
