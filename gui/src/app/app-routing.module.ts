@@ -5,7 +5,6 @@ import {NotFoundPageComponent} from "./shared/not-found-page/not-found-page.comp
 import {NotAuthorizedPageComponent} from "./shared/not-authorized-page/not-authorized-page.component";
 import {LoginComponent} from "./login/login.component";
 import {DocumentSignComponent} from "./document-sign/document-sign.component";
-import {PreauthComponent} from "./login/preauth/preauth.component";
 
 const routes: Routes = [
 
@@ -32,10 +31,6 @@ const routes: Routes = [
   {
     path: 'auth/notAuthorized',
     component: NotAuthorizedPageComponent
-  },
-  {
-    path: 'preauth',
-    component: PreauthComponent,
   },
   {
     path: '**',
