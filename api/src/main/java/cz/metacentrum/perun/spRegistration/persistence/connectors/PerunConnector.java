@@ -123,4 +123,12 @@ public interface PerunConnector {
 	 * @return Attribute definition
 	 */
 	PerunAttributeDefinition getAttributeDefinition(String name) throws ConnectorException;
+
+	/**
+	 * Fetch facilities having specified attribute.
+	 * @param attrName Name of the attribute.
+	 * @param attrValue Value of the attribute
+	 * @return List of facilities, empty list if o such is found.
+	 */
+	List<Facility> getFacilitiesByAttribute(String attrName, String attrValue) throws ConnectorException;
 }

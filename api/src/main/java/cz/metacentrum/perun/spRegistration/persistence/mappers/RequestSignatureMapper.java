@@ -21,6 +21,7 @@ public class RequestSignatureMapper implements RowMapper<RequestSignature> {
 	private static final String USER_ID_KEY = "user_id";
 	private static final String SIGNED_AT_KEY = "signed_at";
 	private static final String NAME_KEY = "name";
+	private static final String APPROVED_KEY = "approved";
 
 	@Override
 	public RequestSignature mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -31,6 +32,7 @@ public class RequestSignatureMapper implements RowMapper<RequestSignature> {
 		approval.setUserId(resultSet.getLong(USER_ID_KEY));
 		approval.setSignedAt(resultSet.getTimestamp(SIGNED_AT_KEY).toLocalDateTime());
 		approval.setName(resultSet.getString(NAME_KEY));
+		approval.setApproved(resultSet.getBoolean(APPROVED_KEY));
 
 		log.trace("mapRow() returns: {}", approval);
 		return approval;

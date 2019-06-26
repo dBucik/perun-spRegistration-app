@@ -11,6 +11,9 @@ import {Subscription} from "rxjs";
 })
 export class AllFacilitiesComponent implements OnInit, OnDestroy {
 
+  private sort: MatSort;
+  private facilitiesSubscription: Subscription;
+
   constructor(private facilitiesService: FacilitiesService) { }
 
   @Input()
@@ -21,12 +24,10 @@ export class AllFacilitiesComponent implements OnInit, OnDestroy {
     this.setDataSource();
   }
 
-  displayedColumns: string[] = ['id', 'name', 'description'];
+  displayedColumns: string[] = ['id', 'name', 'description', 'testEnv'];
   dataSource: MatTableDataSource<Facility>;
   loading = true;
 
-  private sort: MatSort;
-  private facilitiesSubscription: Subscription;
 
   setDataSource() {
     if (!!this.dataSource) {

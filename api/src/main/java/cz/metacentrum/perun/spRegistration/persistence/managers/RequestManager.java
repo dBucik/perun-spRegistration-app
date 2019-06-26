@@ -101,9 +101,10 @@ public interface RequestManager {
 	 * @param requestId id of request to be signed
 	 * @param userId id of user giving the signature
 	 * @param userName name of signing user
+	 * @param approved TRUE if approved, FALSE if rejected
 	 * @return True if everything went OK
 	 */
-	boolean addSignature(Long requestId, Long userId, String userName) throws InternalErrorException;
+	boolean addSignature(Long requestId, Long userId, String userName, boolean approved) throws InternalErrorException;
 
 	/**
 	 * Get all approvals for transferring of service into production environment

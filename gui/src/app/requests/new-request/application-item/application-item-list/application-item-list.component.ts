@@ -1,7 +1,7 @@
 import {Component, Input, ViewChild} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
-import {RequestItem} from "../../RequestItem";
+import {RequestItem} from "../../../../core/models/RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
 import {NgForm} from "@angular/forms";
 import {TranslateService} from "@ngx-translate/core";

@@ -21,7 +21,7 @@ export class ServicesOverviewComponent implements OnInit, OnDestroy {
     this.setDataSource();
   }
 
-  displayedColumns: string[] = ['id', 'name', 'description'];
+  displayedColumns: string[] = ['id', 'name', 'description', 'testEnv'];
   dataSource: MatTableDataSource<Facility>;
   loading = true;
 

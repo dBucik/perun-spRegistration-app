@@ -14,6 +14,7 @@ public class RequestSignature {
 	private Long userId;
 	private LocalDateTime signedAt;
 	private String name;
+	private boolean approved;
 
 	public Long getRequestId() {
 		return requestId;
@@ -47,6 +48,14 @@ public class RequestSignature {
 		this.name = name;
 	}
 
+	public boolean isApproved() {
+		return approved;
+	}
+
+	public void setApproved(boolean approved) {
+		this.approved = approved;
+	}
+
 	@Override
 	public String toString() {
 		return "RequestSignature{" +
@@ -54,6 +63,7 @@ public class RequestSignature {
 				", userId=" + userId +
 				", signedAt=" + signedAt +
 				", name='" + name + '\'' +
+				", approved=" + approved +
 				'}';
 	}
 
@@ -65,11 +75,12 @@ public class RequestSignature {
 		return Objects.equals(requestId, that.requestId) &&
 				Objects.equals(userId, that.userId) &&
 				Objects.equals(signedAt, that.signedAt) &&
-				Objects.equals(name, that.name);
+				Objects.equals(name, that.name) &&
+				this.approved == that.approved;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(requestId, userId, signedAt, name);
+		return Objects.hash(requestId, userId, signedAt, name, approved);
 	}
 }

@@ -38,8 +38,15 @@
                 <td mat-cell *matCellDef="let sign"> {{sign.signedAt | date:'medium'}} </td>
               </ng-container>
 
+              <ng-container matColumnDef="approved">
+                <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.REQUEST_DETAIL_APPROVED' | translate}} </th>
+                <td mat-cell *matCellDef="let sign">
+                  <span [outerHTML]="sign.approved | requestApprovedPipe"></span>
+                </td>
+              </ng-container>
+
               <tr mat-header-row *matHeaderRowDef="columns" class="h-50"></tr>
-              <tr mat-row *matRowDef="let row; columns: columns;" class="h-50"></tr>
+              <tr mat-row *matRowDef="let row; columns: columns;" class="h-50 pad1"></tr>
             </table>
           </mat-expansion-panel>
         </mat-accordion>

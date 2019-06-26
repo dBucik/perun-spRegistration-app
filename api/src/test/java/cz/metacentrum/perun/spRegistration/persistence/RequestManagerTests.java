@@ -110,6 +110,7 @@ public class RequestManagerTests {
 		approval1 = new RequestSignature();
 		approval1.setRequestId(2L);
 		approval1.setSignedAt(now.plusDays(10));
+		approval1.setApproved(true);
 	}
 
 	private void prepareFakeUser() {
@@ -236,7 +237,7 @@ public class RequestManagerTests {
 
 	@Test
 	public void addSignature() throws InternalErrorException {
-		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName());
+		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName(), true);
 
 		List<RequestSignature> found = requestManager.getRequestSignatures(req1.getReqId());
 
@@ -251,7 +252,7 @@ public class RequestManagerTests {
 
 	@Test
 	public void getRequestSignatures() throws InternalErrorException {
-		requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName());
+		requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName(), true);
 		approval1.setRequestId(req1.getReqId());
 
 		List<RequestSignature> res = requestManager.getRequestSignatures(approval1.getRequestId());

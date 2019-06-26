@@ -3,4 +3,5 @@ export interface RequestSignature {
   userId: number;
   name: string;
   signedAt: string;
+  approved;
 }

@@ -43,7 +43,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     loading = true;
     request: Request;
     signatures: RequestSignature[];
-    columns: string[] = ['name', 'signedAt'];
+    columns: string[] = ['name', 'signedAt', 'approved'];
     expansionPanelDisabled: boolean = true;
     icon: boolean = true;
 
@@ -111,35 +111,23 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     }
 
     openApproveDialog(): void {
-      const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
+      this.dialog.open(RequestDetailDialogComponent, {
         width: '400px',
         data: {isApprove: true, isSetWFC: false, parent: this}
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
       });
     }
 
     openRejectDialog(): void {
-      const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
+      this.dialog.open(RequestDetailDialogComponent, {
         width: '400px',
         data: {isApprove: false, isSetWFC: false, parent: this}
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
       });
     }
 
     openSetWFCDialog(): void {
-      const dialogRef = this.dialog.open(RequestDetailDialogComponent, {
+      this.dialog.open(RequestDetailDialogComponent, {
         width: '400px',
         data: {isApprove: false, isSetWFC: true, parent: this}
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
       });
     }
 
