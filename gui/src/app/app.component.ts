@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
   currentUrl: string;
 
   static sideNavHiddenOn : Array<string> = [
-    '/login'
+    '/'
   ];
 
   static pageConfig: PageConfig;
@@ -36,9 +36,6 @@ export class AppComponent implements OnInit {
   logoUrl : String = '';
   appTitle : String = '';
   footerHtml : String = '<div></div>';
-
-  user: User;
-  isAdmin = false;
 
   constructor(
     private configService: ConfigService,
@@ -68,7 +65,7 @@ export class AppComponent implements OnInit {
       this.sideBarOpened = false;
       return;
     }
-    
+
     if (window.innerWidth > this.minWidth) {
       this.sideBarOpened = true;
       this.sidebarMode = 'side';
@@ -90,19 +87,13 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userService.getUser().subscribe(user => {
-      AppComponent.user = user;
-      this.user = user;
+    this.configService.getPageConfig().subscribe(pageConfig => {
+      AppComponent.pageConfig = pageConfig;
+      this.appTitle = pageConfig.headerLabel;
+      this.logoUrl = pageConfig.logoUrl;
+      this.footerHtml = pageConfig.footerHtml;
 
-      this.configService.getPageConfig().subscribe(pageConfig => {
-          AppComponent.pageConfig = pageConfig;
-          this.appTitle = pageConfig.headerLabel;
-          this.logoUrl = pageConfig.logoUrl;
-          this.footerHtml = pageConfig.footerHtml;
-
-          this.isAdmin = AppComponent.user.isAppAdmin;
-          this.loading = false;
-      });
+      this.loading = false;
     });
 
     this.router.events.subscribe((val : NavigationEnd) => {
@@ -121,7 +112,17 @@ export class AppComponent implements OnInit {
     return this.pageConfig;
   }
 
+  // for local usage e.g.: in app.component.html
+  public getUser(): User {
+    return AppComponent.getUser();
+  }
+
+  // for usage from different components
   public static getUser() : User {
-    return AppComponent.user;
+    return this.user;
+  }
+
+  public static setUser(user: User): void {
+    this.user = user;
   }
 }

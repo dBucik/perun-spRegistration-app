@@ -72,7 +72,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   }
 
   moveToProduction(): void {
-    this.router.navigateByUrl('facilities/moveToProduction/' + this.facility.id );
+    this.router.navigateByUrl('auth/facilities/moveToProduction/' + this.facility.id );
   }
 
   openDeleteDialog(): void {
@@ -87,12 +87,12 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
 
   deleteFacility(): void {
     this.facilitiesService.removeFacility(this.facility.id).subscribe(id => {
-      this.router.navigateByUrl('requests/detail/' + id);
+      this.router.navigateByUrl('auth/requests/detail/' + id);
     });
   }
 
   addFacilityAdmin():void{
-    this.router.navigateByUrl('facilities/addAdmin/' + this.facility.id );
+    this.router.navigateByUrl('auth/facilities/addAdmin/' + this.facility.id );
   }
 
   editAdmins(): void{

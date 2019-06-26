@@ -36,38 +36,6 @@ public class AuthController {
 		this.connector = connector;
 	}
 
-
-	@GetMapping(path = "/api/setUser")
-	public boolean setUser(HttpServletRequest req) throws ConnectorException {
-		log.trace("setUser()");
-		String userEmailAttr = appConfig.getUserEmailAttributeName();
-		String extSourceProxy = appConfig.getLoginExtSource();
-		log.debug("settingUser");
-		String sub;
-
-		boolean successfullySet = false;
-		if (devEnabled) {
-			sub = req.getHeader("fake-usr-hdr");
-			log.debug("setting fake user: {}", sub);
-		} else {
-			sub = req.getRemoteUser();
-			log.debug("setting user: {}", sub);
-		}
-
-		if (sub != null && !sub.isEmpty()) {
-			log.debug("found userId: {} ", sub);
-			User user = connector.getUserWithEmail(sub, extSourceProxy, userEmailAttr);
-			user.setAdmin(appConfig.isAppAdmin(user.getId()));
-			log.debug("found user: {}", user);
-
-			req.getSession().setAttribute("user", user);
-			successfullySet = true;
-		}
-
-		log.trace("setUser() returns: {}", successfullySet);
-		return successfullySet;
-	}
-
 	@GetMapping(path = "/api/getUser")
 	public User getUser(HttpServletRequest req) {
 		HttpSession sess = req.getSession();

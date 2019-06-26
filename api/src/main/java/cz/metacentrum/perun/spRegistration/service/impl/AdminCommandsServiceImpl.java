@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -224,6 +225,10 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		List<Facility> result = perunConnector.getFacilitiesByProxyIdentifier(appConfig.getProxyIdentifierAttributeName(),
 				appConfig.getProxyIdentifierAttributeValue());
+
+		if (result == null) {
+			result = new ArrayList<>();
+		}
 
 		log.trace("getAllFacilities returns: {}", result);
 		return result;

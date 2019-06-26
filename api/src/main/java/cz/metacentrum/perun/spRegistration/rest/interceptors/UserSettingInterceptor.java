@@ -39,14 +39,18 @@ public class UserSettingInterceptor implements HandlerInterceptor {
 
 		User userFromRequest = (User)request.getSession().getAttribute("user");
 
-		if (userFromRequest == null) {
-			setUser(request);
+		if (userFromRequest == null && setUser(request) == null) {
+			String url = request.getRequestURL().toString();
+			int index = url.indexOf("/spreg/");
+			url = url.substring(0, index);
+			response.sendRedirect(url + "/spreg/");
+			return false;
 		}
 
 		return true;
 	}
 
-	private void setUser(HttpServletRequest request) throws ConnectorException, InternalErrorException {
+	private User setUser(HttpServletRequest request) throws ConnectorException {
 		String userEmailAttr = appConfig.getUserEmailAttributeName();
 		String extSourceProxy = appConfig.getLoginExtSource();
 		log.info("settingUser");
@@ -66,8 +70,9 @@ public class UserSettingInterceptor implements HandlerInterceptor {
 			log.info("Found user: {}", user);
 
 			request.getSession().setAttribute("user", user);
-		} else {
-			throw new InternalErrorException("Could not fetch user");
+			return user;
 		}
+
+		return null;
 	}
 }

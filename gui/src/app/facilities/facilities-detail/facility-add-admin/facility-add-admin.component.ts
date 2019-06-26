@@ -55,7 +55,7 @@ export class FacilityAddAdminComponent implements OnInit {
               .open(successMessage, goToFacilityMessage, {duration: 5000});
 
             snackBarRef.onAction().subscribe(() => {
-              this.router.navigate(['/facilities/detail/' + this.facility.id]);
+              this.router.navigate(['/auth/facilities/detail/' + this.facility.id]);
             });
 
             this.router.navigate(['/']);

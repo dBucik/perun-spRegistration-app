@@ -7,28 +7,29 @@ import {LoginComponent} from "./login/login.component";
 import {DocumentSignComponent} from "./document-sign/document-sign.component";
 
 const routes: Routes = [
+
   {
     path: '',
-    component: MainMenuComponent,
-  },
-  {
-    path: 'login',
     component: LoginComponent,
   },
   {
-    path: 'requests',
+    path: 'auth',
+    component: MainMenuComponent,
+  },
+  {
+    path: 'auth/requests',
     loadChildren: './requests/requests.module#RequestsModule'
   },
   {
-    path: 'facilities',
+    path: 'auth/facilities',
     loadChildren: './facilities/facilities.module#FacilitiesModule'
   },
   {
-    path: 'sign',
+    path: 'auth/sign',
     component: DocumentSignComponent
   },
   {
-    path: 'notAuthorized',
+    path: 'auth/notAuthorized',
     component: NotAuthorizedPageComponent
   },
   {

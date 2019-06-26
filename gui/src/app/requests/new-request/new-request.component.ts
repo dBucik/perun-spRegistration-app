@@ -116,7 +116,7 @@ export class NewRequestComponent implements OnInit {
       // snackBarRef.onAction().subscribe(() => {
       //   this.router.navigate(['/requests/detail/' + requestId]);
       //});
-      this.router.navigate(['/requests/detail/' + requestId]);
+      this.router.navigate(['/auth/requests/detail/' + requestId]);
       //this.router.navigate(['/']);
     });
   }
