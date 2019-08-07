@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Controller handling requests for obtaining configuration
  *
@@ -99,5 +100,15 @@ public class ConfigController {
 
 		log.trace("getSpecifyAuthoritiesEnabled() returns: {}", specifyAuthoritiesEnabled);
 		return specifyAuthoritiesEnabled;
+	}
+
+	@GetMapping(path = "/api/config/prodTransferAuthoritiesMailsMapRef")
+	public Map<String, String> getProdTransferAuthoritiesMailsMapRef() {
+		log.trace("getProdTransferAuthoritiesMailsMapRef()");
+
+		Map<String, String> map = config.getAppConfig().getProdTransferAuthoritiesMailsMap();
+
+		log.trace("getProdTransferAuthoritiesMailsMapRef() returns: {}", map);
+		return map;
 	}
 }

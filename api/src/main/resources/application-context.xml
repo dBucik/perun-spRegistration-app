@@ -158,6 +158,14 @@
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
     </bean>
 
+    <bean id="prodTransferAuthoritiesMailsMapRef" class="org.springframework.beans.factory.config.PropertiesFactoryBean" >
+        <property name="locations">
+            <list>
+                <value>file:///etc/perun-spRegistration/prodTransferAuthoritiesMailsMap.properties</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig">
         <property name="perunConnector" ref="perunConnector" />
         <property name="appAdminIds" value="#{'${appAdminIds}'.split('\s*,\s*')}" />
@@ -181,6 +189,7 @@
         <property name="signaturesEndpointUrl" value="${host.url}/sign"/>
         <property name="adminsEndpoint" value="${host.url}/facilities/addAdmin/sign"/>
         <property name="entityIdAttributeName" value="${entityID.attrName}"/>
+        <property name="prodTransferAuthoritiesMailsMap" ref="prodTransferAuthoritiesMailsMapRef" />
     </bean>
 
     <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
