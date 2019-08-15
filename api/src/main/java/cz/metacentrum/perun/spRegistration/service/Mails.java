@@ -194,6 +194,9 @@ public class Mails {
 		String from = props.getProperty(FROM_KEY);
 
 		String subject = props.getProperty(ADD_ADMIN_SUBJECT_KEY);
+		Map<String, String> subjectMap = new HashMap<>();
+		subjectMap.put(SERVICE_NAME_FIELD, serviceName);
+		subject = getSubstitutedMessage(subject, subjectMap);
 
 		String message = props.getProperty(ADD_ADMIN_MESSAGE_KEY);
 		Map<String, String> messageMap = new HashMap<>();
