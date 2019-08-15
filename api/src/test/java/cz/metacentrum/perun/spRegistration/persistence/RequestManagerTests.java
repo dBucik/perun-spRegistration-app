@@ -2,7 +2,7 @@ package cz.metacentrum.perun.spRegistration.persistence;
 
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
@@ -49,9 +49,10 @@ public class RequestManagerTests {
 	private Request req2;
 	private RequestSignature approval1;
 	private User fakeUser;
+	private String code1;
 
 	@Before
-	public void setUp() throws CreateRequestException, InternalErrorException {
+	public void setUp() throws ActiveRequestExistsException, InternalErrorException {
 		def1 = new PerunAttributeDefinition(1L, "attr_1", "namespace1", "desc1",
 				"java.lang.String", "attr1", true, false, "facility",
 				"baseFriendlyName", "friendlyNameParameter");
@@ -63,6 +64,8 @@ public class RequestManagerTests {
 		prepareAttributes();
 		prepareRequests();
 		prepareApprovals();
+
+		code1 = "code1";
 
 		Long req1Id = requestManager.createRequest(req1);
 		req1.setReqId(req1Id);
@@ -126,7 +129,7 @@ public class RequestManagerTests {
 	}
 
 	@Test
-	public void createRequest() throws CreateRequestException, InternalErrorException {
+	public void createRequest() throws ActiveRequestExistsException, InternalErrorException {
 		Request request = new Request();
 		request.setAction(RequestAction.REGISTER_NEW_SP);
 		request.setStatus(RequestStatus.WAITING_FOR_APPROVAL);
@@ -236,8 +239,24 @@ public class RequestManagerTests {
 	}
 
 	@Test
+	public void storeCodes() throws InternalErrorException {
+		int res = requestManager.storeCodes(Collections.singletonList(code1));
+		assertEquals("Should store only one code", 1, res);
+		assertTrue("Code should be valid", requestManager.validateCode(code1));
+	}
+
+	@Test
+	public void validateCode() throws InternalErrorException {
+		requestManager.storeCodes(Collections.singletonList(code1));
+		boolean res = requestManager.validateCode(code1);
+
+		assertTrue("Code should be valid", res);
+	}
+
+	@Test
 	public void addSignature() throws InternalErrorException {
-		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName(), true);
+		requestManager.storeCodes(Collections.singletonList(code1));
+		boolean res = requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName(), true, code1);
 
 		List<RequestSignature> found = requestManager.getRequestSignatures(req1.getReqId());
 
@@ -252,7 +271,8 @@ public class RequestManagerTests {
 
 	@Test
 	public void getRequestSignatures() throws InternalErrorException {
-		requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName(), true);
+		requestManager.storeCodes(Collections.singletonList(code1));
+		requestManager.addSignature(req1.getReqId(), fakeUser.getId(), fakeUser.getName(), true, code1);
 		approval1.setRequestId(req1.getReqId());
 
 		List<RequestSignature> res = requestManager.getRequestSignatures(approval1.getRequestId());

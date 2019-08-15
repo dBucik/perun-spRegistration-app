@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 /**
  * Controller handling common actions related to Facilities.
  *
- * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>;
  */
 @RestController
 public class CommonFacilitiesController {
@@ -37,7 +37,8 @@ public class CommonFacilitiesController {
 								   @PathVariable("facilityId") Long facilityId)
 			throws UnauthorizedActionException, InternalErrorException, ConnectorException
 	{
-		log.debug("facilityDetail(user(): {}, facilityId: {})", user.getId(), facilityId);
+		log.trace("facilityDetail(user(): {}, facilityId: {})", user.getId(), facilityId);
+
 		Facility facility = service.getDetailedFacility(facilityId, user.getId());
 
 		log.trace("facilityDetail() returns: {}", facility);

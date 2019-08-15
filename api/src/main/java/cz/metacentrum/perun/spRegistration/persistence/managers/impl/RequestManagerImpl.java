@@ -1,9 +1,10 @@
 package cz.metacentrum.perun.spRegistration.persistence.managers.impl;
 
+import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.CreateRequestException;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestMapper;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestSignatureMapper;
@@ -24,7 +25,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -32,7 +32,7 @@ import java.util.StringJoiner;
 /**
  * Implementation of Request Manager. Works with DB and Request objects.
  *
- * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>;
  */
 @EnableTransactionManagement
 public class RequestManagerImpl implements RequestManager {
@@ -40,6 +40,7 @@ public class RequestManagerImpl implements RequestManager {
 	private static final Logger log = LoggerFactory.getLogger(RequestManagerImpl.class);
 	private static final String REQUESTS_TABLE = "requests";
 	private static final String APPROVALS_TABLE = "approvals";
+	private static final String CODES_TABLE = "signatureCodes";
 
 	private final RequestMapper REQUEST_MAPPER;
 	private final RequestSignatureMapper REQUEST_SIGNATURE_MAPPER;
@@ -55,10 +56,10 @@ public class RequestManagerImpl implements RequestManager {
 	public void setJdbcTemplate(JdbcTemplate template) {
 		if (template == null) {
 			log.error("Illegal parameters passed: template IS NULL");
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		} else if (template.getDataSource() == null) {
 			log.error("Illegal parameters passed: template.dataSource IS NULL");
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 		
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(template.getDataSource());
@@ -66,17 +67,20 @@ public class RequestManagerImpl implements RequestManager {
 
 	@Override
 	@Transactional
-	public Long createRequest(Request request) throws InternalErrorException, CreateRequestException {
+	public Long createRequest(Request request) throws InternalErrorException, ActiveRequestExistsException {
 		log.trace("createRequest({})", request);
-		if (request == null) {
-			log.error("Illegal parameters passed: request IS NULL");
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(request)) {
+			log.error("Wrong parameters passed: (request : {})", request);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Long activeRequestId = this.getActiveRequestIdByFacilityId(request.getFacilityId());
-		if (activeRequestId != null) {
-			log.error("Active requests already exist for facilityId: {}", request.getFacilityId());
-			throw new CreateRequestException();
+		if (request.getFacilityId() != null) {
+			Long activeRequestId = getActiveRequestIdByFacilityId(request.getFacilityId());
+			if (activeRequestId != null) {
+				log.error("Active requests already exist for facilityId: {}", request.getFacilityId());
+				throw new ActiveRequestExistsException();
+			}
 		}
 
 		String query = new StringJoiner(" ")
@@ -118,9 +122,10 @@ public class RequestManagerImpl implements RequestManager {
 	@Transactional
 	public boolean updateRequest(Request request) throws InternalErrorException {
 		log.trace("updateRequest({})", request);
-		if (request == null) {
-			log.error("Illegal parameters passed: request IS NULL");
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(request)) {
+			log.error("Wrong parameters passed: (request: {})", request);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 		
 		String query = new StringJoiner(" ")
@@ -157,9 +162,10 @@ public class RequestManagerImpl implements RequestManager {
 	@Transactional
 	public boolean deleteRequest(Long reqId) throws InternalErrorException {
 		log.trace("deleteRequest({})", reqId);
-		if (reqId == null) {
-			log.error("Illegal parameters passed: reqId IS NULL");
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(reqId)) {
+			log.error("Wrong parameters passed: (reqId: {})", reqId);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
 		String query = new StringJoiner(" ")
@@ -188,9 +194,10 @@ public class RequestManagerImpl implements RequestManager {
 	@Transactional
 	public Request getRequestById(Long reqId) {
 		log.trace("getRequestById({})", reqId);
-		if (reqId == null) {
-			log.error("Illegal parameters passed: reqId IS NULL");
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(reqId)) {
+			log.error("Wrong parameters passed: (reqId: {})", reqId);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 		
 		String query = new StringJoiner(" ")
@@ -226,9 +233,10 @@ public class RequestManagerImpl implements RequestManager {
 	@Transactional
 	public List<Request> getAllRequestsByUserId(Long userId) {
 		log.trace("getAllRequestsByUserId({})", userId);
-		if (userId == null) {
-			log.error("Illegal parameters passed: userId IS NULL");
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(userId)) {
+			log.error("Wrong parameters passed: (userId: {})", userId);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 		
 		String query = new StringJoiner(" ")
@@ -249,9 +257,10 @@ public class RequestManagerImpl implements RequestManager {
 	@Transactional
 	public List<Request> getAllRequestsByStatus(RequestStatus status) {
 		log.trace("getAllRequestsByStatus({})", status);
-		if (status == null) {
-			log.error("Illegal parameters passed: status IS NULL");
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(status)) {
+			log.error("Wrong parameters passed: (status: {})", status);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
 		String query = new StringJoiner(" ")
@@ -272,9 +281,10 @@ public class RequestManagerImpl implements RequestManager {
 	@Transactional
 	public List<Request> getAllRequestsByAction(RequestAction action) {
 		log.trace("getAllRequestsByAction({})", action);
-		if (action == null) {
-			log.error("Illegal parameters passed: action IS NULL");
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(action)) {
+			log.error("Wrong parameters passed: (action: {})", action);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
 		String query = new StringJoiner(" ")
@@ -295,9 +305,10 @@ public class RequestManagerImpl implements RequestManager {
 	@Transactional
 	public List<Request> getAllRequestsByFacilityId(Long facilityId) {
 		log.trace("getAllRequestsByFacilityId({})", facilityId);
-		if (facilityId == null) {
-			log.error("Illegal parameters passed: facilityId IS NULL");
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(facilityId)) {
+			log.error("Wrong parameters passed: (facilityId: {})", facilityId);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
 		String query = new StringJoiner(" ")
@@ -318,9 +329,10 @@ public class RequestManagerImpl implements RequestManager {
 	@Transactional
 	public List<Request> getAllRequestsByFacilityIds(Set<Long> facilityIds) {
 		log.trace("getAllRequestsByFacilityIds({})", facilityIds);
-		if (facilityIds == null || facilityIds.isEmpty()) {
-			log.error("Illegal parameters passed: facilityIds IS NULL OR EMPTY: {}", facilityIds);
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(facilityIds) || facilityIds.isEmpty()) {
+			log.error("Wrong parameters passed: (facilityIds: {})", facilityIds);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
 		String query = new StringJoiner(" ")
@@ -341,20 +353,21 @@ public class RequestManagerImpl implements RequestManager {
 	@Transactional
 	public Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException {
 		log.trace("getActiveRequestIdByFacilityId({})", facilityId);
-		if (facilityId == null) {
-			return null;
-		}
 
-		List<Integer> allowedStatuses = Arrays.asList(RequestStatus.APPROVED.getAsInt(), RequestStatus.REJECTED.getAsInt());
+		if (Utils.checkParamsInvalid(facilityId)) {
+			log.error("Wrong parameters passed: (facilityId: {})", facilityId);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
+		}
 
 		String query = new StringJoiner(" ")
 				.add("SELECT id FROM").add(REQUESTS_TABLE)
-				.add("WHERE facility_id = :fac_id AND status NOT IN (:allowed_statuses)")
+				.add("WHERE facility_id = :fac_id AND (status = :status1 OR status = :status2)")
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("fac_id", facilityId);
-		params.addValue("allowed_statuses", allowedStatuses);
+		params.addValue("status1", RequestStatus.WAITING_FOR_CHANGES.getAsInt());
+		params.addValue("status2", RequestStatus.WAITING_FOR_APPROVAL.getAsInt());
 
 		Long activeRequestId;
 		try {
@@ -362,8 +375,8 @@ public class RequestManagerImpl implements RequestManager {
 		} catch (EmptyResultDataAccessException e) {
 			activeRequestId = null;
 		} catch (IncorrectResultSizeDataAccessException e) {
-			log.error("Two active requests for one facility found");
-			throw new InternalErrorException("Two active requests for one facility found", e);
+			log.error("Two active requests for facility {} found", facilityId);
+			throw new InternalErrorException("Two active requests for facility #" + facilityId + " found", e);
 		}
 
 		log.trace("getActiveRequestIdByFacilityId returns: {}", activeRequestId);
@@ -372,13 +385,16 @@ public class RequestManagerImpl implements RequestManager {
 
 	@Override
 	@Transactional
-	public boolean addSignature(Long requestId, Long userId, String userName, boolean approved)
-			throws InternalErrorException {
+	public boolean addSignature(Long requestId, Long userId, String userName, boolean approved, String code)
+			throws InternalErrorException
+	{
 		log.trace("addSignature(requestId: {}, userId: {}, userName: {}, approved: {})",
 				requestId, userId, userName, approved);
-		if (requestId == null || userId == null || userName == null || userName.isEmpty()) {
-			log.error("Wrong parameters passed: (requestId: {}, user:Id {}, userName: {})", requestId, userId, userName);
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(requestId, userId, userId, code)) {
+			log.error("Wrong parameters passed: (requestId: {}, user:Id {}, userName: {}, code: {})",
+					requestId, userId, userName, code);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 		
 		String query = new StringJoiner(" ")
@@ -396,13 +412,15 @@ public class RequestManagerImpl implements RequestManager {
 
 		if (updatedCount == 0) {
 			log.error("Zero approvals have been inserted");
-			throw new InternalErrorException("Zero approvals have been inserted");
+			throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
 		} else if (updatedCount > 1) {
 			log.error("Only one approval should have been inserted");
-			throw new InternalErrorException("Only one approval should have been inserted");
+			throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
 		}
+
+		deleteUsedCode(code);
 		
-		log.trace("addSignature returns: true");
+		log.trace("addSignature() returns: true");
 		return true;
 	}
 
@@ -410,9 +428,10 @@ public class RequestManagerImpl implements RequestManager {
 	@Transactional
 	public List<RequestSignature> getRequestSignatures(Long requestId) {
 		log.trace("getRequestSignatures({})", requestId);
-		if (requestId == null) {
-			log.error("Illegal parameters passed: requestId IS NULL");
-			throw new IllegalArgumentException();
+
+		if (Utils.checkParamsInvalid(requestId)) {
+			log.error("Illegal parameters passed: (requestId: {})", requestId);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
 		String query = new StringJoiner(" ")
@@ -426,6 +445,103 @@ public class RequestManagerImpl implements RequestManager {
 		List<RequestSignature> foundApprovals = jdbcTemplate.query(query, params, REQUEST_SIGNATURE_MAPPER);
 
 		log.trace("getRequestSignatures returns: {}", foundApprovals);
+
 		return foundApprovals;
+	}
+
+	@Override
+	@Transactional
+	public boolean validateCode(String code) {
+		log.trace("validateCode({})", code);
+
+		if (Utils.checkParamsInvalid(code)) {
+			log.error("Wrong parameters passed: (code: {})", code);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
+		}
+
+		String query = new StringJoiner(" ")
+				.add("SELECT count(code) FROM").add(CODES_TABLE)
+				.add("WHERE code = :code")
+				.toString();
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("code", code);
+
+		Integer foundCodes = jdbcTemplate.queryForObject(query, params, Integer.class);
+		boolean isValid = ((foundCodes != null) && (foundCodes == 1));
+
+		log.trace("validateCode() returns: {}", isValid);
+		return isValid;
+	}
+
+	@Override
+	@Transactional
+	public int storeCodes(List<String> codes) throws InternalErrorException {
+		log.trace("storeCodes({})", codes);
+
+		if (Utils.checkParamsInvalid(codes) || codes.isEmpty()) {
+			log.error("Wrong arguments passed: (codes: {})", codes);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
+		}
+
+		String query = new StringJoiner(" ")
+				.add("INSERT INTO").add(CODES_TABLE).add("(code)")
+				.add("VALUES (:code)")
+				.toString();
+
+		List<MapSqlParameterSource> batchArgs = new ArrayList<>();
+		for (String code: codes) {
+			MapSqlParameterSource parameters = new MapSqlParameterSource();
+			parameters.addValue("code", code);
+			batchArgs.add(parameters);
+		}
+
+		int[] insertedCodes = jdbcTemplate.batchUpdate(query, batchArgs.toArray(new MapSqlParameterSource[codes.size()]));
+		int sum = 0;
+		for (int i : insertedCodes) {
+			if (i != 1) {
+				log.error("Inserting code failed");
+				throw new InternalErrorException("Inserting code failed");
+			} else {
+				sum++;
+			}
+		}
+
+		if (sum != codes.size()) {
+			log.error("Expected {} inserts, made {}", codes.size(), sum);
+			throw new InternalErrorException("Expected " + codes.size() + " inserts, made " + sum);
+		}
+
+		log.trace("storeCodes() returns: {}", sum);
+		return sum;
+	}
+
+	@Override
+	public boolean deleteUsedCode(String code) throws InternalErrorException {
+		log.trace("deleteUsedCode({})", code);
+
+		if (Utils.checkParamsInvalid(code)) {
+			log.error("Wrong parameters passed: (code: {})", code);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
+		}
+
+		String query = new StringJoiner(" ")
+				.add("DELETE FROM").add(CODES_TABLE)
+				.add("WHERE code = :code")
+				.toString();
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("code", code);
+
+		int updatedCount = jdbcTemplate.update(query, params);
+
+		if (updatedCount == 0) {
+			log.error("Zero codes deleted, should delete at least one");
+			throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
+		} else if (updatedCount > 1) {
+			log.error("Only one code should be deleted, more deleted: {}", updatedCount);
+			throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
+		} else {
+			log.trace("deleteUsedCode() returns - codes deleted (void method)");
+			return true;
+		}
 	}
 }

@@ -1,5 +1,6 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
+import cz.metacentrum.perun.spRegistration.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,7 +14,7 @@ import java.util.Objects;
 /**
  * Representation of attribute from Perun.
  *
- * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>;
  */
 public class PerunAttribute {
 
@@ -167,8 +168,8 @@ public class PerunAttribute {
 	 * @return PerunAttribute or null
 	 */
 	public static PerunAttribute fromJsonOfPerun(JSONObject json) {
-		if (json == null || json.isEmpty() || json.equals(JSONObject.NULL)) {
-			return null;
+		if (Utils.checkParamsInvalid(json)) {
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
 		PerunAttributeDefinition definition = PerunAttributeDefinition.fromPerunJson(json);

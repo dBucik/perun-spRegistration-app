@@ -11,9 +11,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.io.IOException;
 
 /**
- * Utils class used by connectors.
+ * PersistenceUtils class used by connectors.
  *
- * @author Dominik Frantisek Bucik &lt;bucik@ics.muni.cz&gt;
+ * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>;
  */
 public class ConnectorUtils {
 
@@ -21,21 +21,25 @@ public class ConnectorUtils {
 
 	public static String dealWithHttpClientErrorException(HttpClientErrorException ex, String message) throws ConnectorException {
 		log.trace("dealWithHttpClientErrorException(ex: {}, message: {})", ex, message);
+
 		MediaType contentType = null;
 		if (ex.getResponseHeaders() != null) {
 			contentType = ex.getResponseHeaders().getContentType();
 		}
-		String body = ex.getResponseBodyAsString();
-		if (contentType != null && "json".equals(contentType.getSubtype())) {
+		if (contentType != null && "json".equalsIgnoreCase(contentType.getSubtype())) {
 			try {
-				new ObjectMapper().readValue(body, JsonNode.class).path("message").asText();
+				String body = ex.getResponseBodyAsString();
+				String exErrorId = new ObjectMapper().readValue(body, JsonNode.class).path("errorId").asText("");
+				String exName = new ObjectMapper().readValue(body, JsonNode.class).path("name").asText("");
+				String exMessage = new ObjectMapper().readValue(body, JsonNode.class).path("message").asText("");
+
+				String errMessage = "Error from Perun: { id: " + exErrorId + ", name: " + exName + ", message: " + exMessage + " }";
+				throw new ConnectorException(errMessage, ex);
 			} catch (IOException e) {
-				log.error("cannot parse error message from JSON", e);
+				throw new ConnectorException("Perun RPC Exception thrown, cannot read message");
 			}
 		} else {
-			log.error(ex.getMessage());
+			throw new ConnectorException("Perun RPC Exception thrown, cannot read message");
 		}
-
-		throw new ConnectorException(message + ' ' + ex.getMessage(), ex);
 	}
 }
