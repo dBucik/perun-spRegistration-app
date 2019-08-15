@@ -142,6 +142,7 @@
     "SUCCESSFULLY_SUBMITTED_ACTION": "Zobraz",
     "WRONGLY_FILLED_ITEM": "Jedno nebo víc polí není vyplněno správne",
     "ERROR_REQUEST_ALREADY_EXISTS": "Pro tuhle službu, již existuje žádost na změnu jejího nastavení",
+    "ENVIRONMENT": "Prostředí",
     "ENV_TEST": "Testovací",
     "ENV_PROD": "Produkční",
     "MOVE_TO_PRODUCTION_REJECT": "Zamítnout"

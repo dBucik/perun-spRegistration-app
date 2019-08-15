@@ -145,6 +145,7 @@
     "SUCCESSFULLY_SUBMITTED_ACTION": "Show",
     "WRONGLY_FILLED_ITEM": "One or more fields are not filled correctly",
     "ERROR_REQUEST_ALREADY_EXISTS": "Request to change this service already exists",
+    "ENVIRONMENT": "Environment",
     "ENV_TEST": "Test",
     "ENV_PROD": "Production",
     "MOVE_TO_PRODUCTION_REJECT": "Reject request"
