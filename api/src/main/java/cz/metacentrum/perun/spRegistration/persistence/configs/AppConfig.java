@@ -42,6 +42,7 @@ public class AppConfig {
 	private String proxyIdentifierAttributeValue;
 	private String adminsAttributeName;
 	private String userEmailAttributeName;
+	private Map<String, String> prodTransferAuthoritiesMailsMap;
 
 	private String footerHTML;
 	private String headerLogo;
@@ -252,6 +253,17 @@ public class AppConfig {
 
 	public void setPerunAttributeDefinitionsMap(Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap) {
 		this.perunAttributeDefinitionsMap = perunAttributeDefinitionsMap;
+	}
+
+	public Map<String, String> getProdTransferAuthoritiesMailsMap() { return prodTransferAuthoritiesMailsMap; }
+
+	public void setProdTransferAuthoritiesMailsMap(Properties prodTransferAuthoritiesMailsMap) {
+
+		this.prodTransferAuthoritiesMailsMap = new HashMap<>();
+
+		for (Map.Entry<Object, Object> entry : prodTransferAuthoritiesMailsMap.entrySet()) {
+			this.prodTransferAuthoritiesMailsMap.put((String) entry.getKey(), (String) entry.getValue());
+		}
 	}
 
 	public String getSignaturesEndpointUrl() {
