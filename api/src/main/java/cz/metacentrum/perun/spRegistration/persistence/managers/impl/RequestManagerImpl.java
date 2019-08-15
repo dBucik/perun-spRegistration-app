@@ -366,8 +366,8 @@ public class RequestManagerImpl implements RequestManager {
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("fac_id", facilityId);
-		params.addValue("status1", RequestStatus.APPROVED.getAsInt());
-		params.addValue("status2", RequestStatus.REJECTED.getAsInt());
+		params.addValue("status1", RequestStatus.WAITING_FOR_CHANGES.getAsInt());
+		params.addValue("status2", RequestStatus.WAITING_FOR_APPROVAL.getAsInt());
 
 		Long activeRequestId;
 		try {
