@@ -55,6 +55,11 @@ export class AppComponent implements OnInit {
 
     router.events.subscribe((_: NavigationEnd) => {
       this.currentUrl = this.router.url;
+      if (this.currentUrl.includes('auth')) {
+        this.userService.getUser().subscribe(user => {
+          AppComponent.setUser(user);
+        });
+      }
     });
   }
 
@@ -101,7 +106,7 @@ export class AppComponent implements OnInit {
         this.onPageWhereSideBarIsHidden = AppComponent.sideNavHiddenOn.includes(val.urlAfterRedirects);
         this.getScreenSize();
       }
-    })
+    });
   }
 
   public static isApplicationAdmin() : boolean {
