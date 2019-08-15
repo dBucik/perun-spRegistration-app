@@ -674,9 +674,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		log.trace("createRequest(facilityId: {}, userId: {}, action: {}, attributes: {})",
 				facilityId, userId, action, attributes);
 
-		if (Utils.checkParamsInvalid(facilityId, userId, action, attributes)) {
-			log.error("Wrong parameters passed: (facility: {}, userId: {}, action: {}, attributes: {})",
-					facilityId, userId, action, attributes);
+		if (Utils.checkParamsInvalid(userId, action, attributes)) {
+			log.error("Wrong parameters passed: (userId: {}, action: {}, attributes: {})", userId, action, attributes);
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
