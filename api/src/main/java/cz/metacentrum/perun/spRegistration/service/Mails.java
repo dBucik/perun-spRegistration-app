@@ -123,6 +123,7 @@ public class Mails {
 		String subject = props.getProperty(PRODUCTION_USER_SUBJECT_KEY);
 		Map<String, String> subjectMap = new HashMap<>();
 		subjectMap.put(REQUEST_ID_FIELD, requestId.toString());
+		subjectMap.put(SERVICE_NAME_FIELD, serviceName);
 		subject = getSubstitutedMessage(subject, subjectMap);
 
 		String message = props.getProperty(PRODUCTION_USER_MESSAGE_KEY);
