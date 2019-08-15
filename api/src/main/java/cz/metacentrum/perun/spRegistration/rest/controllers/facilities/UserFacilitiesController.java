@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.util.List;
 
@@ -75,7 +73,7 @@ public class UserFacilitiesController {
 	{
 		log.trace("addAdminConfirm(user: {}, code: {})", user, code);
 
-		code = ApiUtils.decodeCode(code);
+		code = ApiUtils.normalizeCode(code);
 		boolean successful = service.confirmAddAdmin(user, code);
 
 		log.trace("addAdminConfirm() returns: {}", successful);
@@ -90,7 +88,7 @@ public class UserFacilitiesController {
 	{
 		log.trace("addAdminReject(user: {}, code: {})", user, code);
 
-		code = ApiUtils.decodeCode(code);
+		code = ApiUtils.normalizeCode(code);
 		boolean successful = service.rejectAddAdmin(user, code);
 
 		log.trace("addAdminReject() returns: {}", successful);
