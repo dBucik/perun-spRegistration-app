@@ -15,7 +15,9 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringJoiner;
 
@@ -28,6 +30,8 @@ import java.util.StringJoiner;
 public class Mails {
 
 	private static final Logger log = LoggerFactory.getLogger(Mails.class);
+
+	private static final String NEW_LINE = "<br/>";
 
 	private static final String ADMINS_MAILS = "admins.emails";
 	private static final String HOST_KEY = "host";
@@ -65,22 +69,21 @@ public class Mails {
 		String from = props.getProperty(FROM_KEY);
 
 		String subject = props.getProperty(UPDATE_SUBJECT_KEY);
-		if (subject.contains(REQUEST_ID_FIELD)) {
-			subject = subject.replaceAll(REQUEST_ID_FIELD, requestId.toString());
-		}
+		Map<String, String> subjectMap = new HashMap<>();
+		subjectMap.put(REQUEST_ID_FIELD, requestId.toString());
+		subject = getSubstitutedMessage(subject, subjectMap);
 
 		String message = props.getProperty(UPDATE_MESSAGE_KEY);
-		if (message.contains(REQUEST_ID_FIELD)) {
-			message = message.replaceAll(REQUEST_ID_FIELD, requestId.toString());
-		}
-		if (message.contains(NEW_STATUS_FIELD)) {
-			message = message.replaceAll(NEW_STATUS_FIELD, status.toString());
-		}
+		Map<String, String> messageMap = new HashMap<>();
+		messageMap.put(REQUEST_ID_FIELD, requestId.toString());
+		messageMap.put(NEW_STATUS_FIELD, status.toString());
+		message = getSubstitutedMessage(message, messageMap);
+
 		if (additionalMessage != null && !additionalMessage.isEmpty()) {
-			message = message.concat("<br/>").concat(additionalMessage);
+			message = message.concat(NEW_LINE).concat(additionalMessage);
 		}
 
-		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
+		message = message.concat(NEW_LINE).concat(props.getProperty(FOOTER_KEY));
 
 		boolean res = sendMail(host, from, Collections.singletonList(administratorContact), subject, message);
 		log.debug("requestStatusUpdateUserNotify() returns: {}", res);
@@ -94,19 +97,17 @@ public class Mails {
 		String from = props.getProperty(FROM_KEY);
 
 		String subject = props.getProperty(CREATE_SUBJECT_KEY);
-		if (subject.contains(REQUEST_ID_FIELD)) {
-			subject = subject.replaceAll(REQUEST_ID_FIELD, requestId.toString());
-		}
+		Map<String, String> subjectMap = new HashMap<>();
+		subjectMap.put(REQUEST_ID_FIELD, requestId.toString());
+		subject = getSubstitutedMessage(subject, subjectMap);
 
 		String message = props.getProperty(CREATE_MESSAGE_KEY);
-		if (message.contains(REQUEST_ID_FIELD)) {
-			message = message.replaceAll(REQUEST_ID_FIELD, requestId.toString());
-		}
+		Map<String, String> messageMap = new HashMap<>();
+		messageMap.put(REQUEST_ID_FIELD, requestId.toString());
+		messageMap.put(SERVICE_NAME_FIELD, serviceName);
+		message = getSubstitutedMessage(message, messageMap);
 
-		if (message.contains(SERVICE_NAME_FIELD)) {
-			message = message.replaceAll(SERVICE_NAME_FIELD, serviceName);
-		}
-		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
+		message = message.concat(NEW_LINE).concat(props.getProperty(FOOTER_KEY));
 
 		boolean res = sendMail(host, from, Collections.singletonList(recipient), subject, message);
 		log.debug("userCreateRequestNotify() returns: {}", res);
@@ -120,19 +121,17 @@ public class Mails {
 		String from = props.getProperty(FROM_KEY);
 
 		String subject = props.getProperty(PRODUCTION_USER_SUBJECT_KEY);
-		if (subject.contains(REQUEST_ID_FIELD)) {
-			subject = subject.replaceAll(REQUEST_ID_FIELD, requestId.toString());
-		}
+		Map<String, String> subjectMap = new HashMap<>();
+		subjectMap.put(REQUEST_ID_FIELD, requestId.toString());
+		subject = getSubstitutedMessage(subject, subjectMap);
 
 		String message = props.getProperty(PRODUCTION_USER_MESSAGE_KEY);
-		if (message.contains(REQUEST_ID_FIELD)) {
-			message = message.replaceAll(REQUEST_ID_FIELD, requestId.toString());
-		}
+		Map<String, String> messageMap = new HashMap<>();
+		messageMap.put(REQUEST_ID_FIELD, requestId.toString());
+		messageMap.put(SERVICE_NAME_FIELD, serviceName);
+		message = getSubstitutedMessage(message, messageMap);
 
-		if (message.contains(SERVICE_NAME_FIELD)) {
-			message = message.replaceAll(SERVICE_NAME_FIELD, serviceName);
-		}
-		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
+		message = message.concat(NEW_LINE).concat(props.getProperty(FOOTER_KEY));
 
 		boolean res = sendMail(host, from, Collections.singletonList(recipient), subject, message);
 		log.debug("transferToProductionUserNotify() returns: {}", res);
@@ -146,18 +145,17 @@ public class Mails {
 		String from = props.getProperty(FROM_KEY);
 
 		String subject = props.getProperty(PRODUCTION_AUTHORITIES_SUBJECT_KEY);
-		if (subject.contains(SERVICE_NAME_FIELD)) {
-			subject = subject.replaceAll(SERVICE_NAME_FIELD, serviceName);
-		}
+		Map<String, String> subjectMap = new HashMap<>();
+		subjectMap.put(SERVICE_NAME_FIELD, serviceName);
+		subject = getSubstitutedMessage(subject, subjectMap);
 
 		String message = props.getProperty(PRODUCTION_AUTHORITIES_MESSAGE_KEY);
-		if (message.contains(SERVICE_NAME_FIELD)) {
-			message = message.replaceAll(SERVICE_NAME_FIELD, serviceName);
-		}
-		if (message.contains(APPROVAL_LINK_FIELD)) {
-			message = message.replaceAll(APPROVAL_LINK_FIELD, approvalLink);
-		}
-		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
+		Map<String, String> messageMap = new HashMap<>();
+		messageMap.put(SERVICE_NAME_FIELD, serviceName);
+		messageMap.put(APPROVAL_LINK_FIELD, approvalLink);
+		message = getSubstitutedMessage(message, messageMap);
+
+		message = message.concat(NEW_LINE).concat(props.getProperty(FOOTER_KEY));
 
 		boolean res = sendMail(host, from, Collections.singletonList(recipient), subject, message);
 		log.debug("authoritiesApproveProductionTransferNotify() returns: {}", res);
@@ -170,18 +168,17 @@ public class Mails {
 		String from = props.getProperty(FROM_KEY);
 
 		String subject = props.getProperty(APPROVAL_SUBJECT_KEY);
-		if (subject.contains(REQUEST_ID_FIELD)) {
-			subject = subject.replaceAll(REQUEST_ID_FIELD, requestId.toString());
-		}
+		Map<String, String> subjectMap = new HashMap<>();
+		subjectMap.put(REQUEST_ID_FIELD, requestId.toString());
+		subject = getSubstitutedMessage(subject, subjectMap);
 
 		String message = props.getProperty(APPROVAL_MESSAGE_KEY);
-		if (message.contains(REQUEST_ID_FIELD)) {
-			message = message.replaceAll(REQUEST_ID_FIELD, requestId.toString());
-		}
-		if (message.contains(USER_INFO_FIELD)) {
-			message = message.replaceAll(USER_INFO_FIELD, userId.toString());
-		}
-		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
+		Map<String, String> messageMap = new HashMap<>();
+		messageMap.put(REQUEST_ID_FIELD, requestId.toString());
+		messageMap.put(USER_INFO_FIELD, userId.toString());
+		message = getSubstitutedMessage(message, messageMap);
+
+		message = message.concat(NEW_LINE).concat(props.getProperty(FOOTER_KEY));
 		List<String> admins = Arrays.asList(props.getProperty(ADMINS_MAILS).split(","));
 
 		boolean res = sendMail(host, from, admins, subject, message);
@@ -196,14 +193,14 @@ public class Mails {
 		String from = props.getProperty(FROM_KEY);
 
 		String subject = props.getProperty(ADD_ADMIN_SUBJECT_KEY);
+
 		String message = props.getProperty(ADD_ADMIN_MESSAGE_KEY);
-		if (message.contains(SERVICE_NAME_FIELD)) {
-			message = message.replaceAll(SERVICE_NAME_FIELD, serviceName);
-		}
-		if (message.contains(APPROVAL_LINK_FIELD)) {
-			message = message.replaceAll(APPROVAL_LINK_FIELD, approvalLink);
-		}
-		message = message.concat("<br/>").concat(props.getProperty(FOOTER_KEY));
+		Map<String, String> messageMap = new HashMap<>();
+		messageMap.put(SERVICE_NAME_FIELD, serviceName);
+		messageMap.put(APPROVAL_LINK_FIELD, approvalLink);
+		message = getSubstitutedMessage(message, messageMap);
+
+		message = message.concat(NEW_LINE).concat(props.getProperty(FOOTER_KEY));
 
 		boolean res = sendMail(host, from, Collections.singletonList(recipient), subject, message);
 		log.debug("adminAddRemoveNotify() returns: {}", res);
@@ -245,5 +242,14 @@ public class Mails {
 
 		log.debug("sendMail() returns: TRUE");
 		return true;
+	}
+
+	private static String getSubstitutedMessage(String message, Map<String, String> map) {
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			if (message.contains(entry.getKey())) {
+				message = message.replaceAll(entry.getKey(), entry.getValue());
+			}
+		}
+		return message;
 	}
 }
