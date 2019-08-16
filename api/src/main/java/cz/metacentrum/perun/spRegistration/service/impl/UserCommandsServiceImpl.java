@@ -146,7 +146,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Request req = createRequest(facilityId, userId, attributes, RequestAction.UPDATE_FACILITY);
-		if (req == null || req.getReqId() == null) {
+		if (req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
@@ -185,7 +185,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, PerunAttribute> facilityAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
 
 		Request req = createRequest(facilityId, userId, RequestAction.DELETE_FACILITY, facilityAttributes);
-		if (req == null || req.getReqId() == null) {
+		if (req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
@@ -272,10 +272,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, PerunAttribute> filteredAttributes = filterNotNullAttributes(fac);
 
 		Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, filteredAttributes);
-		if (req == null) {
-			log.error("Could not create request");
-			throw new InternalErrorException("Could not create request");
-		}
 
 		if (authorities == null || authorities.isEmpty()) {
 			String prop = messagesProperties.getProperty("moveToProduction.authorities");
@@ -433,6 +429,10 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		Long activeRequestId = requestManager.getActiveRequestIdByFacilityId(facilityId);
 		facility.setActiveRequestId(activeRequestId);
+
+		PerunAttribute proxyAttrs = perunConnector.getFacilityAttribute(facilityId, appConfig.getMasterProxyIdentifierAttribute());
+		boolean canBeEdited = appConfig.getMasterProxyIdentifierAttribute().equals(proxyAttrs.valueAsString());
+		facility.setCanEdit(canBeEdited);
 
 		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
