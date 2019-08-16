@@ -97,8 +97,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		attributes.add(generateProxyIdentifierAttr());
-
 		Request req = null;
 		try {
 			req = createRequest(null, userId, attributes, RequestAction.REGISTER_NEW_SP);
