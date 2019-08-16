@@ -1,10 +1,11 @@
-import {PerunAttribute} from "./PerunAttribute";
+import {PerunAttribute} from './PerunAttribute';
 
 export interface Facility {
-  id: number,
-  name: string,
-  description: string,
-  testEnv: boolean,
+  id: number;
+  name: string;
+  description: string;
+  testEnv: boolean;
   activeRequestId: number;
-  attrs: Map<string, PerunAttribute>
+  canEdit: boolean;
+  attrs: Map<string, PerunAttribute>;
 }
