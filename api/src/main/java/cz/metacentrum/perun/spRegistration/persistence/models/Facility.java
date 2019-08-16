@@ -18,6 +18,7 @@ public class Facility extends PerunEntity {
 	private String description;
 	private boolean testEnv;
 	private Long activeRequestId;
+	private boolean canEdit = false;
 	private Map<String, PerunAttribute> attrs = new HashMap<>();
 
 	public Facility(Long id) {
@@ -60,6 +61,14 @@ public class Facility extends PerunEntity {
 
 	public void setActiveRequestId(Long activeRequestId) {
 		this.activeRequestId = activeRequestId;
+	}
+
+	public boolean isCanEdit() {
+		return canEdit;
+	}
+
+	public void setCanEdit(boolean canEdit) {
+		this.canEdit = canEdit;
 	}
 
 	public Map<String, PerunAttribute> getAttrs() {
@@ -112,6 +121,7 @@ public class Facility extends PerunEntity {
 				", description='" + description + '\'' +
 				", testEnv=" + testEnv +
 				", activeRequestId=" + activeRequestId +
+				", canEdit=" + canEdit +
 				", attrs=" + attrs +
 				'}';
 	}
@@ -122,13 +132,15 @@ public class Facility extends PerunEntity {
 		if (o == null || getClass() != o.getClass()) return false;
 		Facility facility = (Facility) o;
 		return testEnv == facility.testEnv &&
+				canEdit == facility.canEdit &&
 				Objects.equals(name, facility.name) &&
 				Objects.equals(description, facility.description) &&
+				Objects.equals(activeRequestId, facility.activeRequestId) &&
 				Objects.equals(attrs, facility.attrs);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, description, testEnv, attrs);
+		return Objects.hash(name, description, testEnv, activeRequestId, canEdit, attrs);
 	}
 }

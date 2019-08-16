@@ -6,16 +6,6 @@
     <bean id="facilityServiceAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
-                <!--DO NOT DISPLAY AND EDIT-->
-                <prop key="proxyIdentifiers.attrName">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
-                <prop key="proxyIdentifiers.isDisplayed">false</prop>
-                <prop key="proxyIdentifiers.isEditable">false</prop>
-                <prop key="showOnServicesList.attrName">urn:perun:facility:attribute-def:def:showOnServiceList</prop>
-                <prop key="showOnServicesList.isDisplayed">false</prop>
-                <prop key="showOnServicesList.isEditable">false</prop>
-                <prop key="isTestSp.attrName">urn:perun:facility:attribute-def:def:isTestSp</prop>
-                <prop key="isTestSp.isDisplayed">false</prop>
-                <prop key="isTestSp.isEditable">false</prop>
                 <!-- SERVICE ATTRIBUTES -->
                 <prop key="serviceName.attrName">urn:perun:facility:attribute-def:def:serviceName</prop>
                 <prop key="serviceName.allowedKeys">en,cs</prop>
@@ -96,9 +86,6 @@
     <bean id="facilityOidcAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
-                <prop key="serviceIdInMitre.attrName">urn:perun:facility:attribute-def:def:serviceIdInMitre</prop>
-                <prop key="serviceIdInMitre.isDisplayed">false</prop>
-                <prop key="serviceIdInMitre.isEditable">false</prop>
                 <prop key="oidcClientId.attrName">urn:perun:facility:attribute-def:def:OIDCClientID</prop>
                 <prop key="oidcClientId.position">1</prop>
                 <prop key="oidcRedirectUris.attrName">urn:perun:facility:attribute-def:def:OIDCRedirectURIs</prop>

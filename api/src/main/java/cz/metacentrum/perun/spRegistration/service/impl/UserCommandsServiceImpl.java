@@ -97,8 +97,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		attributes.add(generateProxyIdentifierAttr());
-
 		Request req = null;
 		try {
 			req = createRequest(null, userId, attributes, RequestAction.REGISTER_NEW_SP);
@@ -146,7 +144,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Request req = createRequest(facilityId, userId, attributes, RequestAction.UPDATE_FACILITY);
-		if (req == null || req.getReqId() == null) {
+		if (req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
@@ -180,12 +178,12 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
-		boolean isOidc = ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttributeName());
+		boolean isOidc = ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttribute());
 		List<String> keptAttrs = getAttrsToKeep(isOidc);
 		Map<String, PerunAttribute> facilityAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
 
 		Request req = createRequest(facilityId, userId, RequestAction.DELETE_FACILITY, facilityAttributes);
-		if (req == null || req.getReqId() == null) {
+		if (req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
 		}
@@ -272,10 +270,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, PerunAttribute> filteredAttributes = filterNotNullAttributes(fac);
 
 		Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, filteredAttributes);
-		if (req == null) {
-			log.error("Could not create request");
-			throw new InternalErrorException("Could not create request");
-		}
 
 		if (authorities == null || authorities.isEmpty()) {
 			String prop = messagesProperties.getProperty("moveToProduction.authorities");
@@ -436,13 +430,17 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
-		boolean isOidc = ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttributeName());
+		boolean isOidc = ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttribute());
 		List<String> keptAttrs = getAttrsToKeep(isOidc);
 
 		facility.setAttrs(ServiceUtils.filterFacilityAttrs(attrs, keptAttrs));
 
-		boolean inTest = attrs.get(appConfig.getIsTestSpAttributeName()).valueAsBoolean();
+		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
+
+		PerunAttribute proxyAttrs = perunConnector.getFacilityAttribute(facilityId, appConfig.getMasterProxyIdentifierAttribute());
+		boolean canBeEdited = appConfig.getMasterProxyIdentifierAttributeValue().equals(proxyAttrs.valueAsString());
+		facility.setCanEdit(canBeEdited);
 
 		log.trace("getDetailedFacility returns: {}", facility);
 		return facility;
@@ -513,7 +511,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(
-				appConfig.getProxyIdentifierAttributeName(), appConfig.getProxyIdentifierAttributeValue());
+				appConfig.getProxyIdentifierAttribute(), appConfig.getProxyIdentifierAttributeValue());
 		Map<Long, Facility> proxyFacilitiesMap = ServiceUtils.transformListToMapFacilities(proxyFacilities);
 		if (proxyFacilitiesMap == null || proxyFacilitiesMap.isEmpty()) {
 			return new ArrayList<>();
@@ -525,7 +523,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		List<Facility> testFacilities = perunConnector.getFacilitiesByAttribute(
-				appConfig.getIsTestSpAttributeName(), "true");
+				appConfig.getIsTestSpAttribute(), "true");
 		Map<Long, Facility> testFacilitiesMap = ServiceUtils.transformListToMapFacilities(testFacilities);
 		if (testFacilitiesMap == null) {
 			testFacilitiesMap = new HashMap<>();
@@ -738,7 +736,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private PerunAttribute generateProxyIdentifierAttr() {
 		log.trace("generateProxyIdentifierAttr()");
 
-		String identifierAttrName = appConfig.getProxyIdentifierAttributeName();
+		String identifierAttrName = appConfig.getProxyIdentifierAttribute();
 		String value = appConfig.getProxyIdentifierAttributeValue();
 
 		PerunAttribute identifierAttr = new PerunAttribute();
