@@ -518,7 +518,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		log.trace("generateMasterProxyIdentifierAttribute()");
 
 		PerunAttribute attribute = new PerunAttribute();
-		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getProxyIdentifierAttribute()));
+		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getMasterProxyIdentifierAttribute()));
 		attribute.setValue(appConfig.getMasterProxyIdentifierAttributeValue());
 
 		log.trace("generateMasterProxyIdentifierAttribute() returns: {}", attribute);
