@@ -2,6 +2,7 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.MitreIdConnector;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
@@ -19,6 +20,7 @@ import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +28,14 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of AdminCommandsService.
@@ -87,6 +92,15 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		request.setStatus(RequestStatus.APPROVED);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
+		Set<String> allowedAttrs = appConfig.getPerunAttributeDefinitionsMap().keySet();
+		Set<String> requestedAttrs = request.getAttributes().keySet();
+		Set<String> notAllowed = requestedAttrs.stream()
+				.filter(allowedAttrs::contains)
+				.collect(Collectors.toSet());
+
+		if (!notAllowed.isEmpty()) {
+			throw new InternalErrorException("Cannot approve, requested attributes are not allowed");
+		}
 
 		boolean requestProcessed = processApprovedRequest(request);
 		boolean requestUpdated = requestManager.updateRequest(request);
@@ -224,7 +238,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(
-				appConfig.getProxyIdentifierAttributeName(), appConfig.getProxyIdentifierAttributeValue());
+				appConfig.getProxyIdentifierAttribute(), appConfig.getProxyIdentifierAttributeValue());
 		Map<Long, Facility> proxyFacilitiesMap = ServiceUtils.transformListToMapFacilities(proxyFacilities);
 
 		if (proxyFacilitiesMap == null || proxyFacilitiesMap.isEmpty()) {
@@ -232,7 +246,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		List<Facility> testFacilities = perunConnector.getFacilitiesByAttribute(
-				appConfig.getIsTestSpAttributeName(), "true");
+				appConfig.getIsTestSpAttribute(), "true");
 		Map<Long, Facility> testFacilitiesMap = ServiceUtils.transformListToMapFacilities(testFacilities);
 
 		if (testFacilitiesMap != null && !testFacilitiesMap.isEmpty()) {
@@ -290,19 +304,25 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean adminSet = perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
 
-		Map<String, PerunAttribute> additionalAttributes;
-		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttributeName())) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
 			log.debug("Creating client in mitreId");
 			// TODO: uncomment when connector implemented
 			MitreIdResponse mitreResponse = null; // mitreIdConnector.createClient(request.getAttributes());
-			additionalAttributes = prepareNewFacilityAttributes(true, false, mitreResponse);
-		} else {
-			additionalAttributes = prepareNewFacilityAttributes(true, false, null);
+			// generateClientIdAttribute(mitreResponse.getClientId());
+			// generateClientSecretAttribute(mitreResponse.getClientSecret());
 		}
 
-		request.updateAttributes(additionalAttributes, true);
-		boolean attributesSet = perunConnector.setFacilityAttributes(
-				request.getFacilityId(), request.getAttributesAsJsonArrayForPerun());
+		PerunAttribute testSp = generateTestSpAttribute(true);
+		PerunAttribute showOnServiceList = generateShowOnServiceListAttribute(false);
+		PerunAttribute proxyIdentifiers = generateProxyIdentifiersAttribute();
+		PerunAttribute masterProxyIdentifiers = generateMasterProxyIdentifierAttribute();
+
+		JSONArray attributes = request.getAttributesAsJsonArrayForPerun();
+		attributes.put(testSp.toJson());
+		attributes.put(showOnServiceList.toJson());
+		attributes.put(proxyIdentifiers.toJson());
+		attributes.put(masterProxyIdentifiers.toJson());
+		boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(), attributes);
 
 		boolean successful = (adminSet && attributesSet);
 		if (!successful) {
@@ -336,7 +356,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 				request.getAttributesAsJsonArrayForPerun());
 		boolean mitreIdUpdated = false;
 
-		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttributeName())) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
 			// TODO: uncomment when connector implemented
 			//PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId, mitreIdAttrsConfig.getMitreClientIdAttr());
 			//mitreIdUpdated = mitreIdConnector.updateClient(mitreClientId.valueAsLong(), request.getAttributes());
@@ -345,7 +365,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean successful = (facilityCoreUpdated && attributesSet && mitreIdUpdated);
 		if (!successful) {
-			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttributeName())) {
+			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
 				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}, mitreIdUpdated: {}",
 						facilityCoreUpdated, attributesSet, mitreIdUpdated);
 			} else {
@@ -373,7 +393,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		boolean facilityRemoved = perunConnector.deleteFacilityFromPerun(facilityId);
 		boolean mitreIdRemoved = false;
 
-		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttributeName())) {
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
 			// TODO: uncomment when connector implemented
 			//PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId, mitreIdAttrsConfig.getMitreClientIdAttr());
 			// mitreIdRemoved = mitreIdConnector.deleteClient(mitreClientId.valueAsLong());
@@ -382,7 +402,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean successful = facilityRemoved && mitreIdRemoved;
 		if (!successful) {
-			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttributeName())) {
+			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
 				log.error("Some operations failed - facilityRemoved: {}, mitreIdRemoved: {}",
 						facilityRemoved, mitreIdRemoved);
 			} else {
@@ -400,14 +420,17 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		log.trace("requestMoveToProduction({})", request);
 
 		log.info("Updating facility attributes");
-		Map<String, PerunAttribute> attributeMap = prepareNewFacilityAttributes(false, true, null);
-		request.updateAttributes(attributeMap, true);
+		PerunAttribute testSp = generateTestSpAttribute(false);
+		PerunAttribute showOnServiceList = generateShowOnServiceListAttribute(true);
 
-		boolean updated = perunConnector.setFacilityAttributes(request.getFacilityId(),
-				request.getAttributesAsJsonArrayForPerun());
+		JSONArray attributes = request.getAttributesAsJsonArrayForPerun();
+		attributes.put(testSp.toJson());
+		attributes.put(showOnServiceList.toJson());
 
-		log.trace("requestMoveToProduction returns: {}", updated);
-		return updated;
+		boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(), attributes);
+
+		log.trace("requestMoveToProduction returns: {}", attributesSet);
+		return attributesSet;
 	}
 
 	private Long extractFacilityIdFromRequest(Request request) throws InternalErrorException {
@@ -434,7 +457,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		Map<String, PerunAttribute> attributesMap = new HashMap<>();
 
-		PerunAttributeDefinition testSpAttrDef = appConfig.getAttrDefinition(appConfig.getIsTestSpAttributeName());
+		PerunAttributeDefinition testSpAttrDef = appConfig.getAttrDefinition(appConfig.getIsTestSpAttribute());
 		PerunAttribute isTestSpAttr = new PerunAttribute(testSpAttrDef, testSp);
 
 		PerunAttributeDefinition showOnListAttrDef = appConfig.getAttrDefinition(appConfig.getShowOnServicesListAttributeName());
@@ -489,5 +512,49 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		log.trace("updateFacilityNameAndDesc() returns: {}", successful);
 		return successful;
+	}
+
+	private PerunAttribute generateMasterProxyIdentifierAttribute() {
+		log.trace("generateMasterProxyIdentifierAttribute()");
+
+		PerunAttribute attribute = new PerunAttribute();
+		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getProxyIdentifierAttribute()));
+		attribute.setValue(appConfig.getMasterProxyIdentifierAttributeValue());
+
+		log.trace("generateMasterProxyIdentifierAttribute() returns: {}", attribute);
+		return attribute;
+	}
+
+	private PerunAttribute generateProxyIdentifiersAttribute() {
+		log.trace("generateProxyIdentifierAttribute()");
+
+		PerunAttribute attribute = new PerunAttribute();
+		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getProxyIdentifierAttribute()));
+		attribute.setValue(Collections.singletonList(appConfig.getProxyIdentifierAttributeValue()));
+
+		log.trace("generateProxyIdentifierAttribute() returns: {}", attribute);
+		return attribute;
+	}
+
+	private PerunAttribute generateShowOnServiceListAttribute(boolean value) {
+		log.trace("generateShowOnServiceListAttribute({})", value);
+
+		PerunAttribute attribute = new PerunAttribute();
+		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getShowOnServicesListAttributeName()));
+		attribute.setValue(value);
+
+		log.trace("generateShowOnServiceListAttribute() returns: {}", attribute);
+		return attribute;
+	}
+
+	private PerunAttribute generateTestSpAttribute(boolean value) {
+		log.trace("generateTestSpAttribute({})", value);
+
+		PerunAttribute attribute = new PerunAttribute();
+		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getIsTestSpAttribute()));
+		attribute.setValue(value);
+
+		log.trace("generateTestSpAttribute() returns: {}", attribute);
+		return attribute;
 	}
 }

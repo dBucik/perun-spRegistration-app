@@ -1,5 +1,6 @@
 package cz.metacentrum.perun.spRegistration.persistence.configs;
 
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,13 @@ public class AppConfig {
 	private List<String> availableLanguages;
 	private PerunConnector perunConnector;
 	private String showOnServicesListAttributeName;
-	private String isTestSpAttributeName;
-	private String entityIdAttributeName;
-	private String proxyIdentifierAttributeName;
+	private String isTestSpAttribute;
+	private String entityIdAttribute;
+	private String clientIdAttribute;
+	private String clientSecretAttribute;
+	private String masterProxyIdentifierAttribute;
+	private String masterProxyIdentifierAttributeValue;
+	private String proxyIdentifierAttribute;
 	private String proxyIdentifierAttributeValue;
 	private String adminsAttributeName;
 	private String userEmailAttributeName;
@@ -85,22 +90,6 @@ public class AppConfig {
 		this.availableLanguages = new ArrayList<>();
 	}
 
-	public String getProxyIdentifierAttributeName() {
-		return proxyIdentifierAttributeName;
-	}
-
-	public void setProxyIdentifierAttributeName(String proxyIdentifierAttributeName) {
-		this.proxyIdentifierAttributeName = proxyIdentifierAttributeName;
-	}
-
-	public String getProxyIdentifierAttributeValue() {
-		return proxyIdentifierAttributeValue;
-	}
-
-	public void setProxyIdentifierAttributeValue(String proxyIdentifierAttributeValue) {
-		this.proxyIdentifierAttributeValue = proxyIdentifierAttributeValue;
-	}
-
 	public Set<Long> getAppAdminIds() {
 		return Collections.unmodifiableSet(appAdminIds);
 	}
@@ -133,44 +122,12 @@ public class AppConfig {
 		this.perunConnector = perunConnector;
 	}
 
-	public String getIsTestSpAttributeName() {
-		return isTestSpAttributeName;
-	}
-
-	public void setIsTestSpAttributeName(String isTestSpAttributeName) {
-		this.isTestSpAttributeName = isTestSpAttributeName;
-	}
-
-	public String getShowOnServicesListAttributeName() {
-		return showOnServicesListAttributeName;
-	}
-
-	public void setShowOnServicesListAttributeName(String showOnServicesListAttributeName) {
-		this.showOnServicesListAttributeName = showOnServicesListAttributeName;
-	}
-
-	public String getAdminsAttributeName() {
-		return adminsAttributeName;
-	}
-
-	public void setAdminsAttributeName(String adminsAttributeName) {
-		this.adminsAttributeName = adminsAttributeName;
-	}
-
 	public String getLoginExtSource() {
 		return loginExtSource;
 	}
 
 	public void setLoginExtSource(String loginExtSource) {
 		this.loginExtSource = loginExtSource;
-	}
-
-	public String getUserEmailAttributeName() {
-		return userEmailAttributeName;
-	}
-
-	public void setUserEmailAttributeName(String userEmailAttributeName) {
-		this.userEmailAttributeName = userEmailAttributeName;
 	}
 
 	public String getFooterHTML() {
@@ -282,30 +239,120 @@ public class AppConfig {
 		this.adminsEndpoint = adminsEndpoint;
 	}
 
-	public String getEntityIdAttributeName() {
-		return entityIdAttributeName;
+	// ATTRIBUTES
+
+	public String getMasterProxyIdentifierAttribute() {
+		return masterProxyIdentifierAttribute;
 	}
 
-	public void setEntityIdAttributeName(String entityIdAttributeName) {
-		this.entityIdAttributeName = entityIdAttributeName;
+	public void setMasterProxyIdentifierAttribute(String masterProxyIdentifierAttribute) throws ConnectorException {
+		this.masterProxyIdentifierAttribute = masterProxyIdentifierAttribute;
+
+		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(masterProxyIdentifierAttribute);
+		perunAttributeDefinitionsMap.put(masterProxyIdentifierAttribute, def);
+	}
+
+	public String getProxyIdentifierAttribute() {
+		return proxyIdentifierAttribute;
+	}
+
+	public void setProxyIdentifierAttribute(String proxyIdentifierAttribute) throws ConnectorException {
+		this.proxyIdentifierAttribute = proxyIdentifierAttribute;
+
+		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(proxyIdentifierAttribute);
+		perunAttributeDefinitionsMap.put(proxyIdentifierAttribute, def);
+	}
+
+	public String getIsTestSpAttribute() {
+		return isTestSpAttribute;
+	}
+
+	public void setIsTestSpAttribute(String isTestSpAttribute) throws ConnectorException {
+		this.isTestSpAttribute = isTestSpAttribute;
+
+		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(isTestSpAttribute);
+		perunAttributeDefinitionsMap.put(isTestSpAttribute, def);
+	}
+
+	public String getShowOnServicesListAttributeName() {
+		return showOnServicesListAttributeName;
+	}
+
+	public void setShowOnServicesListAttributeName(String showOnServicesListAttributeName) throws ConnectorException {
+		this.showOnServicesListAttributeName = showOnServicesListAttributeName;
+
+		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(showOnServicesListAttributeName);
+		perunAttributeDefinitionsMap.put(showOnServicesListAttributeName, def);
+	}
+
+	public String getAdminsAttributeName() {
+		return adminsAttributeName;
+	}
+
+	public void setAdminsAttributeName(String adminsAttributeName) {
+		this.adminsAttributeName = adminsAttributeName;
+	}
+
+	public String getUserEmailAttributeName() {
+		return userEmailAttributeName;
+	}
+
+	public void setUserEmailAttributeName(String userEmailAttributeName) {
+		this.userEmailAttributeName = userEmailAttributeName;
+	}
+
+	public String getEntityIdAttribute() {
+		return entityIdAttribute;
+	}
+
+	public void setEntityIdAttribute(String entityIdAttribute) {
+		this.entityIdAttribute = entityIdAttribute;
+	}
+
+	public String getClientIdAttribute() {
+		return clientIdAttribute;
+	}
+
+	public void setClientIdAttribute(String clientIdAttribute) {
+		this.clientIdAttribute = clientIdAttribute;
+	}
+
+	public String getClientSecretAttribute() {
+		return clientSecretAttribute;
+	}
+
+	public void setClientSecretAttribute(String clientSecretAttribute) {
+		this.clientSecretAttribute = clientSecretAttribute;
+	}
+
+	// VALUES
+
+	public String getMasterProxyIdentifierAttributeValue() {
+		return masterProxyIdentifierAttributeValue;
+	}
+
+	public void setMasterProxyIdentifierAttributeValue(String masterProxyIdentifierAttributeValue) {
+		this.masterProxyIdentifierAttributeValue = masterProxyIdentifierAttributeValue;
+	}
+
+	public String getProxyIdentifierAttributeValue() {
+		return proxyIdentifierAttributeValue;
+	}
+
+	public void setProxyIdentifierAttributeValue(String proxyIdentifierAttributeValue) {
+		this.proxyIdentifierAttributeValue = proxyIdentifierAttributeValue;
 	}
 
 	@Override
 	public String toString() {
-		return "proxyIdentifierAttributeName: '" + proxyIdentifierAttributeName + "'\n" +
-				"proxyIdentifierAttributeValue: '" + proxyIdentifierAttributeValue + "'\n" +
-				"adminsAttributeName: '" + adminsAttributeName + "'\n" +
-				"appAdminIds: " + appAdminIds + "'\n" +
+		return	"appAdminIds: " + appAdminIds + "'\n" +
 				"loginExtSource: '" + loginExtSource + "'\n" +
-				"userEmailAttributeName: '" + userEmailAttributeName + "'\n" +
 				"perunAttributeDefinitionsMap: " + perunAttributeDefinitionsMap + "'\n" +
 				"oidcEnabled=" + oidcEnabled + "'\n" +
 				"availableLanguages=" + availableLanguages + "'\n" +
 				"enLocale=" + enLocale + "'\n" +
 				"csLocale=" + csLocale + "'\n" +
 				"perunConnector=" + perunConnector + "'\n" +
-				"showOnServicesListAttributeName: '" + showOnServicesListAttributeName + "'\n" +
-				"isTestSpAttributeName: '" + isTestSpAttributeName + "'\n" +
 				"footerHTML: '" + footerHTML + "'\n" +
 				"headerLogo: '" + headerLogo + "'\n" +
 				"headerTitle: '" + headerTitle + "'\n" +
@@ -315,7 +362,14 @@ public class AppConfig {
 				"secret: " + secret + "'\n" +
 				"specifyAuthoritiesEnabled: " + specifyAuthoritiesEnabled + "'\n" +
 				"signaturesEndpointUrl: '" + signaturesEndpointUrl + "'\n" +
-				"adminsEndpoint: '" + adminsEndpoint + "'\n";
+				"adminsEndpoint: '" + adminsEndpoint + "'\n" +
+				"proxyIdentifierAttribute: '" + proxyIdentifierAttribute + "'\n" +
+				"masterProxyIdentifierAttribute: '" + masterProxyIdentifierAttribute + "'\n" +
+				"proxyIdentifierAttributeValue: '" + proxyIdentifierAttributeValue + "'\n" +
+				"adminsAttributeName: '" + adminsAttributeName + "'\n" +
+				"userEmailAttributeName: '" + userEmailAttributeName + "'\n" +
+				"showOnServicesListAttributeName: '" + showOnServicesListAttributeName + "'\n" +
+				"isTestSpAttribute: '" + isTestSpAttribute + "'\n";
 	}
 
 	// custom methods
@@ -347,4 +401,5 @@ public class AppConfig {
 		}
 		return s.substring(0, 32);
 	}
+
 }
