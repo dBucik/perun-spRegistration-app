@@ -428,10 +428,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Long activeRequestId = requestManager.getActiveRequestIdByFacilityId(facilityId);
 		facility.setActiveRequestId(activeRequestId);
 
-		PerunAttribute proxyAttrs = perunConnector.getFacilityAttribute(facilityId, appConfig.getMasterProxyIdentifierAttribute());
-		boolean canBeEdited = appConfig.getMasterProxyIdentifierAttribute().equals(proxyAttrs.valueAsString());
-		facility.setCanEdit(canBeEdited);
-
 		List<String> attrsToFetch = new ArrayList<>(appConfig.getPerunAttributeDefinitionsMap().keySet());
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
 		boolean isOidc = ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttribute());
@@ -441,6 +437,10 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
+
+		PerunAttribute proxyAttrs = perunConnector.getFacilityAttribute(facilityId, appConfig.getMasterProxyIdentifierAttribute());
+		boolean canBeEdited = appConfig.getMasterProxyIdentifierAttributeValue().equals(proxyAttrs.valueAsString());
+		facility.setCanEdit(canBeEdited);
 
 		log.trace("getDetailedFacility returns: {}", facility);
 		return facility;
