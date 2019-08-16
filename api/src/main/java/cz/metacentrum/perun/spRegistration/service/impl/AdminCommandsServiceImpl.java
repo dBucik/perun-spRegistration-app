@@ -95,7 +95,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		Set<String> allowedAttrs = appConfig.getPerunAttributeDefinitionsMap().keySet();
 		Set<String> requestedAttrs = request.getAttributes().keySet();
 		Set<String> notAllowed = requestedAttrs.stream()
-				.filter(allowedAttrs::contains)
+				.filter(attrName -> !allowedAttrs.contains(attrName))
 				.collect(Collectors.toSet());
 
 		if (!notAllowed.isEmpty()) {
