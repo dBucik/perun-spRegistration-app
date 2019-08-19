@@ -13,7 +13,7 @@
     <context:property-placeholder properties-ref="facilitySamlAttributes" order="3" ignore-unresolvable="true"/>
     <context:property-placeholder properties-ref="facilityOidcAttributes" order="4" ignore-unresolvable="true"/>
     <context:property-placeholder properties-ref="facilityOrganizationAttributes" order="5" ignore-unresolvable="true"/>
-    <context:property-placeholder properties-ref="facilityMembershipAttributes" order="6" />
+    <context:property-placeholder properties-ref="facilityAccessControlAttributes" order="6" />
 
     <tx:annotation-driven proxy-target-class="true" />
 
@@ -35,13 +35,14 @@
                 <prop key="host.url">http://spreg.com/spreg</prop>
                 <prop key="secret">secretSaltGoesHere123!X$</prop>
                 <!-- ATTRS -->
-                <prop key="attr.userEmail.name">urn:perun:user:attribute-def:def:preferredMail</prop>
-                <prop key="attr.proxyIdentifierAttribute">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
-                <prop key="attr.proxyIdentifierAttribute.value">XYZ</prop>
+                <prop key="attr.userEmail">urn:perun:user:attribute-def:def:preferredMail</prop>
+                <prop key="attr.proxyIdentifier">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
+                <prop key="attr.proxyIdentifier.value">XYZ</prop>
                 <prop key="attr.masterProxyIdentifier">urn:perun:facility:attribute-def:def:masterProxyIdentifier</prop>
                 <prop key="attr.masterProxyIdentifier.value">https://login.cesnet.cz/idp/</prop>
                 <prop key="attr.isTestSp">urn:perun:facility:attribute-def:def:isTestSp</prop>
                 <prop key="attr.showOnServiceList">urn:perun:facility:attribute-def:def:showOnServiceList</prop>
+                <prop key="attr.administratorContact">urn:perun:facility:attribute-def:def:administrationContact</prop>
                 <!-- APPROVALS -->
                 <prop key="approval.confirmationPeriod.days">30</prop>
                 <prop key="approval.confirmationPeriod.hours">0</prop>
@@ -53,7 +54,7 @@
                 <prop key="app.header.title">Registration of SP - dev</prop>
                 <prop key="app.header.logo">https://perun.cesnet.cz/signpost/images/perun_3.png</prop>
                 <!-- DATABASE -->
-                <prop key="jdbc.driver">com.mysql.jdbc.Driver</prop>
+                <prop key="jdbc.driver">com.mysql.cj.jdbc.Driver</prop>
                 <prop key="jdbc.url">jdbc:mysql://127.0.0.1:3306/spreg</prop>
                 <prop key="jdbc.username">user</prop>
                 <prop key="jdbc.password">pass</prop>
@@ -79,13 +80,10 @@
         <property name="ignoreResourceNotFound" value="false"/>
     </bean>
 
-    <!-- BEANS WITH ATTRIBUTES CONFIGRATION -->
-    <import resource="attributes-context.xml" />
-
     <bean id="messagesProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
-                <prop key="appAdminIds.emails">appAdminIds@test.com,adminsMailingList@test.com</prop>
+                <prop key="appAdmin.emails">appAdminIds@test.com,adminsMailingList@test.com</prop>
                 <prop key="host">localhost</prop>
                 <prop key="from">test@mail.com</prop>
                 <prop key="footer">&lt;br/&gt; &lt;br/&gt;Best regards, &lt;br/&gt; test.mail.com &lt;br/&gt; service registration</prop>
@@ -106,7 +104,7 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:///etc/perun-spRegistration/messagesProperties.properties</value>
+                <value>file:///etc/perun-spRegistration/mail.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -115,7 +113,7 @@
     <bean id="enLocale" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="locations">
             <list>
-                <value>file:///etc/perun-spRegistration/lang-en.properties</value>
+                <value>file:///etc/perun-spRegistration/langs/en.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -124,7 +122,7 @@
     <bean id="csLocale" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="locations">
             <list>
-                <value>file:///etc/perun-spRegistration/lang-cs.properties</value>
+                <value>file:///etc/perun-spRegistration/langs/cs.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
@@ -163,10 +161,10 @@
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
     </bean>
 
-    <bean id="prodTransferAuthoritiesMailsMapRef" class="org.springframework.beans.factory.config.PropertiesFactoryBean" >
+    <bean id="prodTransferAuthoritiesMailsMap" class="org.springframework.beans.factory.config.PropertiesFactoryBean" >
         <property name="locations">
             <list>
-                <value>file:///etc/perun-spRegistration/prodTransferAuthoritiesMailsMap.properties</value>
+                <value>file:///etc/perun-spRegistration/prodTransferAuthoritiesMails.properties</value>
             </list>
         </property>
     </bean>
@@ -187,48 +185,19 @@
         <property name="secret" value="${secret}" />
         <property name="signaturesEndpointUrl" value="${host.url}/auth/sign"/>
         <property name="adminsEndpoint" value="${host.url}/auth/facilities/addAdmin/sign"/>
-        <property name="prodTransferAuthoritiesMailsMap" ref="prodTransferAuthoritiesMailsMapRef" />
-
+        <property name="prodTransferAuthoritiesMailsMap" ref="prodTransferAuthoritiesMailsMap" />
         <property name="masterProxyIdentifierAttribute" value="${attr.masterProxyIdentifier}" />
         <property name="masterProxyIdentifierAttributeValue" value="${attr.masterProxyIdentifier.value}" />
-        <property name="proxyIdentifierAttribute" value="${attr.proxyIdentifierAttribute}" />
-        <property name="proxyIdentifierAttributeValue" value="${attr.proxyIdentifierAttribute.value}" />
+        <property name="proxyIdentifierAttribute" value="${attr.proxyIdentifier}" />
+        <property name="proxyIdentifierAttributeValue" value="${attr.proxyIdentifier.value}" />
         <property name="isTestSpAttribute" value="${attr.isTestSp}" />
         <property name="showOnServicesListAttributeName" value="${attr.showOnServiceList}" />
         <property name="entityIdAttribute" value="${entityID.attrName}"/>
-        <property name="adminsAttributeName" value="${administratorContact.attrName}" />
-        <property name="userEmailAttributeName" value="${attr.userEmail.name}" />
+        <property name="adminsAttributeName" value="${attr.administratorContact}" />
+        <property name="userEmailAttributeName" value="${attr.userEmail}" />
     </bean>
 
-    <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
-        <constructor-arg name="attrsProps" ref="facilityServiceAttributes" />
-        <constructor-arg name="appConfig" ref="appConfig" />
-        <constructor-arg name="perunConnector" ref="perunConnector" />
-    </bean>
-
-    <bean id="facilityOrganizationConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
-        <constructor-arg name="attrsProps" ref="facilityOrganizationAttributes" />
-        <constructor-arg name="appConfig" ref="appConfig" />
-        <constructor-arg name="perunConnector" ref="perunConnector" />
-    </bean>
-
-    <bean id="facilitySamlConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
-        <constructor-arg name="attrsProps" ref="facilitySamlAttributes" />
-        <constructor-arg name="appConfig" ref="appConfig" />
-        <constructor-arg name="perunConnector" ref="perunConnector" />
-    </bean>
-
-    <bean id="facilityOidcConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
-        <constructor-arg name="attrsProps" ref="facilityOidcAttributes" />
-        <constructor-arg name="appConfig" ref="appConfig" />
-        <constructor-arg name="perunConnector" ref="perunConnector" />
-    </bean>
-
-    <bean id="facilityMembershipConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
-        <constructor-arg name="attrsProps" ref="facilityMembershipAttributes" />
-        <constructor-arg name="appConfig" ref="appConfig" />
-        <constructor-arg name="perunConnector" ref="perunConnector" />
-    </bean>
+    <import resource="attributes-context.xml" />
 
     <bean id="mitreidAttrsConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig">
         <property name="clientIdAttr" value="${oidcClientId.attrName}" />
@@ -238,7 +207,7 @@
         <property name="requiredScopesAttr" value="${oidcRequiredScopes.attrName}" />
         <property name="responseTypesAttr" value="${oidcResponseTypes.attrName}" />
         <property name="grantTypesAttrs" value="${oidcGrantTypes.attrName}" />
-        <property name="contactAttr" value="${administratorContact.attrName}" />
+        <property name="contactAttr" value="${attr.administratorContact}" />
         <property name="informationUrlAttr" value="${informationURL.attrName}" />
         <property name="allowIntrospectionAttr" value="${oidcAllowIntrospection.attrName}" />
         <property name="privacyPolicyUriAttr" value="${privacyPolicyURL.attrName}" />
@@ -248,7 +217,7 @@
         <property name="appConfig" ref="appConfig" />
         <property name="facilityServiceConfig" ref="facilityServiceConfig" />
         <property name="facilityOrganizationConfig" ref="facilityOrganizationConfig" />
-        <property name="facilityMembershipConfig" ref="facilityMembershipConfig" />
+        <property name="facilityMembershipConfig" ref="facilityAccessControlConfig" />
         <property name="facilityOidcConfig" ref="facilityOidcConfig" />
         <property name="facilitySamlConfig" ref="facilitySamlConfig" />
         <property name="messagesConfig" ref="messagesProperties" />

@@ -28,10 +28,16 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:///etc/perun-spRegistration/serviceAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/attrs/service.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+        <constructor-arg name="attrsProps" ref="facilityServiceAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilityOrganizationAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -49,10 +55,16 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:///etc/perun-spRegistration/organizationAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/attrs/organization.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="facilityOrganizationConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+        <constructor-arg name="attrsProps" ref="facilityOrganizationAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilitySamlAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -77,10 +89,16 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:///etc/perun-spRegistration/samlAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/attrs/saml.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="facilitySamlConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+        <constructor-arg name="attrsProps" ref="facilitySamlAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilityOidcAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -108,13 +126,19 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:///etc/perun-spRegistration/oidcAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/attrs/oidc.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
-    <bean id="facilityMembershipAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    <bean id="facilityOidcConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+        <constructor-arg name="attrsProps" ref="facilityOidcAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
+    </bean>
+
+    <bean id="facilityAccessControlAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
                 <prop key="checkGroupMembership.attrName">urn:perun:facility:attribute-def:def:checkGroupMembership</prop>
@@ -130,10 +154,16 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:///etc/perun-spRegistration/membershipAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/attrs/access_control.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="facilityAccessControlConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+        <constructor-arg name="attrsProps" ref="facilityAccessControlAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
 </beans>
