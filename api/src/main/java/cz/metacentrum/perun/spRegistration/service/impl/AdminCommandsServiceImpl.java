@@ -2,6 +2,7 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.MitreIdConnector;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;

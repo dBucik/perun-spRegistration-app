@@ -35,14 +35,13 @@
                 <prop key="host.url">http://spreg.com/spreg</prop>
                 <prop key="secret">secretSaltGoesHere123!X$</prop>
                 <!-- ATTRS -->
-                <prop key="attr.userEmail">urn:perun:user:attribute-def:def:preferredMail</prop>
-                <prop key="attr.proxyIdentifier">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
-                <prop key="attr.proxyIdentifier.value">XYZ</prop>
+                <prop key="attr.userEmail.name">urn:perun:user:attribute-def:def:preferredMail</prop>
+                <prop key="attr.proxyIdentifierAttribute">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
+                <prop key="attr.proxyIdentifierAttribute.value">XYZ</prop>
                 <prop key="attr.masterProxyIdentifier">urn:perun:facility:attribute-def:def:masterProxyIdentifier</prop>
-                <prop key="attr.masterProxyIdentifier.value">XYZ</prop>
+                <prop key="attr.masterProxyIdentifier.value">https://login.cesnet.cz/idp/</prop>
                 <prop key="attr.isTestSp">urn:perun:facility:attribute-def:def:isTestSp</prop>
                 <prop key="attr.showOnServiceList">urn:perun:facility:attribute-def:def:showOnServiceList</prop>
-                <prop key="attr.administratorContact">urn:perun:facility:attribute-def:def:administratorContact</prop>
                 <!-- APPROVALS -->
                 <prop key="approval.confirmationPeriod.days">30</prop>
                 <prop key="approval.confirmationPeriod.hours">0</prop>
@@ -186,6 +185,16 @@
         <property name="signaturesEndpointUrl" value="${host.url}/auth/sign"/>
         <property name="adminsEndpoint" value="${host.url}/auth/facilities/addAdmin/sign"/>
         <property name="prodTransferAuthoritiesMailsMap" ref="prodTransferAuthoritiesMailsMapRef" />
+        <property name="masterProxyIdentifierAttribute" value="${attr.masterProxyIdentifier}" />
+        <property name="masterProxyIdentifierAttributeValue" value="${attr.masterProxyIdentifier.value}" />
+        <property name="proxyIdentifierAttribute" value="${attr.proxyIdentifierAttribute}" />
+        <property name="proxyIdentifierAttributeValue" value="${attr.proxyIdentifierAttribute.value}" />
+        <property name="isTestSpAttribute" value="${attr.isTestSp}" />
+        <property name="showOnServicesListAttributeName" value="${attr.showOnServiceList}" />
+        <property name="entityIdAttribute" value="${entityID.attrName}"/>
+        <property name="adminsAttributeName" value="${administratorContact.attrName}" />
+        <property name="userEmailAttributeName" value="${attr.userEmail.name}" />
+    </bean>
 
         <property name="masterProxyIdentifierAttribute" value="${attr.masterProxyIdentifier}" />
         <property name="masterProxyIdentifierAttributeValue" value="${attr.masterProxyIdentifier.value}" />
