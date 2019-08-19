@@ -35,70 +35,70 @@
     </bean>
 
     <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
-    <constructor-arg name="attrsProps" ref="facilityServiceAttributes" />
-    <constructor-arg name="appConfig" ref="appConfig" />
-    <constructor-arg name="perunConnector" ref="perunConnector" />
+        <constructor-arg name="attrsProps" ref="facilityServiceAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilityOrganizationAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-    <property name="properties">
-        <props>
-            <!-- ORGANIZATION ATTRIBUTES -->
-            <prop key="organizationName.attrName">urn:perun:facility:attribute-def:def:organizationName</prop>
-            <prop key="organizationName.allowedKeys">en,cs</prop>
-            <prop key="organizationName.position">1</prop>
-            <prop key="organizationURL.attrName">urn:perun:facility:attribute-def:def:organizationURL</prop>
-            <prop key="organizationURL.position">2</prop>
-            <prop key="CoCo.attrName">urn:perun:facility:attribute-def:def:CoCo</prop>
-            <prop key="CoCo.position">3</prop>
-        </props>
-    </property>
-    <property name="locations">
-        <list>
-            <value>file:///etc/perun-spRegistration/attrs/organization.properties</value>
-        </list>
-    </property>
-    <property name="ignoreResourceNotFound" value="true"/>
+        <property name="properties">
+            <props>
+                <!-- ORGANIZATION ATTRIBUTES -->
+                <prop key="organizationName.attrName">urn:perun:facility:attribute-def:def:organizationName</prop>
+                <prop key="organizationName.allowedKeys">en,cs</prop>
+                <prop key="organizationName.position">1</prop>
+                <prop key="organizationURL.attrName">urn:perun:facility:attribute-def:def:organizationURL</prop>
+                <prop key="organizationURL.position">2</prop>
+                <prop key="CoCo.attrName">urn:perun:facility:attribute-def:def:CoCo</prop>
+                <prop key="CoCo.position">3</prop>
+            </props>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:///etc/perun-spRegistration/attrs/organization.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
     <bean id="facilityOrganizationConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
-    <constructor-arg name="attrsProps" ref="facilityOrganizationAttributes" />
-    <constructor-arg name="appConfig" ref="appConfig" />
-    <constructor-arg name="perunConnector" ref="perunConnector" />
+        <constructor-arg name="attrsProps" ref="facilityOrganizationAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilitySamlAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-    <property name="properties">
-        <props>
-            <prop key="entityID.attrName">urn:perun:facility:attribute-def:def:entityID</prop>
-            <prop key="entityID.position">1</prop>
-            <prop key="assertionConsumerService.attrName">urn:perun:facility:attribute-def:def:assertionConsumerService</prop>
-            <prop key="assertionConsumerService.isRequired">false</prop>
-            <prop key="assertionConsumerService.position">2</prop>
-            <prop key="singleLogoutService.attrName">urn:perun:facility:attribute-def:def:singleLogoutService</prop>
-            <prop key="singleLogoutService.isRequired">false</prop>
-            <prop key="singleLogoutService.position">3</prop>
-            <prop key="requiredAttributes.attrName">urn:perun:facility:attribute-def:def:requiredAttributes</prop>
-            <prop key="requiredAttributes.position">4</prop>
-            <prop key="requiredAttributes.allowedValues">eduPersonPrincipalName,eduPersonUniqueID,displayName,mail,schacHomeOrganisation,eduPersonScopedAffiliation,forwardedScopedAffiliation,eduPersonEntitlement,bonaFideStatus,eduPersonORCID,country</prop>
-            <prop key="certData.attrName">urn:perun:facility:attribute-def:def:certData</prop>
-            <prop key="certData.position">5</prop>
-            <prop key="metadataURL.attrName">urn:perun:facility:attribute-def:def:metadataURL</prop>
-            <prop key="metadataURL.position">6</prop>
-        </props>
-    </property>
-    <property name="locations">
-        <list>
-            <value>file:///etc/perun-spRegistration/attrs/saml.properties</value>
-        </list>
-    </property>
-    <property name="ignoreResourceNotFound" value="true"/>
+        <property name="properties">
+            <props>
+                <prop key="entityID.attrName">urn:perun:facility:attribute-def:def:entityID</prop>
+                <prop key="entityID.position">1</prop>
+                <prop key="assertionConsumerService.attrName">urn:perun:facility:attribute-def:def:assertionConsumerService</prop>
+                <prop key="assertionConsumerService.isRequired">false</prop>
+                <prop key="assertionConsumerService.position">2</prop>
+                <prop key="singleLogoutService.attrName">urn:perun:facility:attribute-def:def:singleLogoutService</prop>
+                <prop key="singleLogoutService.isRequired">false</prop>
+                <prop key="singleLogoutService.position">3</prop>
+                <prop key="requiredAttributes.attrName">urn:perun:facility:attribute-def:def:requiredAttributes</prop>
+                <prop key="requiredAttributes.position">4</prop>
+                <prop key="requiredAttributes.allowedValues">eduPersonPrincipalName,eduPersonUniqueID,displayName,mail,schacHomeOrganisation,eduPersonScopedAffiliation,forwardedScopedAffiliation,eduPersonEntitlement,bonaFideStatus,eduPersonORCID,country</prop>
+                <prop key="certData.attrName">urn:perun:facility:attribute-def:def:certData</prop>
+                <prop key="certData.position">5</prop>
+                <prop key="metadataURL.attrName">urn:perun:facility:attribute-def:def:metadataURL</prop>
+                <prop key="metadataURL.position">6</prop>
+            </props>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:///etc/perun-spRegistration/attrs/saml.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
     <bean id="facilitySamlConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
-    <constructor-arg name="attrsProps" ref="facilitySamlAttributes" />
-    <constructor-arg name="appConfig" ref="appConfig" />
-    <constructor-arg name="perunConnector" ref="perunConnector" />
+        <constructor-arg name="attrsProps" ref="facilitySamlAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilityOidcAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -126,44 +126,44 @@
         </property>
         <property name="locations">
             <list>
-                <value>file:///etc/perun-spRegistration/oidcAttrs.properties</value>
+                <value>file:///etc/perun-spRegistration/attrs/oidc.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
     <bean id="facilityOidcConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
-    <constructor-arg name="attrsProps" ref="facilityOidcAttributes" />
-    <constructor-arg name="appConfig" ref="appConfig" />
-    <constructor-arg name="perunConnector" ref="perunConnector" />
+        <constructor-arg name="attrsProps" ref="facilityOidcAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
     <bean id="facilityAccessControlAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-    <property name="properties">
-        <props>
-            <prop key="checkGroupMembership.attrName">urn:perun:facility:attribute-def:def:checkGroupMembership</prop>
-            <prop key="checkGroupMembership.position">1</prop>
-            <prop key="allowRegistration.attrName">urn:perun:facility:attribute-def:def:allowRegistration</prop>
-            <prop key="allowRegistration.position">2</prop>
-            <prop key="dynamicRegistration.attrName">urn:perun:facility:attribute-def:def:dynamicRegistration</prop>
-            <prop key="dynamicRegistration.position">3</prop>
-            <prop key="registrationURL.attrName">urn:perun:facility:attribute-def:def:registrationURL</prop>
-            <prop key="registrationURL.isRequired">false</prop>
-            <prop key="registrationURL.position">4</prop>
-        </props>
-    </property>
-    <property name="locations">
-        <list>
-            <value>file:///etc/perun-spRegistration/attrs/access_control.properties</value>
-        </list>
-    </property>
-    <property name="ignoreResourceNotFound" value="true"/>
+        <property name="properties">
+            <props>
+                <prop key="checkGroupMembership.attrName">urn:perun:facility:attribute-def:def:checkGroupMembership</prop>
+                <prop key="checkGroupMembership.position">1</prop>
+                <prop key="allowRegistration.attrName">urn:perun:facility:attribute-def:def:allowRegistration</prop>
+                <prop key="allowRegistration.position">2</prop>
+                <prop key="dynamicRegistration.attrName">urn:perun:facility:attribute-def:def:dynamicRegistration</prop>
+                <prop key="dynamicRegistration.position">3</prop>
+                <prop key="registrationURL.attrName">urn:perun:facility:attribute-def:def:registrationURL</prop>
+                <prop key="registrationURL.isRequired">false</prop>
+                <prop key="registrationURL.position">4</prop>
+            </props>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:///etc/perun-spRegistration/attrs/access_control.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
     <bean id="facilityAccessControlConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
-    <constructor-arg name="attrsProps" ref="facilityAccessControlAttributes" />
-    <constructor-arg name="appConfig" ref="appConfig" />
-    <constructor-arg name="perunConnector" ref="perunConnector" />
+        <constructor-arg name="attrsProps" ref="facilityAccessControlAttributes" />
+        <constructor-arg name="appConfig" ref="appConfig" />
+        <constructor-arg name="perunConnector" ref="perunConnector" />
     </bean>
 
 </beans>
