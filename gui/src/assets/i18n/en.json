@@ -15,6 +15,7 @@
   },
   "MENU": {
     "HOME": "Home",
+    "MAIN" : "Main",
     "REQUESTS": "Requests",
     "ADMIN": "Administrator",
     "ALL_FACILITIES": "All services",
