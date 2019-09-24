@@ -26,9 +26,14 @@
 }
 
 .active {
+  background-color: #212121;
   > a {
-    color: rgba(0, 0, 0, .90) !important;
+    color: #fafafa !important;
   }
+}
+
+.nav-item {
+  padding: .5rem .5rem !important;
 }
 
 .perun-content {
@@ -37,7 +42,6 @@
   min-height: 80vh;
 }
 .content-container {
-  //width: auto;
   margin-top: 64px;
 }
 
