@@ -10,6 +10,7 @@
 /gui/out-tsc
 /out
 /gui/src/main
+/gui/package-lock.json
 
 # Gui dependencies
 /gui/node_modules
