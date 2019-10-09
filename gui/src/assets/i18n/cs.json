@@ -13,6 +13,7 @@
   },
   "MENU": {
     "HOME": "Domů",
+    "MAIN" : "Hlavní",
     "REQUESTS": "Žádosti",
     "ADMIN": "Správce",
     "ALL_FACILITIES": "Všechny služby",

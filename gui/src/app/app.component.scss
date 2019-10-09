@@ -13,22 +13,9 @@
   color: white !important;
 }
 
-.perun-sidenav {
-  background-color: #fafafa;
-  top: 56px !important;
-  padding: 1em;
-  min-width: 200px;
-}
-
 .right-spacer {
   width: 200px;
   background-color: #fafafa;
-}
-
-.active {
-  > a {
-    color: rgba(0, 0, 0, .90) !important;
-  }
 }
 
 .perun-content {
@@ -37,7 +24,6 @@
   min-height: 80vh;
 }
 .content-container {
-  //width: auto;
   margin-top: 64px;
 }
 
@@ -57,3 +43,34 @@
   display: flex;
   align-items: center;
 }
+
+.perun-sidenav {
+  background-color: #fafafa;
+  padding-bottom: 1em !important;
+  min-width: 200px;
+}
+
+.active {
+  background-color: rgba(0,0,0,.65) !important;
+  > a {
+    color: #FAFAFA !important;
+  }
+}
+
+.nav-item {
+  padding: .5rem !important;
+}
+
+.menu-spacer {
+  color: #020202;
+}
+
+.menu-item-l1 {
+  padding-left: 1em !important;
+}
+
+.menu-item-l2 {
+  padding-left: 2em !important;
+}
+
+
