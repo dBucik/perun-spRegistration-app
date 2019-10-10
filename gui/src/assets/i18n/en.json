@@ -122,7 +122,7 @@
     "MOVE_TO_PRODUCTION_DESCRIPTION" : "You are requesting transfer to production environment. Fill in the following form.",
     "SUBMIT_BUTTON" : "Submit",
     "MOVE_TO_PRODUCTION_SUCCESS": "Request was created",
-    "MOVE_TO_PRODUCTION_EMAIL": "I want to specify emails",
+    "MOVE_TO_PRODUCTION_EMAIL": "I want to specify emails of responsible people who will approve this request (Head of node, Head of department...)",
     "EMAIL_DESCRIPTION": "Fill in emails, for approving an email press button Enter",
     "EMAIL_ERROR_FILL": "Fill in an email!",
     "EMAIL_ERROR_CORRECT": "Fill in an correct email!",
