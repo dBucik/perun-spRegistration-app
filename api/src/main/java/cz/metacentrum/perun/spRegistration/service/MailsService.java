@@ -238,7 +238,7 @@ public class MailsService {
 			case REQUEST_MODIFIED:
 				return "update";
 			case REQUEST_STATUS_UPDATED:
-				return "status_update";
+				return "status_updated";
 			case REQUEST_SIGNED:
 				return "signed";
 			default:
