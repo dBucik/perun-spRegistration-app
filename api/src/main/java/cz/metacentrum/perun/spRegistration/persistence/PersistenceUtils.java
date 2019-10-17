@@ -2,22 +2,15 @@ package cz.metacentrum.perun.spRegistration.persistence;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
-import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
-import cz.metacentrum.perun.spRegistration.service.Mails;
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -96,30 +89,6 @@ public class PersistenceUtils {
 	}
 
 	/**
-	 * Update request in Database and notify user about update
-	 * @param rm requestManager
-	 * @param request request
-	 * @param newStatus new status to be set
-	 * @param mp MessageProperties instance
-	 * @param adminsAttr attribute where admins are stored
-	 * @return TRUE if all went OK in DB false otherwise
-	 */
-	public static boolean updateRequestAndNotifyUser(RequestManager rm, Request request, RequestStatus newStatus,
-													 Properties mp, String adminsAttr) throws InternalErrorException {
-		log.trace("updateRequestAndNotifyUser(rm: {}, request: {}, newStatus: {}, mp:{}, adminsAttr: {})",
-				rm, request, newStatus, mp, adminsAttr);
-
-		boolean successful = updateRequest(rm, request, newStatus);
-
-		if (successful) {
-			successful = updateRequestInDbAndNotifyUser(mp, adminsAttr, request);
-		}
-
-		log.trace("updateRequestAndNotifyUser() returns: {}", successful);
-		return successful;
-	}
-
-	/**
 	 * Convert JsonNode to String with proper JSON formatting
 	 * @param jsonNode jsonNode to be converted
 	 * @return String or null
@@ -185,38 +154,5 @@ public class PersistenceUtils {
 			String val = props.getProperty(regexProp);
 			input.setRegex(val);
 		}
-	}
-
-	private static boolean updateRequest(RequestManager rm, Request request, RequestStatus newStatus)
-			throws InternalErrorException
-	{
-		log.trace("updateRequest(rm: {}, request: {}, newStatus:{})", rm, request, newStatus);
-
-		if (Utils.checkParamsInvalid(rm, request, newStatus)) {
-			log.error("Wrong parameters passed: (rm: {}, request: {}, newStatus: {})", rm, request, newStatus);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		request.setStatus(newStatus);
-		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-
-		boolean successful = rm.updateRequest(request);
-
-		log.trace("updateRequest returns: {}", successful);
-		return successful;
-	}
-
-	private static boolean updateRequestInDbAndNotifyUser(Properties mp, String adminsAttr, Request request) {
-		log.trace("updateRequestInDbAndNotifyUser(mp: {}, adminsAttr: {}, request: {})", mp, adminsAttr, request);
-
-		if (Utils.checkParamsInvalid(request)) {
-			log.error("Wrong parameters passed: (request: {})", request);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		boolean sentMails = Mails.requestStatusUpdateUserNotify(request.getReqId(), request.getStatus(), request.getAdminContact(adminsAttr), mp);
-
-		log.trace("updateRequestInDbAndNotifyUser() returns: {}", sentMails);
-		return sentMails;
 	}
 }

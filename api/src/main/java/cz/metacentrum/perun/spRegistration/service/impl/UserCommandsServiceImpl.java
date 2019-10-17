@@ -3,6 +3,7 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
@@ -14,8 +15,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
-import cz.metacentrum.perun.spRegistration.service.Mails;
+import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
@@ -52,6 +52,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static cz.metacentrum.perun.spRegistration.service.MailsService.REQUEST_CREATED;
+import static cz.metacentrum.perun.spRegistration.service.MailsService.REQUEST_MODIFIED;
+import static cz.metacentrum.perun.spRegistration.service.MailsService.REQUEST_SIGNED;
+
 /**
  * Implementation of UserCommandsService.
  *
@@ -67,6 +71,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private static final String FACILITY_ID_KEY = "facilityId";
 	private static final String CREATED_AT_KEY = "createdAt";
 	private static final String REQUESTED_MAIL_KEY = "requestedMail";
+	private static final String APP_ADMINS_EMAILS_KEY = "appAdmin.emails";
 
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
@@ -74,6 +79,9 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private final Config config;
 	private final Properties messagesProperties;
 	private final Cipher cipher;
+	
+	@Autowired
+	private MailsService mailsService;
 
 
 	@Autowired
@@ -109,14 +117,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new InternalErrorException("Could not create request");
 		}
 
-		boolean notificationSent = Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(),
-				req.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
-
-		if (!notificationSent) {
-			log.error("Some operations failed - notificationsSent: false");
-		} else {
-			log.info("Request created, notifications sent");
-		}
+		mailsService.notifyUser(req, REQUEST_CREATED);
+		mailsService.notifyAppAdmins(req, REQUEST_CREATED);
 
 		log.trace("createRegistrationRequest returns: {}", req.getReqId());
 		return req.getReqId();
@@ -149,14 +151,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new InternalErrorException("Could not create request");
 		}
 
-		boolean notificationSent = Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(),
-				req.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
-
-		if (! notificationSent) {
-			log.error("Some operations failed - notificationsSent: false");
-		} else {
-			log.info("Request created, notifications sent");
-		}
+		mailsService.notifyUser(req, REQUEST_CREATED);
+		mailsService.notifyAppAdmins(req, REQUEST_CREATED);
 
 		log.trace("createFacilityChangesRequest returns: {}", req.getReqId());
 		return req.getReqId();
@@ -188,15 +184,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new InternalErrorException("Could not create request");
 		}
 
-		log.info("Sending mail notification");
-		boolean notificationSent = Mails.userCreateRequestNotify(req.getReqId(), req.getFacilityName(),
-				req.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
-
-		if (! notificationSent) {
-			log.error("Some operations failed - notificationsSent: false");
-		} else {
-			log.info("Request created, notifications sent");
-		}
+		mailsService.notifyUser(req, REQUEST_CREATED);
+		mailsService.notifyAppAdmins(req, REQUEST_CREATED);
 
 		log.trace("createRemovalRequest returns: {}", req.getReqId());
 		return req.getReqId();
@@ -231,16 +220,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		boolean requestUpdated = requestManager.updateRequest(request);
 
-		log.info("Sending mail notification");
-		boolean notificationSent = Mails.requestStatusUpdateUserNotify(requestId, request.getStatus(),
-				request.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
-
-		boolean successful = requestUpdated && notificationSent;
-		if (!successful) {
-			log.error("Some operations failed - requestUpdated: {}, notificationSent: {}", requestUpdated, notificationSent);
-		} else {
-			log.info("Request updated, notification sent");
-		}
+		mailsService.notifyUser(request, REQUEST_MODIFIED);
+		mailsService.notifyAppAdmins(request, REQUEST_MODIFIED);
 
 		log.trace("updateRequest returns: {}", requestUpdated);
 		return requestUpdated;
@@ -279,17 +260,9 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, String> authoritiesCodesMap = generateCodesForAuthorities(req, authorities);
 		Map<String, String> authoritiesLinksMap = generateLinksForAuthorities(authoritiesCodesMap, req);
 
-		boolean userNotificationSent = Mails.transferToProductionUserNotify(req.getReqId(), req.getFacilityName(),
-				req.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
-		int authoritiesNotificationSentCount = sendAuthoritiesNotifications(authoritiesLinksMap, req);
-		boolean successful = (userNotificationSent && (authoritiesNotificationSentCount == authorities.size()));
-
-		if (!successful) {
-			log.error("Some operations failed - userNotificationSent: {}, authoritiesNotificationSentCount: {} out of {}",
-					userNotificationSent, authoritiesNotificationSentCount, authorities.size());
-		} else {
-			log.info("Request updated, notification sent to user, notifications sent to authorities");
-		}
+		mailsService.notifyUser(req, REQUEST_CREATED);
+		mailsService.notifyAppAdmins(req, REQUEST_CREATED);
+		mailsService.notifyAuthorities(req, authoritiesLinksMap);
 
 		log.trace("requestMoveToProduction returns: {}", req.getReqId());
 		return req.getReqId();
@@ -350,6 +323,11 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		Long requestId = decryptedCode.getLong(REQUEST_ID_KEY);
 		boolean signed = requestManager.addSignature(requestId, user.getId(), user.getName(), approved, code);
+		Request req = requestManager.getRequestById(requestId);
+
+		log.info("Sending mail notification");
+		mailsService.notifyUser(req, REQUEST_SIGNED);
+		mailsService.notifyAppAdmins(req, REQUEST_SIGNED);
 
 		log.trace("signTransferToProduction returns: {}", signed);
 		return signed;
@@ -565,15 +543,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		Map<String, String> adminCodeMap = generateCodesForAdmins(admins, facilityId);
 		Map<String, String> adminLinkMap = generateLinksForAdmins(facilityId, adminCodeMap);
-		int newAdminsNotificationsSent = sendAdminsNotifications(adminLinkMap, facility);
-
-		boolean successful = (newAdminsNotificationsSent == admins.size());
-		if (!successful) {
-			log.error("Some operations failed - newAdminsNotificationsSent: {} out of {}",
-					newAdminsNotificationsSent, admins.size());
-		} else {
-			log.info("Notifications sent to requested admins");
-		}
+		boolean successful = mailsService.notifyNewAdmins(facility, adminLinkMap);
 
 		log.debug("addAdminsNotify returns: {}", successful);
 		return successful;
@@ -733,20 +703,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return res;
 	}
 
-	private PerunAttribute generateProxyIdentifierAttr() {
-		log.trace("generateProxyIdentifierAttr()");
-
-		String identifierAttrName = appConfig.getProxyIdentifierAttribute();
-		String value = appConfig.getProxyIdentifierAttributeValue();
-
-		PerunAttribute identifierAttr = new PerunAttribute();
-		identifierAttr.setFullName(identifierAttrName);
-		identifierAttr.setValue(Collections.singletonList(value));
-
-		log.trace("generateProxyIdentifierAttr() returns: {}", identifierAttr);
-		return identifierAttr;
-	}
-
 	private JSONObject decryptRequestCode(String code) throws InvalidKeyException, BadPaddingException,
 			IllegalBlockSizeException, MalformedCodeException
 	{
@@ -874,55 +830,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		log.trace("isExpiredCode() returns: {}", isExpired);
 		return isExpired;
-	}
-
-	private int sendAuthoritiesNotifications(Map<String, String> authsWithLinks, Request req) {
-		log.trace("sendAuthoritiesNotifications(authsWithLinks: {}, req: {})", authsWithLinks, req);
-
-		if (Utils.checkParamsInvalid(authsWithLinks, req)) {
-			log.error("Wrong parameters passed: (authsWithLinks: {}, req: {})", authsWithLinks, req);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		int sent = 0;
-		for (Map.Entry<String, String> entry: authsWithLinks.entrySet()) {
-			String mailAuthority = entry.getKey();
-			String mailLink = entry.getValue();
-			boolean res = Mails.authoritiesApproveProductionTransferNotify(mailLink, req.getFacilityName(), mailAuthority, messagesProperties);
-			if (res) {
-				sent++;
-			} else {
-				log.error("Sending notification to authority FAILED - authority: {}, link: {}", mailAuthority, mailLink);
-			}
-		}
-
-		log.trace("sendAuthoritiesNotifications() returns: {}", sent);
-		return sent;
-	}
-
-	private int sendAdminsNotifications(Map<String, String> adminLinkMap, Facility facility) {
-		log.trace("sendAdminsNotifications(adminLinkMap: {}, facility: {})", adminLinkMap, facility);
-
-		if (Utils.checkParamsInvalid(adminLinkMap, facility)) {
-			log.error("Wrong parameters passed: (adminLinkMap: {}, facility: {})", adminLinkMap, facility);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		int sent = 0;
-		for (Map.Entry<String, String> entry: adminLinkMap.entrySet()) {
-			String mailAdmin = entry.getKey();
-			String mailLink = entry.getValue();
-			boolean successful = Mails.adminAddRemoveNotify(entry.getValue(), facility.getName(), entry.getKey(),
-					messagesProperties);
-			if (successful) {
-				sent++;
-			} else {
-				log.error("Sending notification to new admin FAILED - admin: {}, link: {}", mailAdmin, mailLink);
-			}
-		}
-
-		log.trace("sendAdminsNotifications() returns: {}", sent);
-		return sent;
 	}
 
 	private Map<String, PerunAttribute> filterNotNullAttributes(Facility facility) {

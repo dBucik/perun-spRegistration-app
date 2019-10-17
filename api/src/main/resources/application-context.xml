@@ -87,17 +87,29 @@
                 <prop key="host">localhost</prop>
                 <prop key="from">test@mail.com</prop>
                 <prop key="footer">&lt;br/&gt; &lt;br/&gt;Best regards, &lt;br/&gt; test.mail.com &lt;br/&gt; service registration</prop>
-                <prop key="create.subject">Created service registration request %REQUEST_ID%</prop>
-                <prop key="create.message">Your request for registering the service %SERVICE_NAME% has been created with id: %REQUEST_ID%</prop>
-                <prop key="update.subject">Updated status of request %REQUEST_ID%</prop>
-                <prop key="update.message">Status has been updated to %NEW_STATUS%</prop>
-                <prop key="production.user.subject">Request for transfer to production of service: %SERVICE_NAME%</prop>
-                <prop key="production.user.message">Moving to production: %SERVICE_NAME%</prop>
-                <prop key="approval.subject">New request for approval %REQUEST_ID%</prop>
-                <prop key="approval.message">User %USER_INFO% has asked for approval of request %REQUEST_ID%</prop>
+                <prop key="moveToProduction.authorities">${approval.defaultAuthorities.mails}</prop>
+
+                <prop key="create.user.subject">Created service registration request %REQUEST_ID%</prop>
+                <prop key="create.user.message">Created request for registering the service %SERVICE_NAME%. Assigned ID: %REQUEST_ID%</prop>
+                <prop key="create.admin.subject">Created service registration request %REQUEST_ID%</prop>
+                <prop key="create.admin.message">Created request for registering the service %SERVICE_NAME%. Assigned ID: %REQUEST_ID%</prop>
+
+                <prop key="update.user.subject">Request %REQUEST_ID% updated</prop>
+                <prop key="update.user.message">Request %REQUEST_ID% updated</prop>
+                <prop key="update.admin.subject">Request %REQUEST_ID% updated</prop>
+                <prop key="update.admin.message">Request %REQUEST_ID% updated</prop>
+
+                <prop key="status_updated.user.subject">Updated status of request %REQUEST_ID%</prop>
+                <prop key="status_updated.user.message">Status has been updated to %NEW_STATUS%</prop>
+
+                <prop key="signed.user.subject">Request %REQUEST_ID% signed</prop>
+                <prop key="signed.user.message">Request %REQUEST_ID% signed</prop>
+                <prop key="signed.admin.subject">Request %REQUEST_ID% signed</prop>
+                <prop key="signed.admin.message">Request %REQUEST_ID% signed</prop>
+
                 <prop key="production.authorities.subject">Approve transfer to production: %SERVICE_NAME%</prop>
                 <prop key="production.authorities.message">For approval of moving service %SERVICE_NAME% to production visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
-                <prop key="moveToProduction.authorities">${approval.defaultAuthorities.mails}</prop>
+
                 <prop key="admins.add.subject">Approve request to become admin: %SERVICE_NAME%</prop>
                 <prop key="admins.add.message">For approval of becoming admin of %SERVICE_NAME% visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
             </props>
