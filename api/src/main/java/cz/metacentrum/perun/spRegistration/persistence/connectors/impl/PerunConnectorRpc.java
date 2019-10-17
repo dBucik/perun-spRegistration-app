@@ -280,17 +280,13 @@ public class PerunConnectorRpc implements PerunConnector {
 		}
 
 		User user = MapperUtils.mapUser(res, false);
-		if (user != null) {
-			params.clear();
-			params.put("user", user.getId().intValue());
-			params.put("attributeName", userEmailAttr);
+		params.clear();
+		params.put("user", user.getId().intValue());
+		params.put("attributeName", userEmailAttr);
 
-			JSONObject attr = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
-			PerunAttribute attribute = MapperUtils.mapAttribute(attr);
-			if (attribute != null) {
-				user.setEmail(attribute.valueAsString());
-			}
-		}
+		JSONObject attr = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
+		PerunAttribute attribute = MapperUtils.mapAttribute(attr);
+		user.setEmail(attribute.valueAsString());
 
 		log.trace("getUserWithEmail() returns: {}", user);
 		return user;

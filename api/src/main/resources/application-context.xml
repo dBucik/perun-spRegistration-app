@@ -49,10 +49,10 @@
                 <prop key="approval.allowToSpecifyOwn">true</prop>
                 <prop key="approval.defaultAuthorities.mails">mail1@there.com,mail2@there.com</prop>
                 <!-- APP FRONTEND ADDITIONS -->
-                <prop key="app.footer.html"/>
-                <prop key="app.header.html"/>
-                <prop key="app.header.title">Registration of SP - dev</prop>
-                <prop key="app.header.logo">https://perun.cesnet.cz/signpost/images/perun_3.png</prop>
+                <prop key="app.footer.html"/> <!-- TODO: move to frontend config -->
+                <prop key="app.header.html"/> <!-- TODO: move to frontend config -->
+                <prop key="app.header.title">Registration of SP - dev</prop> <!-- TODO: move to frontend config -->
+                <prop key="app.header.logo">https://perun.cesnet.cz/signpost/images/perun_3.png</prop> <!-- TODO: move to frontend config -->
                 <!-- DATABASE -->
                 <prop key="jdbc.driver">com.mysql.cj.jdbc.Driver</prop>
                 <prop key="jdbc.url">jdbc:mysql://127.0.0.1:3306/spreg</prop>

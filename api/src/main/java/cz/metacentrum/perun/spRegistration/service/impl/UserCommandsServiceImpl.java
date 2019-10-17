@@ -43,7 +43,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -71,7 +70,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private static final String FACILITY_ID_KEY = "facilityId";
 	private static final String CREATED_AT_KEY = "createdAt";
 	private static final String REQUESTED_MAIL_KEY = "requestedMail";
-	private static final String APP_ADMINS_EMAILS_KEY = "appAdmin.emails";
 
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
@@ -82,7 +80,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	
 	@Autowired
 	private MailsService mailsService;
-
 
 	@Autowired
 	public UserCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
