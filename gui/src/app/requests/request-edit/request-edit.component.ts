@@ -66,13 +66,15 @@ export class RequestEditComponent implements OnInit {
   onLoading() {
     this.loading = true;
     this.isCardBodyVisible = false;
+    this.isFormVisible = false;
   }
 
 
   submitRequest() {
+    this.loading = true;
 
     let perunAttributes: PerunAttribute[] = [];
-    
+
     this.items.forEach(i => {
       let attr = i.getAttribute();
       let perunAttr = new PerunAttribute(attr.value, attr.urn);
@@ -85,6 +87,7 @@ export class RequestEditComponent implements OnInit {
       let snackBarRef = this.snackBar
         .open(this.successfullySubmittedText, this.successActionText, {duration: this.snackBarDurationMs});
       snackBarRef.onAction().subscribe(() => {
+        this.loading = false;
         this.router.navigate(['/auth/requests/detail/' + this.request.reqId]);
       });
       this.router.navigate(['/auth']);

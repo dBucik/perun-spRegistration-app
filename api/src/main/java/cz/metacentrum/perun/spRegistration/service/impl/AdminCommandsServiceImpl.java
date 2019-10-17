@@ -15,7 +15,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
-import cz.metacentrum.perun.spRegistration.service.Mails;
+import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
@@ -53,6 +53,9 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 	private final Properties messagesProperties;
 	private final MitreIdAttrsConfig mitreIdAttrsConfig;
 	private final MitreIdConnector mitreIdConnector;
+
+	@Autowired
+	private MailsService mailsService;
 
 	@Autowired
 	public AdminCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
@@ -104,13 +107,13 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean requestProcessed = processApprovedRequest(request);
 		boolean requestUpdated = requestManager.updateRequest(request);
-		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.APPROVED,
-				request.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
-		boolean successful = (requestProcessed && requestUpdated && notificationSent);
+		mailsService.notifyUser(request, MailsService.REQUEST_STATUS_UPDATED);
+
+		boolean successful = (requestProcessed && requestUpdated);
 
 		if (!successful) {
-			log.error("some operations failed: requestProcessed: {}, requestUpdated: {}, notificationSent: {} for request: {}",
-					requestProcessed, requestUpdated, notificationSent, request);
+			log.error("some operations failed: requestProcessed: {}, requestUpdated: {} for request: {}",
+					requestProcessed, requestUpdated, request);
 		} else {
 			log.info("Request processed, request updated, notification sent");
 		}
@@ -147,19 +150,16 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
 		boolean requestUpdated = requestManager.updateRequest(request);
-		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.REJECTED,
-				request.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
-		boolean successful = (requestUpdated && notificationSent);
+		mailsService.notifyUser(request, MailsService.REQUEST_STATUS_UPDATED);
 
-		if (! successful) {
-			log.error("some operations failed: requestUpdated: {}, notificationSent: {} for request: {}",
-					requestUpdated, notificationSent, request);
+		if (! requestUpdated) {
+			log.error("some operations failed: requestUpdated: {} for request: {}", requestUpdated, request);
 		} else {
 			log.info("Request updated, notification sent");
 		}
 
-		log.trace("rejectRequest() returns: {}", successful);
-		return successful;
+		log.trace("rejectRequest() returns: {}", request);
+		return requestUpdated;
 	}
 
 	@Override
@@ -191,20 +191,17 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
 		boolean requestUpdated = requestManager.updateRequest(request);
-		boolean notificationSent = Mails.requestStatusUpdateUserNotify(request.getReqId(), RequestStatus.WAITING_FOR_CHANGES,
-				request.getAdminContact(appConfig.getAdminsAttributeName()), messagesProperties);
+		mailsService.notifyUser(request, MailsService.REQUEST_STATUS_UPDATED);
 
-		boolean successful = (requestUpdated && notificationSent);
-
-		if (! successful) {
-			log.error("some operations failed: requestUpdated: {}, notificationSent: {} for request: {}",
-					requestUpdated, notificationSent, request);
+		if (! requestUpdated) {
+			log.error("some operations failed: requestUpdated: {} for request: {}",
+					requestUpdated, request);
 		} else {
 			log.info("Request updated, notification sent");
 		}
 
-		log.trace("askForChanges() returns: {}", successful);
-		return successful;
+		log.trace("askForChanges() returns: {}", requestUpdated);
+		return requestUpdated;
 	}
 
 	@Override

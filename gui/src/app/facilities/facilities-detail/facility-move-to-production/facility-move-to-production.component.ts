@@ -25,6 +25,7 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
   ) { }
 
   private sub : Subscription;
+  private authoritiesMap : Map<string, string>;
 
   loading = true;
 
@@ -43,10 +44,14 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
             this.loading = false;
         });
       });
+      this.configService.getProdTransferAuthoritiesMailsMap().subscribe( map => {
+        this.authoritiesMap = map;
+      });
     });
   }
 
   moveToProduction() : void {
+    this.loading = true;
     if(!this.emailEnabled){
       this.emails = [];
     }
@@ -55,10 +60,12 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
       this.translate.get('FACILITIES.EMAIL_ERROR_FILL').subscribe(result => {
         this.snackBar.open(result, null, {duration: 5000});
       });
+      this.loading = false;
       return;
     }
 
     this.facilitiesService.createRequest(this.facility.id, this.emails).subscribe(reqid => {
+      this.loading = false;
         this.translate.get('FACILITIES.MOVE_TO_PRODUCTION_SUCCESS').subscribe(successMessage => {
           this.translate.get('FACILITIES.MOVE_TO_PRODUCTION_TO_REQUEST').subscribe(goToRequestMessage =>{
             let snackBarRef = this.snackBar
@@ -75,34 +82,14 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
 
   }
 
-  add(event: MatChipInputEvent): void {
-    const input = event.input;
-    const value = event.value;
-
-    if(value == ""){
-        return;
-    }
-
-    let EMAIL_REGEXP = /[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
-
-    if (value.length <= 5 || !EMAIL_REGEXP.test(value)) {
-        this.translate.get('FACILITIES.EMAIL_ERROR_CORRECT').subscribe(result => {
-          this.snackBar.open(result, null, {duration: 5000});
-        });
-    } else{
-       this.emails.push(value);
-         if (input) {
-             input.value = '';
-         }
-    }
-  }
-
- remove(email: string): void {
+  checkboxChanged(email: string): void {
     const index = this.emails.indexOf(email);
     if (index >= 0) {
-        this.emails.splice(index, 1);
+      this.emails.splice(index, 1);
+    } else {
+      this.emails.push(email);
     }
- }
+  };
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();

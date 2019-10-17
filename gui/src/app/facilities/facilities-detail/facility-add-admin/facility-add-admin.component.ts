@@ -41,13 +41,16 @@ export class FacilityAddAdminComponent implements OnInit {
   }
 
   addAdmin() : void {
+    this.loading = true;
     if(this.emails.length == 0){
+      this.loading = false;
       this.translate.get('FACILITIES.EMAIL_ERROR_FILL').subscribe(result => {
         this.snackBar.open(result, null, {duration: 5000});
       });
       return;
     }
     this.facilitiesService.addAdmins(this.facility.id, this.emails).subscribe(response => {
+      this.loading = false;
       if(response){
         this.translate.get('FACILITIES.ADD_FACILITY_ADMINS_SUBMITED').subscribe(successMessage => {
           this.translate.get('FACILITIES.GO_TO_FACILITY_DETAIL').subscribe(goToFacilityMessage =>{

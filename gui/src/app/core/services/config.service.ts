@@ -36,4 +36,8 @@ export class ConfigService {
   isAuthoritiesEnabled() : Observable<boolean>{
       return this.apiService.get('/config/specifyAuthoritiesEnabled');
   }
+
+  getProdTransferAuthoritiesMailsMap() : Observable<Map<string, string>> {
+    return this.apiService.get('/config/prodTransferAuthoritiesMailsMapRef');
+  }
 }

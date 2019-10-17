@@ -15,21 +15,31 @@
 #from                   # Message FROM field
 #footer                 # Footer of the messages
 
-#create.subject=               # Subject of message when notification is sent to user about created request
-#create.subject=               # Message body when notification is sent to user about created request
+#moveToProduction.authorities=        # Coma separated list of authorities emails
 
-#update.subject=               # Subject of message when notification is sent to user about updated request
-#update.subject=               # Message body when notification is sent to user about updated request
+#create.user.subject=       # Subject of message when notification is sent to user about created request
+#create.user.message=       # Message body when notification is sent to user about created request
 
-#production.user.subject=      # Subject of message when notification is sent to user when moving to production has been requested
-#production.user.message=      # Message body when notification is sent to user when moving to production has been requested
+#create.admin.subject=       # Subject of message when notification is sent to admin about created request
+#create.admin.message=       # Message body when notification is sent to admin about created request
+
+#update.user.subject=   # Subject of message when notification is sent to user about updated request
+#update.user.message=   # Message body when notification is sent to user about updated request
+
+#update.admin.subject=   # Subject of message when notification is sent to admin about updated request
+#update.admin.message=   # Message body when notification is sent to admin about updated request
+
+#status_updated.user.subject=   # Subject of message when notification is sent to user about new status of request
+#status_updated.user.message=   # Message body when notification is sent to user about new status of request
+
+#signed.user.subject=   # Subject of message when notification is sent to user about new signature request
+#signed.user.message=   # Message body when notification is sent to user about new signature request
+
+#signed.admin.subject=  # Subject of message when notification is sent to admin about new signature request
+#signed.admin.message=  # Message body when notification is sent to user about new signature request
 
 #production.authorities.subject=      # Subject of message when notification is sent to authority when moving to production has been requested
 #production.authorities.message=      # Message body when notification is sent to authority when moving to production has been requested
-#moveToProduction.authorities=        # Coma separated list of authorities emails 
 
-#approval.subject=      # Subject of message when notification is sent to app admin when moving to production has been requested
-#approval.message=      # Message body when notification is sent to app admin when moving to production has been requested
-
-#appAdminIds.add.subject=       # Subject of message when notification is sent to user when asked to become service administrator
-#appAdminIds.add.message=       # Message body when notification is sent to user when asked to become service administrator
+#admins.add.subject=    # Subject of message when notification is sent to user when asked to become service administrator
+#admins.add.message=    # Message body when notification is sent to user when asked to become service administrator
