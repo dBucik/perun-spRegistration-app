@@ -21,6 +21,7 @@ export class FacilitiesDetailDialogComponent implements OnInit {
   }
 
   onYesClick(): void{
+    this.data.parent.loading = true;
     this.data.parent.deleteFacility();
     this.dialogRef.close();
   }

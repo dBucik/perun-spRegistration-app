@@ -102,22 +102,15 @@ export class NewRequestComponent implements OnInit {
    * Collects data from form and submits new request
    */
   submitRequest() {
-
+    this.loading = true;
     let perunAttributes : PerunAttribute[] = [];
 
     this.steps.forEach(step => perunAttributes = perunAttributes.concat(step.getPerunAttributes()));
 
-    console.log(perunAttributes);
-
     this.requestsService.createRegistrationRequest(perunAttributes).subscribe(requestId => {
-      // let snackBarRef = this.snackBar
-      //   .open(this.successfullySubmittedText, this.successActionText, {duration: this.snackBarDurationMs});
-      //
-      // snackBarRef.onAction().subscribe(() => {
-      //   this.router.navigate(['/requests/detail/' + requestId]);
-      //});
+      this.loading = false;
+      this.snackBar.open(this.successActionText, null, {duration: 6000});
       this.router.navigate(['/auth/requests/detail/' + requestId]);
-      //this.router.navigate(['/']);
     });
   }
 

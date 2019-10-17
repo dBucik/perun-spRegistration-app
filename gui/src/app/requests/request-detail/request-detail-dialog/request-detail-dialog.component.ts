@@ -33,6 +33,7 @@ export class RequestDetailDialogComponent implements OnInit {
   }
 
   onYesClick(): void {
+    this.data.parent.onLoading();
     if (this.data.isApprove) {
       this.data.parent.approve();
     } else if (this.data.isSetWFC) {

@@ -47,6 +47,7 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
   }
 
   moveToProduction() : void {
+    this.loading = true;
     if(!this.emailEnabled){
       this.emails = [];
     }
@@ -55,10 +56,12 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
       this.translate.get('FACILITIES.EMAIL_ERROR_FILL').subscribe(result => {
         this.snackBar.open(result, null, {duration: 5000});
       });
+      this.loading = false;
       return;
     }
 
     this.facilitiesService.createRequest(this.facility.id, this.emails).subscribe(reqid => {
+      this.loading = false;
         this.translate.get('FACILITIES.MOVE_TO_PRODUCTION_SUCCESS').subscribe(successMessage => {
           this.translate.get('FACILITIES.MOVE_TO_PRODUCTION_TO_REQUEST').subscribe(goToRequestMessage =>{
             let snackBarRef = this.snackBar

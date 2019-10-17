@@ -83,6 +83,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
 
   deleteFacility(): void {
     this.facilitiesService.removeFacility(this.facility.id).subscribe(id => {
+      this.loading = false;
       this.router.navigateByUrl('auth/requests/detail/' + id);
     });
   }

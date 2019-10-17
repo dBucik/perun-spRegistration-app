@@ -131,8 +131,13 @@ export class RequestDetailComponent implements OnInit, DoCheck {
       });
     }
 
+    onLoading() : void {
+      this.loading = true;
+    }
+
     reject() {
       this.requestsService.rejectRequest(this.request.reqId).subscribe(bool => {
+        this.loading = false;
         this.snackBar.open(this.successRejectMessage, null, {duration: 6000});
         this.router.navigate(['/auth/requests/allRequests']);
         }, error => {
@@ -144,6 +149,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
 
     approve() {
       this.requestsService.approveRequest(this.request.reqId).subscribe(bool => {
+        this.loading = false;
         this.snackBar.open(this.successApproveMessage, null, {duration: 6000});
         this.router.navigate(['/auth/requests/allRequests']);
         }, error => {
@@ -163,6 +169,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
         }
       }
       this.requestsService.askForChanges(this.request.reqId, array).subscribe(bool => {
+        this.loading = false;
         this.snackBar.open(this.successSetWFCMessage, null, {duration: 6000});
         this.ngOnInit()
       }, error => {

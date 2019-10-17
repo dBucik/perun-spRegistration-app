@@ -74,6 +74,7 @@ export class FacilitiesEditComponent implements OnInit {
 
 
   submitRequest() {
+    this.loading = true;
     if (this.facility.activeRequestId != null){
       this.snackBar.open(this.errorRequestAlreadyExists, null, {duration: 6000});
       return
@@ -89,16 +90,18 @@ export class FacilitiesEditComponent implements OnInit {
       if (!i.hasCorrectValue()) {
         this.snackBar.open(this.errorWronglyFilledItem, null, {duration: 6000});
         allGood = false;
+        this.loading = false;
         return
       }
       perunAttributes.push(perunAttr);
     });
 
-    if (!allGood){return}
-
-    console.log(perunAttributes);
+    if (!allGood) {
+      return;
+    }
 
     this.facilityService.changeFacility(this.facility.id, perunAttributes).subscribe(requestId => {
+      this.loading = false;
       let snackBarRef = this.snackBar
         .open(this.successfullySubmittedText, this.successActionText, {duration: this.snackBarDurationMs});
       snackBarRef.onAction().subscribe(() => {
