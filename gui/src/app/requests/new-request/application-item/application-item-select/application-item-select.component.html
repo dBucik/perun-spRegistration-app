@@ -10,7 +10,7 @@
 
           <mat-option *ngFor="let value of applicationItem.allowedValues" [value]="value">{{value}}</mat-option>
         </mat-select>
-        <mat-hint>{{translatedDescription}}</mat-hint>
+        <mat-hint [innerHTML]="translatedDescription"></mat-hint>
       </mat-form-field>
     </div>
   </form>
