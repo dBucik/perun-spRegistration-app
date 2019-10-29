@@ -12,7 +12,7 @@
           [required]="applicationItem.required"
           type="text"
           id="{{applicationItem.name}}">
-        <mat-hint>{{translatedDescription}}</mat-hint>
+        <mat-hint [innerHTML]="translatedDescription"></mat-hint>
       </mat-form-field>
     </div>
     <div class="col-12 d-flex perun-warn" *ngIf="input.errors?.pattern && input.touched">
