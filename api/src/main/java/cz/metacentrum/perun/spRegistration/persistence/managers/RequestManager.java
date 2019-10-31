@@ -162,4 +162,24 @@ public interface RequestManager {
 	 * @throws IllegalArgumentException Thrown when param "code" is NULL or empty.
 	 */
 	boolean deleteUsedCode(String code) throws InternalErrorException;
+
+	/**
+	 * Store new clientId
+	 * @param clientId clientId
+	 * @return TRUE if stored, false otherwise
+	 */
+	boolean storeClientId(String clientId) throws InternalErrorException;
+
+	/**
+	 * Check if generated clientId is available
+	 * @param clientId clientId
+	 * @return TRUE if abailable, FALSE otherwise
+	 */
+	boolean isClientIdAvailable(String clientId);
+
+	/**
+	 * Delete clientId
+	 * @param clientId clientId
+	 */
+	void deleteClientId(String clientId) throws InternalErrorException;
 }

@@ -7,5 +7,6 @@ export interface Facility {
   testEnv: boolean;
   activeRequestId: number;
   canEdit: boolean;
+  oidc: boolean;
   attrs: Map<string, PerunAttribute>;
 }

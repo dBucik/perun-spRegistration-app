@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.security.InvalidKeyException;
 import java.util.List;
 
 /**
@@ -52,8 +55,7 @@ public class AdminRequestsController {
 	@PostMapping(path = "/api/approve/{requestId}")
 	public boolean approveRequest(@SessionAttribute("user") User user,
 								  @PathVariable("requestId") Long requestId)
-			throws ConnectorException, CannotChangeStatusException, InternalErrorException, UnauthorizedActionException
-	{
+			throws ConnectorException, CannotChangeStatusException, InternalErrorException, UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("approveRequest(user: {}, requestId: {})", user.getId(), requestId);
 		
 		boolean successful = service.approveRequest(requestId, user.getId());

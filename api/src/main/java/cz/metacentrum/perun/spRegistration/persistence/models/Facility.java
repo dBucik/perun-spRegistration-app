@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Representation of Perun Facility.
  *
- * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>;
+ * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>
  */
 public class Facility extends PerunEntity {
 
@@ -19,6 +19,7 @@ public class Facility extends PerunEntity {
 	private boolean testEnv;
 	private Long activeRequestId;
 	private boolean canEdit = false;
+	private boolean isOidc = false;
 	private Map<String, PerunAttribute> attrs = new HashMap<>();
 
 	public Facility(Long id) {
@@ -69,6 +70,14 @@ public class Facility extends PerunEntity {
 
 	public void setCanEdit(boolean canEdit) {
 		this.canEdit = canEdit;
+	}
+
+	public boolean isOidc() {
+		return isOidc;
+	}
+
+	public void setOidc(boolean oidc) {
+		isOidc = oidc;
 	}
 
 	public Map<String, PerunAttribute> getAttrs() {

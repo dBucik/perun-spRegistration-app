@@ -8,9 +8,19 @@ import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +31,16 @@ import java.util.stream.Collectors;
 public class ServiceUtils {
 
 	public static final Logger log = LoggerFactory.getLogger(ServiceUtils.class);
+	public static final String CIPHER_PARAMS = "AES/ECB/PKCS5PADDING";
+	public static Cipher cipher;
+
+	static {
+		try {
+			cipher = Cipher.getInstance(CIPHER_PARAMS);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Transform list of facilities into Map, where key is ID, value is Facility object.
@@ -134,4 +154,38 @@ public class ServiceUtils {
 		log.trace("isOidcAttributes() returns: {}", isOidc);
 		return isOidc;
 	}
+
+	public static String encrypt(String strToEncrypt, SecretKeySpec secretKeySpec)
+			throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+		Base64.Encoder b64enc = Base64.getUrlEncoder();
+
+		cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+		byte[] encrypted = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
+
+		return b64enc.encodeToString(encrypted);
+	}
+
+	public static String decrypt(String strToDecrypt, SecretKeySpec secretKeySpec) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+
+		Base64.Decoder b64dec = Base64.getUrlDecoder();
+
+		cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+		byte[] decrypted = cipher.doFinal(b64dec.decode(strToDecrypt));
+
+		return new String(decrypted);
+	}
+
+	public static String generateClientId() {
+		return UUID.randomUUID().toString();
+	}
+
+	public static String generateClientSecret() {
+		String uuid = UUID.randomUUID().toString();
+		uuid += UUID.randomUUID().toString();
+		uuid += UUID.randomUUID().toString();
+		uuid += UUID.randomUUID().toString();
+
+		return uuid;
+	}
+
 }

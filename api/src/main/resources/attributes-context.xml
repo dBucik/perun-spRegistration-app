@@ -104,23 +104,21 @@
     <bean id="facilityOidcAttributes" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
-                <prop key="oidcClientId.attrName">urn:perun:facility:attribute-def:def:OIDCClientID</prop>
-                <prop key="oidcClientId.position">1</prop>
                 <prop key="oidcRedirectUris.attrName">urn:perun:facility:attribute-def:def:OIDCRedirectURIs</prop>
-                <prop key="oidcRedirectUris.position">2</prop>
+                <prop key="oidcRedirectUris.position">1</prop>
                 <prop key="oidcGrantTypes.attrName">urn:perun:facility:attribute-def:def:OIDCGrantTypes</prop>
-                <prop key="oidcGrantTypes.position">3</prop>
+                <prop key="oidcGrantTypes.position">2</prop>
                 <prop key="oidcGrantTypes.allowedValues">authorization_code,implicit,device</prop>
                 <prop key="oidcResponseTypes.attrName">urn:perun:facility:attribute-def:def:OIDCResponseTypes</prop>
-                <prop key="oidcResponseTypes.position">4</prop>
+                <prop key="oidcResponseTypes.position">3</prop>
                 <prop key="oidcResponseTypes.allowedValues">code,token,id_token,token id_token,code id_token,code token,code token id_token</prop>
                 <prop key="oidcAllowIntrospection.attrName">urn:perun:facility:attribute-def:def:OIDCAllowIntrospection</prop>
-                <prop key="oidcAllowIntrospection.position">5</prop>
+                <prop key="oidcAllowIntrospection.position">4</prop>
                 <prop key="oidcRequiredScopes.attrName">urn:perun:facility:attribute-def:def:requiredScopes</prop>
-                <prop key="oidcRequiredScopes.position">6</prop>
+                <prop key="oidcRequiredScopes.position">5</prop>
                 <prop key="oidcRequiredScopes.allowedValues">openid,profile,email,address,phone,offline_access,perun_api,groupNames,permissions_ega,forwardedScopedAffiliations,bona_fide_status,country,eduPersonEntitlement</prop>
                 <prop key="oidcLogoUrl.attrName">urn:perun:facility:attribute-def:def:OIDCLogoUrl</prop>
-                <prop key="oidcLogoUrl.position">7</prop>
+                <prop key="oidcLogoUrl.position">6</prop>
                 <prop key="oidcLogoUrl.isRequired">false</prop>
             </props>
         </property>

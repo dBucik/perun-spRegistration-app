@@ -43,6 +43,8 @@
                 <prop key="attr.isTestSp">urn:perun:facility:attribute-def:def:isTestSp</prop>
                 <prop key="attr.showOnServiceList">urn:perun:facility:attribute-def:def:showOnServiceList</prop>
                 <prop key="attr.administratorContact">urn:perun:facility:attribute-def:def:administrationContact</prop>
+                <prop key="attr.oidcClientId">urn:perun:facility:attribute-def:def:OIDCClientID</prop>
+                <prop key="attr.oidcClientSecret">urn:perun:facility:attribute-def:def:OIDCClientSecret</prop>
                 <!-- APPROVALS -->
                 <prop key="approval.confirmationPeriod.days">30</prop>
                 <prop key="approval.confirmationPeriod.hours">0</prop>
@@ -62,10 +64,6 @@
                 <prop key="rpc.url">https://perun-dev.cesnet.cz/ba/rpc/</prop>
                 <prop key="rpc.user">user</prop>
                 <prop key="rpc.password">pass</prop>
-                <!-- MITREID -->
-                <prop key="mitreid.endpoint.clients">https://somewhere.com/oidc/api/clients</prop>
-                <prop key="mitreid.username">user</prop>
-                <prop key="mitreid.password">pass</prop>
             </props>
         </property>
     </bean>
@@ -162,13 +160,6 @@
         <property name="perunRpcPassword" value="${rpc.password}"/>
     </bean>
 
-    <bean id="mitreConnector" class="cz.metacentrum.perun.spRegistration.persistence.connectors.impl.MitreIdConnectorImpl">
-        <constructor-arg name="attrsConfig" ref="mitreidAttrsConfig" />
-        <constructor-arg name="username" value="${mitreid.username}" />
-        <constructor-arg name="password" value="${mitreid.password}" />
-        <constructor-arg name="clientsEndpoint" value="${mitreid.endpoint.clients}" />
-    </bean>
-
     <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
     </bean>
@@ -206,25 +197,13 @@
         <property name="isTestSpAttribute" value="${attr.isTestSp}" />
         <property name="showOnServicesListAttributeName" value="${attr.showOnServiceList}" />
         <property name="entityIdAttribute" value="${entityID.attrName}"/>
+        <property name="clientIdAttribute" value="${attr.oidcClientId}"/>
+        <property name="clientSecretAttribute" value="${attr.oidcClientSecret}"/>
         <property name="adminsAttributeName" value="${attr.administratorContact}" />
         <property name="userEmailAttributeName" value="${attr.userEmail}" />
     </bean>
 
     <import resource="attributes-context.xml" />
-
-    <bean id="mitreidAttrsConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig">
-        <property name="clientIdAttr" value="${oidcClientId.attrName}" />
-        <property name="redirectUrisAttr" value="${oidcRedirectUris.attrName}" />
-        <property name="clientNameAttr" value="${serviceName.attrName}" />
-        <property name="clientDescriptionAttr" value="${serviceDescription.attrName}" />
-        <property name="requiredScopesAttr" value="${oidcRequiredScopes.attrName}" />
-        <property name="responseTypesAttr" value="${oidcResponseTypes.attrName}" />
-        <property name="grantTypesAttrs" value="${oidcGrantTypes.attrName}" />
-        <property name="contactAttr" value="${attr.administratorContact}" />
-        <property name="informationUrlAttr" value="${informationURL.attrName}" />
-        <property name="allowIntrospectionAttr" value="${oidcAllowIntrospection.attrName}" />
-        <property name="privacyPolicyUriAttr" value="${privacyPolicyURL.attrName}" />
-    </bean>
 
     <bean id="config" class="cz.metacentrum.perun.spRegistration.persistence.configs.Config">
         <property name="appConfig" ref="appConfig" />
