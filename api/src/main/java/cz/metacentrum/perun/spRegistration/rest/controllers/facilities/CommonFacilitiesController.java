@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.security.InvalidKeyException;
+import java.util.Map;
+
 /**
  * Controller handling common actions related to Facilities.
  *
@@ -43,5 +48,17 @@ public class CommonFacilitiesController {
 
 		log.trace("facilityDetail() returns: {}", facility);
 		return facility;
+	}
+
+	@GetMapping(path = "/api/facility/oidcDetails/{facilityId}")
+	public Map<String, String> oidcDetails(@SessionAttribute("user") User user,
+								   @PathVariable("facilityId") Long facilityId)
+			throws ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+		log.trace("facilityDetail(user(): {}, facilityId: {})", user.getId(), facilityId);
+
+		Map<String, String> details = service.getOidcClientIdAndSecret(facilityId, user.getId());
+
+		log.trace("facilityDetail() returns: {}", details);
+		return details;
 	}
 }

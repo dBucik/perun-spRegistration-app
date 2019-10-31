@@ -9,6 +9,9 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatus
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.security.InvalidKeyException;
 import java.util.List;
 
 /**
@@ -30,7 +33,7 @@ public interface AdminCommandsService {
 	 *
 	 */
 	boolean approveRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, ConnectorException;
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException;
 
 	/**
 	 * Reject request.

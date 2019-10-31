@@ -2,17 +2,12 @@ package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
-import cz.metacentrum.perun.spRegistration.persistence.configs.MitreIdAttrsConfig;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.MitreIdConnector;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
-import cz.metacentrum.perun.spRegistration.persistence.models.MitreIdResponse;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
 import cz.metacentrum.perun.spRegistration.service.MailsService;
@@ -26,14 +21,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,29 +49,20 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 	private final RequestManager requestManager;
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
-	private final Properties messagesProperties;
-	private final MitreIdAttrsConfig mitreIdAttrsConfig;
-	private final MitreIdConnector mitreIdConnector;
 
 	@Autowired
 	private MailsService mailsService;
 
 	@Autowired
-	public AdminCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector,
-									AppConfig appConfig, Properties messagesProperties,
-									MitreIdAttrsConfig mitreIdAttrsConfig, MitreIdConnector mitreIdConnector) {
+	public AdminCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
-		this.messagesProperties = messagesProperties;
-		this.mitreIdAttrsConfig = mitreIdAttrsConfig;
-		this.mitreIdConnector = mitreIdConnector;
 	}
 
 	@Override
 	public boolean approveRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, ConnectorException
-	{
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("approveRequest(requestId: {}, userId: {})", requestId, userId);
 
 		if (Utils.checkParamsInvalid(requestId, userId)) {
@@ -261,7 +251,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 	/* PRIVATE METHODS */
 
-	private boolean processApprovedRequest(Request request) throws InternalErrorException, ConnectorException {
+	private boolean processApprovedRequest(Request request) throws InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		switch(request.getAction()) {
 			case REGISTER_NEW_SP:
 				return registerNewFacilityToPerun(request);
@@ -276,7 +266,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		return false;
 	}
 
-	private boolean registerNewFacilityToPerun(Request request) throws InternalErrorException, ConnectorException {
+	private boolean registerNewFacilityToPerun(Request request) throws InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("registerNewFacilityToPerun({})", request);
 
 		String newName = request.getFacilityName();
@@ -301,20 +291,20 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		boolean adminSet = perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
 
-		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
-			log.debug("Creating client in mitreId");
-			// TODO: uncomment when connector implemented
-			MitreIdResponse mitreResponse = null; // mitreIdConnector.createClient(request.getAttributes());
-			// generateClientIdAttribute(mitreResponse.getClientId());
-			// generateClientSecretAttribute(mitreResponse.getClientSecret());
-		}
-
 		PerunAttribute testSp = generateTestSpAttribute(true);
 		PerunAttribute showOnServiceList = generateShowOnServiceListAttribute(false);
 		PerunAttribute proxyIdentifiers = generateProxyIdentifiersAttribute();
 		PerunAttribute masterProxyIdentifiers = generateMasterProxyIdentifierAttribute();
 
+
 		JSONArray attributes = request.getAttributesAsJsonArrayForPerun();
+		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
+			PerunAttribute clientId = generateClientIdAttribute();
+			attributes.put(clientId.toJson());
+			PerunAttribute clientSecret = generateClientSecretAttribute();
+			attributes.put(clientSecret.toJson());
+		}
+
 		attributes.put(testSp.toJson());
 		attributes.put(showOnServiceList.toJson());
 		attributes.put(proxyIdentifiers.toJson());
@@ -388,29 +378,22 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		Long facilityId = extractFacilityIdFromRequest(request);
 
 		boolean facilityRemoved = perunConnector.deleteFacilityFromPerun(facilityId);
-		boolean mitreIdRemoved = false;
 
 		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
-			// TODO: uncomment when connector implemented
-			//PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId, mitreIdAttrsConfig.getMitreClientIdAttr());
-			// mitreIdRemoved = mitreIdConnector.deleteClient(mitreClientId.valueAsLong());
-			mitreIdRemoved = true;
+			String clientId = perunConnector.getFacilityAttribute(facilityId, appConfig.getClientIdAttribute())
+					.valueAsString();
+
+			requestManager.deleteClientId(clientId);
 		}
 
-		boolean successful = facilityRemoved && mitreIdRemoved;
-		if (!successful) {
-			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
-				log.error("Some operations failed - facilityRemoved: {}, mitreIdRemoved: {}",
-						facilityRemoved, mitreIdRemoved);
-			} else {
-				log.error("Some operations failed - facilityRemoved: {}", facilityRemoved);
-			}
+		if (!facilityRemoved) {
+			log.error("Some operations failed - facilityRemoved: {}", false);
 		} else {
 			log.info("Facility has been deleted");
 		}
 
-		log.trace("deleteFacilityFromPerun returns: {}", successful);
-		return successful;
+		log.trace("deleteFacilityFromPerun returns: {}", facilityRemoved);
+		return facilityRemoved;
 	}
 
 	private boolean moveToProduction(Request request) throws ConnectorException {
@@ -446,35 +429,6 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		log.trace("extractFacilityIdFromRequest() returns: {}", facilityId);
 		return facilityId;
-	}
-
-	private Map<String, PerunAttribute> prepareNewFacilityAttributes(boolean testSp, boolean showOnList, MitreIdResponse mitreResponse) {
-		log.trace("prepareNewFacilityAttributes(testSp: {}, showOnList: {}, mitreResponse: {})",
-				testSp, showOnList, mitreResponse);
-
-		Map<String, PerunAttribute> attributesMap = new HashMap<>();
-
-		PerunAttributeDefinition testSpAttrDef = appConfig.getAttrDefinition(appConfig.getIsTestSpAttribute());
-		PerunAttribute isTestSpAttr = new PerunAttribute(testSpAttrDef, testSp);
-
-		PerunAttributeDefinition showOnListAttrDef = appConfig.getAttrDefinition(appConfig.getShowOnServicesListAttributeName());
-		PerunAttribute showOnServicesListAttr = new PerunAttribute(showOnListAttrDef, showOnList);
-
-		if (mitreResponse != null) {
-			PerunAttributeDefinition oidcClientIdDef = appConfig.getAttrDefinition(mitreIdAttrsConfig.getClientIdAttr());
-			PerunAttribute oidcClientIdAttr = new PerunAttribute(oidcClientIdDef, mitreResponse.getClientId());
-
-			PerunAttributeDefinition mitreClientIdDef = appConfig.getAttrDefinition(mitreIdAttrsConfig.getClientIdAttr());
-			PerunAttribute mitreClientIdAttr = new PerunAttribute(mitreClientIdDef, mitreResponse.getId());
-
-			attributesMap.put(oidcClientIdAttr.getFullName(), oidcClientIdAttr);
-			attributesMap.put(mitreClientIdAttr.getFullName(), mitreClientIdAttr);
-		}
-		attributesMap.put(isTestSpAttr.getFullName(), isTestSpAttr);
-		attributesMap.put(showOnServicesListAttr.getFullName(), showOnServicesListAttr);
-
-		log.trace("prepareNewFacilityAttributes() returns: {}", attributesMap);
-		return attributesMap;
 	}
 
 	private boolean updateFacilityNameAndDesc(Facility actualFacility, Request request) throws ConnectorException {
@@ -552,6 +506,41 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		attribute.setValue(value);
 
 		log.trace("generateTestSpAttribute() returns: {}", attribute);
+		return attribute;
+	}
+
+	private PerunAttribute generateClientIdAttribute() throws InternalErrorException {
+		log.trace("generateClientIdAttribute()");
+
+		PerunAttribute attribute = new PerunAttribute();
+		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getClientIdAttribute()));
+
+		String clientId = "";
+		boolean res;
+		do {
+			clientId = ServiceUtils.generateClientId();
+			res = requestManager.isClientIdAvailable(clientId);
+		} while (!res);
+
+		requestManager.storeClientId(clientId);
+		attribute.setValue(clientId);
+
+		log.trace("generateClientIdAttribute() returns: {}", attribute);
+		return attribute;
+	}
+
+	private PerunAttribute generateClientSecretAttribute() throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+		log.trace("generateClientIdAttribute()");
+
+		PerunAttribute attribute = new PerunAttribute();
+		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getClientSecretAttribute()));
+
+		String clientSecret = ServiceUtils.generateClientSecret();
+		String encryptedClientSecret = ServiceUtils.encrypt(clientSecret, appConfig.getSecret());
+
+		attribute.setValue(encryptedClientSecret);
+
+		log.trace("generateClientIdAttribute() returns: {}", attribute);
 		return attribute;
 	}
 }

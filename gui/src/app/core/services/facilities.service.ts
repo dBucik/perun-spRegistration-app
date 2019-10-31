@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { Facility } from "../models/Facility";
 import { Request } from "../models/Request";
 import {PerunAttribute} from "../models/PerunAttribute";
+import {OidcDetails} from "../models/OidcDetails";
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,10 @@ export class FacilitiesService {
 
   getFacility(id: number): Observable<Facility> {
     return this.apiService.get('/facility/' + id);
+  }
+
+  getOidcDetails(id: number): Observable<OidcDetails> {
+    return this.apiService.get('/facility/oidcDetails/' + id);
   }
 
   createRequest(id: number, emails: string[]): Observable<number> {

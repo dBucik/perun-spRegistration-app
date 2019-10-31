@@ -1,5 +1,7 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,6 +23,8 @@ public class AttrInput {
 	private List<String> allowedValues;
 	private int displayPosition;
 	private String regex;
+	@JsonIgnore
+	private boolean encrypted = false;
 	private List<String> allowedKeys; // only if the type is Map
 
 	public AttrInput(String name, Map<String, String> displayName, Map<String, String> description,
@@ -155,5 +159,14 @@ public class AttrInput {
 		res *= 31 * type.hashCode();
 
 		return (int) res;
+	}
+
+	public void setEncrypted(boolean val) {
+		this.encrypted = val;
+
+	}
+
+	public boolean isEncrypted() {
+		return encrypted;
 	}
 }

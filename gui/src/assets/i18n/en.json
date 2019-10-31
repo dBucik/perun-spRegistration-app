@@ -149,6 +149,8 @@
     "ENVIRONMENT": "Environment",
     "ENV_TEST": "Test",
     "ENV_PROD": "Production",
-    "MOVE_TO_PRODUCTION_REJECT": "Reject request"
+    "MOVE_TO_PRODUCTION_REJECT": "Reject request",
+    "CLIENT_ID": "Client ID",
+    "CLIENT_SECRET": "Client SECRET"
   }
 }
