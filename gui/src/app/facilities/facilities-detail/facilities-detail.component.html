@@ -7,11 +7,15 @@
       </h2>
       {{'FACILITIES.DESCRIPTION' | translate}}: {{facility.description}}
 
-      <div *ngIf="facility.testEnv" class="pull-right">
-
+      <div *ngIf="facility.testEnv" class="pull-right text-right">
         <div *ngIf="!facility.activeRequestId">
           <button class="ml-2" mat-raised-button color="accent" (click)="moveToProduction()">
             {{'FACILITIES.MOVE_TO_PRODUCTION' | translate}}
+          </button>
+        </div>
+        <div *ngIf="facility.oidc">
+          <button class="ml-2 mt-1 pu" mat-raised-button color="accent" (click)="regenerateClientSecret()">
+            {{'FACILITIES.REGENERATE_CLIENT_SECRET' | translate}}
           </button>
         </div>
 

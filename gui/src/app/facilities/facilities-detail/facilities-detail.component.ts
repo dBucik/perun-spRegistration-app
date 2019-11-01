@@ -98,8 +98,14 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  addFacilityAdmin():void{
+  addFacilityAdmin(): void {
     this.router.navigateByUrl('auth/facilities/addAdmin/' + this.facility.id );
+  }
+
+  regenerateClientSecret(): void {
+    this.facilitiesService.regenerateClientSecret(this.facility.id).subscribe(newSecret => {
+      this.clientSecret = newSecret.clientSecret;
+    });
   }
 
   isUndefined(value) {
