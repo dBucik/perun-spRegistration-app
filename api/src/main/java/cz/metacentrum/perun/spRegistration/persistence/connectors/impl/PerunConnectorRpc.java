@@ -112,6 +112,7 @@ public class PerunConnectorRpc implements PerunConnector {
 
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityId);
+		params.put("force", true);
 
 		boolean successful = null != makeRpcPostCall(FACILITIES_MANAGER, "deleteFacility", params);
 

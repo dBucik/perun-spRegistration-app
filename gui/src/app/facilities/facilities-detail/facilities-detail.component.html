@@ -7,11 +7,15 @@
       </h2>
       {{'FACILITIES.DESCRIPTION' | translate}}: {{facility.description}}
 
-      <div *ngIf="facility.testEnv" class="pull-right">
-
+      <div *ngIf="facility.testEnv" class="pull-right text-right">
         <div *ngIf="!facility.activeRequestId">
           <button class="ml-2" mat-raised-button color="accent" (click)="moveToProduction()">
             {{'FACILITIES.MOVE_TO_PRODUCTION' | translate}}
+          </button>
+        </div>
+        <div *ngIf="facility.oidc">
+          <button class="ml-2 mt-1 pu" mat-raised-button color="accent" (click)="regenerateClientSecret()">
+            {{'FACILITIES.REGENERATE_CLIENT_SECRET' | translate}}
           </button>
         </div>
 
@@ -30,6 +34,17 @@
       </div>
 
       <h4 class="mt-4">{{'FACILITIES.FACILITY_ATTRIBUTES' | translate}}</h4>
+
+      <table *ngIf="this.facility.oidc" class="w-100">
+        <tr>
+          <td>{{ 'FACILITIES.CLIENT_ID' | translate }}</td>
+          <td>{{ this.clientId }}</td>
+        </tr>
+        <tr>
+          <td>{{ 'FACILITIES.CLIENT_SECRET' | translate }}</td>
+          <td>{{ this.clientSecret }}</td>
+        </tr>
+      </table>
 
       <table mat-table [dataSource]="facilityAttributes" class="w-100">
         <ng-container matColumnDef="fullname" class="mr-5">

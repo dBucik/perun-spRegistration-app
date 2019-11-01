@@ -62,7 +62,7 @@ public class UserSignaturesController {
 	@GetMapping(path = "/api/moveToProduction/getFacilityDetails", params = "code")
 	public Request signRequestGetData(String code)
 			throws BadPaddingException, ConnectorException, IllegalBlockSizeException, MalformedCodeException,
-			InvalidKeyException, ExpiredCodeException, UnsupportedEncodingException, InternalErrorException
+			InvalidKeyException, ExpiredCodeException, InternalErrorException
 	{
 		log.trace("signRequestGetData({})", code);
 

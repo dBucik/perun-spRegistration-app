@@ -146,6 +146,9 @@
     "ENVIRONMENT": "Prostředí",
     "ENV_TEST": "Testovací",
     "ENV_PROD": "Produkční",
-    "MOVE_TO_PRODUCTION_REJECT": "Zamítnout"
+    "MOVE_TO_PRODUCTION_REJECT": "Zamítnout",
+    "CLIENT_ID": "Client ID",
+    "CLIENT_SECRET": "Client SECRET",
+    "REGENERATE_CLIENT_SECRET": "Vygenerovat nové client secret"
   }
 }

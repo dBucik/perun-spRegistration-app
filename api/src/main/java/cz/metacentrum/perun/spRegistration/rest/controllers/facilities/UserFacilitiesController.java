@@ -68,7 +68,7 @@ public class UserFacilitiesController {
 	@PostMapping(path = "/api/addAdmin/confirm")
 	public boolean addAdminConfirm(@SessionAttribute("user") User user,
 								   @RequestBody String code)
-			throws UnsupportedEncodingException, BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
+			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
 			MalformedCodeException, InvalidKeyException, ConnectorException, InternalErrorException
 	{
 		log.trace("addAdminConfirm(user: {}, code: {})", user, code);
@@ -83,7 +83,7 @@ public class UserFacilitiesController {
 	@PostMapping(path = "/api/addAdmin/reject")
 	public boolean addAdminReject(@SessionAttribute("user") User user,
 								   @RequestBody String code)
-			throws UnsupportedEncodingException, BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
+			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
 			MalformedCodeException, InvalidKeyException, InternalErrorException
 	{
 		log.trace("addAdminReject(user: {}, code: {})", user, code);

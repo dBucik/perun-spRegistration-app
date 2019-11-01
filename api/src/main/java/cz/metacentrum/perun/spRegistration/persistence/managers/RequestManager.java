@@ -162,4 +162,5 @@ public interface RequestManager {
 	 * @throws IllegalArgumentException Thrown when param "code" is NULL or empty.
 	 */
 	boolean deleteUsedCode(String code) throws InternalErrorException;
+
 }

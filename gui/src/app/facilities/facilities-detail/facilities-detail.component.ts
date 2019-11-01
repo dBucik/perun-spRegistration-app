@@ -8,8 +8,8 @@ import {MatDialog} from "@angular/material";
 import {FacilitiesDetailDialogComponent} from "./facilities-detail-dialog/facilities-detail-dialog.component";
 
 export interface DialogData {
-  parent: FacilitiesDetailComponent,
-  facilityName: string
+  parent: FacilitiesDetailComponent;
+  facilityName: string;
 }
 
 @Component({
@@ -26,13 +26,15 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
   ) { }
 
-  private sub : Subscription;
+  private sub: Subscription;
 
   displayedColumns: string[] = ['fullname', 'value'];
   facilityAttributes: any[];
 
   loading = true;
   facility: Facility;
+  clientId: string;
+  clientSecret: string;
 
   isUserAdmin: boolean;
 
@@ -57,7 +59,15 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
         this.facility = facility;
         this.mapAttributes();
         this.isUserAdmin = AppComponent.isApplicationAdmin();
-        this.loading = false;
+        if (facility.oidc) {
+          this.facilitiesService.getOidcDetails(params['id']).subscribe(oidcDetails => {
+            this.clientId = oidcDetails.clientId;
+            this.clientSecret = oidcDetails.clientSecret;
+            this.loading = false;
+          });
+        } else {
+          this.loading = false;
+        }
       }, error => {
         this.loading = false;
         console.log(error);
@@ -88,8 +98,14 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  addFacilityAdmin():void{
+  addFacilityAdmin(): void {
     this.router.navigateByUrl('auth/facilities/addAdmin/' + this.facility.id );
+  }
+
+  regenerateClientSecret(): void {
+    this.facilitiesService.regenerateClientSecret(this.facility.id).subscribe(newSecret => {
+      this.clientSecret = newSecret.clientSecret;
+    });
   }
 
   isUndefined(value) {

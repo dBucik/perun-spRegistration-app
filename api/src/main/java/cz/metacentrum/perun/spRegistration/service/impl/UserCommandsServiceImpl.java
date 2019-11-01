@@ -76,21 +76,18 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private final AppConfig appConfig;
 	private final Config config;
 	private final Properties messagesProperties;
-	private final Cipher cipher;
 	
 	@Autowired
 	private MailsService mailsService;
 
 	@Autowired
 	public UserCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
-								   AppConfig appConfig, Properties messagesProperties)
-			throws NoSuchPaddingException, NoSuchAlgorithmException {
+								   AppConfig appConfig, Properties messagesProperties) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.config = config;
 		this.messagesProperties = messagesProperties;
-		this.cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 	}
 
 	@Override
@@ -409,6 +406,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		List<String> keptAttrs = getAttrsToKeep(isOidc);
 
 		facility.setAttrs(ServiceUtils.filterFacilityAttrs(attrs, keptAttrs));
+		facility.setOidc(ServiceUtils.isOidcFacility(facility, appConfig.getEntityIdAttribute()));
 
 		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
@@ -624,6 +622,21 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return isValid;
 	}
 
+	@Override
+	public Map<String, String> getOidcClientIdAndSecret(Long facilityId, Long id) throws ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(
+				facilityId, Arrays.asList(appConfig.getClientIdAttribute(), appConfig.getClientSecretAttribute()));
+
+		String clientId = attrs.get(appConfig.getClientIdAttribute()).valueAsString();
+		String clientSecret = ServiceUtils.decrypt(attrs.get(appConfig.getClientSecretAttribute()).valueAsString(), appConfig.getSecret());
+
+		Map<String, String> result = new HashMap<>();
+		result.put("clientId", clientId);
+		result.put("clientSecret", clientSecret);
+
+		return result;
+	}
+
 	/* PRIVATE METHODS */
 
 	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes, RequestAction action)
@@ -710,15 +723,10 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Base64.Decoder b64dec = Base64.getUrlDecoder();
-
-		cipher.init(Cipher.DECRYPT_MODE, appConfig.getSecret());
-		byte[] decrypted = cipher.doFinal(b64dec.decode(code));
-
-		String objInString = new String(decrypted);
+		String decrypted = ServiceUtils.decrypt(code, appConfig.getSecret());
 
 		try {
-			JSONObject decryptedAsJson = new JSONObject(objInString);
+			JSONObject decryptedAsJson = new JSONObject(decrypted);
 
 			log.trace("decryptRequestCode() returns: {}", decryptedAsJson);
 			return decryptedAsJson;
@@ -745,12 +753,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		object.put(REQUESTED_MAIL_KEY, requestedMail);
 
 		String strToEncrypt = object.toString();
-		Base64.Encoder b64enc = Base64.getUrlEncoder();
-
-		cipher.init(Cipher.ENCRYPT_MODE, appConfig.getSecret());
-		byte[] encrypted = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
-
-		String encoded = b64enc.encodeToString(encrypted);
+		String encoded = ServiceUtils.encrypt(strToEncrypt, appConfig.getSecret());
 
 		log.trace("createRequestCode() returns: {}", encoded);
 		return encoded;
@@ -766,15 +769,10 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Base64.Decoder b64dec = Base64.getUrlDecoder();
-
-		cipher.init(Cipher.DECRYPT_MODE, appConfig.getSecret());
-		byte[] decrypted = cipher.doFinal(b64dec.decode(code));
-
-		String objInString = new String(decrypted);
+		String decrypted = ServiceUtils.decrypt(code, appConfig.getSecret());
 
 		try {
-			JSONObject decryptedAsJson = new JSONObject(objInString);
+			JSONObject decryptedAsJson = new JSONObject(decrypted);
 			log.trace("decryptAddAdminCode() returns: {}", decryptedAsJson);
 			return decryptedAsJson;
 		} catch (JSONException e) {
@@ -798,12 +796,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		object.put(REQUESTED_MAIL_KEY, requestedMail);
 
 		String strToEncrypt = object.toString();
-		Base64.Encoder b64enc = Base64.getUrlEncoder();
-
-		cipher.init(Cipher.ENCRYPT_MODE, appConfig.getSecret());
-		byte[] encrypted = cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8));
-
-		String encoded = b64enc.encodeToString(encrypted);
+		String encoded = ServiceUtils.encrypt(strToEncrypt, appConfig.getSecret());
 
 		log.trace("createRequestCode() returns: {}", encoded);
 		return encoded;

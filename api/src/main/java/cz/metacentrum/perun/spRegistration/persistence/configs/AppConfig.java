@@ -313,16 +313,22 @@ public class AppConfig {
 		return clientIdAttribute;
 	}
 
-	public void setClientIdAttribute(String clientIdAttribute) {
+	public void setClientIdAttribute(String clientIdAttribute) throws ConnectorException {
 		this.clientIdAttribute = clientIdAttribute;
+
+		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(clientIdAttribute);
+		perunAttributeDefinitionsMap.put(clientIdAttribute, def);
 	}
 
 	public String getClientSecretAttribute() {
 		return clientSecretAttribute;
 	}
 
-	public void setClientSecretAttribute(String clientSecretAttribute) {
+	public void setClientSecretAttribute(String clientSecretAttribute) throws ConnectorException {
 		this.clientSecretAttribute = clientSecretAttribute;
+
+		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(clientSecretAttribute);
+		perunAttributeDefinitionsMap.put(clientSecretAttribute, def);
 	}
 
 	// VALUES
