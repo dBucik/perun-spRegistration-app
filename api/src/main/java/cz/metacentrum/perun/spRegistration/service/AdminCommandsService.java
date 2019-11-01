@@ -5,6 +5,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
+import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
@@ -81,5 +82,18 @@ public interface AdminCommandsService {
 	 * @throws IllegalArgumentException Thrown when param "adminId" is NULL.
 	 */
 	List<Facility> getAllFacilities(Long adminId) throws UnauthorizedActionException, ConnectorException;
+
+	/**
+	 * Regenerate Client secret for OIDC facility
+	 * @param userId id of admin calling method
+	 * @param facilityId id of facility
+	 * @return generated and encrypted client secret
+	 * @throws UnauthorizedActionException
+	 * @throws BadPaddingException
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws ConnectorException
+	 */
+	String regenerateClientSecret(Long userId, Long facilityId) throws UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, ConnectorException;
 
 }

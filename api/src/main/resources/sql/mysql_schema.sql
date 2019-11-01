@@ -25,8 +25,3 @@ CREATE TABLE IF NOT EXISTS signatureCodes
 (
     code    TEXT
 );
-
-CREATE TABLE IF NOT EXISTS clientIds
-(
-    client_id    TEXT NOT NULL
-);

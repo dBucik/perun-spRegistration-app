@@ -42,7 +42,6 @@ public class RequestManagerImpl implements RequestManager {
 	private static final String REQUESTS_TABLE = "requests";
 	private static final String APPROVALS_TABLE = "approvals";
 	private static final String CODES_TABLE = "signatureCodes";
-	private static final String CLIENT_IDS_TABLE = "clientIds";
 
 	private final RequestMapper REQUEST_MAPPER;
 	private final RequestSignatureMapper REQUEST_SIGNATURE_MAPPER;
@@ -545,75 +544,5 @@ public class RequestManagerImpl implements RequestManager {
 			log.trace("deleteUsedCode() returns - codes deleted (void method)");
 			return true;
 		}
-	}
-
-	@Override
-	public boolean storeClientId(String clientId) throws InternalErrorException {
-		log.trace("storeClientId({})", clientId);
-
-		if (Utils.checkParamsInvalid(clientId)) {
-			log.error("Wrong parameters passed: (code: {})", clientId);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		String query = new StringJoiner(" ")
-				.add("INSERT INTO").add(CLIENT_IDS_TABLE).add("(client_id)")
-				.add("VALUES (:clientId)")
-				.toString();
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("clientId", clientId);
-
-		int updatedCount = jdbcTemplate.update(query, params);
-
-		if (updatedCount == 0) {
-			log.error("Zero codes inserted, should insert at least one");
-			throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
-		} else if (updatedCount > 1) {
-			log.error("Only one code should be inserted, more inserted: {}", updatedCount);
-			throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
-		} else {
-			log.trace("storeClientId() returns {}", true);
-			return true;
-		}
-	}
-
-	@Override
-	public boolean isClientIdAvailable(String clientId) {
-		log.trace("storeClientId({})", clientId);
-
-		if (Utils.checkParamsInvalid(clientId)) {
-			log.error("Wrong parameters passed: (code: {})", clientId);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		String query = new StringJoiner(" ")
-				.add("SELECT count(client_id) FROM").add(CLIENT_IDS_TABLE)
-				.add("WHERE client_id = :clientId")
-				.toString();
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("clientId", clientId);
-
-		Integer foundCount = jdbcTemplate.queryForObject(query, params, Integer.class);
-
-		return foundCount == null || foundCount.equals(0);
-	}
-
-	@Override
-	public void deleteClientId(String clientId) {
-		log.trace("deleteUsedCode({})", clientId);
-
-		if (Utils.checkParamsInvalid(clientId)) {
-			log.error("Wrong parameters passed: (clientId: {})", clientId);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		String query = new StringJoiner(" ")
-				.add("DELETE FROM").add(CLIENT_IDS_TABLE)
-				.add("WHERE client_id = :clientId")
-				.toString();
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("clientId", clientId);
-
-		jdbcTemplate.update(query, params);
 	}
 }

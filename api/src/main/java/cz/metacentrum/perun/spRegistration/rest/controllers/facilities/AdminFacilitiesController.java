@@ -4,15 +4,23 @@ import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorExcep
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
+import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.security.InvalidKeyException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller handling ADMIN actions related to Facilities.
@@ -41,5 +49,19 @@ public class AdminFacilitiesController {
 
 		log.trace("allFacilities() returns: {}", facilityList);
 		return facilityList;
+	}
+
+	@GetMapping(path = "api/facility/regenerateClientSecret/{facilityId}",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public Map<String, String> generateClientSecret(@SessionAttribute("user") User user,
+													@PathVariable("facilityId") Long facilityId)
+			throws UnauthorizedActionException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+		log.trace("generateClientSecret(user: {}, facilityId: {})", user, facilityId);
+		String clientSecret = service.regenerateClientSecret(user.getId(), facilityId);
+
+		Map<String, String> map = new HashMap<>();
+		map.put("clientSecret", clientSecret);
+		log.trace("generateClientSecret() returns: {}", map);
+		return map;
 	}
 }

@@ -9,6 +9,7 @@ import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
 import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
@@ -249,7 +250,47 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		return proxyFacilities;
 	}
 
+	@Override
+	public String regenerateClientSecret(Long userId, Long facilityId) throws UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, ConnectorException {
+		log.trace("regenerateClientSecret({}, {})", userId, facilityId);
+
+		if (Utils.checkParamsInvalid(userId, facilityId)) {
+			log.error("Wrong parameters passed: (userId: {}, facilityId: {})", userId, facilityId);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
+		} else if (! appConfig.isAppAdmin(userId) && !isFacilityAdmin(facilityId, userId)) {
+			log.error("User is not authorized to regenerate client secret");
+			throw new UnauthorizedActionException("User is not authorized to regenerate client secret");
+		}
+
+		PerunAttribute clientSecret = generateClientSecretAttribute();
+		perunConnector.setFacilityAttribute(facilityId, clientSecret.toJson());
+
+		String decrypted = ServiceUtils.decrypt(clientSecret.valueAsString(), appConfig.getSecret());
+		log.trace("regenerateClientSecret({}, {}) returns: {}", userId, facilityId, decrypted);
+		return decrypted;
+	}
+
 	/* PRIVATE METHODS */
+
+	private boolean isFacilityAdmin(Long facilityId, Long userId) throws ConnectorException {
+		log.trace("isFacilityAdmin(facilityId: {}, userId: {})", facilityId, userId);
+
+		if (Utils.checkParamsInvalid(facilityId, userId)) {
+			log.error("Wrong parameters passed: (facility: {}, userId: {})", facilityId, userId);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
+		}
+
+		Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
+
+		if (whereAdmin == null || whereAdmin.isEmpty()) {
+			log.debug("isFacilityAdmin returns: {}", false);
+			return false;
+		}
+
+		boolean result = whereAdmin.contains(facilityId);
+		log.debug("isFacilityAdmin returns:  {}", result);
+		return result;
+	}
 
 	private boolean processApprovedRequest(Request request) throws InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		switch(request.getAction()) {
@@ -266,7 +307,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		return false;
 	}
 
-	private boolean registerNewFacilityToPerun(Request request) throws InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+	private boolean registerNewFacilityToPerun(Request request) throws InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("registerNewFacilityToPerun({})", request);
 
 		String newName = request.getFacilityName();
@@ -280,7 +321,11 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		Facility facility = new Facility(null);
 		facility.setName(newName);
 		facility.setDescription(newDesc);
-		facility = perunConnector.createFacilityInPerun(facility.toJson());
+		try {
+			facility = perunConnector.createFacilityInPerun(facility.toJson());
+		} catch (ConnectorException e) {
+			throw new InternalErrorException("Creating facility in Perun failed");
+		}
 
 		if (facility == null) {
 			log.error("Creating facility in Perun failed");
@@ -288,38 +333,57 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		request.setFacilityId(facility.getId());
+		try {
+			boolean adminSet = perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
 
-		boolean adminSet = perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
-
-		PerunAttribute testSp = generateTestSpAttribute(true);
-		PerunAttribute showOnServiceList = generateShowOnServiceListAttribute(false);
-		PerunAttribute proxyIdentifiers = generateProxyIdentifiersAttribute();
-		PerunAttribute masterProxyIdentifiers = generateMasterProxyIdentifierAttribute();
+			PerunAttribute testSp = generateTestSpAttribute(true);
+			PerunAttribute showOnServiceList = generateShowOnServiceListAttribute(false);
+			PerunAttribute proxyIdentifiers = generateProxyIdentifiersAttribute();
+			PerunAttribute masterProxyIdentifiers = generateMasterProxyIdentifierAttribute();
 
 
-		JSONArray attributes = request.getAttributesAsJsonArrayForPerun();
-		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
-			PerunAttribute clientId = generateClientIdAttribute();
-			attributes.put(clientId.toJson());
-			PerunAttribute clientSecret = generateClientSecretAttribute();
-			attributes.put(clientSecret.toJson());
+			JSONArray attributes = request.getAttributesAsJsonArrayForPerun();
+			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
+				for (int i = 0; i < 10; i++) {
+					PerunAttribute clientId = generateClientIdAttribute();
+					try {
+						perunConnector.setFacilityAttribute(facility.getId(), clientId.toJson());
+						break;
+					} catch (ConnectorException e) {
+						log.warn("Failed to set attribute clientId with value {} for facility {}",
+								clientId.valueAsString(), facility.getId());
+					}
+				}
+
+				PerunAttribute clientSecret = generateClientSecretAttribute();
+				perunConnector.setFacilityAttribute(facility.getId(), clientSecret.toJson());
+			}
+
+			attributes.put(testSp.toJson());
+			attributes.put(showOnServiceList.toJson());
+			attributes.put(proxyIdentifiers.toJson());
+			attributes.put(masterProxyIdentifiers.toJson());
+			boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(), attributes);
+
+			boolean successful = (adminSet && attributesSet);
+			if (!successful) {
+				log.error("Some operations failed - adminSet: {}, attributesSet: {}", adminSet, attributesSet);
+			} else {
+				log.info("Facility is all set up");
+			}
+
+			log.trace("registerNewFacilityToPerun returns: {}", successful);
+			return successful;
+		} catch (ConnectorException e) {
+			log.error("Caught ConnectorException", e);
+			try {
+				perunConnector.deleteFacilityFromPerun(facility.getId());
+			} catch (ConnectorException ex) {
+				log.error("Caught ConnectorException", ex);
+			}
+
+			return false;
 		}
-
-		attributes.put(testSp.toJson());
-		attributes.put(showOnServiceList.toJson());
-		attributes.put(proxyIdentifiers.toJson());
-		attributes.put(masterProxyIdentifiers.toJson());
-		boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(), attributes);
-
-		boolean successful = (adminSet && attributesSet);
-		if (!successful) {
-			log.error("Some operations failed - adminSet: {}, attributesSet: {}", adminSet, attributesSet);
-		} else {
-			log.info("Facility is all set up");
-		}
-
-		log.trace("registerNewFacilityToPerun returns: {}", successful);
-		return successful;
 	}
 
 	private boolean updateFacilityInPerun(Request request) throws InternalErrorException, ConnectorException {
@@ -333,38 +397,39 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		Long facilityId = extractFacilityIdFromRequest(request);
 
 		Facility actualFacility = perunConnector.getFacilityById(facilityId);
+		Map<String, PerunAttribute> oldAttributes = perunConnector.getFacilityAttributes(facilityId,
+				new ArrayList<>(request.getAttributes().keySet()));
+
 		if (actualFacility == null) {
 			log.error("Facility with ID: {} does not exist in Perun", facilityId);
 			throw new InternalErrorException("Facility with ID: " + facilityId + " does not exist in Perun");
 		}
 
-		boolean facilityCoreUpdated = updateFacilityNameAndDesc(actualFacility, request);
-		boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(),
-				request.getAttributesAsJsonArrayForPerun());
-		boolean mitreIdUpdated = false;
-
-		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
-			// TODO: uncomment when connector implemented
-			//PerunAttribute mitreClientId = perunConnector.getFacilityAttribute(facilityId, mitreIdAttrsConfig.getMitreClientIdAttr());
-			//mitreIdUpdated = mitreIdConnector.updateClient(mitreClientId.valueAsLong(), request.getAttributes());
-			mitreIdUpdated = true;
-		}
-
-		boolean successful = (facilityCoreUpdated && attributesSet && mitreIdUpdated);
-		if (!successful) {
-			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
-				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}, mitreIdUpdated: {}",
-						facilityCoreUpdated, attributesSet, mitreIdUpdated);
+		try {
+			boolean facilityCoreUpdated = updateFacilityNameAndDesc(actualFacility, request);
+			boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(),
+					request.getAttributesAsJsonArrayForPerun());
+			boolean successful = (facilityCoreUpdated && attributesSet);
+			if (!successful) {
+				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}", facilityCoreUpdated, attributesSet);
 			} else {
-				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}",
-						facilityCoreUpdated, attributesSet);
+				log.info("Facility has been updated in Perun");
 			}
-		} else {
-			log.info("Facility has been updated in Perun");
-		}
 
-		log.trace("updateFacilityInPerun returns: {}", successful);
-		return successful;
+			log.trace("updateFacilityInPerun returns: {}", successful);
+			return successful;
+		} catch (ConnectorException e) {
+			log.warn("Caught ConnectorException", e);
+			try {
+				perunConnector.updateFacilityInPerun(actualFacility.toJson());
+				JSONArray oldAttrsArray = new JSONArray();
+				oldAttributes.values().forEach(a -> oldAttrsArray.put(a.toJson()));
+				perunConnector.setFacilityAttributes(actualFacility.getId(), oldAttrsArray);
+			} catch (ConnectorException ex) {
+				log.warn("Caught ConnectorException", ex);
+			}
+			return false;
+		}
 	}
 
 	private boolean deleteFacilityFromPerun(Request request) throws ConnectorException, InternalErrorException {
@@ -378,13 +443,6 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		Long facilityId = extractFacilityIdFromRequest(request);
 
 		boolean facilityRemoved = perunConnector.deleteFacilityFromPerun(facilityId);
-
-		if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
-			String clientId = perunConnector.getFacilityAttribute(facilityId, appConfig.getClientIdAttribute())
-					.valueAsString();
-
-			requestManager.deleteClientId(clientId);
-		}
 
 		if (!facilityRemoved) {
 			log.error("Some operations failed - facilityRemoved: {}", false);
@@ -444,21 +502,23 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		boolean changed = false;
 		boolean successful = true;
 
+		Facility newFacility = new Facility(actualFacility.getId(), actualFacility.getName(), actualFacility.getDescription());
+
 		if (newName != null && !Objects.equals(actualFacility.getName(), newName)) {
 			log.debug("Update facility name requested");
-			actualFacility.setName(newName);
+			newFacility.setName(newName);
 			changed = true;
 		}
 
 		if (newDesc != null && !Objects.equals(actualFacility.getDescription(), newDesc)) {
 			log.debug("Update facility description requested");
-			actualFacility.setDescription(newDesc);
+			newFacility.setDescription(newDesc);
 			changed = true;
 		}
 
 		if (changed) {
 			log.debug("Updating facility name and/or description");
-			successful = (null != perunConnector.updateFacilityInPerun(actualFacility.toJson()));
+			successful = (null != perunConnector.updateFacilityInPerun(newFacility.toJson()));
 		}
 
 		log.trace("updateFacilityNameAndDesc() returns: {}", successful);
@@ -509,20 +569,13 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		return attribute;
 	}
 
-	private PerunAttribute generateClientIdAttribute() throws InternalErrorException {
+	private PerunAttribute generateClientIdAttribute() {
 		log.trace("generateClientIdAttribute()");
 
 		PerunAttribute attribute = new PerunAttribute();
 		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getClientIdAttribute()));
 
-		String clientId = "";
-		boolean res;
-		do {
-			clientId = ServiceUtils.generateClientId();
-			res = requestManager.isClientIdAvailable(clientId);
-		} while (!res);
-
-		requestManager.storeClientId(clientId);
+		String clientId = ServiceUtils.generateClientId();
 		attribute.setValue(clientId);
 
 		log.trace("generateClientIdAttribute() returns: {}", attribute);

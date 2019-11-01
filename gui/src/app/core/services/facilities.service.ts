@@ -5,6 +5,7 @@ import { Facility } from "../models/Facility";
 import { Request } from "../models/Request";
 import {PerunAttribute} from "../models/PerunAttribute";
 import {OidcDetails} from "../models/OidcDetails";
+import {ClientSecret} from "../models/ClientSecret";
 
 @Injectable({
   providedIn: 'root'
@@ -63,11 +64,15 @@ export class FacilitiesService {
     return this.apiService.post('/addAdmin/reject', hash);
   }
 
-  changeFacility(id: number, perunAttributes: PerunAttribute[]): Observable<number>{
+  changeFacility(id: number, perunAttributes: PerunAttribute[]): Observable<number> {
     return this.apiService.post('/changeFacility/' + id, perunAttributes);
   }
 
   getFacilityWithInputs(id: number): Observable<Facility> {
     return this.apiService.get('/facilityWithInputs/' + id);
+  }
+
+  regenerateClientSecret(id: number): Observable<ClientSecret> {
+    return this.apiService.get('/facility/regenerateClientSecret/' + id);
   }
 }
