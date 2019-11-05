@@ -13,12 +13,14 @@ import { FacilityAddAdminSignComponent } from './facilities-detail/facility-add-
 import { AllFacilitiesComponent } from './all-facilities/all-facilities.component';
 import { FacilitiesEditComponent } from './facilities-edit/facilities-edit.component';
 import {FacilityEnvironmentPipe} from "./facility-environment.pipe";
+import {MatTabsModule} from "@angular/material/tabs";
 
 @NgModule({
   imports: [
     CommonModule,
     FacilitiesRoutingModule,
-    SharedModule
+    SharedModule,
+    MatTabsModule
   ],
   declarations: [
     ServicesOverviewComponent,

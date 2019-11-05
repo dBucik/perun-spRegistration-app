@@ -13,37 +13,17 @@
         <img [src]="logoUrl" class="logo" alt="logo"/>
         {{ appTitle }}
       </a>
-      <div class="user-info" *ngIf="getUser() !== undefined">
-<!--        TODO: Prepared dropdown if needed in future-->
-<!--        <div class="dropdown">-->
-<!--          <button mat-icon-button class="dropdown-toggle" type="button" id="userDropDownButton" data-toggle="dropdown">-->
-<!--            <mat-icon>-->
-<!--              person-->
-<!--            </mat-icon>-->
-<!--          </button>-->
-<!--          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">-->
-<!--            <div class="dropdown-item-text" disabled="true">{{user | UserFullName}}</div>-->
-<!--          </div>-->
-<!--        </div>-->
-        <mat-icon>
-          person
-        </mat-icon>
-        <div>
-          {{getUser().fullName}}
-        </div>
+      <div class="user-info" *ngIf="getUser() !== undefined && getUser() !== null">
+        <mat-icon>person</mat-icon>
+        <div>{{ getUser().fullName }}</div>
       </div>
     </mat-toolbar-row>
   </mat-toolbar>
 
 <mat-sidenav-container>
-  <mat-sidenav #sidenav
-               [mode]="sidebarMode"
-               class="perun-sidenav"
-               [(opened)]="sideBarOpened"
-               [fixedInViewport]="true"
-               [fixedTopGap]="64"
-  >
-    <ul class="navbar-nav" *ngIf="getUser() !== undefined">
+  <mat-sidenav #sidenav [mode]="sidebarMode" class="perun-sidenav" [(opened)]="sideBarOpened"
+               [fixedInViewport]="true" [fixedTopGap]="64">
+    <ul class="navbar-nav" *ngIf="getUser() !== undefined && getUser() !== null">
       <li class="nav-item menu-spacer home-spacer menu-item-l1">
         {{ 'MENU.MAIN' | translate }}
       </li>
@@ -52,8 +32,7 @@
           {{'MENU.HOME' | translate}}
         </a>
       </li>
-      <ng-template *ngIf="getUser() !== undefined && getUser().isAppAdmin; then adminBlock;"></ng-template>
-      <ng-template #adminBlock>
+      <ng-container *ngIf="getUser() !== undefined && getUser().isAppAdmin">
         <li class="nav-item menu-spacer admin-spacer menu-item-l1">
           {{'MENU.ADMIN' | translate}}
         </li>
@@ -69,7 +48,7 @@
             {{ 'MENU.ALL_FACILITIES' | translate }}
           </a>
         </li>
-      </ng-template>
+      </ng-container>
       <li class="nav-item menu-spacer requests-spacer menu-item-l1">
         {{ 'MENU.REQUESTS' | translate }}
       </li>

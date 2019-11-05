@@ -9,7 +9,6 @@ import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
 import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
@@ -23,11 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -237,21 +233,22 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 				appConfig.getIsTestSpAttribute(), "true");
 		Map<Long, Facility> testFacilitiesMap = ServiceUtils.transformListToMapFacilities(testFacilities);
 
-		if (testFacilitiesMap != null && !testFacilitiesMap.isEmpty()) {
-			testFacilitiesMap.forEach((facId, value) -> {
-				if (proxyFacilitiesMap.containsKey(facId)) {
-					Facility testFacility = proxyFacilitiesMap.get(facId);
-					testFacility.setTestEnv(true);
-				}
-			});
-		}
+		List<Facility> oidcFacilities = perunConnector.getFacilitiesByAttribute(
+				appConfig.getAuthProtocolAttribute(), "OIDC");
+		Map<Long, Facility> oidcFacilitiesMap = ServiceUtils.transformListToMapFacilities(oidcFacilities);
+
+		proxyFacilitiesMap.forEach((facId, val) -> {
+			Facility f = proxyFacilitiesMap.get(facId);
+			f.setTestEnv(testFacilitiesMap.containsKey(facId));
+			f.setProtocol(oidcFacilitiesMap.containsKey(facId) ? "OIDC" : "SAML");
+		});
 
 		log.trace("getAllFacilities returns: {}", proxyFacilities);
 		return proxyFacilities;
 	}
 
 	@Override
-	public String regenerateClientSecret(Long userId, Long facilityId) throws UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, ConnectorException {
+	public PerunAttribute regenerateClientSecret(Long userId, Long facilityId) throws UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, ConnectorException {
 		log.trace("regenerateClientSecret({}, {})", userId, facilityId);
 
 		if (Utils.checkParamsInvalid(userId, facilityId)) {
@@ -266,8 +263,9 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		perunConnector.setFacilityAttribute(facilityId, clientSecret.toJson());
 
 		String decrypted = ServiceUtils.decrypt(clientSecret.valueAsString(), appConfig.getSecret());
-		log.trace("regenerateClientSecret({}, {}) returns: {}", userId, facilityId, decrypted);
-		return decrypted;
+		clientSecret.setValue(decrypted);
+		log.trace("regenerateClientSecret({}, {}) returns: {}", userId, facilityId, clientSecret);
+		return clientSecret;
 	}
 
 	/* PRIVATE METHODS */
@@ -340,7 +338,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			PerunAttribute showOnServiceList = generateShowOnServiceListAttribute(false);
 			PerunAttribute proxyIdentifiers = generateProxyIdentifiersAttribute();
 			PerunAttribute masterProxyIdentifiers = generateMasterProxyIdentifierAttribute();
-
+			PerunAttribute authProtocol = generateAuthProtocolAttribute(ServiceUtils.isOidcRequest(request,
+					appConfig.getEntityIdAttribute()));
 
 			JSONArray attributes = request.getAttributesAsJsonArrayForPerun();
 			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
@@ -363,6 +362,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			attributes.put(showOnServiceList.toJson());
 			attributes.put(proxyIdentifiers.toJson());
 			attributes.put(masterProxyIdentifiers.toJson());
+			attributes.put(authProtocol.toJson());
 			boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(), attributes);
 
 			boolean successful = (adminSet && attributesSet);
@@ -523,6 +523,17 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		log.trace("updateFacilityNameAndDesc() returns: {}", successful);
 		return successful;
+	}
+
+	private PerunAttribute generateAuthProtocolAttribute(boolean isOidc) {
+		log.trace("generateAuthProtocolAttribute({})", isOidc);
+
+		PerunAttribute attribute = new PerunAttribute();
+		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getAuthProtocolAttribute()));
+		attribute.setValue(isOidc ? "OIDC" : "SAML");
+
+		log.trace("generateAuthProtocolAttribute() returns: {}", attribute);
+		return attribute;
 	}
 
 	private PerunAttribute generateMasterProxyIdentifierAttribute() {

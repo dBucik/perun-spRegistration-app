@@ -30,19 +30,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -406,14 +402,17 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		List<String> keptAttrs = getAttrsToKeep(isOidc);
 
 		facility.setAttrs(ServiceUtils.filterFacilityAttrs(attrs, keptAttrs));
-		facility.setOidc(ServiceUtils.isOidcFacility(facility, appConfig.getEntityIdAttribute()));
 
 		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
 
+		PerunAttribute protocolAttr = perunConnector.getFacilityAttribute(facilityId, appConfig.getAuthProtocolAttribute());
+		String protocol = protocolAttr.valueAsString();
+		facility.setProtocol(protocol);
+
 		PerunAttribute proxyAttrs = perunConnector.getFacilityAttribute(facilityId, appConfig.getMasterProxyIdentifierAttribute());
 		boolean canBeEdited = appConfig.getMasterProxyIdentifierAttributeValue().equals(proxyAttrs.valueAsString());
-		facility.setCanEdit(canBeEdited);
+		facility.setEditable(canBeEdited);
 
 		log.trace("getDetailedFacility returns: {}", facility);
 		return facility;
@@ -502,12 +501,18 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			testFacilitiesMap = new HashMap<>();
 		}
 
+		List<Facility> oidcFacilities = perunConnector.getFacilitiesByAttribute(
+				appConfig.getAuthProtocolAttribute(), "OIDC");
+		Map<Long, Facility> oidcFacilitiesMap = ServiceUtils.transformListToMapFacilities(oidcFacilities);
+
 		List<Facility> filteredFacilities = new ArrayList<>();
 
 		for (Facility f : userFacilities) {
 			if (proxyFacilitiesMap.containsKey(f.getId())) {
-				f.setTestEnv(testFacilitiesMap.containsKey(f.getId()));
 				filteredFacilities.add(f);
+
+				f.setProtocol(oidcFacilitiesMap.containsKey(f.getId()) ? "OIDC" : "SAML");
+				f.setTestEnv(testFacilitiesMap.containsKey(f.getId()));
 			}
 		}
 
@@ -623,18 +628,31 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public Map<String, String> getOidcClientIdAndSecret(Long facilityId, Long id) throws ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
-		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(
-				facilityId, Arrays.asList(appConfig.getClientIdAttribute(), appConfig.getClientSecretAttribute()));
+	public Map<String, PerunAttribute> getOidcDetails(Long facilityId, Long id) throws ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+		log.trace("getOidcClientIdAndSercret({}, {})", facilityId, id);
+		Set<String> attrNames = config.getOidcInputs().stream().map(AttrInput::getName).collect(Collectors.toSet());
+		attrNames.add(appConfig.getClientIdAttribute());
+		attrNames.add(appConfig.getClientSecretAttribute());
 
-		String clientId = attrs.get(appConfig.getClientIdAttribute()).valueAsString();
-		String clientSecret = ServiceUtils.decrypt(attrs.get(appConfig.getClientSecretAttribute()).valueAsString(), appConfig.getSecret());
+		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, new ArrayList<>(attrNames));
+		PerunAttribute clientSecret = attrs.get(appConfig.getClientSecretAttribute());
+		String value = ServiceUtils.decrypt(clientSecret.valueAsString(), appConfig.getSecret());
+		clientSecret.setValue(value);
 
-		Map<String, String> result = new HashMap<>();
-		result.put("clientId", clientId);
-		result.put("clientSecret", clientSecret);
+		log.trace("getOidcClientIdAndSecret() returns: {}", attrs);
+		return attrs;
+	}
 
-		return result;
+	@Override
+	public Map<String, PerunAttribute> getSamlDetails(Long facilityId, Long id) throws ConnectorException {
+		log.trace("getOidcClientIdAndSercret({}, {})", facilityId, id);
+		Set<String> attrNames = config.getSamlInputs().stream().map(AttrInput::getName).collect(Collectors.toSet());
+
+
+		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, new ArrayList<>(attrNames));
+
+		log.trace("getOidcClientIdAndSercret() returns: {}", attrs);
+		return attrs;
 	}
 
 	/* PRIVATE METHODS */

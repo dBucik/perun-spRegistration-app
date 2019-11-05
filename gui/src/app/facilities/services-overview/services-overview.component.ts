@@ -21,7 +21,7 @@ export class ServicesOverviewComponent implements OnInit, OnDestroy {
     this.setDataSource();
   }
 
-  displayedColumns: string[] = ['id', 'name', 'description', 'testEnv'];
+  displayedColumns: string[] = ['id', 'name', 'description', 'environment', 'protocol'];
   dataSource: MatTableDataSource<Facility>;
   loading = true;
 
@@ -47,5 +47,9 @@ export class ServicesOverviewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.facilitiesSubscription.unsubscribe();
+  }
+
+  doFilter = (value: string) => {
+    this.dataSource.filter = value.trim().toLocaleLowerCase();
   }
 }

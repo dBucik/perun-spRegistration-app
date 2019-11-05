@@ -166,6 +166,9 @@ public class ServiceUtils {
 	}
 
 	public static String decrypt(String strToDecrypt, SecretKeySpec secretKeySpec) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+		if (strToDecrypt == null || strToDecrypt.equals("null")) {
+			return null;
+		}
 
 		Base64.Decoder b64dec = Base64.getUrlDecoder();
 

@@ -2,6 +2,7 @@ package cz.metacentrum.perun.spRegistration.rest.controllers.facilities;
 
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
@@ -53,15 +54,13 @@ public class AdminFacilitiesController {
 
 	@GetMapping(path = "api/facility/regenerateClientSecret/{facilityId}",
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, String> generateClientSecret(@SessionAttribute("user") User user,
-													@PathVariable("facilityId") Long facilityId)
+	public PerunAttribute generateClientSecret(@SessionAttribute("user") User user,
+											   @PathVariable("facilityId") Long facilityId)
 			throws UnauthorizedActionException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("generateClientSecret(user: {}, facilityId: {})", user, facilityId);
-		String clientSecret = service.regenerateClientSecret(user.getId(), facilityId);
+		PerunAttribute clientSecret = service.regenerateClientSecret(user.getId(), facilityId);
 
-		Map<String, String> map = new HashMap<>();
-		map.put("clientSecret", clientSecret);
-		log.trace("generateClientSecret() returns: {}", map);
-		return map;
+		log.trace("generateClientSecret() returns: {}", clientSecret);
+		return clientSecret;
 	}
 }

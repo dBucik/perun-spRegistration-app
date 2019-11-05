@@ -3,7 +3,9 @@ package cz.metacentrum.perun.spRegistration.persistence.models;
 import cz.metacentrum.perun.spRegistration.Utils;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -16,10 +18,11 @@ public class Facility extends PerunEntity {
 
 	private String name;
 	private String description;
-	private boolean testEnv;
+	private String protocol;
 	private Long activeRequestId;
-	private boolean canEdit = false;
-	private boolean isOidc = false;
+	private boolean testEnv;
+	private boolean editable = false;
+	private List<User> admins = new ArrayList<>();
 	private Map<String, PerunAttribute> attrs = new HashMap<>();
 
 	public Facility(Long id) {
@@ -64,20 +67,28 @@ public class Facility extends PerunEntity {
 		this.activeRequestId = activeRequestId;
 	}
 
-	public boolean isCanEdit() {
-		return canEdit;
+	public boolean isEditable() {
+		return editable;
 	}
 
-	public void setCanEdit(boolean canEdit) {
-		this.canEdit = canEdit;
+	public void setEditable(boolean editable) {
+		this.editable = editable;
 	}
 
-	public boolean isOidc() {
-		return isOidc;
+	public String getProtocol() {
+		return protocol;
 	}
 
-	public void setOidc(boolean oidc) {
-		isOidc = oidc;
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
+	}
+
+	public List<User> getAdmins() {
+		return admins;
+	}
+
+	public void setAdmins(List<User> admins) {
+		this.admins = admins;
 	}
 
 	public Map<String, PerunAttribute> getAttrs() {
@@ -130,7 +141,7 @@ public class Facility extends PerunEntity {
 				", description='" + description + '\'' +
 				", testEnv=" + testEnv +
 				", activeRequestId=" + activeRequestId +
-				", canEdit=" + canEdit +
+				", canEdit=" + editable +
 				", attrs=" + attrs +
 				'}';
 	}
@@ -141,7 +152,7 @@ public class Facility extends PerunEntity {
 		if (o == null || getClass() != o.getClass()) return false;
 		Facility facility = (Facility) o;
 		return testEnv == facility.testEnv &&
-				canEdit == facility.canEdit &&
+				editable == facility.editable &&
 				Objects.equals(name, facility.name) &&
 				Objects.equals(description, facility.description) &&
 				Objects.equals(activeRequestId, facility.activeRequestId) &&
@@ -150,6 +161,6 @@ public class Facility extends PerunEntity {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, description, testEnv, activeRequestId, canEdit, attrs);
+		return Objects.hash(name, description, testEnv, activeRequestId, editable, attrs);
 	}
 }

@@ -1,4 +1,5 @@
 import {PerunAttribute} from './PerunAttribute';
+import {User} from './User';
 
 export interface Facility {
   id: number;
@@ -6,7 +7,8 @@ export interface Facility {
   description: string;
   testEnv: boolean;
   activeRequestId: number;
-  canEdit: boolean;
-  oidc: boolean;
+  editable: boolean;
+  protocol: string;
   attrs: Map<string, PerunAttribute>;
+  admins: User[];
 }

@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -43,14 +44,16 @@ public class PerunConnectorRpc implements PerunConnector {
 
 	private static final Logger log = LoggerFactory.getLogger(PerunConnectorRpc.class);
 
-	private String perunRpcUrl;
-	private String perunRpcUser;
-	private String perunRpcPassword;
-
 	private static final String USERS_MANAGER = "usersManager";
 	private static final String FACILITIES_MANAGER = "facilitiesManager";
 	private static final String ATTRIBUTES_MANAGER = "attributesManager";
 	private static final String SEARCHER = "searcher";
+
+	private String perunRpcUrl;
+	private String perunRpcUser;
+	private String perunRpcPassword;
+	private String userEmailAttr;
+	private Set<Long> appAdminIds = new HashSet<>();
 
 	public void setPerunRpcUrl(String perunRpcUrl) {
 		this.perunRpcUrl = perunRpcUrl;
@@ -62,6 +65,16 @@ public class PerunConnectorRpc implements PerunConnector {
 
 	public void setPerunRpcPassword(String perunRpcPassword) {
 		this.perunRpcPassword = perunRpcPassword;
+	}
+
+	public void setUserEmailAttr(String userEmailAttr) {
+		this.userEmailAttr = userEmailAttr;
+	}
+
+	public void setAppAdminIds(String[] appAdminIdsStrs) {
+		for (String appAdminIdStr: appAdminIdsStrs) {
+			appAdminIds.add(Long.getLong(appAdminIdStr));
+		}
 	}
 
 	@Override
@@ -134,6 +147,9 @@ public class PerunConnectorRpc implements PerunConnector {
 
 		JSONObject res = makeRpcGetCallForObject(FACILITIES_MANAGER, "getFacilityById", params);
 		Facility facility = MapperUtils.mapFacility(res);
+
+		List<User> admins = getAdminsForFacility(facilityId, userEmailAttr);
+		facility.setAdmins(admins);
 
 		log.trace("getFacilityById() returns: {}", facility);
 		return facility;
@@ -280,7 +296,7 @@ public class PerunConnectorRpc implements PerunConnector {
 			throw new ConnectorException("Should not found more than one user");
 		}
 
-		User user = MapperUtils.mapUser(res, false);
+		User user = MapperUtils.mapUser(res);
 		params.clear();
 		params.put("user", user.getId().intValue());
 		params.put("attributeName", userEmailAttr);
@@ -373,6 +389,24 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	/* PRIVATE METHODS */
+
+	private List<User> getAdminsForFacility(Long facility, String userEmailAttr) throws ConnectorException {
+		log.trace("getAdminsForFacility({})", facility);
+		Map<String, Object> params = new LinkedHashMap<>();
+		params.put("facility", facility);
+		params.put("specificAttributes", Collections.singletonList(userEmailAttr));
+		params.put("allUserAttributes", false);
+		params.put("onlyDirectAdmins", false);
+
+		JSONArray res = makeRpcGetCallForArray(FACILITIES_MANAGER, "getRichAdmins", params);
+		List<User> admins = MapperUtils.mapUsers(res, userEmailAttr);
+		for (User u: admins) {
+			u.setAdmin(appAdminIds.contains(u.getId()));
+		}
+
+		log.trace("getAdminsForFacility() returns: {}", admins);
+		return admins;
+	}
 
 	private JSONObject makeRpcGetCallForObject(String manager, String method, Map<String, Object> map) throws ConnectorException {
 		log.trace("makeRpcGetCallForObject(manager: {}, method: {}, map: {}", manager, method, map);

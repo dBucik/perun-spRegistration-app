@@ -6,6 +6,9 @@
         {{'REQUESTS.MY_REQUESTS' | translate}}
       </h4>
 
+      <mat-form-field class="w-100">
+        <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="{{ 'SEARCH' | translate}}">
+      </mat-form-field>
       <table mat-table [dataSource]="dataSource" matSort matSortActive="reqId" matSortDirection="asc" matSortDisableClear class="w-100">
         <ng-container matColumnDef="reqId">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>{{'REQUESTS.ID' | translate}}</th>

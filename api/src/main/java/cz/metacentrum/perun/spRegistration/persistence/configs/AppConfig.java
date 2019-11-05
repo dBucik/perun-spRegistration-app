@@ -47,6 +47,7 @@ public class AppConfig {
 	private String proxyIdentifierAttributeValue;
 	private String adminsAttributeName;
 	private String userEmailAttributeName;
+	private String authProtocolAttribute;
 	private Map<String, String> prodTransferAuthoritiesMailsMap;
 
 	private String footerHTML;
@@ -331,8 +332,6 @@ public class AppConfig {
 		perunAttributeDefinitionsMap.put(clientSecretAttribute, def);
 	}
 
-	// VALUES
-
 	public String getMasterProxyIdentifierAttributeValue() {
 		return masterProxyIdentifierAttributeValue;
 	}
@@ -347,6 +346,17 @@ public class AppConfig {
 
 	public void setProxyIdentifierAttributeValue(String proxyIdentifierAttributeValue) {
 		this.proxyIdentifierAttributeValue = proxyIdentifierAttributeValue;
+	}
+
+	public void setAuthnProtocolAttribute(String authnProtocolAttribute) throws ConnectorException {
+		this.authProtocolAttribute = authnProtocolAttribute;
+
+		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(authnProtocolAttribute);
+		perunAttributeDefinitionsMap.put(authnProtocolAttribute, def);
+	}
+
+	public String getAuthProtocolAttribute() {
+		return authProtocolAttribute;
 	}
 
 	@Override
@@ -407,5 +417,4 @@ public class AppConfig {
 		}
 		return s.substring(0, 32);
 	}
-
 }

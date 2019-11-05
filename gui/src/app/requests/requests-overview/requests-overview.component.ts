@@ -50,4 +50,8 @@ export class RequestsOverviewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.requestsSubscription.unsubscribe();
   }
+
+  doFilter = (value: string) => {
+    this.dataSource.filter = value.trim().toLocaleLowerCase();
+  }
 }
