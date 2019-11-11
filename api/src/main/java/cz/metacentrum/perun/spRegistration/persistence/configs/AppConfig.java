@@ -332,10 +332,6 @@ public class AppConfig {
 		perunAttributeDefinitionsMap.put(clientSecretAttribute, def);
 	}
 
-		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(clientSecretAttribute);
-		perunAttributeDefinitionsMap.put(clientSecretAttribute, def);
-	}
-
 	public String getMasterProxyIdentifierAttributeValue() {
 		return masterProxyIdentifierAttributeValue;
 	}

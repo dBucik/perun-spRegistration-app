@@ -402,7 +402,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		List<String> keptAttrs = getAttrsToKeep(isOidc);
 
 		facility.setAttrs(ServiceUtils.filterFacilityAttrs(attrs, keptAttrs));
-		facility.setOidc(ServiceUtils.isOidcFacility(facility, appConfig.getEntityIdAttribute()));
 
 		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
