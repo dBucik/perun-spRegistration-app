@@ -91,6 +91,14 @@ public class Facility extends PerunEntity {
 		this.admins = admins;
 	}
 
+	public boolean isOidc() {
+		return isOidc;
+	}
+
+	public void setOidc(boolean oidc) {
+		isOidc = oidc;
+	}
+
 	public Map<String, PerunAttribute> getAttrs() {
 		return attrs;
 	}

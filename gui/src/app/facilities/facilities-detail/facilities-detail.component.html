@@ -64,7 +64,6 @@
               <tr mat-row *matRowDef="let row; columns: displColumnsAttrs;" class="hover-dark"></tr>
             </table>
           </mat-tab>
-
           <mat-tab label="{{ 'PROTOCOL' | translate }}">
             <mat-spinner class="ml-auto mr-auto" *ngIf="loadingProtocol"></mat-spinner>
             <ng-container *ngIf="!loadingProtocol">

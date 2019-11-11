@@ -327,6 +327,10 @@ public class AppConfig {
 
 	public void setClientSecretAttribute(String clientSecretAttribute) throws ConnectorException {
 		this.clientSecretAttribute = clientSecretAttribute;
+    
+		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(clientSecretAttribute);
+		perunAttributeDefinitionsMap.put(clientSecretAttribute, def);
+	}
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(clientSecretAttribute);
 		perunAttributeDefinitionsMap.put(clientSecretAttribute, def);

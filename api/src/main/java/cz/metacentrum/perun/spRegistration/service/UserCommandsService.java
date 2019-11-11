@@ -262,7 +262,7 @@ public interface UserCommandsService {
 	boolean validateCode(String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException;
 
 	/**
-	 * Get oidc details
+	 * Get oidc detail
 	 * @param facilityId Id of facility
 	 * @param id userId
 	 * @return Map
