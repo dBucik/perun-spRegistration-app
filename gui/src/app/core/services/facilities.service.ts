@@ -28,8 +28,12 @@ export class FacilitiesService {
     return this.apiService.get('/facility/' + id);
   }
 
-  getOidcDetails(id: number): Observable<OidcDetails> {
+  getOidcDetails(id: number): Observable<Map<String, PerunAttribute>> {
     return this.apiService.get('/facility/oidcDetails/' + id);
+  }
+
+  getSamlDetails(id: number): Observable<Map<String, PerunAttribute>> {
+    return this.apiService.get('/facility/samlDetails/' + id);
   }
 
   createRequest(id: number, emails: string[]): Observable<number> {
@@ -72,7 +76,7 @@ export class FacilitiesService {
     return this.apiService.get('/facilityWithInputs/' + id);
   }
 
-  regenerateClientSecret(id: number): Observable<ClientSecret> {
+  regenerateClientSecret(id: number): Observable<PerunAttribute> {
     return this.apiService.get('/facility/regenerateClientSecret/' + id);
   }
 }

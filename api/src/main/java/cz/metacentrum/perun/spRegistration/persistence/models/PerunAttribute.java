@@ -214,12 +214,9 @@ public class PerunAttribute {
 	@Override
 	public String toString() {
 		return "PerunAttribute{" +
-				"definition=" + definition +
-				", value=" + value +
+				"value=" + value +
 				", oldValue=" + oldValue +
-				", comment='" + comment + '\'' +
 				", fullName='" + fullName + '\'' +
-				", input=" + input +
 				'}';
 	}
 

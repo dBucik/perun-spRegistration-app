@@ -1,6 +1,5 @@
 package cz.metacentrum.perun.spRegistration.persistence.mappers;
 
-import com.fasterxml.jackson.databind.node.NullNode;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
@@ -74,12 +73,22 @@ public class MapperUtils {
 	/**
 	 * Map JSON response from Perun RPC to User object.
 	 * @param json JSON from Perun with user.
-	 * @param isRichUser Boolean value specifying if the JSON contains attributes as well.
 	 * @return Mapped User object.
 	 * @throws IllegalArgumentException Thrown when param "json" is NULL, equal to JSONObject.NULL or empty.
 	 */
-	public static User mapUser(JSONObject json, boolean isRichUser) {
-		log.trace("mapUser(json: {}, isRichUser: {})", json, isRichUser);
+	public static User mapUser(JSONObject json) {
+		return mapUser(json, null);
+	}
+
+	/**
+	 * Map JSON response from Perun RPC to User object.
+	 * @param json JSON from Perun with user.
+	 * @param userMailAttr mapping of user email attribute, pass NULL if JSON is not RichUser
+	 * @return Mapped User object.
+	 * @throws IllegalArgumentException Thrown when param "json" is NULL, equal to JSONObject.NULL or empty.
+	 */
+	public static User mapUser(JSONObject json, String userMailAttr) {
+		log.trace("mapUser(json: {}, userMailAttr: {})", json, userMailAttr);
 		User user;
 
 		if (Utils.checkParamsInvalid(json)) {
@@ -88,13 +97,22 @@ public class MapperUtils {
 		}
 
 		user = User.fromPerunJson(json);
-		if (isRichUser) {
-			JSONArray attrs = json.getJSONArray("attributes");
+		if (userMailAttr != null) {
+			JSONArray attrs = new JSONArray();
+
+			if (json.has("attributes")) {
+				attrs = json.getJSONArray("attributes");
+			} else if (json.has("userAttributes")) {
+				attrs = json.getJSONArray("userAttributes");
+			}
+
 			for (int i = 0; i < attrs.length(); i++) {
 				JSONObject attrJson = attrs.getJSONObject(i);
-				if (!(attrJson.get("name") instanceof NullNode)
-						&& "preferredMail".equals(attrJson.getString("name"))) {
-					user.setEmail(attrJson.getString("name"));
+				String namespace = attrJson.getString("namespace");
+				String friendlyName = attrJson.getString("friendlyName");
+				String fullAttrName = namespace + ':' + friendlyName;
+				if (userMailAttr.equals(fullAttrName)) {
+					user.setEmail(attrJson.getString("value"));
 				}
 			}
 		}
@@ -170,5 +188,20 @@ public class MapperUtils {
 
 		log.trace("mapAttrDefinition() returns: {}", perunAttributeDefinition);
 		return perunAttributeDefinition;
+	}
+
+	public static List<User> mapUsers(JSONArray jsonArray, String userMailAttr) {
+		List<User> mappedUsers = new ArrayList<>();
+
+		if (Utils.checkParamsInvalid(jsonArray)) {
+			log.error("Wrong parameters passed: (json: {})", jsonArray);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
+		}
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			mappedUsers.add(mapUser(jsonArray.getJSONObject(i), userMailAttr));
+		}
+
+		return mappedUsers;
 	}
 }

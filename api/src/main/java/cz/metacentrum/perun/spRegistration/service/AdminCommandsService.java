@@ -94,6 +94,6 @@ public interface AdminCommandsService {
 	 * @throws IllegalBlockSizeException
 	 * @throws ConnectorException
 	 */
-	String regenerateClientSecret(Long userId, Long facilityId) throws UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, ConnectorException;
+	PerunAttribute regenerateClientSecret(Long userId, Long facilityId) throws UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, ConnectorException;
 
 }

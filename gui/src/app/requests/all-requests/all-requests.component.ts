@@ -50,4 +50,8 @@ export class AllRequestsComponent implements OnInit {
   ngOnDestroy() {
     this.requestsSubscription.unsubscribe();
   }
+
+  doFilter = (value: string) => {
+    this.dataSource.filter = value.trim().toLocaleLowerCase();
+  }
 }

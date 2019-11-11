@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import {NavigationEnd, Router} from "@angular/router";
-import { HostListener } from "@angular/core";
-import {UsersService} from "./core/services/users.service";
-import {ConfigService} from "./core/services/config.service";
-import {PageConfig} from "./core/models/PageConfig";
-import {User} from "./core/models/User";
+import {NavigationEnd, Router} from '@angular/router';
+import { HostListener } from '@angular/core';
+import {UsersService} from './core/services/users.service';
+import {ConfigService} from './core/services/config.service';
+import {PageConfig} from './core/models/PageConfig';
+import {User} from './core/models/User';
 
 @Component({
   selector: 'app-root',
@@ -13,29 +13,6 @@ import {User} from "./core/models/User";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
-  sideBarOpened = false;
-  onPageWhereSideBarIsHidden = false;
-  loading = true;
-
-  static supportedLangs : Array<string> = ['en', 'cs'];
-
-  lastScreenWidth: number;
-
-  minWidth = 768;
-  sidebarMode = 'side';
-  currentUrl: string;
-
-  static sideNavHiddenOn : Array<string> = [
-    '/'
-  ];
-
-  static pageConfig: PageConfig;
-  static user: User;
-
-  logoUrl : String = '';
-  appTitle : String = '';
-  footerHtml : String = '<div></div>';
 
   constructor(
     private configService: ConfigService,
@@ -45,7 +22,7 @@ export class AppComponent implements OnInit {
   ) {
     this.getScreenSize();
 
-    let browserLang = translate.getBrowserLang();
+    const browserLang = translate.getBrowserLang();
 
     if (!AppComponent.supportedLangs.includes(browserLang)) {
       translate.setDefaultLang('en');
@@ -61,6 +38,57 @@ export class AppComponent implements OnInit {
         });
       }
     });
+
+    this.userService.getUser().subscribe(user => {
+      AppComponent.setUser(user);
+    });
+  }
+
+  static supportedLangs: Array<string> = ['en', 'cs'];
+
+  static sideNavHiddenOn: Array<string> = [
+    '/'
+  ];
+
+  static pageConfig: PageConfig;
+  static user: User;
+
+  sideBarOpened = false;
+  onPageWhereSideBarIsHidden = false;
+  loading = true;
+
+  lastScreenWidth: number;
+
+  minWidth = 768;
+  sidebarMode = 'side';
+  currentUrl: string;
+
+  logoUrl: String = '';
+  appTitle: String = '';
+  footerHtml: String = '<div></div>';
+
+  public static isApplicationAdmin(): boolean {
+    if (this.user === undefined || this.user === null) {
+      return false;
+    }
+    return this.user.isAppAdmin;
+  }
+
+  public static getPageConfig(): PageConfig {
+    return this.pageConfig;
+  }
+
+  // for usage from different components
+  public static getUser(): User {
+    if (this.user === undefined || this.user === null) {
+      return null;
+    }
+
+    return this.user;
+  }
+
+  public static setUser(user: User): void {
+    this.user = user;
   }
 
   @HostListener('window:resize', ['$event'])
@@ -86,7 +114,7 @@ export class AppComponent implements OnInit {
   }
 
   closeSideBar() {
-      if (this.sidebarMode == 'over') {
+      if (this.sidebarMode === 'over') {
           this.sideBarOpened = false;
       }
   }
@@ -101,7 +129,7 @@ export class AppComponent implements OnInit {
       this.loading = false;
     });
 
-    this.router.events.subscribe((val : NavigationEnd) => {
+    this.router.events.subscribe((val: NavigationEnd) => {
       if (val instanceof NavigationEnd) {
         this.onPageWhereSideBarIsHidden = AppComponent.sideNavHiddenOn.includes(val.urlAfterRedirects);
         this.getScreenSize();
@@ -109,25 +137,8 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public static isApplicationAdmin() : boolean {
-    return this.user.isAppAdmin;
-  }
-
-  public static getPageConfig() : PageConfig {
-    return this.pageConfig;
-  }
-
   // for local usage e.g.: in app.component.html
   public getUser(): User {
     return AppComponent.getUser();
-  }
-
-  // for usage from different components
-  public static getUser() : User {
-    return this.user;
-  }
-
-  public static setUser(user: User): void {
-    this.user = user;
   }
 }

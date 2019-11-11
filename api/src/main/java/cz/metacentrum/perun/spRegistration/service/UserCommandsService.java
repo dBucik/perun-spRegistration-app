@@ -262,10 +262,12 @@ public interface UserCommandsService {
 	boolean validateCode(String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException;
 
 	/**
-	 * Get clientId and clientSecret for facility.
+	 * Get oidc detail
 	 * @param facilityId Id of facility
 	 * @param id userId
 	 * @return Map
 	 */
-	Map<String, String> getOidcClientIdAndSecret(Long facilityId, Long id) throws ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException;
+	Map<String, PerunAttribute> getOidcDetails(Long facilityId, Long id) throws ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException;
+
+ 	Map<String, PerunAttribute> getSamlDetails(Long facilityId, Long id) throws ConnectorException;
 }
