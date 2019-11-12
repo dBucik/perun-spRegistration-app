@@ -45,7 +45,8 @@
                 <prop key="attr.administratorContact">urn:perun:facility:attribute-def:def:administrationContact</prop>
                 <prop key="attr.oidcClientId">urn:perun:facility:attribute-def:def:OIDCClientID</prop>
                 <prop key="attr.oidcClientSecret">urn:perun:facility:attribute-def:def:OIDCClientSecret</prop>
-                <prop key="attr.authnProtocol">urn:perun:facility:attribute-def:def:authnProtocol</prop>
+                <prop key="attr.isOidc">urn:perun:facility:attribute-def:def:isOidcFacility</prop>
+                <prop key="attr.isSaml">urn:perun:facility:attribute-def:def:isSamlFacility</prop>
                 <!-- APPROVALS -->
                 <prop key="approval.confirmationPeriod.days">30</prop>
                 <prop key="approval.confirmationPeriod.hours">0</prop>
@@ -202,7 +203,8 @@
         <property name="entityIdAttribute" value="${entityID.attrName}"/>
         <property name="clientIdAttribute" value="${attr.oidcClientId}"/>
         <property name="clientSecretAttribute" value="${attr.oidcClientSecret}"/>
-        <property name="authnProtocolAttribute" value="${attr.authnProtocol}"/>
+        <property name="isOidcAttributeName" value="${attr.isOidc}"/>
+        <property name="isSamlAttributeName" value="${attr.isSaml}"/>
         <property name="adminsAttributeName" value="${attr.administratorContact}" />
         <property name="userEmailAttributeName" value="${attr.userEmail}" />
     </bean>

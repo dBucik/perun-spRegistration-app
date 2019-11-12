@@ -18,7 +18,8 @@ public class Facility extends PerunEntity {
 
 	private String name;
 	private String description;
-	private String protocol;
+	private boolean oidc;
+	private boolean saml;
 	private Long activeRequestId;
 	private boolean testEnv;
 	private boolean editable = false;
@@ -75,12 +76,20 @@ public class Facility extends PerunEntity {
 		this.editable = editable;
 	}
 
-	public String getProtocol() {
-		return protocol;
+	public boolean isOidc() {
+		return oidc;
 	}
 
-	public void setProtocol(String protocol) {
-		this.protocol = protocol;
+	public void setOidc(boolean oidc) {
+		this.oidc = oidc;
+	}
+
+	public boolean isSaml() {
+		return saml;
+	}
+
+	public void setSaml(boolean saml) {
+		this.saml = saml;
 	}
 
 	public List<User> getAdmins() {

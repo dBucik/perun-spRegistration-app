@@ -8,7 +8,8 @@ export interface Facility {
   testEnv: boolean;
   activeRequestId: number;
   editable: boolean;
-  protocol: string;
+  saml: boolean;
+  oidc: boolean;
   attrs: Map<string, PerunAttribute>;
   admins: User[];
 }

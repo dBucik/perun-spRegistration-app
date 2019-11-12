@@ -406,9 +406,10 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
 
-		PerunAttribute protocolAttr = perunConnector.getFacilityAttribute(facilityId, appConfig.getAuthProtocolAttribute());
-		String protocol = protocolAttr.valueAsString();
-		facility.setProtocol(protocol);
+		Map<String, PerunAttribute> protocolAttrs = perunConnector.getFacilityAttributes(facilityId, Arrays.asList(
+				appConfig.getIsOidcAttributeName(), appConfig.getIsSamlAttributeName()));
+		facility.setOidc(protocolAttrs.get(appConfig.getIsOidcAttributeName()).valueAsBoolean());
+		facility.setSaml(protocolAttrs.get(appConfig.getIsSamlAttributeName()).valueAsBoolean());
 
 		PerunAttribute proxyAttrs = perunConnector.getFacilityAttribute(facilityId, appConfig.getMasterProxyIdentifierAttribute());
 		boolean canBeEdited = appConfig.getMasterProxyIdentifierAttributeValue().equals(proxyAttrs.valueAsString());
@@ -502,8 +503,12 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		List<Facility> oidcFacilities = perunConnector.getFacilitiesByAttribute(
-				appConfig.getAuthProtocolAttribute(), "OIDC");
+				appConfig.getIsOidcAttributeName(), "true");
 		Map<Long, Facility> oidcFacilitiesMap = ServiceUtils.transformListToMapFacilities(oidcFacilities);
+
+		List<Facility> samlFacilities = perunConnector.getFacilitiesByAttribute(
+				appConfig.getIsSamlAttributeName(), "true");
+		Map<Long, Facility> samlFacilitiesMap = ServiceUtils.transformListToMapFacilities(samlFacilities);
 
 		List<Facility> filteredFacilities = new ArrayList<>();
 
@@ -511,7 +516,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			if (proxyFacilitiesMap.containsKey(f.getId())) {
 				filteredFacilities.add(f);
 
-				f.setProtocol(oidcFacilitiesMap.containsKey(f.getId()) ? "OIDC" : "SAML");
+				f.setOidc(oidcFacilitiesMap.containsKey(f.getId()));
+				f.setSaml(samlFacilitiesMap.containsKey(f.getId()));
 				f.setTestEnv(testFacilitiesMap.containsKey(f.getId()));
 			}
 		}

@@ -47,7 +47,8 @@ public class AppConfig {
 	private String proxyIdentifierAttributeValue;
 	private String adminsAttributeName;
 	private String userEmailAttributeName;
-	private String authProtocolAttribute;
+	private String isSamlAttributeName;
+	private String isOidcAttributeName;
 	private Map<String, String> prodTransferAuthoritiesMailsMap;
 
 	private String footerHTML;
@@ -327,9 +328,31 @@ public class AppConfig {
 
 	public void setClientSecretAttribute(String clientSecretAttribute) throws ConnectorException {
 		this.clientSecretAttribute = clientSecretAttribute;
-    
+
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(clientSecretAttribute);
 		perunAttributeDefinitionsMap.put(clientSecretAttribute, def);
+	}
+
+	public String getIsSamlAttributeName() {
+		return isSamlAttributeName;
+	}
+
+	public void setIsSamlAttributeName(String isSamlAttributeName) throws ConnectorException {
+		this.isSamlAttributeName = isSamlAttributeName;
+
+		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(isSamlAttributeName);
+		perunAttributeDefinitionsMap.put(isSamlAttributeName, def);
+	}
+
+	public String getIsOidcAttributeName() {
+		return isOidcAttributeName;
+	}
+
+	public void setIsOidcAttributeName(String isOidcAttributeName) throws ConnectorException {
+		this.isOidcAttributeName = isOidcAttributeName;
+
+		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(isOidcAttributeName);
+		perunAttributeDefinitionsMap.put(isOidcAttributeName, def);
 	}
 
 	public String getMasterProxyIdentifierAttributeValue() {
@@ -346,17 +369,6 @@ public class AppConfig {
 
 	public void setProxyIdentifierAttributeValue(String proxyIdentifierAttributeValue) {
 		this.proxyIdentifierAttributeValue = proxyIdentifierAttributeValue;
-	}
-
-	public void setAuthnProtocolAttribute(String authnProtocolAttribute) throws ConnectorException {
-		this.authProtocolAttribute = authnProtocolAttribute;
-
-		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(authnProtocolAttribute);
-		perunAttributeDefinitionsMap.put(authnProtocolAttribute, def);
-	}
-
-	public String getAuthProtocolAttribute() {
-		return authProtocolAttribute;
 	}
 
 	@Override
@@ -417,4 +429,5 @@ public class AppConfig {
 		}
 		return s.substring(0, 32);
 	}
+
 }

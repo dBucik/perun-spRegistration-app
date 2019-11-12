@@ -38,7 +38,8 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   loading = true;
   loadingProtocol = false;
   facility: Facility;
-  protocolDetails: any[];
+  samlDetails: any[];
+  oidcDetails: any[];
   moveToProductionActive = false;
 
   running = 0;
@@ -82,9 +83,11 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
         this.mapAttributes();
         this.mapAdmins();
 
-        if (facility.protocol === 'OIDC') {
+        if (facility.oidc) {
           this.loadOidcDetails(params['id']);
-        } else if (facility.protocol === 'SAML') {
+        }
+
+        if (facility.saml) {
           this.loadSamlDetails(params['id']);
         }
 
@@ -112,10 +115,10 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   loadOidcDetails(id: number) {
     this.startLoadingProtocolDetails();
     this.facilitiesService.getOidcDetails(id).subscribe(oidcDetails => {
-      this.protocolDetails = [];
+      this.oidcDetails = [];
       for (const urn of Object.keys(oidcDetails)) {
         const item = oidcDetails[urn];
-        this.protocolDetails.push(
+        this.oidcDetails.push(
           {
             'urn': urn,
             'value': item.value,
@@ -132,10 +135,10 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   loadSamlDetails(id: number) {
     this.startLoadingProtocolDetails();
     this.facilitiesService.getSamlDetails(id).subscribe(samlDetails => {
-      this.protocolDetails = [];
+      this.samlDetails = [];
       for (const urn of Object.keys(samlDetails)) {
         const item = samlDetails[urn];
-        this.protocolDetails.push(
+        this.samlDetails.push(
           {
             'urn': urn,
             'value': item.value,

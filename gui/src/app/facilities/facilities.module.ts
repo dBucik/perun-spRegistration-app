@@ -14,6 +14,7 @@ import { AllFacilitiesComponent } from './all-facilities/all-facilities.componen
 import { FacilitiesEditComponent } from './facilities-edit/facilities-edit.component';
 import {FacilityEnvironmentPipe} from "./facility-environment.pipe";
 import {MatTabsModule} from "@angular/material/tabs";
+import {FacilityProtocolPipe} from "./facility-protocol.pipe";
 
 @NgModule({
   imports: [
@@ -34,7 +35,8 @@ import {MatTabsModule} from "@angular/material/tabs";
     FacilityAddAdminSignComponent,
     AllFacilitiesComponent,
     FacilityAttributeValuePipe,
-    FacilityEnvironmentPipe
+    FacilityEnvironmentPipe,
+    FacilityProtocolPipe
   ],
   entryComponents: [
     FacilitiesDetailDialogComponent,

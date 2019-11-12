@@ -240,13 +240,18 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		Map<Long, Facility> testFacilitiesMap = ServiceUtils.transformListToMapFacilities(testFacilities);
 
 		List<Facility> oidcFacilities = perunConnector.getFacilitiesByAttribute(
-				appConfig.getAuthProtocolAttribute(), "OIDC");
+				appConfig.getIsOidcAttributeName(), "true");
 		Map<Long, Facility> oidcFacilitiesMap = ServiceUtils.transformListToMapFacilities(oidcFacilities);
+
+		List<Facility> samlFacilities = perunConnector.getFacilitiesByAttribute(
+				appConfig.getIsSamlAttributeName(), "true");
+		Map<Long, Facility> samlFacilitiesMap = ServiceUtils.transformListToMapFacilities(samlFacilities);
 
 		proxyFacilitiesMap.forEach((facId, val) -> {
 			Facility f = proxyFacilitiesMap.get(facId);
 			f.setTestEnv(testFacilitiesMap.containsKey(facId));
-			f.setProtocol(oidcFacilitiesMap.containsKey(facId) ? "OIDC" : "SAML");
+			f.setOidc(oidcFacilitiesMap.containsKey(facId));
+			f.setSaml(samlFacilitiesMap.containsKey(facId));
 		});
 
 		log.trace("getAllFacilities returns: {}", proxyFacilities);
@@ -534,8 +539,12 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		log.trace("generateAuthProtocolAttribute({})", isOidc);
 
 		PerunAttribute attribute = new PerunAttribute();
-		attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getAuthProtocolAttribute()));
-		attribute.setValue(isOidc ? "OIDC" : "SAML");
+		if (isOidc) {
+			attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getIsOidcAttributeName()));
+		} else {
+			attribute.setDefinition(appConfig.getAttrDefinition(appConfig.getIsSamlAttributeName()));
+		}
+		attribute.setValue(true);
 
 		log.trace("generateAuthProtocolAttribute() returns: {}", attribute);
 		return attribute;
