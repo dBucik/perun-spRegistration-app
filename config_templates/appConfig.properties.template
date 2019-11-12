@@ -23,6 +23,8 @@
 #attr.showOnServiceList=                # indicates if service should be displayed on service list
 #attr.administratorContact              # attribute for storing administration contact
 #attr.userEmail.name=					# attribute which contains user email
+#attr.isSaml                            # attribute indicating if service is using SAML
+#attr.isOidc                            # attribute indicating if service is using OIDC
 
 ###########################
 ###      APPROVALS      ###
