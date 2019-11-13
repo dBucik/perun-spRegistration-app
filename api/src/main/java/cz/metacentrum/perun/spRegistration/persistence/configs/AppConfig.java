@@ -32,9 +32,9 @@ public class AppConfig {
 
 	private Set<Long> appAdminIds;
 	private String loginExtSource;
-	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap;
+	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
 	private boolean oidcEnabled;
-	private List<String> availableLanguages;
+	private List<String> availableLanguages = new ArrayList<>();
 	private PerunConnector perunConnector;
 	private String showOnServicesListAttributeName;
 	private String isTestSpAttribute;
@@ -62,35 +62,6 @@ public class AppConfig {
 	private boolean specifyAuthoritiesEnabled;
 	private String signaturesEndpointUrl;
 	private String adminsEndpoint;
-
-	private Properties enLocale;
-	private Properties csLocale;
-
-	@Autowired
-	public AppConfig(@Qualifier("enLocale") Properties enLocale, @Qualifier("csLocale") Properties csLocale) {
-		this.enLocale = new Properties();
-		this.csLocale = new Properties();
-
-		Resource enLang = new ClassPathResource("localization.properties");
-		Resource csLang = new ClassPathResource("localization_cs.properties");
-		try (InputStream en = enLang.getInputStream(); InputStream cs = csLang.getInputStream()) {
-			this.enLocale.load(en);
-			this.csLocale.load(cs);
-		} catch (IOException e) {
-			throw new RuntimeException("Cannot load translations", e);
-		}
-
-		if (enLocale != null) {
-			this.enLocale.putAll(enLocale);
-		}
-
-		if (csLocale != null) {
-			this.enLocale.putAll(csLocale);
-		}
-
-		this.perunAttributeDefinitionsMap = new HashMap<>();
-		this.availableLanguages = new ArrayList<>();
-	}
 
 	public Set<Long> getAppAdminIds() {
 		return Collections.unmodifiableSet(appAdminIds);
@@ -378,8 +349,6 @@ public class AppConfig {
 				"perunAttributeDefinitionsMap: " + perunAttributeDefinitionsMap + "'\n" +
 				"oidcEnabled=" + oidcEnabled + "'\n" +
 				"availableLanguages=" + availableLanguages + "'\n" +
-				"enLocale=" + enLocale + "'\n" +
-				"csLocale=" + csLocale + "'\n" +
 				"perunConnector=" + perunConnector + "'\n" +
 				"footerHTML: '" + footerHTML + "'\n" +
 				"headerLogo: '" + headerLogo + "'\n" +
@@ -401,14 +370,6 @@ public class AppConfig {
 	}
 
 	// custom methods
-
-	public Properties getEnLocale() {
-		return enLocale;
-	}
-
-	public Properties getCsLocale() {
-		return csLocale;
-	}
 
 	public PerunAttributeDefinition getAttrDefinition(String fullName) {
 		return perunAttributeDefinitionsMap.get(fullName);

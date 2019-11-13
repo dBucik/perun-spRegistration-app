@@ -5,6 +5,7 @@ import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorExcep
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Properties;
 
@@ -17,7 +18,7 @@ public class AttrsConfig {
 
 	private List<AttrInput> inputs;
 
-	public AttrsConfig(AppConfig appConfig, PerunConnector perunConnector, Properties attrsProps) throws ConnectorException {
+	public AttrsConfig(AppConfig appConfig, PerunConnector perunConnector, Properties attrsProps) throws ConnectorException, UnsupportedEncodingException {
 		inputs = PersistenceUtils.initializeAttributes(perunConnector, appConfig, attrsProps);
 	}
 

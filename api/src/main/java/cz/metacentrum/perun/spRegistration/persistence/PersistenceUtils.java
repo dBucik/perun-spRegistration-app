@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,18 +46,17 @@ public class PersistenceUtils {
 	 * @return List of initialized attributes
 	 * @throws ConnectorException Thrown when problem while communicating with Perun RPC occur.
 	 */
-	public static List<AttrInput> initializeAttributes(PerunConnector connector, AppConfig appConfig, Properties props) throws ConnectorException {
+	public static List<AttrInput> initializeAttributes(PerunConnector connector, AppConfig appConfig, Properties props) throws ConnectorException, UnsupportedEncodingException {
 		log.trace("Initializing attribute inputs - START");
 		List<AttrInput> inputs = new ArrayList<>();
-		Properties en = appConfig.getEnLocale();
-		Properties cs = appConfig.getCsLocale();
-		boolean isCsDisabled = cs.isEmpty();
-		log.debug("Locales enabled: EN - {}, CS - {}", true, !isCsDisabled);
+		log.debug("Locales enabled: {}", appConfig.getAvailableLanguages());
 
 		for (String prop: props.stringPropertyNames()) {
 			if (! prop.contains(ATTR_NAME)) {
 				continue;
 			}
+
+			String baseProp = prop.replace('.' + ATTR_NAME, "");
 
 			String attrName = props.getProperty(prop);
 			log.debug("Initializing attribute: {}", attrName);
@@ -63,19 +64,8 @@ public class PersistenceUtils {
 			PerunAttributeDefinition def = connector.getAttributeDefinition(attrName);
 			appConfig.getPerunAttributeDefinitionsMap().put(def.getFullName(), def);
 
-			Map<String, String> name = new HashMap<>();
-			Map<String, String> desc = new HashMap<>();
-
-			String nameKey = attrName.replaceAll(":", ".") + ".name";
-			String descKey = attrName.replaceAll(":", ".") + ".desc";
-
-			name.put("en", en.getProperty(nameKey));
-			desc.put("en", en.getProperty(descKey));
-
-			if (! isCsDisabled) {
-				name.put("cs", cs.getProperty(nameKey));
-				desc.put("cs", cs.getProperty(descKey));
-			}
+			Map<String, String> name = getTranslations(appConfig, "name", baseProp, props);
+			Map<String, String> desc = getTranslations(appConfig, "desc", baseProp, props);
 
 			AttrInput input = new AttrInput(def.getFullName(), name, desc, def.getType());
 
@@ -86,6 +76,18 @@ public class PersistenceUtils {
 
 		log.trace("Initializing attribute inputs - FINISHED");
 		return inputs;
+	}
+
+	private static Map<String, String> getTranslations(AppConfig appConfig, String subKey, String baseProp, Properties props) throws UnsupportedEncodingException {
+		Map<String, String> map = new HashMap<>();
+		for (String langKey: appConfig.getAvailableLanguages()) {
+			String prop = baseProp + ".lang." + subKey + '.' + langKey;
+			if (props.containsKey(prop)) {
+				map.put(langKey, props.getProperty(prop));
+			}
+		}
+
+		return map;
 	}
 
 	/**
