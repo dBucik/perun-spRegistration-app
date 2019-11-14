@@ -45,6 +45,7 @@
                 <prop key="attr.administratorContact">urn:perun:facility:attribute-def:def:administrationContact</prop>
                 <prop key="attr.oidcClientId">urn:perun:facility:attribute-def:def:OIDCClientID</prop>
                 <prop key="attr.oidcClientSecret">urn:perun:facility:attribute-def:def:OIDCClientSecret</prop>
+                <prop key="attr.entityId">urn:perun:facility:attribute-def:def:entityID</prop>
                 <prop key="attr.isOidc">urn:perun:facility:attribute-def:def:isOidcFacility</prop>
                 <prop key="attr.isSaml">urn:perun:facility:attribute-def:def:isSamlFacility</prop>
                 <!-- APPROVALS -->
@@ -200,7 +201,7 @@
         <property name="proxyIdentifierAttributeValue" value="${attr.proxyIdentifier.value}" />
         <property name="isTestSpAttribute" value="${attr.isTestSp}" />
         <property name="showOnServicesListAttributeName" value="${attr.showOnServiceList}" />
-        <property name="entityIdAttribute" value="${entityID.attrName}"/>
+        <property name="entityIdAttribute" value="${attr.entityId}"/>
         <property name="clientIdAttribute" value="${attr.oidcClientId}"/>
         <property name="clientSecretAttribute" value="${attr.oidcClientSecret}"/>
         <property name="isOidcAttributeName" value="${attr.isOidc}"/>
