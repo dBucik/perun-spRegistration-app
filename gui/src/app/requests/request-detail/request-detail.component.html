@@ -3,8 +3,12 @@
   <div *ngIf="!loading" class="card mb-4 shadow-sm">
     <div class="card-body p-5">
       <h2 class="card-title">{{'REQUESTS.REQUEST_DETAIL_TITLE' | translate}}{{request.reqId}}</h2>
-      <div>{{'REQUESTS.REQUEST_DETAIL_STATUS' | translate}}: {{ request.status | requestStatusPipe }}</div>
-      <div>{{'REQUESTS.REQUEST_DETAIL_ACTION' | translate}}: {{ request.action | requestActionPipe }}</div>
+      <div>
+        {{'REQUESTS.REQUEST_DETAIL_STATUS' | translate}}: <span [innerHTML]=" request.status | requestStatusPipe "></span>
+      </div>
+      <div>
+        {{'REQUESTS.REQUEST_DETAIL_ACTION' | translate}}: <span [innerHTML]=" request.action | requestActionPipe "></span>
+      </div>
       <div class="mb-4">{{'REQUESTS.REQUEST_DETAIL_EDITED' | translate}}: {{ request.modifiedAt | date }}</div>
 
       <div *ngIf="request.action == 'MOVE_TO_PRODUCTION'">
