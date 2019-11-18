@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { HostListener } from '@angular/core';
 import { UsersService } from './core/services/users.service';
 import { ConfigService } from './core/services/config.service';
 import { PageConfig } from './core/models/PageConfig';
 import { User } from './core/models/User';
-import {PerunFooterCstComponent} from './perun-footer-cst/perun-footer-cst.component';
-import {PerunHeaderComponent} from './perun-header/perun-header.component';
+import { PerunFooterCstComponent } from './perun-footer-cst/perun-footer-cst.component';
+import { PerunHeaderComponent } from './perun-header/perun-header.component';
 
 @Component({
   selector: 'app-root',
@@ -32,17 +32,16 @@ export class AppComponent implements OnInit {
       translate.setDefaultLang(browserLang);
     }
 
-    router.events.subscribe((_: NavigationEnd) => {
+    this.currentUrl = this.router.url;
+
+    router.events.subscribe(_ => {
       this.currentUrl = this.router.url;
       if (this.currentUrl.includes('auth')) {
         this.userService.getUser().subscribe(user => {
           if (user !== undefined && user !== null) {
             AppComponent.setUser(user);
           }
-          this.sideBarOpened = false;
         });
-      } else {
-        this.sideBarOpened = true;
       }
     });
 
@@ -52,31 +51,26 @@ export class AppComponent implements OnInit {
   }
 
   static supportedLangs: Array<string> = ['en', 'cs'];
-
-  static sideNavHiddenOn: Array<string> = ['/'];
-
   static pageConfig: PageConfig;
   static user: User;
 
-  sideBarOpened = false;
-  onPageWhereSideBarIsHidden = false;
+  sidenavOpen = true;
   loading = true;
-
-  lastScreenWidth: number;
-
   minWidth = 768;
-  sidebarMode = 'side';
-  currentUrl: string;
-
-  logoUrl: String = '';
-  appTitle: String = '';
+  sidenavMode = 'side';
+  currentUrl = '';
+  logoUrl = '';
+  appTitle = '';
   footerHtml = '<div></div>';
   headerHtml = '<div></div>';
+  isWideForUser = true;
+  isWideForTitle = true;
 
   public static isApplicationAdmin(): boolean {
     if (this.user === undefined || this.user === null) {
       return false;
     }
+
     return this.user.isAppAdmin;
   }
 
@@ -84,7 +78,6 @@ export class AppComponent implements OnInit {
     return this.pageConfig;
   }
 
-  // for usage from different components
   public static getUser(): User {
     if (this.user === undefined || this.user === null) {
       return null;
@@ -99,30 +92,14 @@ export class AppComponent implements OnInit {
 
   @HostListener('window:resize', ['$event'])
   getScreenSize(event?) {
-
-    if (this.onPageWhereSideBarIsHidden) {
-      this.sideBarOpened = false;
-      return;
-    }
-
-    if (window.innerWidth > this.minWidth) {
-      this.sideBarOpened = true;
-      this.sidebarMode = 'side';
-    } else if (this.lastScreenWidth > this.minWidth) {
-      this.sideBarOpened = false;
-    }
-
-    if (window.innerWidth <= this.minWidth) {
-      this.sidebarMode = 'over';
-    }
-
-    this.lastScreenWidth = window.innerWidth;
+    this.sidenavOpen = window.innerWidth > this.minWidth;
+    this.isWideForUser = this.sidenavOpen;
+    this.sidenavMode = window.innerWidth > this.minWidth ? 'side' : 'over';
+    this.isWideForTitle = window.innerWidth > 540;
   }
 
   closeSideBar() {
-      if (this.sidebarMode === 'over') {
-          this.sideBarOpened = false;
-      }
+    this.sidenavOpen = !this.sidenavOpen;
   }
 
   ngOnInit(): void {
@@ -143,8 +120,11 @@ export class AppComponent implements OnInit {
     });
   }
 
-  // for local usage e.g.: in app.component.html
+  public hasUser(): boolean {
+    return (AppComponent.getUser() !== null && AppComponent.getUser() !== undefined);
+  }
+
   public getUser(): User {
-    return AppComponent.getUser();
+    return AppComponent.user;
   }
 }

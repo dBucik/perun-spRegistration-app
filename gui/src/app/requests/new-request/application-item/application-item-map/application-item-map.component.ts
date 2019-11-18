@@ -1,9 +1,9 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {ApplicationItem} from "../../../../core/models/ApplicationItem";
-import {RequestItem} from "../../../../core/models/RequestItem";
-import {Attribute} from "../../../../core/models/Attribute";
-import {NgForm} from "@angular/forms";
-import {TranslateService} from "@ngx-translate/core";
+import {ApplicationItem} from '../../../../core/models/ApplicationItem';
+import {RequestItem} from '../../../../core/models/RequestItem';
+import {Attribute} from '../../../../core/models/Attribute';
+import {NgForm} from '@angular/forms';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-application-item-map',
@@ -47,8 +47,8 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   }
 
   addValue() {
-    this.values.push("");
-    this.keys.push("");
+    this.values.push('');
+    this.keys.push('');
     this.indexes.push(this.index++);
     this.noItemError = false;
   }
@@ -61,7 +61,7 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   }
 
   getAttribute(): Attribute {
-    let map = new Map();
+    const map = new Map();
 
     for (let i = 0; i < this.values.length; i++) {
       map.set(this.keys[i], this.values[i]);
@@ -87,8 +87,11 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   }
 
   private allValuesAreFilled(): boolean {
+    if (this.values.length === 0) {
+      return false;
+    }
     for (const value of this.values) {
-      if (value.trim().length == 0) {
+      if (value === undefined || value === null || value.trim().length === 0) {
         return false;
       }
     }
@@ -101,29 +104,22 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     this.duplicitKeysError = false;
     this.noValueError = false;
 
-    console.log(this.values);
-    // if (this.applicationItem.required && !this.allValuesAreFilled()){
-    //   console.log("here");
-    //   return false;
-    // }
-    if (!this.applicationItem.required && this.values.length === 0) {
+    // not required
+    if (! this.applicationItem.required) {
       return true;
-    } else {
-      if (this.disableCustomKeys && !this.allValuesAreFilled()) {
-        this.noValueError = true;
-        return false;
-      } else if (this.values.length === 0) {
-        return false;
-      }
     }
 
-    let keysWithIndexes = new Map<string, number>();
+    // required
+    if (this.disableCustomKeys && !this.allValuesAreFilled()) {
+      this.noValueError = true;
+      return false;
+    }
+
+    const keysWithIndexes = new Map<string, number>();
 
     for (let i = 0; i < this.values.length; i++) {
-      let keys = Array.from(keysWithIndexes.keys());
-
-      let value = this.values[i].trim();
-      let key = this.keys[i].trim();
+      const keys = Array.from(keysWithIndexes.keys());
+      const key = this.keys[i].trim();
 
       if (keys.includes(key)) {
         this.duplicitKeysError = true;
@@ -140,41 +136,32 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   }
 
   showErredKey(orderNumber: number) {
-    let index = this.indexes[orderNumber];
-    let input = this.form.form.controls['key-' + index];
-
-    input.markAsTouched();
-    input.setErrors({'incorrect': true});
-  }
-
-  showErredValue(orderNumber: number) {
-    let index = this.indexes[orderNumber];
-    let input = this.form.form.controls['value-' + index];
+    const index = this.indexes[orderNumber];
+    const input = this.form.form.controls['key-' + index];
 
     input.markAsTouched();
     input.setErrors({'incorrect': true});
   }
 
   ngOnInit(): void {
-    let browserLang = this.translate.getDefaultLang();
+    const browserLang = this.translate.getDefaultLang();
     this.translatedDescription = this.applicationItem.description[browserLang];
     this.translatedName = this.applicationItem.displayName[browserLang];
 
     if (this.applicationItem.oldValue != null) {
-      let map: Map<string, string> = this.applicationItem.oldValue;
+      const map: Map<string, string> = this.applicationItem.oldValue;
       for (const [key, value] of Object.entries(map)) {
         this.addValueNonEmpty(key, value);
       }
     }
-    if (this.applicationItem.allowedKeys != undefined && this.applicationItem.allowedKeys.length > 0) {
+    if (this.applicationItem.allowedKeys !== undefined && this.applicationItem.allowedKeys.length > 0) {
       this.disableCustomKeys = true;
 
-      if (this.values.length == 0) {
+      if (this.values.length === 0) {
         this.keys = this.applicationItem.allowedKeys;
 
         for (let i = 0; i < this.keys.length; i++) {
-          //this.values.push(map.get());
-          this.values.push("");
+          this.values.push('');
           this.indexes.push(this.index++);
         }
         this.noItemError = false;
@@ -183,11 +170,9 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   }
 
   onFormSubmitted(): void {
-    if (!this.hasCorrectValue()) {
-      if (this.values.length === 0) {
-        console.log("ERRED: " + this.applicationItem.displayName);
-        this.noItemError = true;
-      }
+    if (!this.hasCorrectValue() && this.values.length === 0) {
+      this.noItemError = true;
     }
   }
+
 }

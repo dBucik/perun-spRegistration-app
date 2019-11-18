@@ -1,15 +1,15 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {RequestsService} from "../../core/services/requests.service";
-import {Request} from "../../core/models/Request";
-import {MatSort, MatTableDataSource} from "@angular/material";
-import {Subscription} from "rxjs";
+import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {RequestsService} from '../../core/services/requests.service';
+import {Request} from '../../core/models/Request';
+import {MatSort, MatTableDataSource} from '@angular/material';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-all-requests',
   templateUrl: './all-requests.component.html',
   styleUrls: ['./all-requests.component.scss']
 })
-export class AllRequestsComponent implements OnInit {
+export class AllRequestsComponent implements OnInit, OnDestroy {
 
   constructor(private requestsService: RequestsService) { }
 

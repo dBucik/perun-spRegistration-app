@@ -34,7 +34,7 @@
             <mat-form-field class="w-100 mr-2 ml-2">
               <input
                 matInput
-                [required]="!disableCustomKeys"
+                [required]="applicationItem.required"
                 placeholder="{{'REQUESTS.MAP_VALUE' | translate}}"
                 type="text"
                 name="value-{{i}}"
