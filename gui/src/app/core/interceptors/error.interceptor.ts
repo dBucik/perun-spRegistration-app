@@ -45,9 +45,7 @@ export class ErrorInterceptor implements HttpInterceptor {
         }
         if (errorResponse.status === 0) {
           errors.push(this.serverNotLiveError);
-        }
-
-        else if (typeof errorResponse.error === "string") {
+        } else if (typeof errorResponse.error === 'string') {
           errors.push(errorResponse.error);
         } else {
           errors.push(errorResponse.message);

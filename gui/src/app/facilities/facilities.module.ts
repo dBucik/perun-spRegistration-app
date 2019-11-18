@@ -15,13 +15,15 @@ import { FacilitiesEditComponent } from './facilities-edit/facilities-edit.compo
 import {FacilityEnvironmentPipe} from "./facility-environment.pipe";
 import {MatTabsModule} from "@angular/material/tabs";
 import {FacilityProtocolPipe} from "./facility-protocol.pipe";
+import {MatDialogModule} from "@angular/material/dialog";
 
 @NgModule({
   imports: [
     CommonModule,
     FacilitiesRoutingModule,
     SharedModule,
-    MatTabsModule
+    MatTabsModule,
+    MatDialogModule
   ],
   declarations: [
     ServicesOverviewComponent,

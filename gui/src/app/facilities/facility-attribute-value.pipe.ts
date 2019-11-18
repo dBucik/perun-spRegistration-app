@@ -5,8 +5,10 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class FacilityAttributeValuePipe implements PipeTransform {
 
-  transform(value: any, args?: any): any {
+  private expression = /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})$/;
+  private regex = new RegExp(this.expression);
 
+  transform(value: any, args?: any): any {
     if (typeof value === 'boolean') {
       if (!value) {
         return '<i class="material-icons red">clear</i>';
@@ -14,21 +16,21 @@ export class FacilityAttributeValuePipe implements PipeTransform {
         return '<i class="material-icons green">done</i>';
       }
     }
-    if(value instanceof Array){
+    if (value instanceof Array) {
       let output = '';
-      for(let val of value){
-        if(val.toString().match("^(http|https)://")){
-          output += `<div><a target="_blank" href="${val}">${val}</a></div>`;
+      for (const val of value) {
+        if (val.toString().match(this.regex)) {
+          output += `<li><a target="_blank" href="${val}">${val}</a></li>`;
         } else {
-          output += `<div>${val}</div>`;
+          output += `<li>${val}</li>`;
         }
       }
-      return `<div class="pad1">${output}</div>`;
+      return `<ul class="pad1 aul-attr">${output}</ul>`;
     }
-    if(value instanceof Object){
+    if (value instanceof Object) {
       let output = '';
-      for(let key of Object.keys(value)){
-        if(value[key].match("^(http|https)://")){
+      for (const key of Object.keys(value)) {
+        if (value[key].match(this.regex)) {
           output += `<div>${key} :  <a target="_blank" href="${value[key]}">${value[key]}</a></div>`;
         } else {
           output += `<div>${key} :  ${value[key]}</div>`;
@@ -36,10 +38,10 @@ export class FacilityAttributeValuePipe implements PipeTransform {
       }
       return `<div class="pad1">${output}</div>`;
     }
-    if(value.toString().match("^(http|https)://")){
+    if (value.toString().match(this.regex)) {
       return `<a target="_blank" href="${value}">${value}</a>`;
     }
     return value;
   }
-
 }
+

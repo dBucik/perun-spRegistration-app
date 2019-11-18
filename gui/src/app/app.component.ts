@@ -1,11 +1,13 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import {NavigationEnd, Router} from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { HostListener } from '@angular/core';
-import {UsersService} from './core/services/users.service';
-import {ConfigService} from './core/services/config.service';
-import {PageConfig} from './core/models/PageConfig';
-import {User} from './core/models/User';
+import { UsersService } from './core/services/users.service';
+import { ConfigService } from './core/services/config.service';
+import { PageConfig } from './core/models/PageConfig';
+import { User } from './core/models/User';
+import {PerunFooterCstComponent} from './perun-footer-cst/perun-footer-cst.component';
+import {PerunHeaderComponent} from './perun-header/perun-header.component';
 
 @Component({
   selector: 'app-root',
@@ -34,8 +36,13 @@ export class AppComponent implements OnInit {
       this.currentUrl = this.router.url;
       if (this.currentUrl.includes('auth')) {
         this.userService.getUser().subscribe(user => {
-          AppComponent.setUser(user);
+          if (user !== undefined && user !== null) {
+            AppComponent.setUser(user);
+          }
+          this.sideBarOpened = false;
         });
+      } else {
+        this.sideBarOpened = true;
       }
     });
 
@@ -46,9 +53,7 @@ export class AppComponent implements OnInit {
 
   static supportedLangs: Array<string> = ['en', 'cs'];
 
-  static sideNavHiddenOn: Array<string> = [
-    '/'
-  ];
+  static sideNavHiddenOn: Array<string> = ['/'];
 
   static pageConfig: PageConfig;
   static user: User;
@@ -65,7 +70,8 @@ export class AppComponent implements OnInit {
 
   logoUrl: String = '';
   appTitle: String = '';
-  footerHtml: String = '<div></div>';
+  footerHtml = '<div></div>';
+  headerHtml = '<div></div>';
 
   public static isApplicationAdmin(): boolean {
     if (this.user === undefined || this.user === null) {
@@ -122,18 +128,18 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.configService.getPageConfig().subscribe(pageConfig => {
       AppComponent.pageConfig = pageConfig;
-      this.appTitle = pageConfig.headerLabel;
-      this.logoUrl = pageConfig.logoUrl;
-      this.footerHtml = pageConfig.footerHtml;
-
-      this.loading = false;
-    });
-
-    this.router.events.subscribe((val: NavigationEnd) => {
-      if (val instanceof NavigationEnd) {
-        this.onPageWhereSideBarIsHidden = AppComponent.sideNavHiddenOn.includes(val.urlAfterRedirects);
-        this.getScreenSize();
+      if (pageConfig !== null && pageConfig !== undefined) {
+        this.appTitle = pageConfig.headerLabel;
+        this.logoUrl = pageConfig.logoUrl;
+        this.footerHtml = pageConfig.footerHtml;
+        this.headerHtml = pageConfig.headerHtml;
+        PerunFooterCstComponent.setFooter(this.footerHtml);
+        PerunHeaderComponent.setHeader(this.headerHtml);
       }
+
+      PerunFooterCstComponent.setFooter(this.footerHtml);
+      PerunHeaderComponent.setHeader(this.headerHtml);
+      this.loading = false;
     });
   }
 

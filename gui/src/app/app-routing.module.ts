@@ -29,7 +29,7 @@ const routes: Routes = [
     component: DocumentSignComponent
   },
   {
-    path: 'auth/notAuthorized',
+    path: 'notAuthorized',
     component: NotAuthorizedPageComponent
   },
   {

@@ -5,11 +5,9 @@
       <button mat-icon-button
               class="mr-2 no-focus-outline d-block d-md-none"
               (click)="sidenav.toggle()">
-        <mat-icon>
-          menu
-        </mat-icon>
+        <mat-icon>menu</mat-icon>
       </button>
-      <a [routerLink]="getUser() !== undefined ? '/auth' : '/'" class="site-title ml-2">
+      <a [routerLink]="(getUser() !== undefined && getUser() !== null) ? '/auth' : '/'" class="site-title ml-2">
         <img [src]="logoUrl" class="logo" alt="logo"/>
         {{ appTitle }}
       </a>
@@ -73,14 +71,14 @@
     </ul>
   </mat-sidenav>
 
-    <mat-sidenav-content class="content-container">
-      <div class="row mr-0 ml-0">
-        <div class="col-12 col-xl-11 p-0 pr-lg-5 pl-lg-5">
-          <router-outlet></router-outlet>
-        </div>
+  <mat-sidenav-content class="content-container">
+    <app-perun-header></app-perun-header>
+    <div class="row mr-0 ml-0">
+      <div class="col-12 col-xl-11 p-0 pr-lg-5 pl-lg-5">
+        <router-outlet></router-outlet>
       </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
-
-  <div [innerHTML]="footerHtml"></div>
+    </div>
+    <app-perun-footer-cst></app-perun-footer-cst>
+  </mat-sidenav-content>
+</mat-sidenav-container>
 </div>
