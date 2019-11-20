@@ -1,6 +1,7 @@
 import {Component, Input, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {ApplicationItem} from "../../../core/models/ApplicationItem";
-import {MatSnackBar, MatStepper} from "@angular/material";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatStepper } from "@angular/material/stepper";
 import {ApplicationItemComponent} from "../application-item/application-item.component";
 import {PerunAttribute} from "../../../core/models/PerunAttribute";
 import {TranslateService} from "@ngx-translate/core";

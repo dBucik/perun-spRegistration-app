@@ -1,7 +1,8 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {RequestsService} from '../../core/services/requests.service';
 import {Request} from '../../core/models/Request';
-import {MatSort, MatTableDataSource} from '@angular/material';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import {Subscription} from 'rxjs';
 import {MatPaginator} from '@angular/material/paginator';
 
@@ -14,8 +15,8 @@ export class AllRequestsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(private requestsService: RequestsService) { }
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @ViewChild(MatSort, {static: false}) sort: MatSort;
 
   private requestsSubscription: Subscription;
   requests: Request[];

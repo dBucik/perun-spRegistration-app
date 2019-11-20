@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {FacilitiesService} from '../../core/services/facilities.service';
 import {Facility} from '../../core/models/Facility';
 import {AppComponent} from '../../app.component';
-import {MatDialog} from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import {FacilitiesDetailDialogComponent} from './facilities-detail-dialog/facilities-detail-dialog.component';
 import {RequestsService} from '../../core/services/requests.service';
 import {Subscription} from 'rxjs';

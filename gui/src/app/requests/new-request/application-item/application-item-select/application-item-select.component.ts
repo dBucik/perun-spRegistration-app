@@ -26,7 +26,7 @@ export class ApplicationItemSelectComponent implements RequestItem, OnInit {
   @Input()
   applicationItem: ApplicationItem;
 
-  @ViewChild('form')
+  @ViewChild('form', {static: false})
   form : NgForm;
 
   getAttribute(): Attribute {

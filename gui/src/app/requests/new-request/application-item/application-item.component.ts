@@ -20,15 +20,15 @@ export class ApplicationItemComponent implements RequestItem, AfterViewInit {
   @Input()
   applicationItem: ApplicationItem;
 
-  @ViewChild(ApplicationItemStringComponent)
+  @ViewChild(ApplicationItemStringComponent, {static: false})
   stringItem: RequestItem;
-  @ViewChild(ApplicationItemBooleanComponent)
+  @ViewChild(ApplicationItemBooleanComponent, {static: false})
   booleanItem: RequestItem;
-  @ViewChild(ApplicationItemListComponent)
+  @ViewChild(ApplicationItemListComponent, {static: false})
   listItem: RequestItem;
-  @ViewChild(ApplicationItemMapComponent)
+  @ViewChild(ApplicationItemMapComponent, {static: false})
   mapItem: RequestItem;
-  @ViewChild(ApplicationItemSelectComponent)
+  @ViewChild(ApplicationItemSelectComponent, {static: false})
   selectItem: RequestItem;
 
   item : RequestItem;

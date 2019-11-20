@@ -2,7 +2,8 @@ import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/co
 import {ConfigService} from "../../core/services/config.service";
 import {ApplicationItem} from "../../core/models/ApplicationItem";
 import {RequestsService} from "../../core/services/requests.service";
-import {MatHorizontalStepper, MatSnackBar} from "@angular/material";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatHorizontalStepper } from "@angular/material/stepper";
 import {TranslateService} from "@ngx-translate/core";
 import {PerunAttribute} from "../../core/models/PerunAttribute";
 import {RequestCreationStepComponent} from "./request-creation-step/request-creation-step.component";
@@ -25,7 +26,7 @@ export class NewRequestComponent implements OnInit {
   @ViewChildren(RequestCreationStepComponent)
   steps: QueryList<RequestCreationStepComponent>;
 
-  @ViewChild(MatHorizontalStepper)
+  @ViewChild(MatHorizontalStepper, {static: false})
   stepper: MatHorizontalStepper;
 
   serviceSelected : string;

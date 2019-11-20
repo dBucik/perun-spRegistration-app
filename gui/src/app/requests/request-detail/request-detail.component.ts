@@ -5,7 +5,8 @@ import {Subscription} from "rxjs";
 import {Request} from "../../core/models/Request";
 import {NgModel} from "@angular/forms";
 import {PerunAttribute} from "../../core/models/PerunAttribute";
-import {MatDialog, MatSnackBar} from "@angular/material";
+import { MatDialog } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import {TranslateService} from "@ngx-translate/core";
 import {AppComponent} from "../../app.component";
 import {RequestSignature} from "../../core/models/RequestSignature";
@@ -47,7 +48,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     expansionPanelDisabled: boolean = true;
     icon: boolean = true;
 
-    @ViewChild('input')
+    @ViewChild('input', {static: false})
     inputField: NgModel;
 
     successApproveMessage: string;

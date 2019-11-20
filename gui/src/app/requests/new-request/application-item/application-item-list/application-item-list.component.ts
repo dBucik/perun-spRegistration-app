@@ -28,7 +28,7 @@ export class ApplicationItemListComponent implements RequestItem {
   @Input()
   applicationItem: ApplicationItem;
 
-  @ViewChild('form')
+  @ViewChild('form', {static: false})
   form : NgForm;
 
   removeValue(index : number) {

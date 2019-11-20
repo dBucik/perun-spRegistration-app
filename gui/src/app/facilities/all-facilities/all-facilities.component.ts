@@ -1,7 +1,8 @@
 import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FacilitiesService} from '../../core/services/facilities.service';
 import {Facility} from '../../core/models/Facility';
-import {MatSort, MatTableDataSource} from '@angular/material';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import {Subscription} from 'rxjs';
 
 @Component({
@@ -19,7 +20,7 @@ export class AllFacilitiesComponent implements OnInit, OnDestroy {
   @Input()
   facilities: Facility[];
 
-  @ViewChild(MatSort) set matSort(ms: MatSort) {
+  @ViewChild(MatSort, {static: false}) set matSort(ms: MatSort) {
     this.sort = ms;
     this.setDataSource();
   }
