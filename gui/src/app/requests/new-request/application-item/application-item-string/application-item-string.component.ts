@@ -21,10 +21,10 @@ export class ApplicationItemStringComponent implements RequestItem, OnInit {
   translatedName: string;
   translatedDescription: string;
 
-  @ViewChild('form')
+  @ViewChild('form', {static: false})
   form : NgForm;
 
-  @ViewChild('input')
+  @ViewChild('input', {static: false})
   inputField: NgModel;
 
   getAttribute(): Attribute {

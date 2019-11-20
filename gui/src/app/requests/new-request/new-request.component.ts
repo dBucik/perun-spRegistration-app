@@ -26,7 +26,7 @@ export class NewRequestComponent implements OnInit {
   @ViewChildren(RequestCreationStepComponent)
   steps: QueryList<RequestCreationStepComponent>;
 
-  @ViewChild(MatHorizontalStepper)
+  @ViewChild(MatHorizontalStepper, {static: false})
   stepper: MatHorizontalStepper;
 
   serviceSelected : string;

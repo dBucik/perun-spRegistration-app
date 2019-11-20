@@ -33,7 +33,7 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   @Input()
   applicationItem: ApplicationItem;
 
-  @ViewChild('form')
+  @ViewChild('form', {static: false})
   form: NgForm;
 
   removeValue(index: number) {

@@ -15,7 +15,7 @@ export class AllRequestsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(private requestsService: RequestsService) { }
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: false}) sort: MatSort;
 
   private requestsSubscription: Subscription;

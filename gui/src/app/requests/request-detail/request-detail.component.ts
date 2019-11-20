@@ -48,7 +48,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     expansionPanelDisabled: boolean = true;
     icon: boolean = true;
 
-    @ViewChild('input')
+    @ViewChild('input', {static: false})
     inputField: NgModel;
 
     successApproveMessage: string;
