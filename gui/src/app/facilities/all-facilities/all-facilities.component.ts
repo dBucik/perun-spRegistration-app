@@ -20,7 +20,7 @@ export class AllFacilitiesComponent implements OnInit, OnDestroy {
   @Input()
   facilities: Facility[];
 
-  @ViewChild(MatSort) set matSort(ms: MatSort) {
+  @ViewChild(MatSort, {static: false}) set matSort(ms: MatSort) {
     this.sort = ms;
     this.setDataSource();
   }

@@ -17,7 +17,7 @@ export class ServicesOverviewComponent implements OnInit, OnDestroy {
   @Input()
   myFacilities: Facility[];
 
-  @ViewChild(MatSort) set matSort(ms: MatSort) {
+  @ViewChild(MatSort, {static: false}) set matSort(ms: MatSort) {
     this.sort = ms;
     this.setDataSource();
   }

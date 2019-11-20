@@ -18,7 +18,7 @@ export class RequestsOverviewComponent implements OnInit, OnDestroy {
   requests: Request[];
 
 
-  @ViewChild(MatSort) set matSort(ms: MatSort) {
+  @ViewChild(MatSort, {static: false}) set matSort(ms: MatSort) {
     this.sort = ms;
     this.setDataSource();
   }
