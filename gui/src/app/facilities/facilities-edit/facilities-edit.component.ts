@@ -1,7 +1,7 @@
 import {Component, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {ConfigService} from "../../core/services/config.service";
-import {MatSnackBar} from "@angular/material";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import {TranslateService} from "@ngx-translate/core";
 import {ApplicationItemComponent} from "../../requests/new-request/application-item/application-item.component";
 import {ApplicationItem} from "../../core/models/ApplicationItem";

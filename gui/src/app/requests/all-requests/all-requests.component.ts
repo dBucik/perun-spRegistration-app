@@ -1,7 +1,8 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {RequestsService} from '../../core/services/requests.service';
 import {Request} from '../../core/models/Request';
-import {MatSort, MatTableDataSource} from '@angular/material';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import {Subscription} from 'rxjs';
 import {MatPaginator} from '@angular/material/paginator';
 

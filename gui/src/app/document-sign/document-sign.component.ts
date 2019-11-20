@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {FacilitiesService} from "../core/services/facilities.service";
 import {Subscription} from "rxjs";
 import {Facility} from "../core/models/Facility";
-import {MatSnackBar} from "@angular/material";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import {TranslateService} from "@ngx-translate/core";
 
 @Component({

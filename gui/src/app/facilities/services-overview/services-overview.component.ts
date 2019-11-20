@@ -2,7 +2,8 @@ import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { Facility } from '../../core/models/Facility';
 import { FacilitiesService } from '../../core/services/facilities.service';
 import { Subscription } from 'rxjs';
-import {MatSort, MatTableDataSource} from '@angular/material';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-facilities-overview',

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {FacilitiesService} from "../../../../core/services/facilities.service";
-import {MatSnackBar} from "@angular/material";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import {TranslateService} from "@ngx-translate/core";
 import {Subscription} from "rxjs";
 

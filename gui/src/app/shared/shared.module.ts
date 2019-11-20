@@ -7,24 +7,27 @@ import {PerunFooterComponent} from './layout/perun-footer/perun-footer.component
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {RouterModule} from "@angular/router";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {
-  MatButtonModule,
-  MatCheckboxModule, MatDialogModule, MatFormFieldModule,
-  MatIconModule,
-  MatInputModule, MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatRadioModule,
-  MatSelectModule,
-  MatSidenavModule,
-  MatSnackBarModule,
-  MatSortModule, MatStepperModule,
-  MatTableModule,
-  MatToolbarModule,
-  MatTooltipModule,
-  MatExpansionModule,
-  MatChipsModule, MatMenuModule,
-  MatBadgeModule
-} from "@angular/material";
+import { MatBadgeModule } from "@angular/material/badge";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatChipsModule } from "@angular/material/chips";
+import { MatDialogModule } from "@angular/material/dialog";
+import { MatExpansionModule } from "@angular/material/expansion";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatMenuModule } from "@angular/material/menu";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatRadioModule } from "@angular/material/radio";
+import { MatSelectModule } from "@angular/material/select";
+import { MatSidenavModule } from "@angular/material/sidenav";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatSortModule } from "@angular/material/sort";
+import { MatStepperModule } from "@angular/material/stepper";
+import { MatTableModule } from "@angular/material/table";
+import { MatToolbarModule } from "@angular/material/toolbar";
+import { MatTooltipModule } from "@angular/material/tooltip";
 import { ErrorDialogComponent } from './error-dialog/error-dialog.component';
 import { NotFoundPageComponent } from './not-found-page/not-found-page.component';
 import { NotAuthorizedPageComponent } from './not-authorized-page/not-authorized-page.component';
