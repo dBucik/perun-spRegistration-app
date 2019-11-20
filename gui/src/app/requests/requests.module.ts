@@ -15,13 +15,15 @@ import { RequestEditComponent } from './request-edit/request-edit.component';
 import { RequestStatusPipe } from './request-status.pipe';
 import { RequestActionPipe } from './request-action.pipe';
 import {RequestApprovedPipe} from "./request-approved.pipe";
+import {MatPaginatorModule} from "@angular/material/paginator";
 
 @NgModule({
   imports: [
     CommonModule,
     RequestsRoutingModule,
     SharedModule,
-    MatDialogModule
+    MatDialogModule,
+    MatPaginatorModule
   ],
   declarations: [
     RequestsOverviewComponent,

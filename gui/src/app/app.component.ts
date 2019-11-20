@@ -57,6 +57,8 @@ export class AppComponent implements OnInit {
   sidenavOpen = true;
   loading = true;
   minWidth = 768;
+  titleMinWidth = 540;
+  userMinWidth = this.minWidth;
   sidenavMode = 'side';
   currentUrl = '';
   logoUrl = '';
@@ -65,6 +67,8 @@ export class AppComponent implements OnInit {
   headerHtml = '<div></div>';
   isWideForUser = true;
   isWideForTitle = true;
+
+  lastWindowWidth: number;
 
   public static isApplicationAdmin(): boolean {
     if (this.user === undefined || this.user === null) {
@@ -92,13 +96,18 @@ export class AppComponent implements OnInit {
 
   @HostListener('window:resize', ['$event'])
   getScreenSize(event?) {
-    this.sidenavOpen = window.innerWidth > this.minWidth;
-    this.isWideForUser = this.sidenavOpen;
+    if (this.sidenavOpen && window.innerWidth < this.minWidth) {
+      this.sidenavOpen = false;
+    }
+
+    this.isWideForUser = window.innerWidth > this.userMinWidth;
     this.sidenavMode = window.innerWidth > this.minWidth ? 'side' : 'over';
-    this.isWideForTitle = window.innerWidth > 540;
+    this.isWideForTitle = window.innerWidth > this.titleMinWidth;
+
+    this.lastWindowWidth = window.innerWidth;
   }
 
-  closeSideBar() {
+  toggleSideBar() {
     this.sidenavOpen = !this.sidenavOpen;
   }
 

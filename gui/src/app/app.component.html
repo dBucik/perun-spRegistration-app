@@ -1,7 +1,7 @@
 <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
 <div *ngIf="!loading">
   <mat-toolbar color="primary" class="fixed-top" role="heading">
-    <button mat-icon-button class="mr-2 no-focus-outline d-block" (click)="closeSideBar()">
+    <button mat-icon-button class="mr-2 no-focus-outline d-block" (click)="toggleSideBar()">
       <mat-icon>menu</mat-icon>
     </button>
     <a [routerLink]="hasUser() ? '/auth' : '/'" class="site-title ml-2">
@@ -30,7 +30,7 @@
           {{ 'MENU.MAIN' | translate }}
         </li>
         <li class="nav-item menu-item-l2" [class.active]="currentUrl !== undefined && currentUrl === '/auth'">
-          <a class="no-hover-decoration" routerLink="/auth" (click)="closeSideBar()">
+          <a class="no-hover-decoration" routerLink="/auth">
             {{'MENU.HOME' | translate}}
           </a>
         </li>
@@ -40,13 +40,13 @@
           </li>
           <li class="nav-item menu-item-l2"
               [class.active]="currentUrl !== undefined && currentUrl === '/auth/requests/allRequests'">
-            <a class="no-hover-decoration" routerLink="/auth/requests/allRequests" (click)="closeSideBar()">
+            <a class="no-hover-decoration" routerLink="/auth/requests/allRequests">
               {{'MENU.ALL_REQUESTS' | translate}}
             </a>
           </li>
           <li class="nav-item menu-item-l2"
               [class.active]="currentUrl !== undefined && currentUrl === '/auth/facilities'">
-            <a class="no-hover-decoration" routerLink="/auth/facilities/allFacilities" (click)="closeSideBar()">
+            <a class="no-hover-decoration" routerLink="/auth/facilities/allFacilities">
               {{ 'MENU.ALL_FACILITIES' | translate }}
             </a>
           </li>
@@ -55,7 +55,7 @@
           {{ 'MENU.REQUESTS' | translate }}
         </li>
         <li class="nav-item menu-item-l2" [class.active]="currentUrl !== undefined && currentUrl === '/auth/requests/myRequests'">
-          <a class="no-hover-decoration" routerLink="/auth/requests/myRequests" (click)="closeSideBar()">
+          <a class="no-hover-decoration" routerLink="/auth/requests/myRequests">
             {{'MENU.MY_REQUESTS' | translate}}
           </a>
         </li>
@@ -63,12 +63,12 @@
           {{'MENU.SERVICES' | translate}}
         </li>
         <li class="nav-item menu-item-l2" [class.active]="currentUrl !== undefined && currentUrl === '/auth/facilities/myServices'">
-          <a class="no-hover-decoration" routerLink="/auth/facilities/myServices" (click)="closeSideBar()">
+          <a class="no-hover-decoration" routerLink="/auth/facilities/myServices">
             {{'MENU.MY_SERVICES' | translate}}
           </a>
         </li>
         <li class="nav-item menu-item-l2" [class.active]="currentUrl !== undefined && currentUrl === '/auth/requests/new'">
-          <a class="no-hover-decoration" routerLink="/auth/requests/new" (click)="closeSideBar()">
+          <a class="no-hover-decoration" routerLink="/auth/requests/new">
             {{'MENU.REGISTER_SERVICE' | translate}}
           </a>
         </li>

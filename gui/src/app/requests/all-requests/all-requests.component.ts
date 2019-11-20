@@ -1,57 +1,59 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {RequestsService} from '../../core/services/requests.service';
 import {Request} from '../../core/models/Request';
 import {MatSort, MatTableDataSource} from '@angular/material';
 import {Subscription} from 'rxjs';
+import {MatPaginator} from '@angular/material/paginator';
 
 @Component({
   selector: 'app-all-requests',
   templateUrl: './all-requests.component.html',
   styleUrls: ['./all-requests.component.scss']
 })
-export class AllRequestsComponent implements OnInit, OnDestroy {
+export class AllRequestsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(private requestsService: RequestsService) { }
 
-  @Input()
-  requests: Request[];
-
-
-  @ViewChild(MatSort) set matSort(ms: MatSort) {
-    this.sort = ms;
-    this.setDataSource();
-  }
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   private requestsSubscription: Subscription;
-  private sort: MatSort;
-
+  requests: Request[];
   loading = true;
-
   displayedColumns: string[] = ['reqId', 'reqUserId', 'facilityId', 'status', 'action'];
   dataSource: MatTableDataSource<Request>;
-
-  setDataSource() {
-    if (!!this.dataSource) {
-      this.dataSource.sort = this.sort;
-    }
-  }
 
   ngOnInit() {
     this.requestsSubscription = this.requestsService.getAllRequests().subscribe(requests => {
       this.loading = false;
       this.requests = requests;
       this.dataSource = new MatTableDataSource<Request>(requests);
+      this.setDataSource();
     }, error => {
       this.loading = false;
-      console.log(error);
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.requestsSubscription.unsubscribe();
   }
 
-  doFilter = (value: string) => {
-    this.dataSource.filter = value.trim().toLocaleLowerCase();
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
+
+  setDataSource() {
+    if (!!this.dataSource) {
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+    }
+  }
+
+  applyFilter(filterValue: string) {
+    filterValue = filterValue.trim();
+    filterValue = filterValue.toLowerCase();
+    this.dataSource.filter = filterValue;
+  }
+
 }

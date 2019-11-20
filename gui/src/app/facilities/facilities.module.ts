@@ -16,6 +16,7 @@ import {FacilityEnvironmentPipe} from "./facility-environment.pipe";
 import {MatTabsModule} from "@angular/material/tabs";
 import {FacilityProtocolPipe} from "./facility-protocol.pipe";
 import {MatDialogModule} from "@angular/material/dialog";
+import {MatPaginatorModule} from "@angular/material/paginator";
 
 @NgModule({
   imports: [
@@ -23,7 +24,8 @@ import {MatDialogModule} from "@angular/material/dialog";
     FacilitiesRoutingModule,
     SharedModule,
     MatTabsModule,
-    MatDialogModule
+    MatDialogModule,
+    MatPaginatorModule
   ],
   declarations: [
     ServicesOverviewComponent,
