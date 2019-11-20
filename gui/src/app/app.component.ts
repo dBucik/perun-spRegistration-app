@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
     private translate: TranslateService,
     private router: Router
   ) {
-    this.getScreenSize();
+    this.onResize();
 
     const browserLang = translate.getBrowserLang();
 
@@ -57,16 +57,12 @@ export class AppComponent implements OnInit {
   sidenavOpen = true;
   loading = true;
   minWidth = 768;
-  titleMinWidth = 540;
-  userMinWidth = this.minWidth;
   sidenavMode = 'side';
   currentUrl = '';
   logoUrl = '';
   appTitle = '';
   footerHtml = '<div></div>';
   headerHtml = '<div></div>';
-  isWideForUser = true;
-  isWideForTitle = true;
 
   lastWindowWidth: number;
 
@@ -94,23 +90,6 @@ export class AppComponent implements OnInit {
     this.user = user;
   }
 
-  @HostListener('window:resize', ['$event'])
-  getScreenSize(event?) {
-    if (this.sidenavOpen && window.innerWidth < this.minWidth) {
-      this.sidenavOpen = false;
-    }
-
-    this.isWideForUser = window.innerWidth > this.userMinWidth;
-    this.sidenavMode = window.innerWidth > this.minWidth ? 'side' : 'over';
-    this.isWideForTitle = window.innerWidth > this.titleMinWidth;
-
-    this.lastWindowWidth = window.innerWidth;
-  }
-
-  toggleSideBar() {
-    this.sidenavOpen = !this.sidenavOpen;
-  }
-
   ngOnInit(): void {
     this.configService.getPageConfig().subscribe(pageConfig => {
       AppComponent.pageConfig = pageConfig;
@@ -129,6 +108,21 @@ export class AppComponent implements OnInit {
     });
   }
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event?) {
+    if (this.sidenavOpen && this.lastWindowWidth > window.innerWidth &&
+      window.innerWidth < this.minWidth) {
+      this.sidenavOpen = false;
+    }
+
+    this.sidenavMode = window.innerWidth > this.minWidth ? 'side' : 'over';
+    this.lastWindowWidth = window.innerWidth;
+  }
+
+  toggleSideBar() {
+    this.sidenavOpen = !this.sidenavOpen;
+  }
+
   public hasUser(): boolean {
     return (AppComponent.getUser() !== null && AppComponent.getUser() !== undefined);
   }
@@ -136,4 +130,5 @@ export class AppComponent implements OnInit {
   public getUser(): User {
     return AppComponent.user;
   }
+
 }

@@ -32,9 +32,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-        <tr
-          mat-row
-          *matRowDef="let row; columns: displayedColumns;"
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
           [routerLink]="['/auth/facilities/detail', row.id]"
           class="hover-dark clickable">
         </tr>

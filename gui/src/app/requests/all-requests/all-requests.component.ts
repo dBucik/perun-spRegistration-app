@@ -19,6 +19,7 @@ export class AllRequestsComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(MatSort, {static: false}) sort: MatSort;
 
   private requestsSubscription: Subscription;
+  config: any;
   requests: Request[];
   loading = true;
   displayedColumns: string[] = ['reqId', 'reqUserId', 'facilityId', 'status', 'action'];
