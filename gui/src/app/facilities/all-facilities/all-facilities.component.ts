@@ -1,9 +1,10 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FacilitiesService} from '../../core/services/facilities.service';
 import {Facility} from '../../core/models/Facility';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import {Subscription} from 'rxjs';
+import {MatPaginator} from '@angular/material/paginator';
 
 @Component({
   selector: 'app-all-facilities',
@@ -13,9 +14,13 @@ import {Subscription} from 'rxjs';
 export class AllFacilitiesComponent implements OnInit, OnDestroy {
 
   private sort: MatSort;
+  private paginator: MatPaginator;
   private facilitiesSubscription: Subscription;
 
-  constructor(private facilitiesService: FacilitiesService) { }
+  constructor(private facilitiesService: FacilitiesService) {
+    this.facilities = [];
+    this.dataSource = new MatTableDataSource<Facility>([]);
+  }
 
   @Input()
   facilities: Facility[];
@@ -25,14 +30,23 @@ export class AllFacilitiesComponent implements OnInit, OnDestroy {
     this.setDataSource();
   }
 
+  @ViewChild(MatPaginator, {static: false}) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.setDataSource();
+  }
+
   displayedColumns: string[] = ['id', 'name', 'description', 'environment', 'protocol'];
   dataSource: MatTableDataSource<Facility>;
   loading = true;
 
-
   setDataSource() {
     if (!!this.dataSource) {
-      this.dataSource.sort = this.sort;
+      if (!!this.sort) {
+        this.dataSource.sort = this.sort;
+      }
+      if (!!this.paginator) {
+        this.dataSource.paginator = this.paginator;
+      }
     }
   }
 

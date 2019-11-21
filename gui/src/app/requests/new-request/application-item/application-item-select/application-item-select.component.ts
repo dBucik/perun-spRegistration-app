@@ -1,10 +1,9 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
-import {ApplicationItem} from "../../../../core/models/ApplicationItem";
-import {Attribute} from "../../../../core/models/Attribute";
-import {RequestItem} from "../../../../core/models/RequestItem";
-import {NgForm} from "@angular/forms";
-import {TranslateService} from "@ngx-translate/core";
+import {ApplicationItem} from '../../../../core/models/ApplicationItem';
+import {Attribute} from '../../../../core/models/Attribute';
+import {RequestItem} from '../../../../core/models/RequestItem';
+import {NgForm} from '@angular/forms';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-application-item-select',
@@ -13,13 +12,11 @@ import {TranslateService} from "@ngx-translate/core";
 })
 export class ApplicationItemSelectComponent implements RequestItem, OnInit {
 
-  constructor(private translate: TranslateService) { }
+  constructor(private translate: TranslateService) {
+    this.values = [];
+  }
 
-  removeIcon = faMinus;
-  addIcon = faPlus;
-  helpIcon = faQuestionCircle;
-
-  values = [];
+  values: string[];
   translatedName: string;
   translatedDescription: string;
 
@@ -27,7 +24,7 @@ export class ApplicationItemSelectComponent implements RequestItem, OnInit {
   applicationItem: ApplicationItem;
 
   @ViewChild('form', {static: false})
-  form : NgForm;
+  form: NgForm;
 
   getAttribute(): Attribute {
     return new Attribute(this.applicationItem.name, this.values);
@@ -35,13 +32,14 @@ export class ApplicationItemSelectComponent implements RequestItem, OnInit {
 
   hasCorrectValue(): boolean {
     if (!this.applicationItem.required) {
+      if (this.values === undefined || this.values === null) {
+        this.values = [];
+      }
+
       return true;
     }
 
-    // if ((this.values == this.applicationItem.oldValue) && (this.applicationItem.comment != "")){
-    //
-    // }
-    return this.values.length > 0;
+    return this.values !== undefined && this.values !== null && this.values.length > 0;
   }
 
   onFormSubmitted(): void {
@@ -52,7 +50,7 @@ export class ApplicationItemSelectComponent implements RequestItem, OnInit {
   }
 
   ngOnInit(): void {
-    let browserLang = this.translate.getDefaultLang();
+    const browserLang = this.translate.getDefaultLang();
     this.translatedDescription = this.applicationItem.description[browserLang];
     this.translatedName = this.applicationItem.displayName[browserLang];
     this.values = this.applicationItem.oldValue;

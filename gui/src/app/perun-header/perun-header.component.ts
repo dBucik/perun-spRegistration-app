@@ -19,6 +19,7 @@ export class PerunHeaderComponent implements OnInit {
   public getHeader(): string {
     return PerunHeaderComponent.header;
   }
+
   ngOnInit(): void {
     if (AppComponent.getPageConfig() !== null && AppComponent.getPageConfig() !== undefined) {
       PerunHeaderComponent.header = AppComponent.getPageConfig().headerHtml;

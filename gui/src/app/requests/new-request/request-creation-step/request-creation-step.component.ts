@@ -1,10 +1,10 @@
 import {Component, Input, OnInit, QueryList, ViewChildren} from '@angular/core';
-import {ApplicationItem} from "../../../core/models/ApplicationItem";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { MatStepper } from "@angular/material/stepper";
-import {ApplicationItemComponent} from "../application-item/application-item.component";
-import {PerunAttribute} from "../../../core/models/PerunAttribute";
-import {TranslateService} from "@ngx-translate/core";
+import {ApplicationItem} from '../../../core/models/ApplicationItem';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatStepper } from '@angular/material/stepper';
+import {ApplicationItemComponent} from '../application-item/application-item.component';
+import {PerunAttribute} from '../../../core/models/PerunAttribute';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-request-creation-step',
@@ -15,35 +15,35 @@ export class RequestCreationStepComponent implements OnInit {
 
   constructor(
     private snackBar: MatSnackBar,
-    private translation : TranslateService
+    private translation: TranslateService
   ) { }
 
   @ViewChildren(ApplicationItemComponent)
   items: QueryList<ApplicationItemComponent>;
 
   @Input()
-  applicationItems : ApplicationItem[];
+  applicationItems: ApplicationItem[];
 
   @Input()
-  stepper : MatStepper;
+  stepper: MatStepper;
 
   private valueErrorText: string;
 
-  public getPerunAttributes() : PerunAttribute[] {
-    let perunAttributes : PerunAttribute[] = [];
+  public getPerunAttributes(): PerunAttribute[] {
+    const perunAttributes: PerunAttribute[] = [];
 
     this.items.forEach(i => {
-      let attr = i.getAttribute();
-      let perunAttr = new PerunAttribute(attr.value, attr.urn);
+      const attr = i.getAttribute();
+      const perunAttr = new PerunAttribute(attr.value, attr.urn);
       perunAttributes.push(perunAttr);
     });
 
     return perunAttributes;
   }
 
-  private attributesHasCorrectValues() : boolean {
+  private attributesHasCorrectValues(): boolean {
 
-    let attributeItems = this.items.toArray();
+    const attributeItems = this.items.toArray();
 
     for (const i of attributeItems) {
       if (!i.hasCorrectValue()) {
@@ -54,7 +54,7 @@ export class RequestCreationStepComponent implements OnInit {
     return true;
   }
 
-  private checkValues() : boolean {
+  private checkValues(): boolean {
     this.items.forEach(i => i.onFormSubmitted());
 
     if (!this.attributesHasCorrectValues()) {
@@ -65,19 +65,19 @@ export class RequestCreationStepComponent implements OnInit {
     return true;
   }
 
-  nextStep(){
+  nextStep() {
     if (!this.checkValues()) {
       return;
     }
     this.stepper.next();
   }
 
-  previousStep(){
+  previousStep() {
     this.stepper.previous();
   }
 
   ngOnInit() {
-    this.translation.get("REQUESTS.NEW_VALUES_ERROR_MESSAGE").subscribe(text => this.valueErrorText = text);
+    this.translation.get('REQUESTS.NEW_VALUES_ERROR_MESSAGE').subscribe(text => this.valueErrorText = text);
   }
 
 }

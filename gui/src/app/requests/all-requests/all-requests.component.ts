@@ -1,25 +1,36 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {RequestsService} from '../../core/services/requests.service';
-import {Request} from '../../core/models/Request';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { RequestsService } from '../../core/services/requests.service';
+import { Request } from '../../core/models/Request';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import {Subscription} from 'rxjs';
-import {MatPaginator} from '@angular/material/paginator';
+import { Subscription } from 'rxjs';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-all-requests',
   templateUrl: './all-requests.component.html',
   styleUrls: ['./all-requests.component.scss']
 })
-export class AllRequestsComponent implements OnInit, OnDestroy, AfterViewInit {
+export class AllRequestsComponent implements OnInit, OnDestroy {
 
-  constructor(private requestsService: RequestsService) { }
+  constructor(private requestsService: RequestsService) {
+    this.requests = [];
+    this.dataSource = new MatTableDataSource<Request>([]);
+  }
 
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: false}) sort: MatSort;
+  @ViewChild(MatPaginator, {static: false}) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.setDataSource();
+  }
+  @ViewChild(MatSort, {static: false}) set matSort(ms: MatSort) {
+    this.sort = ms;
+    this.setDataSource();
+  }
+
+  private paginator: MatPaginator = undefined;
+  private sort: MatSort = undefined;
 
   private requestsSubscription: Subscription;
-  config: any;
   requests: Request[];
   loading = true;
   displayedColumns: string[] = ['reqId', 'reqUserId', 'facilityId', 'status', 'action'];
@@ -30,7 +41,6 @@ export class AllRequestsComponent implements OnInit, OnDestroy, AfterViewInit {
       this.loading = false;
       this.requests = requests;
       this.dataSource = new MatTableDataSource<Request>(requests);
-      this.setDataSource();
     }, error => {
       this.loading = false;
     });
@@ -40,15 +50,14 @@ export class AllRequestsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.requestsSubscription.unsubscribe();
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-  }
-
   setDataSource() {
     if (!!this.dataSource) {
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
+      if (!!this.sort) {
+        this.dataSource.sort = this.sort;
+      }
+      if (!!this.paginator) {
+        this.dataSource.paginator = this.paginator;
+      }
     }
   }
 

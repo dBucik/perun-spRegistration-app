@@ -24,7 +24,7 @@ public class PerunAttribute {
 	private final static String ARRAY_TYPE = "java.util.ArrayList";
 	private final static String MAP_TYPE = "java.util.LinkedHashMap";
 	private final static String LARGE_STRING_TYPE = "java.lang.LargeString";
-	private final static String LARGE_ARRAY_LIST_TYPE = "java.lang.LargeArrayList";
+	private final static String LARGE_ARRAY_LIST_TYPE = "java.util.LargeArrayList";
 
 	private PerunAttributeDefinition definition;
 	private Object value;

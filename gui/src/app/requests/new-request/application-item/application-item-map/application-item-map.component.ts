@@ -13,11 +13,14 @@ import {TranslateService} from '@ngx-translate/core';
 export class ApplicationItemMapComponent implements RequestItem, OnInit {
 
   constructor(private translate: TranslateService) {
+    this.keys = [];
+    this.values = [];
+    this.indexes = [];
   }
 
-  keys: string[] = [];
-  values: string[] = [];
-  indexes: number[] = [];
+  keys: string[];
+  values: string[];
+  indexes: number[];
 
   private index = 0;
 
@@ -74,16 +77,6 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
 
   customTrackBy(index: number, obj: any): any {
     return index;
-  }
-
-  private isFilledAtLeastOneValue(): boolean {
-    for (const value of this.values) {
-      if (value.trim().length > 0) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   private allValuesAreFilled(): boolean {

@@ -2,7 +2,8 @@
   <div class="col-sm-12 d-flex">
     <form class="d-flex w-100" #form="ngForm">
       <div class="w-100">
-        <label class="col-form-label word-break-word" [class.perun-warn]="this.noItemError || this.duplicitKeysError || this.noValueError">
+        <label class="col-form-label word-break-word"
+               [class.perun-warn]="this.noItemError || this.duplicitKeysError || this.noValueError">
           {{translatedName}}
           <span *ngIf="applicationItem.required"> *</span>
         </label>
@@ -21,31 +22,14 @@
           </div>
           <div *ngFor="let value of values; let i = index; trackBy: customTrackBy" class="d-flex mb-1">
             <mat-form-field class="w-25 ml-3 mr-2">
-              <input
-                matInput
-                [disabled]="disableCustomKeys"
-                required
-                placeholder="{{'REQUESTS.MAP_KEY' | translate}}"
-                type="text"
-                id="{{applicationItem.name}}-key-{{i}}"
-                [(ngModel)] = "keys[i]"
-                name="key-{{i}}">
+              <input matInput [disabled]="disableCustomKeys" required placeholder="{{'REQUESTS.MAP_KEY' | translate}}"
+                type="text" id="{{applicationItem.name}}-key-{{i}}" [(ngModel)] = "keys[i]" name="key-{{i}}">
             </mat-form-field>
             <mat-form-field class="w-100 mr-2 ml-2">
-              <input
-                matInput
-                [required]="applicationItem.required"
-                placeholder="{{'REQUESTS.MAP_VALUE' | translate}}"
-                type="text"
-                name="value-{{i}}"
-                id="{{applicationItem.name}}-value-{{i}}"
-                [(ngModel)] = "values[i]">
+              <input matInput [required]="applicationItem.required" placeholder="{{'REQUESTS.MAP_VALUE' | translate}}"
+                type="text" name="value-{{i}}" id="{{applicationItem.name}}-value-{{i}}" [(ngModel)] = "values[i]">
             </mat-form-field>
-            <button
-              *ngIf="!disableCustomKeys"
-              mat-icon-button
-              color="warn"
-              (click)="removeValue(i)">
+            <button *ngIf="!disableCustomKeys" mat-icon-button color="warn" (click)="removeValue(i)">
               <mat-icon>
                 indeterminate_check_box
               </mat-icon>

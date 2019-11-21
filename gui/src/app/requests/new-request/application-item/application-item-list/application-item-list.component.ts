@@ -1,37 +1,36 @@
-import {Component, Input, ViewChild} from '@angular/core';
-import {ApplicationItem} from "../../../../core/models/ApplicationItem";
-import {faMinus, faPlus, faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
-import {RequestItem} from "../../../../core/models/RequestItem";
-import {Attribute} from "../../../../core/models/Attribute";
-import {NgForm} from "@angular/forms";
-import {TranslateService} from "@ngx-translate/core";
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {ApplicationItem} from '../../../../core/models/ApplicationItem';
+import {faMinus, faPlus, faQuestionCircle} from '@fortawesome/free-solid-svg-icons';
+import {RequestItem} from '../../../../core/models/RequestItem';
+import {Attribute} from '../../../../core/models/Attribute';
+import {NgForm} from '@angular/forms';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-application-item-list',
   templateUrl: './application-item-list.component.html',
   styleUrls: ['./application-item-list.component.scss']
 })
-export class ApplicationItemListComponent implements RequestItem {
+export class ApplicationItemListComponent implements RequestItem, OnInit {
 
-  constructor(private translate: TranslateService) { }
+  constructor(private translate: TranslateService) {
+    this.values = [];
+  }
 
-  removeIcon = faMinus;
-  addIcon = faPlus;
-  helpIcon = faQuestionCircle;
   error = false;
   noItemError = false;
   translatedName: string;
   translatedDescription: string;
 
-  values : string[] = [];
+  values: string[];
 
   @Input()
   applicationItem: ApplicationItem;
 
   @ViewChild('form', {static: false})
-  form : NgForm;
+  form: NgForm;
 
-  removeValue(index : number) {
+  removeValue(index: number) {
     this.values.splice(index, 1);
     if (this.values.length === 0) {
       this.noItemError = true;
@@ -39,7 +38,7 @@ export class ApplicationItemListComponent implements RequestItem {
   }
 
   addValue() {
-    this.values.push("");
+    this.values.push('');
     this.noItemError = false;
   }
 
@@ -54,10 +53,8 @@ export class ApplicationItemListComponent implements RequestItem {
   hasCorrectValue(): boolean {
     if (!this.applicationItem.required) {
       return true;
-    } else {
-      if (this.values.length === 0) {
-        return false;
-      }
+    } else if (!!this.values) {
+      return false;
     }
 
     for (let i = 0; i < this.values.length; i++) {
@@ -66,25 +63,26 @@ export class ApplicationItemListComponent implements RequestItem {
       }
     }
 
-    return true;
+    return !(this.applicationItem.required && this.values.length === 0);
   }
 
   ngOnInit(): void {
-    let browserLang = this.translate.getDefaultLang();
+    const browserLang = this.translate.getDefaultLang();
     this.translatedDescription = this.applicationItem.description[browserLang];
     this.translatedName = this.applicationItem.displayName[browserLang];
-    if (this.applicationItem.oldValue != null){
+    if (this.applicationItem.oldValue != null) {
       this.values = this.applicationItem.oldValue;
     }
   }
 
   onFormSubmitted(): void {
     if (!this.hasCorrectValue()) {
-      if (this.values.length === 0) {
+      if (this.applicationItem.required && this.values.length === 0) {
         this.noItemError = true;
       }
+
       for (let i = 0; i < this.values.length; i++) {
-        let value = this.values[i];
+        const value = this.values[i];
 
         if (value.trim().length === 0) {
           this.form.form.controls['value-' + i].markAsTouched();

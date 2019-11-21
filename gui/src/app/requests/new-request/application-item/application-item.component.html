@@ -15,13 +15,15 @@
     <!-- ArrayList without allowed values-->
     <app-application-item-list
       [applicationItem]="applicationItem"
-      *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues === null">
+      *ngIf="(applicationItem.type === 'java.util.ArrayList' || applicationItem.type === 'java.util.LargeArrayList')
+      && (applicationItem.allowedValues === null || applicationItem.allowedValues.length === 0)">
     </app-application-item-list>
 
     <!-- ArrayList with allowed values-->
     <app-application-item-select
       [applicationItem]="applicationItem"
-      *ngIf="applicationItem.type === 'java.util.ArrayList' && applicationItem.allowedValues !== null">
+      *ngIf="(applicationItem.type === 'java.util.ArrayList' || applicationItem.type === 'java.util.LargeArrayList')
+      && (applicationItem.allowedValues !== null && applicationItem.allowedValues.length > 0)">
     </app-application-item-select>
 
     <!-- HashMap -->

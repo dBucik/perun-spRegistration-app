@@ -1,13 +1,13 @@
 import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {ConfigService} from "../../core/services/config.service";
-import {ApplicationItem} from "../../core/models/ApplicationItem";
-import {RequestsService} from "../../core/services/requests.service";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { MatHorizontalStepper } from "@angular/material/stepper";
-import {TranslateService} from "@ngx-translate/core";
-import {PerunAttribute} from "../../core/models/PerunAttribute";
-import {RequestCreationStepComponent} from "./request-creation-step/request-creation-step.component";
-import {Router} from "@angular/router";
+import {ConfigService} from '../../core/services/config.service';
+import {ApplicationItem} from '../../core/models/ApplicationItem';
+import {RequestsService} from '../../core/services/requests.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatHorizontalStepper } from '@angular/material/stepper';
+import {TranslateService} from '@ngx-translate/core';
+import {PerunAttribute} from '../../core/models/PerunAttribute';
+import {RequestCreationStepComponent} from './request-creation-step/request-creation-step.component';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-new-request',
@@ -29,21 +29,62 @@ export class NewRequestComponent implements OnInit {
   @ViewChild(MatHorizontalStepper, {static: false})
   stepper: MatHorizontalStepper;
 
-  serviceSelected : string;
+  serviceSelected: string;
 
   isFormVisible = false;
   isCardBodyVisible = false;
   oidcEnabled: boolean;
   loading = true;
-  selected = "";
+  selected = '';
   snackBarDurationMs = 8000;
 
   // translations
-  errorText : string;
+  errorText: string;
   successfullySubmittedText: string;
   successActionText: string;
 
   applicationItemGroups: ApplicationItem[][];
+
+  /**
+   * Filters items that should not be displayed
+   *
+   * @param items
+   */
+  private static filterItems(items: ApplicationItem[][]): ApplicationItem[][] {
+    const filteredItems: ApplicationItem[][] = [];
+
+    items.forEach(itemsGroup => {
+      const filteredGroup: ApplicationItem[] = [];
+
+      itemsGroup.forEach(item => {
+        if (item.displayed) {
+          filteredGroup.push(item);
+        }
+      });
+
+      filteredItems.push(filteredGroup);
+    });
+
+    return filteredItems;
+  }
+
+  /**
+   * Sorts items in order that they should be displayed
+   *
+   * @param items
+   */
+  private static sortItems(items: ApplicationItem[][]): ApplicationItem[][] {
+    const sortedItems: ApplicationItem[][] = [];
+
+    items.forEach(itemsGroup => {
+      sortedItems.push(itemsGroup.sort(((a, b) => {
+        return a.displayPosition - b.displayPosition;
+      })));
+    });
+
+    console.log(sortedItems);
+    return sortedItems;
+  }
 
   ngOnInit() {
 
@@ -55,7 +96,7 @@ export class NewRequestComponent implements OnInit {
       if (!isEnabled) {
         this.samlSelected();
       }
-    },error => {
+    }, error => {
       this.loading = false;
       console.log(error);
     });
@@ -81,7 +122,7 @@ export class NewRequestComponent implements OnInit {
 
   oidcSelected() {
     this.onLoading();
-    this.selected = "oidc";
+    this.selected = 'oidc';
 
     this.configService.getOidcApplicationItems().subscribe(items => {
       this.applicationItemGroups = NewRequestComponent.sortItems(NewRequestComponent.filterItems(items));
@@ -91,12 +132,12 @@ export class NewRequestComponent implements OnInit {
 
   samlSelected() {
     this.onLoading();
-    this.selected = "saml";
+    this.selected = 'saml';
 
     this.configService.getSamlApplicationItems().subscribe(items => {
       this.applicationItemGroups = NewRequestComponent.sortItems(NewRequestComponent.filterItems(items));
       this.revealForm();
-    })
+    });
   }
 
   /**
@@ -104,7 +145,7 @@ export class NewRequestComponent implements OnInit {
    */
   submitRequest() {
     this.loading = true;
-    let perunAttributes : PerunAttribute[] = [];
+    let perunAttributes: PerunAttribute[] = [];
 
     this.steps.forEach(step => perunAttributes = perunAttributes.concat(step.getPerunAttributes()));
 
@@ -115,48 +156,7 @@ export class NewRequestComponent implements OnInit {
     });
   }
 
-  /**
-   * Filters items that should not be displayed
-   *
-   * @param items
-   */
-  private static filterItems(items : ApplicationItem[][]) : ApplicationItem[][] {
-    let filteredItems : ApplicationItem[][] = [];
-
-    items.forEach(itemsGroup => {
-      let filteredGroup : ApplicationItem[] = [];
-
-      itemsGroup.forEach(item => {
-        if (item.displayed) {
-          filteredGroup.push(item);
-        }
-      });
-
-      filteredItems.push(filteredGroup);
-    });
-
-    return filteredItems;
-  }
-
-  /**
-   * Sorts items in order that they should be displayed
-   *
-   * @param items
-   */
-  private static sortItems(items : ApplicationItem[][]) : ApplicationItem[][] {
-    let sortedItems : ApplicationItem[][] = [];
-
-    items.forEach(itemsGroup => {
-      sortedItems.push(itemsGroup.sort(((a, b) => {
-        return a.displayPosition - b.displayPosition;
-      })))
-    });
-
-    console.log(sortedItems);
-    return sortedItems;
-  }
-
-  previousStep(){
+  previousStep() {
     this.stepper.previous();
   }
 }
