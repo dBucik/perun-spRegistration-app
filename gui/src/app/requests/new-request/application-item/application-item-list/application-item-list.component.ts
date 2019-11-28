@@ -53,7 +53,7 @@ export class ApplicationItemListComponent implements RequestItem, OnInit {
   hasCorrectValue(): boolean {
     if (!this.applicationItem.required) {
       return true;
-    } else if (!!this.values) {
+    } else if (this.values === undefined || this.values === null || this.values.length === 0) {
       return false;
     }
 
@@ -63,7 +63,7 @@ export class ApplicationItemListComponent implements RequestItem, OnInit {
       }
     }
 
-    return !(this.applicationItem.required && this.values.length === 0);
+    return true;
   }
 
   ngOnInit(): void {
