@@ -731,7 +731,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		boolean res = reqUserId.equals(userId);
+		boolean res = reqUserId.equals(userId) || appConfig.isAppAdmin(userId);
 
 		log.debug("isAdminInRequest returns: {}", res);
 		return res;

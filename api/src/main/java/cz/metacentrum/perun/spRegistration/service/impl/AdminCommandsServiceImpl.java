@@ -322,8 +322,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		String newName = request.getFacilityName();
 		String newDesc = request.getFacilityDescription();
 
-		if (Utils.checkParamsInvalid(newName, newDesc)) {
-			log.error("Wrong parameters passed: (newName: {}, newDesc: {})", newName, newDesc);
+		if (Utils.checkParamsInvalid(newName)) {
+			log.error("Wrong parameters passed: (newName: {})", newName);
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
