@@ -42,4 +42,16 @@ public enum RequestAction {
 
 		return null;
 	}
+
+
+	@Override
+	public String toString() {
+		switch (this) {
+			case REGISTER_NEW_SP: return "Register a new service";
+			case UPDATE_FACILITY: return "Update service configuration";
+			case DELETE_FACILITY:  return "Remove service";
+			case MOVE_TO_PRODUCTION: return "Transfer service to production environment";
+			default: return super.toString();
+		}
+	}
 }

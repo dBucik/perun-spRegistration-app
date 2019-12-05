@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -102,13 +103,13 @@ public class ConfigController {
 		return specifyAuthoritiesEnabled;
 	}
 
-	@GetMapping(path = "/api/config/prodTransferAuthoritiesMailsMapRef")
-	public Map<String, String> getProdTransferAuthoritiesMailsMapRef() {
-		log.trace("getProdTransferAuthoritiesMailsMapRef()");
+	@GetMapping(path = "/api/config/prodTransferEntries")
+	public Set<String> getProdTransferEntries() {
+		log.trace("getProdTransferEntries()");
 
-		Map<String, String> map = config.getAppConfig().getProdTransferAuthoritiesMailsMap();
+		Set<String> entries = config.getAppConfig().getProdTransferAuthoritiesMailsMap().keySet();
 
-		log.trace("getProdTransferAuthoritiesMailsMapRef() returns: {}", map);
-		return map;
+		log.trace("getProdTransferEntries() returns: {}", entries);
+		return entries;
 	}
 }

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from "./api.service";
-import {Observable, of} from "rxjs";
-import {ApplicationItem} from "../models/ApplicationItem";
-import {PageConfig} from "../models/PageConfig";
+import { ApiService } from './api.service';
+import {Observable, of} from 'rxjs';
+import {ApplicationItem} from '../models/ApplicationItem';
+import {PageConfig} from '../models/PageConfig';
 
 @Injectable({
   providedIn: 'root'
@@ -17,27 +17,27 @@ export class ConfigService {
     return this.apiService.get('/config/oidcEnabled');
   }
 
-  getSamlApplicationItems() : Observable<ApplicationItem[][]> {
+  getSamlApplicationItems(): Observable<ApplicationItem[][]> {
     return this.apiService.get('/config/samlInputs');
   }
 
-  getOidcApplicationItems() : Observable<ApplicationItem[][]> {
+  getOidcApplicationItems(): Observable<ApplicationItem[][]> {
     return this.apiService.get('/config/oidcInputs');
   }
 
-  getPageConfig() : Observable<PageConfig> {
+  getPageConfig(): Observable<PageConfig> {
       return this.apiService.get('/config/pageConfig');
   }
 
-  isUserAdmin() : Observable<boolean> {
+  isUserAdmin(): Observable<boolean> {
     return this.apiService.get('/config/isApplicationAdmin');
   }
 
-  isAuthoritiesEnabled() : Observable<boolean>{
+  isAuthoritiesEnabled(): Observable<boolean> {
       return this.apiService.get('/config/specifyAuthoritiesEnabled');
   }
 
-  getProdTransferAuthoritiesMailsMap() : Observable<Map<string, string>> {
-    return this.apiService.get('/config/prodTransferAuthoritiesMailsMapRef');
+  getProdTransferEntries(): Observable<string[]> {
+    return this.apiService.get('/config/prodTransferEntries');
   }
 }

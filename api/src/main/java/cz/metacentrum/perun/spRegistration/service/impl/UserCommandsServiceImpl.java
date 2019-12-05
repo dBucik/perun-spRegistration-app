@@ -242,11 +242,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, filteredAttributes);
 
-		if (authorities == null || authorities.isEmpty()) {
-			String prop = messagesProperties.getProperty("moveToProduction.authorities");
-			authorities = Arrays.asList(prop.split(","));
-		}
-
 		Map<String, String> authoritiesCodesMap = generateCodesForAuthorities(req, authorities);
 		Map<String, String> authoritiesLinksMap = generateLinksForAuthorities(authoritiesCodesMap, req);
 
@@ -902,15 +897,28 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	{
 		log.trace("generateCodesForAuthorities(request: {}, authorities: {})", request, authorities);
 
+		List<String> emails = new ArrayList<>();
 		if (Utils.checkParamsInvalid(request, authorities)) {
 			log.error("Wrong parameters passed: (request: {}, authorities: {})", request, authorities);
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
+		if (authorities == null || authorities.isEmpty()) {
+			String prop = messagesProperties.getProperty("moveToProduction.authorities");
+			emails = Arrays.asList(prop.split(","));
+		} else {
+			Map<String, List<String>> authsMap = appConfig.getProdTransferAuthoritiesMailsMap();
+			for (String authoritiesInput: authorities) {
+				if (authsMap.containsKey(authoritiesInput)) {
+					emails.addAll(authsMap.get(authoritiesInput));
+				}
+			}
+		}
+
 		List<String> codes = new ArrayList<>();
 		Map<String, String> authsCodesMap = new HashMap<>();
 
-		for (String authority : authorities) {
+		for (String authority : emails) {
 			String code = createRequestCode(request.getReqId(), request.getFacilityId(), authority);
 			codes.add(code);
 			authsCodesMap.put(authority, code);

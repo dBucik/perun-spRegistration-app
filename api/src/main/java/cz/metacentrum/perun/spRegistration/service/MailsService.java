@@ -56,6 +56,8 @@ public class MailsService {
 	private static final String APPROVAL_LINK_FIELD = "%APPROVAL_LINK%";
 	private static final String SERVICE_DESCRIPTION_FIELD = "%SERVICE_DESCRIPTION%";
 	private static final String REQUEST_DETAIL_LINK_FIELD = "%REQUEST_DETAIL_LINK%";
+	private static final String ACTION_FIELD = "%ACTION%";
+	private static final String USER_INFO_FIELD = "%USER_INFO%";
 
 	@Autowired
 	private Properties messagesProperties;
@@ -202,13 +204,15 @@ public class MailsService {
 		containerString = replacePlaceholder(containerString, SERVICE_NAME_FIELD, req.getFacilityName());
 		containerString = replacePlaceholder(containerString, SERVICE_DESCRIPTION_FIELD, req.getFacilityDescription());
 		containerString = replacePlaceholder(containerString, REQUEST_DETAIL_LINK_FIELD, hostUrl + "/auth/requests/detail/" + req.getReqId());
+		containerString = replacePlaceholder(containerString, ACTION_FIELD, req.getAction().toString());
+		containerString = replacePlaceholder(containerString, USER_INFO_FIELD, req.getReqUserId().toString());
 
 		return containerString;
 	}
 
 	private String replacePlaceholder(String container, String replaceKey, String replaceWith) {
 		if (container.contains(replaceKey)) {
-			return container.replaceAll(replaceKey, replaceWith);
+			return container.replace(replaceKey, replaceWith);
 		}
 
 		return container;

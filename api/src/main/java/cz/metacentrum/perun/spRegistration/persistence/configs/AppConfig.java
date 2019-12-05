@@ -49,7 +49,7 @@ public class AppConfig {
 	private String userEmailAttributeName;
 	private String isSamlAttributeName;
 	private String isOidcAttributeName;
-	private Map<String, String> prodTransferAuthoritiesMailsMap;
+	private Map<String, List<String>> prodTransferAuthoritiesMailsMap;
 
 	private String footerHTML;
 	private String headerLogo;
@@ -185,14 +185,15 @@ public class AppConfig {
 		this.perunAttributeDefinitionsMap = perunAttributeDefinitionsMap;
 	}
 
-	public Map<String, String> getProdTransferAuthoritiesMailsMap() { return prodTransferAuthoritiesMailsMap; }
+	public Map<String, List<String>> getProdTransferAuthoritiesMailsMap() { return prodTransferAuthoritiesMailsMap; }
 
 	public void setProdTransferAuthoritiesMailsMap(Properties prodTransferAuthoritiesMailsMap) {
-
 		this.prodTransferAuthoritiesMailsMap = new HashMap<>();
 
 		for (Map.Entry<Object, Object> entry : prodTransferAuthoritiesMailsMap.entrySet()) {
-			this.prodTransferAuthoritiesMailsMap.put((String) entry.getKey(), (String) entry.getValue());
+			List<String> emails = Arrays.asList(((String)entry.getValue()).split(","));
+			String displayedText = (String) entry.getKey();
+			this.prodTransferAuthoritiesMailsMap.put(displayedText, emails);
 		}
 	}
 
