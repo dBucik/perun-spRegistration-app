@@ -109,6 +109,12 @@ export class AppComponent implements OnInit {
       PerunHeaderComponent.setHeader(this.headerHtml);
       this.loading = false;
     });
+    this.userService.getUser().subscribe(user => {
+      if (user !== null && user !== undefined) {
+        AppComponent.setUser(user);
+        this.router.navigate(['/auth']);
+      }
+    })
   }
 
   @HostListener('window:resize', ['$event'])
