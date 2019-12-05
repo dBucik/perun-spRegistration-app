@@ -29,8 +29,6 @@ export class ApplicationItemBooleanComponent implements OnInit, RequestItem {
 
   hasCorrectValue(): boolean {
     return !((this.value == this.applicationItem.oldValue) && (this.applicationItem.comment != null));
-    //return !((this.value == this.applicationItem.oldValue) && ((this.applicationItem.comment != "") || (this.applicationItem.comment == null)));
-    //return true;
   }
 
   onFormSubmitted(): void {

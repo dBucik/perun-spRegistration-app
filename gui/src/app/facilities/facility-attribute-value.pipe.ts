@@ -25,7 +25,7 @@ export class FacilityAttributeValuePipe implements PipeTransform {
           output += `<li>${val}</li>`;
         }
       }
-      return `<ul class="pad1 aul-attr">${output}</ul>`;
+      return `<ul class="pad1 ul-attr">${output}</ul>`;
     }
     if (value instanceof Object) {
       let output = '';

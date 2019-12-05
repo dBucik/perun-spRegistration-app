@@ -32,9 +32,18 @@ export class ApplicationItemStringComponent implements RequestItem, OnInit {
   }
 
   hasCorrectValue(): boolean {
-    if ((this.value === this.applicationItem.oldValue) && ((this.applicationItem.comment != null))) {
-      return false;
+    if (!this.applicationItem.required) {
+      return true;
+    } else {
+      if (this.value === undefined || this.value === null || this.value.trim().length === 0) {
+        return false;
+      }
+
+      if ((this.value === this.applicationItem.oldValue) && ((this.applicationItem.comment != null))) {
+        return false;
+      }
     }
+
     return this.inputField.valid;
   }
 

@@ -156,7 +156,6 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     this.startMethod();
     this.requestsService.getRequest(activeRequestId).subscribe(request => {
       this.moveToProductionActive = (request.action === 'MOVE_TO_PRODUCTION');
-
       this.endMethod();
     });
   }

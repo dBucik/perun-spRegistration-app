@@ -2,14 +2,14 @@
   <mat-spinner class="ml-auto mr-auto" *ngIf="loading" color=""></mat-spinner>
   <div *ngIf="!loading" class="card mb-4 shadow-sm">
     <div class="card-body p-5">
-      <h2 class="card-title">{{'REQUESTS.DETAILTITLE' | translate}}{{request.reqId}}</h2>
+      <h2 class="card-title">{{'REQUESTS.DETAIL_TITLE' | translate}}{{request.reqId}}</h2>
       <div>
         {{'REQUESTS.STATUS' | translate}}: <span [innerHTML]=" request.status | requestStatusPipe "></span>
       </div>
       <div>
         {{'REQUESTS.ACTION' | translate}}: <span [innerHTML]=" request.action | requestActionPipe "></span>
       </div>
-      <div class="mb-4">{{'REQUESTS.DETAILEDITED' | translate}}: {{ request.modifiedAt | date }}</div>
+      <div class="mb-4">{{'REQUESTS.DETAIL_EDITED' | translate}}: {{ request.modifiedAt | date }}</div>
 
       <div *ngIf="request.action == 'MOVE_TO_PRODUCTION'">
         <mat-accordion hideToggle="true">
@@ -32,12 +32,12 @@
               </ng-container>
 
               <ng-container matColumnDef="signedAt">
-                <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.DETAILDATE' | translate}} </th>
+                <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.DETAIL_DATE' | translate}} </th>
                 <td mat-cell *matCellDef="let sign"> {{sign.signedAt | date:'medium'}} </td>
               </ng-container>
 
               <ng-container matColumnDef="approved">
-                <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.DETAILAPPROVED' | translate}} </th>
+                <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.DETAIL_APPROVED' | translate}} </th>
                 <td mat-cell *matCellDef="let sign">
                   <span [outerHTML]="sign.approved | requestApprovedPipe"></span>
                 </td>
@@ -63,8 +63,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="value">
-          <th mat-header-cell [class]="request.status === 'WAITING_FOR_APPROVAL' || request.status === 'WAITING_FOR_CHANGES' ? 'w-50' : 'w-75'"
-              *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
+          <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
           <td mat-cell *matCellDef="let item">
             <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
               {{'UNDEFINED' | translate}}
@@ -96,7 +95,7 @@
       <div class="mt-5">
         <button mat-raised-button color="warn" (click)="openRejectDialog()"
                 *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
-          {{'REQUESTS.DETAILREJECT' | translate}}
+          {{'REQUESTS.DETAIL_REJECT' | translate}}
         </button>
         <div class="pull-right">
           <button class="ml-2" mat-raised-button [routerLink]="['/auth/requests/editRequest', request.reqId]"
@@ -105,11 +104,11 @@
           </button>
           <button class="ml-2" mat-raised-button color="accent" (click)="openSetWFCDialog()"
                   *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
-            {{'REQUESTS.DETAILREQUEST_CHANGES' | translate}}
+            {{'REQUESTS.DETAIL_REQUEST_CHANGES' | translate}}
           </button>
           <button class="ml-2" mat-raised-button color="accent" (click)="openApproveDialog()"
                   *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
-            {{'REQUESTS.DETAILAPPROVE' | translate}}
+            {{'REQUESTS.DETAIL_APPROVE' | translate}}
           </button>
         </div>
       </div>
