@@ -36,10 +36,13 @@ export class AppComponent implements OnInit {
 
     router.events.subscribe(_ => {
       this.currentUrl = this.router.url;
-      if (this.currentUrl.includes('auth')) {
+      if (this.currentUrl.includes('auth') && AppComponent.getUser() === null || AppComponent.getUser() === undefined) {
         this.userService.getUser().subscribe(user => {
           if (user !== undefined && user !== null) {
             AppComponent.setUser(user);
+          } else {
+            this.router.navigate(['/']);
+            AppComponent.setUser(undefined);
           }
         });
       }

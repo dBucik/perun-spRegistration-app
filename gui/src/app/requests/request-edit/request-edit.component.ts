@@ -39,7 +39,6 @@ export class RequestEditComponent implements OnInit {
 
   // translations
   errorText: string;
-  successfullySubmittedText: string;
   successActionText: string;
 
   applicationItemGroupsWithComment: ApplicationItem[][];
@@ -48,13 +47,10 @@ export class RequestEditComponent implements OnInit {
   ngOnInit() {
     this.translate.get('REQUESTS.NEW_VALUES_ERROR_MESSAGE')
       .subscribe(value => this.errorText = value);
-    this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED_MESSAGE')
-      .subscribe(value => this.successfullySubmittedText = value);
-    this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED_ACTION')
+    this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED')
       .subscribe(value => this.successActionText = value);
     this.getAttributes();
   }
-
 
   revealForm() {
     this.loading = false;
@@ -62,13 +58,11 @@ export class RequestEditComponent implements OnInit {
     this.isFormVisible = true;
   }
 
-
   onLoading() {
     this.loading = true;
     this.isCardBodyVisible = false;
     this.isFormVisible = false;
   }
-
 
   submitRequest() {
     this.loading = true;
@@ -83,17 +77,11 @@ export class RequestEditComponent implements OnInit {
 
     console.log(perunAttributes);
 
-    this.requestsService.updateRequest(this.request.reqId, perunAttributes).subscribe(boolean => {
-      let snackBarRef = this.snackBar
-        .open(this.successfullySubmittedText, this.successActionText, {duration: this.snackBarDurationMs});
-      snackBarRef.onAction().subscribe(() => {
-        this.loading = false;
-        this.router.navigate(['/auth/requests/detail/' + this.request.reqId]);
-      });
-      this.router.navigate(['/auth']);
+    this.requestsService.updateRequest(this.request.reqId, perunAttributes).subscribe(_ => {
+      this.snackBar.open(this.successActionText, null, {duration: this.snackBarDurationMs});
+      this.router.navigate(['/auth/requests/detail/' + this.request.reqId]);
     });
   }
-
 
   private static filterItems(items: ApplicationItem[][]): ApplicationItem[][] {
     let filteredItems: ApplicationItem[][] = [];

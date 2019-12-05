@@ -5,7 +5,7 @@
       <div class="row">
         <div class="col-sm-9">
           <h2 class="card-title">
-            {{'FACILITIES.FACILITY_DETAIL_TITLE' | translate}}{{facility.id}} - {{facility.name}}
+            {{'FACILITIES.DETAIL_TITLE' | translate}}{{facility.id}} - {{facility.name}}
           </h2>
           <p>{{'FACILITIES.DESCRIPTION' | translate}}: {{facility.description}}</p>
         </div>
@@ -40,7 +40,7 @@
             </div>
             <table mat-table [dataSource]="facilityAttributes" class="w-100">
               <ng-container matColumnDef="fullname" class="mr-5">
-                <th mat-header-cell *matHeaderCellDef>{{'FACILITIES.FACILITY_DETAIL_ITEM_NAME' | translate}}</th>
+                <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
                 <td mat-cell *matCellDef="let item" class="font-thick">
                   {{item.name}}
                   <span>
@@ -49,7 +49,7 @@
                 </td>
               </ng-container>
               <ng-container matColumnDef="value">
-                <th mat-header-cell *matHeaderCellDef>{{'FACILITIES.FACILITY_DETAIL_ITEM_VALUE' | translate}}</th>
+                <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
                 <td mat-cell *matCellDef="let item">
                   <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
                     {{'UNDEFINED' | translate}}
@@ -75,11 +75,11 @@
               </div>
               <table mat-table [dataSource]="oidcDetails" class="w-100">
                 <ng-container matColumnDef="fullname" class="mr-5">
-                  <th mat-header-cell *matHeaderCellDef>{{'FACILITIES.FACILITY_DETAIL_ITEM_NAME' | translate}}</th>
+                  <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
                   <td mat-cell *matCellDef="let property" class="font-thick">{{ property.name }}</td>
                 </ng-container>
                 <ng-container matColumnDef="value">
-                  <th mat-header-cell *matHeaderCellDef>{{'FACILITIES.FACILITY_DETAIL_ITEM_VALUE' | translate}}</th>
+                  <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
                   <td mat-cell *matCellDef="let item">
                     <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
                       {{'UNDEFINED' | translate}}
@@ -100,11 +100,11 @@
             <ng-container *ngIf="!loadingProtocol">
               <table mat-table [dataSource]="samlDetails" class="w-100">
                 <ng-container matColumnDef="fullname" class="mr-5">
-                  <th mat-header-cell *matHeaderCellDef>{{'FACILITIES.FACILITY_DETAIL_ITEM_NAME' | translate}}</th>
+                  <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
                   <td mat-cell *matCellDef="let property" class="font-thick">{{ property.name }}</td>
                 </ng-container>
                 <ng-container matColumnDef="value">
-                  <th mat-header-cell *matHeaderCellDef>{{'FACILITIES.FACILITY_DETAIL_ITEM_VALUE' | translate}}</th>
+                  <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
                   <td mat-cell *matCellDef="let item">
                     <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
                       {{'UNDEFINED' | translate}}

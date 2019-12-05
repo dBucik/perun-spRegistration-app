@@ -11,44 +11,25 @@
           </div>
           <div class="mt-4" *ngIf="this.isCardBodyVisible">
             <div class="container-fluid" *ngFor="let applicationItems of applicationItemGroupsWithComment">
-              <app-application-item
-                *ngFor="let appItem of applicationItems"
-                [applicationItem]="appItem">
+              <app-application-item *ngFor="let appItem of applicationItems" [applicationItem]="appItem">
               </app-application-item>
             </div>
             <div *ngIf="showMore">
               <div class="container-fluid" *ngFor="let applicationItems of applicationItemGroupsWithoutComment">
-                <app-application-item
-                  *ngFor="let appItem of applicationItems"
-                  [applicationItem]="appItem">
+                <app-application-item *ngFor="let appItem of applicationItems" [applicationItem]="appItem">
                 </app-application-item>
               </div>
             </div>
             <div class="mt-4">
-              <button
-                *ngIf="!showMore"
-                class="ml-2"
-                type="button"
-                mat-raised-button
-                (click)="changeShowMore()">
+              <button *ngIf="!showMore" class="ml-2" type="button" mat-raised-button (click)="changeShowMore()">
                 {{"REQUESTS.SHOW_MORE" | translate}}
               </button>
-              <button
-                *ngIf="showMore"
-                class="ml-2"
-                type="button"
-                mat-raised-button
-                (click)="changeShowMore()">
+              <button *ngIf="showMore" class="ml-2" type="button" mat-raised-button (click)="changeShowMore()">
                 {{"REQUESTS.SHOW_LESS" | translate}}
               </button>
               <div class="pull-right">
-                <button
-                  class="ml-2"
-                  type="submit"
-                  mat-raised-button
-                  color="accent"
-                  (click)="submitRequest()">
-                  {{"REQUESTS.REQUEST_SAVE" | translate}}
+                <button class="ml-2" type="submit" mat-raised-button color="accent" (click)="submitRequest()">
+                  {{"REQUESTS.SAVE" | translate}}
                 </button>
               </div>
             </div>

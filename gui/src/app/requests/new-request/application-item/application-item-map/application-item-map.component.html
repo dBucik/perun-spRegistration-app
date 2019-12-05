@@ -26,7 +26,7 @@
                 type="text" id="{{applicationItem.name}}-key-{{i}}" [(ngModel)] = "keys[i]" name="key-{{i}}">
             </mat-form-field>
             <mat-form-field class="w-100 mr-2 ml-2">
-              <input matInput [required]="applicationItem.required" placeholder="{{'REQUESTS.MAP_VALUE' | translate}}"
+              <input matInput [required]="applicationItem.required" placeholder="{{'REQUESTS.VALUE' | translate}}"
                 type="text" name="value-{{i}}" id="{{applicationItem.name}}-value-{{i}}" [(ngModel)] = "values[i]">
             </mat-form-field>
             <button *ngIf="!disableCustomKeys" mat-icon-button color="warn" (click)="removeValue(i)">

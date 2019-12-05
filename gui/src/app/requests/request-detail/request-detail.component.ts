@@ -90,7 +90,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
                 console.log(error);
             });
         });
-        this.translate.get("REQUESTS.REQUEST_ERROR").subscribe(value => this.noCommentErrorMessage = value);
+        this.translate.get("COMMON.ERROR").subscribe(value => this.noCommentErrorMessage = value);
         this.translate.get("REQUESTS.REJECTED").subscribe(value => this.successRejectMessage = value);
         this.translate.get("REQUESTS.APPROVED").subscribe(value => this.successApproveMessage = value);
         this.translate.get("REQUESTS.SET_WFC").subscribe(value => this.successSetWFCMessage = value);

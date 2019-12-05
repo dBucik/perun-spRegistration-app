@@ -38,7 +38,6 @@ export class FacilitiesEditComponent implements OnInit {
 
   // translations
   errorText: string;
-  successfullySubmittedText: string;
   successActionText: string;
   errorWronglyFilledItem: string;
   errorRequestAlreadyExists: string;
@@ -48,9 +47,7 @@ export class FacilitiesEditComponent implements OnInit {
   ngOnInit() {
     this.translate.get('FACILITIES.NEW_VALUES_ERROR_MESSAGE')
       .subscribe(value => this.errorText = value);
-    this.translate.get('FACILITIES.SUCCESSFULLY_SUBMITTED_MESSAGE')
-      .subscribe(value => this.successfullySubmittedText = value);
-    this.translate.get('FACILITIES.SUCCESSFULLY_SUBMITTED_ACTION')
+    this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED')
       .subscribe(value => this.successActionText = value);
     this.translate.get('FACILITIES.WRONGLY_FILLED_ITEM')
       .subscribe(value => this.errorWronglyFilledItem = value);
@@ -100,13 +97,9 @@ export class FacilitiesEditComponent implements OnInit {
       return;
     }
 
-    this.facilityService.changeFacility(this.facility.id, perunAttributes).subscribe(requestId => {
+    this.facilityService.changeFacility(this.facility.id, perunAttributes).subscribe(_ => {
       this.loading = false;
-      let snackBarRef = this.snackBar
-        .open(this.successfullySubmittedText, this.successActionText, {duration: this.snackBarDurationMs});
-      snackBarRef.onAction().subscribe(() => {
-        this.router.navigate(['/auth/requests/detail/' + requestId]);
-      });
+      this.snackBar.open(this.successActionText, null, {duration: this.snackBarDurationMs});
       this.router.navigate(['/auth']);
     });
   }

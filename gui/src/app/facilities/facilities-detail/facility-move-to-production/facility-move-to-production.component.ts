@@ -4,7 +4,6 @@ import {FacilitiesService} from '../../../core/services/facilities.service';
 import {Subscription} from 'rxjs';
 import {Facility} from '../../../core/models/Facility';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {TranslateService} from '@ngx-translate/core';
 import {ConfigService} from '../../../core/services/config.service';
 
@@ -32,6 +31,7 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
   emails: string[] = [];
   selectEmailsEnabled = false;
   specifyFromList = false;
+  successActionText: string;
 
   ngOnInit() {
     this.sub = this.route.params.subscribe(params => {
@@ -48,6 +48,8 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
         this.authorities = entries;
       });
     });
+    this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED')
+      .subscribe(value => this.successActionText = value);
   }
 
   moveToProduction(): void {
@@ -66,17 +68,8 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
 
     this.facilitiesService.createRequest(this.facility.id, this.emails).subscribe(reqid => {
       this.loading = false;
-        this.translate.get('FACILITIES.MOVE_TO_PRODUCTION_SUCCESS').subscribe(successMessage => {
-          this.translate.get('FACILITIES.SUCCESSFULLY_SUBMITTED_ACTION').subscribe(goToRequestMessage => {
-            const snackBarRef = this.snackBar.open(successMessage, goToRequestMessage, {duration: 5000});
-
-            snackBarRef.onAction().subscribe(() => {
-                this.router.navigate(['/auth/requests/detail/' + reqid]);
-            });
-
-            this.router.navigate(['/auth']);
-          });
-        });
+      this.snackBar.open(this.successActionText, null, {duration: 5000});
+      this.router.navigate(['/auth/requests/detail/' + reqid]);
     });
   }
 

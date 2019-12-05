@@ -40,7 +40,6 @@ export class NewRequestComponent implements OnInit {
 
   // translations
   errorText: string;
-  successfullySubmittedText: string;
   successActionText: string;
 
   applicationItemGroups: ApplicationItem[][];
@@ -103,9 +102,7 @@ export class NewRequestComponent implements OnInit {
 
     this.translate.get('REQUESTS.NEW_VALUES_ERROR_MESSAGE')
       .subscribe(value => this.errorText = value);
-    this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED_MESSAGE')
-      .subscribe(value => this.successfullySubmittedText = value);
-    this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED_ACTION')
+    this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED')
       .subscribe(value => this.successActionText = value);
   }
 

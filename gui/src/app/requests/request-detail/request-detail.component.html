@@ -2,14 +2,14 @@
   <mat-spinner class="ml-auto mr-auto" *ngIf="loading" color=""></mat-spinner>
   <div *ngIf="!loading" class="card mb-4 shadow-sm">
     <div class="card-body p-5">
-      <h2 class="card-title">{{'REQUESTS.REQUEST_DETAIL_TITLE' | translate}}{{request.reqId}}</h2>
+      <h2 class="card-title">{{'REQUESTS.DETAILTITLE' | translate}}{{request.reqId}}</h2>
       <div>
-        {{'REQUESTS.REQUEST_DETAIL_STATUS' | translate}}: <span [innerHTML]=" request.status | requestStatusPipe "></span>
+        {{'REQUESTS.STATUS' | translate}}: <span [innerHTML]=" request.status | requestStatusPipe "></span>
       </div>
       <div>
-        {{'REQUESTS.REQUEST_DETAIL_ACTION' | translate}}: <span [innerHTML]=" request.action | requestActionPipe "></span>
+        {{'REQUESTS.ACTION' | translate}}: <span [innerHTML]=" request.action | requestActionPipe "></span>
       </div>
-      <div class="mb-4">{{'REQUESTS.REQUEST_DETAIL_EDITED' | translate}}: {{ request.modifiedAt | date }}</div>
+      <div class="mb-4">{{'REQUESTS.DETAILEDITED' | translate}}: {{ request.modifiedAt | date }}</div>
 
       <div *ngIf="request.action == 'MOVE_TO_PRODUCTION'">
         <mat-accordion hideToggle="true">
@@ -17,7 +17,7 @@
             <mat-expansion-panel-header collapsedHeight="auto" expandedHeight="auto" class="pl-0" (click)="changeArrow()">
               <mat-panel-title>
                 <div *ngIf="expansionPanelDisabled" class="font-italic">
-                  {{'REQUESTS.SIGN_REQUEST_NO_SIGN' | translate}}
+                  {{'REQUESTS.NO_SIGNATURE_GIVEN' | translate}}
                 </div>
                 <div *ngIf="!expansionPanelDisabled" class="pt-2">
                   <mat-icon inline="true">{{icon  ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</mat-icon>
@@ -27,17 +27,17 @@
             </mat-expansion-panel-header>
             <table mat-table [dataSource]="signatures" class="w-100">
               <ng-container matColumnDef="name" >
-                <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.REQUEST_DETAIL_ITEM_NAME' | translate}}</th>
+                <th mat-header-cell *matHeaderCellDef> {{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
                 <td mat-cell *matCellDef="let sign"> {{sign.name}} </td>
               </ng-container>
 
               <ng-container matColumnDef="signedAt">
-                <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.REQUEST_DETAIL_DATE' | translate}} </th>
+                <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.DETAILDATE' | translate}} </th>
                 <td mat-cell *matCellDef="let sign"> {{sign.signedAt | date:'medium'}} </td>
               </ng-container>
 
               <ng-container matColumnDef="approved">
-                <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.REQUEST_DETAIL_APPROVED' | translate}} </th>
+                <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.DETAILAPPROVED' | translate}} </th>
                 <td mat-cell *matCellDef="let sign">
                   <span [outerHTML]="sign.approved | requestApprovedPipe"></span>
                 </td>
@@ -50,11 +50,11 @@
         </mat-accordion>
       </div>
 
-      <h4 class="mt-4">{{'REQUESTS.REQUEST_DETAIL_ITEMS' | translate}}</h4>
+      <h4 class="mt-4">{{'REQUESTS.DETAIL_ITEMS' | translate}}</h4>
 
       <table mat-table [dataSource]="requestItems" class="w-100">
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>{{'REQUESTS.REQUEST_DETAIL_ITEM_NAME' | translate}}</th>
+          <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
           <td mat-cell *matCellDef="let item" class="font-thick">
             {{item.name}}
             <span>
@@ -63,7 +63,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="value">
-          <th mat-header-cell *matHeaderCellDef>{{'REQUESTS.REQUEST_DETAIL_ITEM_VALUE' | translate}}</th>
+          <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
           <td mat-cell *matCellDef="let item">
             <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
               {{'UNDEFINED' | translate}}
@@ -101,7 +101,7 @@
       <div class="mt-5">
         <button mat-raised-button color="warn" (click)="openRejectDialog()"
                 *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
-          {{'REQUESTS.REQUEST_DETAIL_REJECT' | translate}}
+          {{'REQUESTS.DETAILREJECT' | translate}}
         </button>
         <div class="pull-right">
           <button class="ml-2" mat-raised-button [routerLink]="['/auth/requests/editRequest', request.reqId]"
@@ -110,11 +110,11 @@
           </button>
           <button class="ml-2" mat-raised-button color="accent" (click)="openSetWFCDialog()"
                   *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
-            {{'REQUESTS.REQUEST_DETAIL_REQUEST_CHANGES' | translate}}
+            {{'REQUESTS.DETAILREQUEST_CHANGES' | translate}}
           </button>
           <button class="ml-2" mat-raised-button color="accent" (click)="openApproveDialog()"
                   *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
-            {{'REQUESTS.REQUEST_DETAIL_APPROVE' | translate}}
+            {{'REQUESTS.DETAILAPPROVE' | translate}}
           </button>
         </div>
       </div>

@@ -38,11 +38,11 @@ export class ErrorInterceptor implements HttpInterceptor {
         if (errorResponse.status === this.HTTP_NOT_FOUND) {
           this.router.navigate(['/notFound']);
           return;
-        }
-        if (errorResponse.status === this.HTTP_FORBIDDEN) {
+        } else if (errorResponse.status === this.HTTP_FORBIDDEN) {
           this.router.navigate(['/notAuthorized']);
           return;
         }
+
         if (errorResponse.status === 0) {
           errors.push(this.serverNotLiveError);
         } else if (typeof errorResponse.error === 'string') {

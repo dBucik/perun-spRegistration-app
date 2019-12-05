@@ -8,20 +8,13 @@
           <h1 class="mb-3 col-8">{{'FACILITIES.EDIT_FACILITY' | translate}}</h1>
           <div class="mt-4" *ngIf="this.isCardBodyVisible">
             <div class="container-fluid">
-              <app-application-item
-                *ngFor="let appItem of applicationItems"
-                [applicationItem]="appItem">
+              <app-application-item *ngFor="let appItem of applicationItems" [applicationItem]="appItem">
               </app-application-item>
             </div>
             <div class="mt-2">
               <div class="pull-right">
-                <button
-                  class="ml-2"
-                  type="submit"
-                  mat-raised-button
-                  color="accent"
-                  (click)="submitRequest()">
-                  {{"REQUESTS.REQUEST_SUBMIT" | translate}}
+                <button class="ml-2" type="submit" mat-raised-button color="accent" (click)="submitRequest()">
+                  {{"COMMON.SUBMIT" | translate}}
                 </button>
               </div>
             </div>
