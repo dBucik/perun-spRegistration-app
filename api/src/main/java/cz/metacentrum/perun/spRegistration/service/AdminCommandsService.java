@@ -1,5 +1,6 @@
 package cz.metacentrum.perun.spRegistration.service;
 
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
@@ -34,7 +35,7 @@ public interface AdminCommandsService {
 	 *
 	 */
 	boolean approveRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException;
+            throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, BadRequestException;
 
 	/**
 	 * Reject request.

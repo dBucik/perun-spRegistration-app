@@ -153,7 +153,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
         this.loading = false;
         this.snackBar.open(this.successApproveMessage, null, {duration: 6000});
         this.router.navigate(['/auth/requests/allRequests']);
-        }, error => {
+      }, error => {
         console.log("Error");
         console.log(error);
       });

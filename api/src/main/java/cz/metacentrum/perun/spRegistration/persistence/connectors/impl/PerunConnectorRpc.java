@@ -5,6 +5,7 @@ import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.PersistenceUtils;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.ConnectorUtils;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.MapperUtils;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
@@ -15,7 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -78,7 +78,7 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public Facility createFacilityInPerun(JSONObject facilityJson) throws ConnectorException {
+	public Facility createFacilityInPerun(JSONObject facilityJson) throws ConnectorException, BadRequestException {
 		log.trace("createFacilityInPerun({})", facilityJson);
 
 		if (Utils.checkParamsInvalid(facilityJson)) {
@@ -89,15 +89,23 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityJson);
 
-		JSONObject res = new JSONObject(makeRpcPostCall(FACILITIES_MANAGER, "createFacility", params));
-		Facility facility = MapperUtils.mapFacility(res);
+		try {
+			JSONObject res = new JSONObject(makeRpcPostCall(FACILITIES_MANAGER, "createFacility", params));
+			Facility facility = MapperUtils.mapFacility(res);
 
-		log.trace("createFacilityInPerun() returns: {}", facility);
-		return facility;
+			log.trace("createFacilityInPerun() returns: {}", facility);
+			return facility;
+		} catch (ConnectorException e) {
+			if (e.getCause() != null && e.getCause() instanceof HttpClientErrorException) {
+				throw new BadRequestException();
+			}
+
+			throw e;
+		}
 	}
 
 	@Override
-	public Facility updateFacilityInPerun(JSONObject facilityJson) throws ConnectorException {
+	public Facility updateFacilityInPerun(JSONObject facilityJson) throws ConnectorException, BadRequestException {
 		log.trace("updateFacilityInPerun({})", facilityJson);
 
 		if (Utils.checkParamsInvalid(facilityJson)) {
@@ -107,11 +115,19 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("facility", facilityJson);
 
-		JSONObject res = new JSONObject(makeRpcPostCall(FACILITIES_MANAGER, "updateFacility", params));
-		Facility facility = MapperUtils.mapFacility(res);
+		try {
+			JSONObject res = new JSONObject(makeRpcPostCall(FACILITIES_MANAGER, "updateFacility", params));
+			Facility facility = MapperUtils.mapFacility(res);
 
-		log.trace("updateFacilityInPerun() returns: {}", facility);
-		return facility;
+			log.trace("updateFacilityInPerun() returns: {}", facility);
+			return facility;
+		} catch (ConnectorException e) {
+			if (e.getCause() != null && e.getCause() instanceof HttpClientErrorException) {
+				throw new BadRequestException();
+			}
+
+			throw e;
+		}
 	}
 
 	@Override

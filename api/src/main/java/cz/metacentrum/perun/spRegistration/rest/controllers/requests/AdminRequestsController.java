@@ -1,5 +1,6 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.requests;
 
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
@@ -55,7 +56,7 @@ public class AdminRequestsController {
 	@PostMapping(path = "/api/approve/{requestId}")
 	public boolean approveRequest(@SessionAttribute("user") User user,
 								  @PathVariable("requestId") Long requestId)
-			throws ConnectorException, CannotChangeStatusException, InternalErrorException, UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+			throws ConnectorException, CannotChangeStatusException, InternalErrorException, UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, BadRequestException {
 		log.trace("approveRequest(user: {}, requestId: {})", user.getId(), requestId);
 		
 		boolean successful = service.approveRequest(requestId, user.getId());

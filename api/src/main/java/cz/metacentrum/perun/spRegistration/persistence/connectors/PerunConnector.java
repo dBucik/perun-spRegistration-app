@@ -1,5 +1,6 @@
 package cz.metacentrum.perun.spRegistration.persistence.connectors;
 
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
@@ -26,7 +27,7 @@ public interface PerunConnector {
 	 * @throws ConnectorException Thrown when problem while communicating with Perun RPC occur.
 	 * @throws IllegalArgumentException Thrown when param "facilityJson" is NULL, equals JSONObject.NULL or empty.
 	 */
-	Facility createFacilityInPerun(JSONObject facilityJson) throws ConnectorException;
+	Facility createFacilityInPerun(JSONObject facilityJson) throws ConnectorException, BadRequestException;
 
 	/**
 	 * Update existing facility in Perun.
@@ -35,7 +36,7 @@ public interface PerunConnector {
 	 * @throws ConnectorException Thrown when problem while communicating with Perun RPC occur.
 	 * @throws IllegalArgumentException Thrown when param "facilityJson" is NULL, equals JSONObject.NULL or empty.
 	 */
-	Facility updateFacilityInPerun(JSONObject facilityJson) throws ConnectorException;
+	Facility updateFacilityInPerun(JSONObject facilityJson) throws ConnectorException, BadRequestException;
 
 	/**
 	 * Delete facility from Perun.

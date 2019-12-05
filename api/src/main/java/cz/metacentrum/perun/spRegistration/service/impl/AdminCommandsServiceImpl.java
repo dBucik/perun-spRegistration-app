@@ -4,12 +4,12 @@ import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
 import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
@@ -25,11 +25,6 @@ import org.springframework.stereotype.Service;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.security.InvalidKeyException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +60,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 	@Override
 	public boolean approveRequest(Long requestId, Long userId)
-			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+			throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, BadRequestException {
 		log.trace("approveRequest(requestId: {}, userId: {})", requestId, userId);
 
 		if (Utils.checkParamsInvalid(requestId, userId)) {
@@ -301,7 +296,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		return result;
 	}
 
-	private boolean processApprovedRequest(Request request) throws InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+	private boolean processApprovedRequest(Request request) throws InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, BadRequestException {
 		switch(request.getAction()) {
 			case REGISTER_NEW_SP:
 				return registerNewFacilityToPerun(request);
@@ -316,7 +311,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		return false;
 	}
 
-	private boolean registerNewFacilityToPerun(Request request) throws InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+	private boolean registerNewFacilityToPerun(Request request) throws InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, BadRequestException {
 		log.trace("registerNewFacilityToPerun({})", request);
 
 		String newName = request.getFacilityName();
@@ -396,7 +391,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		}
 	}
 
-	private boolean updateFacilityInPerun(Request request) throws InternalErrorException, ConnectorException {
+	private boolean updateFacilityInPerun(Request request) throws InternalErrorException, ConnectorException, BadRequestException {
 		log.trace("updateFacilityInPerun({})", request);
 
 		if (Utils.checkParamsInvalid(request)) {
@@ -499,7 +494,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		return facilityId;
 	}
 
-	private boolean updateFacilityNameAndDesc(Facility actualFacility, Request request) throws ConnectorException {
+	private boolean updateFacilityNameAndDesc(Facility actualFacility, Request request) throws ConnectorException, BadRequestException {
 		log.trace("updateFacilityNameAndDesc(actualFacility: {}, request: {})", actualFacility, request);
 
 		if (Utils.checkParamsInvalid(actualFacility, request)) {

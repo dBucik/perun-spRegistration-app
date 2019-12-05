@@ -86,10 +86,11 @@ public class RequestMapper implements RowMapper<Request> {
 
 			while (keys.hasNext()) {
 				String key = keys.next();
-				PerunAttribute mappedAttribute = PerunAttribute.fromJsonOfDb(
-						key, json.getJSONObject(key), definitionMap, attrInputMap
-				);
-				attributes.put(key, mappedAttribute);
+				PerunAttribute mappedAttribute = PerunAttribute.fromJsonOfDb(key,
+						json.getJSONObject(key), definitionMap, attrInputMap);
+				if (mappedAttribute != null) {
+					attributes.put(key, mappedAttribute);
+				}
 			}
 		}
 
