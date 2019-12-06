@@ -56,6 +56,7 @@
     "PREVIOUS_STEP": "Zpět",
     "SAVE": "Uložit",
     "SUCCESSFULLY_SUBMITTED": "Žádost byla podána.",
+    "COULD_NOT_SUBMIT_EMPTY": "Není možné podat prázdnou žádost!",
     "DETAIL_TITLE" : "Žádost #",
     "DETAIL_EDITED" : "Upraveno",
     "DETAIL_ITEMS" : "Navrhované nastavení služby:",

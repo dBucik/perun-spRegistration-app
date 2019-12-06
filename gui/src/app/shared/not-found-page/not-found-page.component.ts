@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {AppComponent} from '../../app.component';
 
 @Component({
   selector: 'app-not-found-page',
@@ -10,6 +11,10 @@ export class NotFoundPageComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+  }
+
+  hasUser(): boolean {
+    return AppComponent.getUser() !== null && AppComponent.getUser() !== undefined;
   }
 
 }

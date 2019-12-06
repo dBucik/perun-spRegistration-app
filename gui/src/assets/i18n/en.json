@@ -58,6 +58,7 @@
     "PREVIOUS_STEP": "Previous",
     "SAVE": "Save",
     "SUCCESSFULLY_SUBMITTED": "Request has been submitted.",
+    "COULD_NOT_SUBMIT_EMPTY": "Not possible to submit empty request!",
     "DETAIL_TITLE" : "Request #",
     "DETAIL_EDITED" : "Edited on",
     "DETAIL_ITEMS" : "Proposed service settings:",

@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -133,6 +134,23 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		if (facility == null) {
 			log.error("Could not fetch facility for facilityId: {}", facilityId);
 			throw new InternalErrorException("Could not fetch facility for facilityId: " + facilityId);
+		}
+
+		boolean attrsChanged = false;
+		List<String> attrNames = attributes.stream().map(PerunAttribute::getFullName).collect(Collectors.toList());
+		Map<String, PerunAttribute> actualAttrs = perunConnector.getFacilityAttributes(facilityId, attrNames);
+		for (PerunAttribute a: attributes) {
+			if (actualAttrs.containsKey(a.getFullName())) {
+				PerunAttribute actualA = actualAttrs.get(a.getFullName());
+				if (!Objects.equals(actualA, a)) {
+					attrsChanged = true;
+					break;
+				}
+			}
+		}
+
+		if (!attrsChanged) {
+			return null;
 		}
 
 		Request req = createRequest(facilityId, userId, attributes, RequestAction.UPDATE_FACILITY);

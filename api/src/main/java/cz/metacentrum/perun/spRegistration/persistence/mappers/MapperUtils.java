@@ -139,11 +139,10 @@ public class MapperUtils {
 		for (int i = 0; i < attrsJson.length(); i++) {
 			JSONObject attrJson = attrsJson.getJSONObject(i);
 			PerunAttribute a = PerunAttribute.fromJsonOfPerun(attrJson);
-			if (a != null) {
-				PerunAttributeDefinition def = a.getDefinition();
-				a.setDefinition(def);
-				attributesMap.put(def.getFullName(), a);
-			}
+			PerunAttributeDefinition def = a.getDefinition();
+			a.setDefinition(def);
+			a.setFullName(def.getFullName());
+			attributesMap.put(def.getFullName(), a);
 		}
 
 		log.trace("mapAttributes() returns: {}", attributesMap);

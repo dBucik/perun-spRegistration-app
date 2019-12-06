@@ -59,7 +59,7 @@ public class PerunAttribute {
 		this.definition = attributeDefinition;
 		this.fullName = attributeDefinition.getFullName();
 		this.value = value;
-		if (definition != null && BOOLEAN_TYPE.equals(definition.getType())) {
+		if (BOOLEAN_TYPE.equals(definition.getType())) {
 			if (value == null) {
 				this.value = false;
 			}
@@ -225,17 +225,15 @@ public class PerunAttribute {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		PerunAttribute that = (PerunAttribute) o;
-		return Objects.equals(definition, that.definition) &&
-				Objects.equals(value, that.value) &&
+		return Objects.equals(value, that.value) &&
 				Objects.equals(oldValue, that.oldValue) &&
 				Objects.equals(comment, that.comment) &&
-				Objects.equals(fullName, that.fullName) &&
-				Objects.equals(input, that.input);
+				Objects.equals(fullName, that.fullName);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(definition, value, oldValue, comment, fullName, input);
+		return Objects.hash(value, oldValue, comment, fullName);
 	}
 
 	private String valueAsString(boolean isOldValue) {
