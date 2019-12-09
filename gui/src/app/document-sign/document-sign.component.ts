@@ -1,10 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from "@angular/router";
-import {FacilitiesService} from "../core/services/facilities.service";
-import {Subscription} from "rxjs";
-import {Facility} from "../core/models/Facility";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import {TranslateService} from "@ngx-translate/core";
+import {ActivatedRoute, Router} from '@angular/router';
+import {FacilitiesService} from '../core/services/facilities.service';
+import {Subscription} from 'rxjs';
+import {Facility} from '../core/models/Facility';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-document-sign',
@@ -21,17 +21,17 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
   ) {}
 
-  private sub : Subscription;
+  private sub: Subscription;
   loading = true;
 
-  private hash : string;
+  private hash: string;
   private facility: Facility;
 
   ngOnInit() {
     this.sub = this.route.queryParams.subscribe(params => {
-      if(params.code){
+      if (params.code) {
         this.hash = params.code;
-        this.facilitiesService.getRequestDetailsWithHash(this.hash).subscribe(request =>{
+        this.facilitiesService.getRequestDetailsWithHash(this.hash).subscribe(request => {
           this.facilitiesService.getFacility(request.facilityId).subscribe(facility => {
             this.facility = facility;
             this.loading = false;
@@ -40,8 +40,7 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
             console.log(error);
           });
         });
-      }
-      else{
+      } else {
         this.router.navigate(['/notFound']);
       }
     });
@@ -51,11 +50,11 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
   }
 
-  approveRequest(): void{
+  approveRequest(): void {
     this.facilitiesService.approveTransferToProduction(this.hash).subscribe(req => {
       this.translate.get('FACILITIES.DOCUMENT_SIGN_SUCCESS').subscribe(successMessage => {
-        this.translate.get('FACILITIES.GO_TO_FACILITY_DETAIL').subscribe(goToFacilityMessage =>{
-          let snackBarRef = this.snackBar
+        this.translate.get('FACILITIES.GO_TO_FACILITY_DETAIL').subscribe(goToFacilityMessage => {
+          const snackBarRef = this.snackBar
             .open(successMessage, goToFacilityMessage, {duration: 5000});
 
           snackBarRef.onAction().subscribe(() => {
@@ -68,11 +67,11 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
     });
   }
 
-  rejectRequest(): void{
+  rejectRequest(): void {
     this.facilitiesService.rejectTransferToProduction(this.hash).subscribe(req => {
       this.translate.get('FACILITIES.DOCUMENT_SIGN_SUCCESS').subscribe(successMessage => {
-        this.translate.get('FACILITIES.GO_TO_FACILITY_DETAIL').subscribe(goToFacilityMessage =>{
-          let snackBarRef = this.snackBar
+        this.translate.get('FACILITIES.GO_TO_FACILITY_DETAIL').subscribe(goToFacilityMessage => {
+          const snackBarRef = this.snackBar
             .open(successMessage, goToFacilityMessage, {duration: 5000});
 
           snackBarRef.onAction().subscribe(() => {

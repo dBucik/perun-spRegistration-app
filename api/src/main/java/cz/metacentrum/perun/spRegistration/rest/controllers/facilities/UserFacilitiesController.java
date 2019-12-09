@@ -73,7 +73,7 @@ public class UserFacilitiesController {
 	{
 		log.trace("addAdminConfirm(user: {}, code: {})", user, code);
 
-		code = ApiUtils.normalizeCode(code);
+		code = ApiUtils.normalizeRequestBodyString(code);
 		boolean successful = service.confirmAddAdmin(user, code);
 
 		log.trace("addAdminConfirm() returns: {}", successful);
@@ -88,7 +88,7 @@ public class UserFacilitiesController {
 	{
 		log.trace("addAdminReject(user: {}, code: {})", user, code);
 
-		code = ApiUtils.normalizeCode(code);
+		code = ApiUtils.normalizeRequestBodyString(code);
 		boolean successful = service.rejectAddAdmin(user, code);
 
 		log.trace("addAdminReject() returns: {}", successful);

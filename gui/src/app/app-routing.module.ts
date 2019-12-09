@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
-import {MainMenuComponent} from "./main-menu/main-menu.component";
-import {NotFoundPageComponent} from "./shared/not-found-page/not-found-page.component";
-import {NotAuthorizedPageComponent} from "./shared/not-authorized-page/not-authorized-page.component";
-import {LoginComponent} from "./login/login.component";
-import {DocumentSignComponent} from "./document-sign/document-sign.component";
+import {MainMenuComponent} from './main-menu/main-menu.component';
+import {NotFoundPageComponent} from './shared/not-found-page/not-found-page.component';
+import {NotAuthorizedPageComponent} from './shared/not-authorized-page/not-authorized-page.component';
+import {LoginComponent} from './login/login.component';
+import {DocumentSignComponent} from './document-sign/document-sign.component';
+import {ToolsComponent} from './tools/tools.component';
 
 const routes: Routes = [
 
@@ -27,6 +28,10 @@ const routes: Routes = [
   {
     path: 'auth/sign',
     component: DocumentSignComponent
+  },
+  {
+    path: 'auth/tools',
+    component: ToolsComponent
   },
   {
     path: 'notAuthorized',

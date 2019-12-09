@@ -1,5 +1,5 @@
 <div class="container-fluid pt-5">
-  <ng-container *ngIf="getUser() !== undefined && getUser().isAppAdmin">
+  <ng-container *ngIf="hasUser() && isUserAppAdmin()">
     <h4>{{'MENU.MAIN' | translate}}</h4>
   </ng-container>
 
@@ -25,6 +25,9 @@
       </app-menu-button>
       <app-menu-button class="col-sm-12 col-md-6 col-lg-6 col-xl-4 mb-5"
                        [icon]="facilitiesIcon" [route]="'facilities/allFacilities'" [text]="'MENU.ALL_FACILITIES'">
+      </app-menu-button>
+      <app-menu-button class="col-sm-12 col-md-6 col-lg-6 col-xl-4 mb-5"
+                       [icon]="toolboxIcon" [route]="'tools'" [text]="'MENU.TOOLS'">
       </app-menu-button>
     </div>
   </ng-container>

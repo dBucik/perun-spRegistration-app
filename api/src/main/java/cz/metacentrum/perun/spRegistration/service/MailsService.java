@@ -124,6 +124,10 @@ public class MailsService {
 
 	private boolean sendMail(String host, String from, String to, String subject, String msg) {
 		log.debug("sendMail(host: {}, from: {}, to: {}, subject: {}, msg: {})", host, from, to, subject, msg);
+		if (to == null) {
+			log.error("Could not send mail, to == null");
+			return false;
+		}
 		Properties props = new Properties();
 		props.put("mail.smtp.host", host);
 		Session session = Session.getDefaultInstance(props);
@@ -134,7 +138,7 @@ public class MailsService {
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
 			message.setSubject(subject);
 			MimeBodyPart mimeBodyPart = new MimeBodyPart();
-			mimeBodyPart.setContent(msg, "text/html");
+			mimeBodyPart.setContent(msg, "text/html; charset=utf-8");
 			Multipart multipart = new MimeMultipart();
 			multipart.addBodyPart(mimeBodyPart);
 			message.setContent(multipart);
@@ -185,7 +189,8 @@ public class MailsService {
 
 	private String replaceApprovalLink(String containerString, String link) {
 		if (containerString.contains(APPROVAL_LINK_FIELD)) {
-			return containerString.replaceAll(APPROVAL_LINK_FIELD, link);
+			String item = "<a href=\"" + link + "\">approval link</a>";
+			return containerString.replaceAll(APPROVAL_LINK_FIELD, item);
 		}
 
 		return containerString;

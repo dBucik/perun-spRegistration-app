@@ -7,12 +7,12 @@ public class ApiUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(ApiUtils.class);
 
-	public static String normalizeCode(String code) {
+	public static String normalizeRequestBodyString(String code) {
 		if (code.startsWith("\"")) {
 			code = code.substring(1, code.length() - 1);
 		}
 
-		log.trace("normalizeCode() returns: {}", code);
+		log.trace("normalizeRequestBodyString() returns: {}", code);
 		return code;
 	}
 }

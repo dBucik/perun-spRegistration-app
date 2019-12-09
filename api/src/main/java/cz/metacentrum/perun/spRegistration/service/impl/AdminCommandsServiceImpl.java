@@ -26,12 +26,14 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.security.InvalidKeyException;
 import java.sql.Timestamp;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -315,7 +317,13 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		log.trace("registerNewFacilityToPerun({})", request);
 
 		String newName = request.getFacilityName();
-		String newDesc = request.getFacilityDescription();
+		Pattern pattern = Pattern.compile("[^A-Za-z0-9]");
+		Pattern pattern2 = Pattern.compile("_+_");
+
+		newName = Normalizer.normalize(newName, Normalizer.Form.NFD).replaceAll("\\p{M}", "");;
+		newName = pattern.matcher(newName).replaceAll("_");
+		newName = pattern2.matcher(newName).replaceAll("_");
+		String newDesc = newName + " registered via SP_REG, use app to manage configuration";
 
 		if (Utils.checkParamsInvalid(newName)) {
 			log.error("Wrong parameters passed: (newName: {})", newName);
@@ -411,12 +419,14 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		try {
-			boolean facilityCoreUpdated = updateFacilityNameAndDesc(actualFacility, request);
+			//boolean facilityCoreUpdated = updateFacilityNameAndDesc(actualFacility, request);
 			boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(),
 					request.getAttributesAsJsonArrayForPerun());
-			boolean successful = (facilityCoreUpdated && attributesSet);
+			//boolean successful = (facilityCoreUpdated && attributesSet);
+			boolean successful = attributesSet;
 			if (!successful) {
-				log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}", facilityCoreUpdated, attributesSet);
+				//log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}", facilityCoreUpdated, attributesSet);
+				log.error("Some operations failed - attributesSet: {}", attributesSet);
 			} else {
 				log.info("Facility has been updated in Perun");
 			}
@@ -503,6 +513,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		String newName = request.getFacilityName();
+		newName = Normalizer.normalize(newName, Normalizer.Form.NFD);
+
 		String newDesc = request.getFacilityDescription();
 		boolean changed = false;
 		boolean successful = true;

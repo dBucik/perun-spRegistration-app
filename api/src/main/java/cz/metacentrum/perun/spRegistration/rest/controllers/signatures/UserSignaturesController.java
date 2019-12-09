@@ -66,7 +66,7 @@ public class UserSignaturesController {
 	{
 		log.trace("signRequestGetData({})", code);
 
-		code = ApiUtils.normalizeCode(code);
+		code = ApiUtils.normalizeRequestBodyString(code);
 		if (! service.validateCode(code)) {
 			throw new IllegalAccessError("You cannot sign the request, code is invalid");
 		}
@@ -85,7 +85,7 @@ public class UserSignaturesController {
 	{
 		log.trace("approveProductionTransfer(user: {}, code: {})", user, code);
 
-		code = ApiUtils.normalizeCode(code);
+		code = ApiUtils.normalizeRequestBodyString(code);
 		if (! service.validateCode(code)) {
 			throw new IllegalAccessError("You cannot sign the request, code is invalid");
 		}
@@ -104,7 +104,7 @@ public class UserSignaturesController {
 	{
 		log.trace("rejectProductionTransfer(user: {}, code: {})", user, code);
 
-		code = ApiUtils.normalizeCode(code);
+		code = ApiUtils.normalizeRequestBodyString(code);
 		if (! service.validateCode(code)) {
 			throw new IllegalAccessError("You cannot sign the request, code is invalid");
 		}

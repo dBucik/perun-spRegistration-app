@@ -14,7 +14,7 @@ export class NotFoundPageComponent implements OnInit {
   }
 
   hasUser(): boolean {
-    return AppComponent.getUser() !== null && AppComponent.getUser() !== undefined;
+    return AppComponent.hasUser();
   }
 
 }

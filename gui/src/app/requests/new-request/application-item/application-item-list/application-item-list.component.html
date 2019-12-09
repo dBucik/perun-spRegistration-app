@@ -17,7 +17,9 @@
           <div *ngFor="let value of values; let i = index; trackBy: customTrackBy" class="d-flex mb-1">
             <mat-form-field class="w-100 ml-3 mr-2">
               <input matInput [required]="this.applicationItem.required" placeholder="{{'REQUESTS.VALUE' | translate}}"
-                     type="text" name="value-{{i}}" id="{{applicationItem.name}}-{{i}}" [(ngModel)]="values[i]">
+                     [pattern]="((applicationItem.regex != undefined) && (applicationItem.regex.length > 0) && (applicationItem.regex !== 'URL')) ? applicationItem.regex : null"
+                     [type] = "((applicationItem.regex != undefined) && (applicationItem.regex.length > 0) && (applicationItem.regex !== 'URL')) ? 'text' : 'url'"
+                     name="value-{{i}}" id="{{applicationItem.name}}-{{i}}" [(ngModel)]="values[i]">
             </mat-form-field>
             <button mat-icon-button color="warn" (click)="removeValue(i)">
               <mat-icon>indeterminate_check_box</mat-icon>

@@ -36,21 +36,11 @@ export class AppComponent implements OnInit {
 
     router.events.subscribe(_ => {
       this.currentUrl = this.router.url;
-      if (this.currentUrl.includes('auth') && AppComponent.getUser() === null || AppComponent.getUser() === undefined) {
-        this.userService.getUser().subscribe(user => {
-          if (user !== undefined && user !== null) {
-            AppComponent.setUser(user);
-          } else {
-            this.router.navigate(['/']);
-            AppComponent.setUser(undefined);
-          }
-        });
+      if (this.currentUrl.includes('auth') && !this.hasUser()) {
+        this.setAndGetUser();
       }
     });
-
-    this.userService.getUser().subscribe(user => {
-      AppComponent.setUser(user);
-    });
+    this.setAndGetUser();
   }
 
   static supportedLangs: Array<string> = ['en', 'cs'];
@@ -93,6 +83,10 @@ export class AppComponent implements OnInit {
     this.user = user;
   }
 
+  public static hasUser() {
+    return (AppComponent.getUser() !== null && AppComponent.getUser() !== undefined);
+  }
+
   ngOnInit(): void {
     this.configService.getPageConfig().subscribe(pageConfig => {
       AppComponent.pageConfig = pageConfig;
@@ -109,12 +103,7 @@ export class AppComponent implements OnInit {
       PerunHeaderComponent.setHeader(this.headerHtml);
       this.loading = false;
     });
-    this.userService.getUser().subscribe(user => {
-      if (user !== null && user !== undefined) {
-        AppComponent.setUser(user);
-        this.router.navigate(['/auth']);
-      }
-    })
+    this.setAndGetUser();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -128,7 +117,7 @@ export class AppComponent implements OnInit {
     this.lastWindowWidth = window.innerWidth;
   }
 
-  toggleSideBar() {
+  public toggleSideBar() {
     this.sidenavOpen = !this.sidenavOpen;
   }
 
@@ -140,4 +129,18 @@ export class AppComponent implements OnInit {
     return AppComponent.user;
   }
 
+  private setAndGetUser() {
+    this.userService.getUser().subscribe(user => {
+      if (user !== undefined && user !== null) {
+        AppComponent.setUser(user);
+      } else {
+        this.goOnLogin();
+      }
+    });
+  }
+
+  private goOnLogin() {
+    this.router.navigate(['/']);
+    AppComponent.setUser(undefined);
+  }
 }

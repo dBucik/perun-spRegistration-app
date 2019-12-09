@@ -23,7 +23,8 @@
     "ALL_REQUESTS": "Všechny žádosti",
     "MY_SERVICES": "Mé služby",
     "MY_REQUESTS": "Mé žádosti",
-    "REGISTER_SERVICE": "Nová služba"
+    "REGISTER_SERVICE": "Nová služba",
+    "TOOLS": "Nástroje"
   },
   "COMMON": {
     "ID": "Identifikátor",
@@ -140,5 +141,15 @@
     "MANAGER_NAME": "Jméno správce",
     "MANAGER_EMAIL": "Kontaktní email",
     "PROTOCOL": "SAML/OIDC"
+  },
+  "TOOLS": {
+    "CRYPTO_TITLE": "Šifrování",
+    "CRYPTO_DESCRIPTION": "Nástroje pro (de)šifrování hodnot",
+    "ENCRYPT": "Zašifrování hodnoty",
+    "ENCRYPT_INPUT": "Zadejte vstup pro zašifrování",
+    "ENCRYPT_OUTPUT": "Výstup po zašifrování",
+    "DECRYPT": "Rozšifrování hodnoty",
+    "DECRYPT_INPUT": "Zadejte vstup pro rozšifrování",
+    "DECRYPT_OUTPUT": "Výstup po rozšifrování"
   }
 }

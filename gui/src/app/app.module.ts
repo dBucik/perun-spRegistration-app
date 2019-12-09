@@ -15,6 +15,7 @@ import { LoginComponent } from './login/login.component';
 import { DocumentSignComponent } from './document-sign/document-sign.component';
 import {PerunHeaderComponent} from './perun-header/perun-header.component';
 import {PerunFooterCstComponent} from './perun-footer-cst/perun-footer-cst.component';
+import {ToolsComponent} from './tools/tools.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -26,7 +27,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     LoginComponent,
     DocumentSignComponent,
     PerunFooterCstComponent,
-    PerunHeaderComponent
+    PerunHeaderComponent,
+    ToolsComponent
   ],
   imports: [
     AppRoutingModule,

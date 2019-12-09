@@ -25,7 +25,8 @@
     "ALL_REQUESTS": "All requests",
     "MY_SERVICES": "My services",
     "MY_REQUESTS": "My requests",
-    "REGISTER_SERVICE": "New service"
+    "REGISTER_SERVICE": "New service",
+    "TOOLS": "Toolbox"
   },
   "COMMON": {
     "ID": "Identifier",
@@ -142,5 +143,15 @@
     "MANAGER_NAME": "Name",
     "MANAGER_EMAIL": "Contact email",
     "PROTOCOL": "SAML/OIDC"
+  },
+  "TOOLS": {
+    "CRYPTO_TITLE": "Crypto",
+    "CRYPTO_DESCRIPTION": "Tools for encrypting and decrypting values",
+    "ENCRYPT": "Encrypt value",
+    "ENCRYPT_INPUT": "Input to be encrypted",
+    "ENCRYPT_OUTPUT": "Encrypted output",
+    "DECRYPT": "Decrypt value",
+    "DECRYPT_INPUT": "Input to be decrypted",
+    "DECRYPT_OUTPUT": "Decrypted output"
   }
 }

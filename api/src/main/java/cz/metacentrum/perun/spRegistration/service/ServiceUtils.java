@@ -185,8 +185,6 @@ public class ServiceUtils {
 	public static String generateClientSecret() {
 		String uuid = UUID.randomUUID().toString();
 		uuid += UUID.randomUUID().toString();
-		uuid += UUID.randomUUID().toString();
-		uuid += UUID.randomUUID().toString();
 
 		return uuid;
 	}

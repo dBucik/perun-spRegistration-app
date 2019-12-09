@@ -77,6 +77,6 @@ export class FacilitiesService {
   }
 
   regenerateClientSecret(id: number): Observable<PerunAttribute> {
-    return this.apiService.get('/facility/regenerateClientSecret/' + id);
+    return this.apiService.post('/facility/regenerateClientSecret/' + id);
   }
 }
