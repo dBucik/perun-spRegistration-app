@@ -13,7 +13,8 @@
   "ERROR": {
     "GENERAL_ERROR_TITLE": "Oops, something went wrong.",
     "SERVER_DOWN": "Server is currently offline. Please try it again later.",
-    "CLOSE": "Close"
+    "CLOSE": "Close",
+    "CODE_EXPIRED": "You have used an expired code"
   },
   "MENU": {
     "HOME": "Home",
@@ -95,7 +96,8 @@
     "ARE_YOU_SURE_REJECT": "Are you sure you want to reject this request?",
     "ARE_YOU_SURE_SET_WFC": "Are you sure you want to set status to 'Waiting for changes'?",
     "NO_COMMENT": "Value is OK",
-    "REQUEST_DETAIL_APPROVED": "Approved"
+    "DETAIL_APPROVED": "Approved",
+    "SEE_FACILITY": "Service detail"
   },
   "FACILITIES": {
     "NAME": "Name",

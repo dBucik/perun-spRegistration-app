@@ -40,4 +40,20 @@ public enum RequestStatus {
 			default: return null;
 		}
 	}
+
+	public String toString(String lang) {
+		switch (this) {
+			case APPROVED: return "cs".equalsIgnoreCase(lang) ? "Schváleno" : "Approved";
+			case REJECTED: return "cs".equalsIgnoreCase(lang) ? "Zamítnuto" : "Rejected";
+			case WAITING_FOR_APPROVAL: return "cs".equalsIgnoreCase(lang) ? "Čeká na schválení" : "Waiting for approval";
+			case WAITING_FOR_CHANGES: return "cs".equalsIgnoreCase(lang) ? "Čeká na změny" : "Waiting for changes";
+			default: return this.toString();
+		}
+	}
+
+
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 }

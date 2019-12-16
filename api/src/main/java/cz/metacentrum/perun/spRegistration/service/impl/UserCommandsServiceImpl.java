@@ -18,6 +18,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
+import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
@@ -571,8 +572,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	@Override
 	public boolean confirmAddAdmin(User user, String code)
 			throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
-			ExpiredCodeException, ConnectorException, InternalErrorException
-	{
+			ExpiredCodeException, ConnectorException, InternalErrorException, CodeNotStoredException {
 		log.debug("confirmAddAdmin({})", code);
 
 		if (Utils.checkParamsInvalid(user, code)) {
@@ -606,8 +606,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	@Override
 	public boolean rejectAddAdmin(User user, String code)
 			throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
-			ExpiredCodeException, InternalErrorException
-	{
+			ExpiredCodeException, InternalErrorException, CodeNotStoredException {
 		log.debug("rejectAddAdmin(user: {}, code: {})", user, code);
 
 		if (Utils.checkParamsInvalid(user, code)) {
@@ -631,15 +630,17 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 	@Override
 	public boolean validateCode(String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException,
-			MalformedCodeException
-	{
+			MalformedCodeException, ExpiredCodeException, CodeNotStoredException {
 		log.trace("validateCode({})", code);
 
 		if (Utils.checkParamsInvalid(code)) {
 			log.error("Wrong parameters passed: (code: {})", code);
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
+		} else if (isExpiredCode(decryptRequestCode(code))) {
+			throw new ExpiredCodeException("Code expired");
+		} else if (!requestManager.validateCode(code)) {
+			throw new CodeNotStoredException("Code not found");
 		}
-
 		boolean isValid = (!isExpiredCode(decryptRequestCode(code)) && requestManager.validateCode(code));
 
 		log.trace("validateCode() returns: {}", isValid);

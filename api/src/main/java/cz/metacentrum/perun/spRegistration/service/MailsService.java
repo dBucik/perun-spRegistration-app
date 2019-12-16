@@ -51,7 +51,8 @@ public class MailsService {
 	private static final String FOOTER_KEY = "footer";
 
 	private static final String REQUEST_ID_FIELD = "%REQUEST_ID%";
-	private static final String NEW_STATUS_FIELD = "%NEW_STATUS%";
+	private static final String EN_NEW_STATUS_FIELD = "%EN_NEW_STATUS%";
+	private static final String CS_NEW_STATUS_FIELD = "%CS_NEW_STATUS%";
 	private static final String SERVICE_NAME_FIELD = "%SERVICE_NAME%";
 	private static final String APPROVAL_LINK_FIELD = "%APPROVAL_LINK%";
 	private static final String SERVICE_DESCRIPTION_FIELD = "%SERVICE_DESCRIPTION%";
@@ -189,8 +190,7 @@ public class MailsService {
 
 	private String replaceApprovalLink(String containerString, String link) {
 		if (containerString.contains(APPROVAL_LINK_FIELD)) {
-			String item = "<a href=\"" + link + "\">approval link</a>";
-			return containerString.replaceAll(APPROVAL_LINK_FIELD, item);
+			return containerString.replaceAll(APPROVAL_LINK_FIELD, wrapInAnchorElement(link));
 		}
 
 		return containerString;
@@ -204,15 +204,22 @@ public class MailsService {
 	}
 
 	private String replacePlaceholders(String containerString, Request req) {
+		String requestLink = hostUrl + "/auth/requests/detail/" + req.getReqId();
+
 		containerString = replacePlaceholder(containerString, REQUEST_ID_FIELD, req.getReqId().toString());
-		containerString = replacePlaceholder(containerString, NEW_STATUS_FIELD, req.getStatus().toString());
+		containerString = replacePlaceholder(containerString, EN_NEW_STATUS_FIELD, req.getStatus().toString("en"));
+		containerString = replacePlaceholder(containerString, CS_NEW_STATUS_FIELD, req.getStatus().toString("cs"));
 		containerString = replacePlaceholder(containerString, SERVICE_NAME_FIELD, req.getFacilityName());
 		containerString = replacePlaceholder(containerString, SERVICE_DESCRIPTION_FIELD, req.getFacilityDescription());
-		containerString = replacePlaceholder(containerString, REQUEST_DETAIL_LINK_FIELD, hostUrl + "/auth/requests/detail/" + req.getReqId());
+		containerString = replacePlaceholder(containerString, REQUEST_DETAIL_LINK_FIELD, wrapInAnchorElement(requestLink));
 		containerString = replacePlaceholder(containerString, ACTION_FIELD, req.getAction().toString());
 		containerString = replacePlaceholder(containerString, USER_INFO_FIELD, req.getReqUserId().toString());
 
 		return containerString;
+	}
+
+	private String wrapInAnchorElement(String link) {
+		return "<a href=\"" + link + "\">" + link + "</a>";
 	}
 
 	private String replacePlaceholder(String container, String replaceKey, String replaceWith) {

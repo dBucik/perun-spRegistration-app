@@ -93,7 +93,8 @@
     "ARE_YOU_SURE_REJECT": "Jste si jistý, že chcete zamítnout tuhle žádost?",
     "ARE_YOU_SURE_SET_WFC": "Jste si jistý, že chcete vyžádát změny?",
     "NO_COMMENT": "Hodnota je v pořádku",
-    "REQUEST_DETAIL_APPROVED": "Potvrzení"
+    "DETAIL_APPROVED": "Potvrzení",
+    "SEE_FACILITY": "Detail služby"
   },
   "FACILITIES": {
     "NAME": "Jméno",

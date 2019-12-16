@@ -7,6 +7,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
@@ -237,7 +238,7 @@ public interface UserCommandsService {
 	 */
 	boolean confirmAddAdmin(User user, String code)
 			throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
-			ExpiredCodeException, ConnectorException, InternalErrorException;
+			ExpiredCodeException, ConnectorException, InternalErrorException, CodeNotStoredException;
 
 	/**
 	 * Reject request to be added as a facility admin.
@@ -252,14 +253,14 @@ public interface UserCommandsService {
 	 * @throws IllegalArgumentException Thrown when param "user" is NULL, when param "code" is NULL or empty.
 	 */
 	boolean rejectAddAdmin(User user, String code) throws IllegalBlockSizeException, BadPaddingException,
-			InvalidKeyException, MalformedCodeException, ExpiredCodeException, InternalErrorException;
+			InvalidKeyException, MalformedCodeException, ExpiredCodeException, InternalErrorException, CodeNotStoredException;
 
 	/**
 	 * Validate code for signature
 	 * @param code code to be validated
 	 * @return True if valid, false otherwise
 	 */
-	boolean validateCode(String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException;
+	boolean validateCode(String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException, CodeNotStoredException;
 
 	/**
 	 * Get oidc detail

@@ -7,6 +7,7 @@ import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.rest.ApiUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
+import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
@@ -62,8 +63,7 @@ public class UserSignaturesController {
 	@GetMapping(path = "/api/moveToProduction/getFacilityDetails", params = "code")
 	public Request signRequestGetData(String code)
 			throws BadPaddingException, ConnectorException, IllegalBlockSizeException, MalformedCodeException,
-			InvalidKeyException, ExpiredCodeException, InternalErrorException
-	{
+			InvalidKeyException, ExpiredCodeException, InternalErrorException, CodeNotStoredException {
 		log.trace("signRequestGetData({})", code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
@@ -81,8 +81,7 @@ public class UserSignaturesController {
 	public boolean approveProductionTransfer(@SessionAttribute("user") User user,
 											 @RequestBody String code)
 			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
-			MalformedCodeException, InternalErrorException, InvalidKeyException
-	{
+			MalformedCodeException, InternalErrorException, InvalidKeyException, CodeNotStoredException {
 		log.trace("approveProductionTransfer(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
@@ -100,8 +99,7 @@ public class UserSignaturesController {
 	public boolean rejectProductionTransfer(@SessionAttribute("user") User user,
 											@RequestBody String code)
 			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
-			MalformedCodeException, InternalErrorException, InvalidKeyException
-	{
+			MalformedCodeException, InternalErrorException, InvalidKeyException, CodeNotStoredException {
 		log.trace("rejectProductionTransfer(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);

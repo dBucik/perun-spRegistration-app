@@ -2,6 +2,7 @@ package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
+import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
@@ -36,7 +37,8 @@ public class GlobalExceptionController {
 		return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@ExceptionHandler(value = { ExpiredCodeException.class, MalformedCodeException.class, UnauthorizedActionException.class } )
+	@ExceptionHandler(value = { ExpiredCodeException.class, MalformedCodeException.class,
+			UnauthorizedActionException.class, CodeNotStoredException.class } )
 	public ResponseEntity<Object> forbidden(ExpiredCodeException exception) {
 		log.error(exception.toString());
 		return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);

@@ -2,14 +2,24 @@
   <mat-spinner class="ml-auto mr-auto" *ngIf="loading" color=""></mat-spinner>
   <div *ngIf="!loading" class="card mb-4 shadow-sm">
     <div class="card-body p-5">
-      <h2 class="card-title">{{'REQUESTS.DETAIL_TITLE' | translate}}{{request.reqId}}</h2>
-      <div>
-        {{'REQUESTS.STATUS' | translate}}: <span [innerHTML]=" request.status | requestStatusPipe "></span>
+      <div class="row">
+        <div [class]="request.facilityId ? 'col-sm-9' : ''">
+          <h2 class="card-title">{{'REQUESTS.DETAIL_TITLE' | translate}}{{request.reqId}}</h2>
+          <div>
+            {{'REQUESTS.STATUS' | translate}}: <span [innerHTML]=" request.status | requestStatusPipe "></span>
+          </div>
+          <div>
+            {{'REQUESTS.ACTION' | translate}}: <span [innerHTML]=" request.action | requestActionPipe "></span>
+          </div>
+          <div class="mb-4">{{'REQUESTS.DETAIL_EDITED' | translate}}: {{ request.modifiedAt | date }}</div>
+        </div>
+        <div class="col-sm-3 mt-4 text-right" *ngIf="request.facilityId">
+            <button class="btn-block mb-1" mat-raised-button color="accent"
+                    [routerLink]="['/auth/facilities/detail', request.facilityId]">
+              {{'REQUESTS.SEE_FACILITY' | translate}}
+            </button>
+        </div>
       </div>
-      <div>
-        {{'REQUESTS.ACTION' | translate}}: <span [innerHTML]=" request.action | requestActionPipe "></span>
-      </div>
-      <div class="mb-4">{{'REQUESTS.DETAIL_EDITED' | translate}}: {{ request.modifiedAt | date }}</div>
 
       <div *ngIf="request.action == 'MOVE_TO_PRODUCTION'">
         <mat-accordion hideToggle="true">

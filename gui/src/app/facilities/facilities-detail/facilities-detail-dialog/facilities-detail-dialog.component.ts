@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
-import {DialogData} from "../facilities-detail.component";
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {DialogData} from '../facilities-detail.component';
 
 @Component({
   selector: 'app-facilities-detail-dialog',
@@ -20,7 +20,7 @@ export class FacilitiesDetailDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onYesClick(): void{
+  onYesClick(): void {
     this.data.parent.loading = true;
     this.data.parent.deleteFacility();
     this.dialogRef.close();
