@@ -396,7 +396,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		if (Utils.checkParamsInvalid(facilityId, userId)) {
 			log.error("Wrong parameters passed: (facilityId: {}, userId: {})", facilityId, userId);
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		} else if (! appConfig.isAppAdmin(userId) && ! isFacilityAdmin(facilityId, userId)) {
+		} else if (!isFacilityAdmin(facilityId, userId)) {
 			log.error("User cannot view facility, user is not an admin");
 			throw new UnauthorizedActionException("User cannot view facility, user is not an admin");
 		}
@@ -725,14 +725,21 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
+		boolean result = false;
 
-		if (whereAdmin == null || whereAdmin.isEmpty()) {
-			log.debug("isFacilityAdmin returns: {}", false);
-			return false;
+		if (appConfig.isAppAdmin(userId)) {
+			result = true;
+		} else {
+			Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
+
+			if (whereAdmin == null || whereAdmin.isEmpty()) {
+				log.debug("isFacilityAdmin returns: {}", false);
+				return false;
+			}
+
+			result = whereAdmin.contains(facilityId);
 		}
 
-		boolean result = whereAdmin.contains(facilityId);
 		log.debug("isFacilityAdmin returns:  {}", result);
 		return result;
 	}
