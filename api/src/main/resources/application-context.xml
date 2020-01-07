@@ -30,7 +30,7 @@
                 <!-- APP -->
                 <prop key="appAdminIds">0,1,2,3</prop>
                 <prop key="extSource.proxy.entityId">https://login.cesnet.cz/idp/</prop>
-                <prop key="oidc.isEnabled">true</prop>
+                <prop key="protocols.enabled">oidc,saml</prop>
                 <prop key="availableLanguages">en,cs</prop>
                 <prop key="host.url">http://spreg.com/spreg</prop>
                 <prop key="secret">secretSaltGoesHere123!X$</prop>
@@ -182,7 +182,7 @@
         <property name="perunConnector" ref="perunConnector" />
         <property name="appAdminIds" value="#{'${appAdminIds}'.split('\s*,\s*')}" />
         <property name="loginExtSource" value="${extSource.proxy.entityId}" />
-        <property name="oidcEnabled" value="${oidc.isEnabled}" />
+        <property name="protocolsEnabled" value="#{'${protocols.enabled}'.split('\s*,\s*')}" />
         <property name="availableLanguages" value="#{'${availableLanguages}'.split('\s*,\s*')}" />
         <property name="footerHTML" value="${app.footer.html}" />
         <property name="headerHTML" value="${app.header.html}" />

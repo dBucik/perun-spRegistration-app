@@ -1,16 +1,10 @@
 package cz.metacentrum.perun.spRegistration.persistence.configs;
 
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,7 +27,7 @@ public class AppConfig {
 	private Set<Long> appAdminIds;
 	private String loginExtSource;
 	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
-	private boolean oidcEnabled;
+	private String[] protocolsEnabled = new String[] {};
 	private List<String> availableLanguages = new ArrayList<>();
 	private PerunConnector perunConnector;
 	private String showOnServicesListAttributeName;
@@ -69,14 +63,6 @@ public class AppConfig {
 
 	public void setAppAdminIds(Set<Long> appAdminIds) {
 		this.appAdminIds = appAdminIds;
-	}
-
-	public boolean isOidcEnabled() {
-		return oidcEnabled;
-	}
-
-	public void setOidcEnabled(boolean oidcEnabled) {
-		this.oidcEnabled = oidcEnabled;
 	}
 
 	public List<String> getAvailableLanguages() {
@@ -137,6 +123,20 @@ public class AppConfig {
 
 	public long getConfirmationPeriodDays() {
 		return confirmationPeriodDays;
+	}
+
+	public String[] getProtocolsEnabled() {
+		return protocolsEnabled;
+	}
+
+	public void setProtocolsEnabled(String[] protocolsEnabled) {
+		if (protocolsEnabled != null && protocolsEnabled.length > 0) {
+			String[] transf = new String[protocolsEnabled.length];
+			for (int i = 0; i < protocolsEnabled.length; i++) {
+				transf[i] = protocolsEnabled[i].toLowerCase();
+			}
+			this.protocolsEnabled = transf;
+		}
 	}
 
 	public void setConfirmationPeriodDays(long confirmationPeriodDays) {
@@ -348,7 +348,7 @@ public class AppConfig {
 		return	"appAdminIds: " + appAdminIds + "'\n" +
 				"loginExtSource: '" + loginExtSource + "'\n" +
 				"perunAttributeDefinitionsMap: " + perunAttributeDefinitionsMap + "'\n" +
-				"oidcEnabled=" + oidcEnabled + "'\n" +
+				"protocolsEnabled=" + protocolsEnabled + "'\n" +
 				"availableLanguages=" + availableLanguages + "'\n" +
 				"perunConnector=" + perunConnector + "'\n" +
 				"footerHTML: '" + footerHTML + "'\n" +

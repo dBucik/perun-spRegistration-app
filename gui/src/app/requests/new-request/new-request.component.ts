@@ -33,10 +33,9 @@ export class NewRequestComponent implements OnInit {
 
   isFormVisible = false;
   isCardBodyVisible = false;
-  oidcEnabled: boolean;
+  enabledProtocols: string[];
   loading = true;
   selected = '';
-  snackBarDurationMs = 8000;
 
   // translations
   errorText: string;
@@ -86,14 +85,13 @@ export class NewRequestComponent implements OnInit {
   }
 
   ngOnInit() {
-
-    // this.requestsService.login().subscribe();
-
-    this.configService.isOidcEnabled().subscribe(isEnabled => {
-      this.oidcEnabled = isEnabled;
+    this.configService.getProtocolsEnabled().subscribe(protocols => {
+      this.enabledProtocols = protocols;
       this.loading = false;
-      if (!isEnabled) {
+      if (protocols.indexOf('oidc') === -1) {
         this.samlSelected();
+      } else if (protocols.indexOf('saml') === -1) {
+        this.oidcSelected();
       }
     }, error => {
       this.loading = false;

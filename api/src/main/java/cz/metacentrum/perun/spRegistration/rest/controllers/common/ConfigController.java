@@ -60,10 +60,10 @@ public class ConfigController {
 		return inputs;
 	}
 
-	@GetMapping(path = "/api/config/oidcEnabled")
-	public boolean getOidcEnabled() {
-		log.trace("getOidcEnabled() returns: {}", config.getAppConfig().isOidcEnabled());
-		return config.getAppConfig().isOidcEnabled();
+	@GetMapping(path = "/api/config/protocols")
+	public String[] getProtocolsEnabled() {
+		log.trace("getProtocolsEnabled() returns: {}", (Object[]) config.getAppConfig().getProtocolsEnabled());
+		return config.getAppConfig().getProtocolsEnabled();
 	}
 
 	@GetMapping(path = "/api/config/langs")

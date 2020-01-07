@@ -13,8 +13,8 @@ export class ConfigService {
     private apiService: ApiService
   ) { }
 
-  isOidcEnabled(): Observable<boolean> {
-    return this.apiService.get('/config/oidcEnabled');
+  getProtocolsEnabled(): Observable<string[]> {
+    return this.apiService.get('/config/protocols');
   }
 
   getSamlApplicationItems(): Observable<ApplicationItem[][]> {

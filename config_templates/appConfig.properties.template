@@ -7,7 +7,7 @@
 #############################
 #appAdminIds= 				    # coma separated list of IDs
 #extSource.proxy.entityId=		# identifier of proxy
-#oidc.isEnabled=			    # false if OIDC is not supported
+#protocols.enabled=			    # coma separated list of protocols [possible values: SAML,OIDC]
 #availableLanguages=			# only EN and CS are supported
 #host.url=				        # URL of host where application runs
 #secret=				        # secret salt used for encryption of signature codes
