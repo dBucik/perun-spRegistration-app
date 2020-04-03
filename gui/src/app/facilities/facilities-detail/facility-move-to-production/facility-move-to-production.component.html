@@ -5,7 +5,7 @@
       <h2 class="card-title">
         {{'FACILITIES.MOVE_TO_PRODUCTION_TITLE_1' | translate}}{{facility.id}} - {{facility.name}} {{'FACILITIES.MOVE_TO_PRODUCTION_TITLE_2' | translate}}
       </h2>
-      {{'FACILITIES.MOVE_TO_PRODUCTION_DESCRIPTION' | translate}}
+      {{'FACILITIES.MOVE_TO_PRODUCTION_DESCRIPTION' | translate}} {{ (selectEmailsEnabled) ? ('FACILITIES.MOVE_TO_PRODUCTION_DESCRIPTION_SPEC' | translate) : '' }}
 
       <div *ngIf="selectEmailsEnabled">
         <div class="mt-4">
