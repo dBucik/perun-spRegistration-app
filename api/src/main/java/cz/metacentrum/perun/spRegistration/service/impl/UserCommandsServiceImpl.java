@@ -251,7 +251,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new UnauthorizedActionException("User is not registered as admin for facility, cannot ask for moving to production");
 		}
 
-		Facility fac = getDetailedFacility(facilityId, userId);
+		Facility fac = getDetailedFacility(facilityId, userId, true);
 		if (fac == null) {
 			log.error("Could not retrieve facility for id: {}", facilityId);
 			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
@@ -388,15 +388,15 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public Facility getDetailedFacility(Long facilityId, Long userId)
+	public Facility getDetailedFacility(Long facilityId, Long userId, boolean checkAdmin)
 			throws UnauthorizedActionException, ConnectorException, InternalErrorException
 	{
-		log.trace("getDetailedFacility(facilityId: {}, userId: {})", facilityId, userId);
+		log.trace("getDetailedFacility(facilityId: {}, userId: {}, checkAdmin: {})", facilityId, userId, checkAdmin);
 
 		if (Utils.checkParamsInvalid(facilityId, userId)) {
 			log.error("Wrong parameters passed: (facilityId: {}, userId: {})", facilityId, userId);
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		} else if (!isFacilityAdmin(facilityId, userId)) {
+		} else if (checkAdmin && !isFacilityAdmin(facilityId, userId)) {
 			log.error("User cannot view facility, user is not an admin");
 			throw new UnauthorizedActionException("User cannot view facility, user is not an admin");
 		}
@@ -444,7 +444,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Facility facility = getDetailedFacility(facilityId, userId);
+		Facility facility = getDetailedFacility(facilityId, userId, true);
 		if (facility == null || facility.getAttrs() == null) {
 			log.error("Could not fetch facility for id: {}", facilityId);
 			throw new InternalErrorException("Could not fetch facility for id: " + facilityId);

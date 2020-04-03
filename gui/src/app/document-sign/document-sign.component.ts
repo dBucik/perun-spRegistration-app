@@ -32,7 +32,7 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
       if (params.code) {
         this.hash = params.code;
         this.facilitiesService.getRequestDetailsWithHash(this.hash).subscribe(request => {
-          this.facilitiesService.getFacility(request.facilityId).subscribe(facility => {
+          this.facilitiesService.getFacilitySignature(request.facilityId).subscribe(facility => {
             this.facility = facility;
             this.loading = false;
           }, error => {
@@ -53,16 +53,8 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
   approveRequest(): void {
     this.facilitiesService.approveTransferToProduction(this.hash).subscribe(req => {
       this.translate.get('FACILITIES.DOCUMENT_SIGN_SUCCESS').subscribe(successMessage => {
-        this.translate.get('FACILITIES.GO_TO_FACILITY_DETAIL').subscribe(goToFacilityMessage => {
-          const snackBarRef = this.snackBar
-            .open(successMessage, goToFacilityMessage, {duration: 5000});
-
-          snackBarRef.onAction().subscribe(() => {
-            this.router.navigate(['/auth/facilities/detail/' + this.facility.id]);
-          });
-
+          this.snackBar.open(successMessage, null, {duration: 5000});
           this.router.navigate(['/auth']);
-        });
       });
     });
   }
@@ -70,16 +62,8 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
   rejectRequest(): void {
     this.facilitiesService.rejectTransferToProduction(this.hash).subscribe(req => {
       this.translate.get('FACILITIES.DOCUMENT_SIGN_SUCCESS').subscribe(successMessage => {
-        this.translate.get('FACILITIES.GO_TO_FACILITY_DETAIL').subscribe(goToFacilityMessage => {
-          const snackBarRef = this.snackBar
-            .open(successMessage, goToFacilityMessage, {duration: 5000});
-
-          snackBarRef.onAction().subscribe(() => {
-            this.router.navigate(['/auth/facilities/detail/' + this.facility.id]);
-          });
-
-          this.router.navigate(['/auth']);
-        });
+        this.snackBar.open(successMessage, null, {duration: 5000});
+        this.router.navigate(['/auth']);
       });
     });
   }

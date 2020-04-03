@@ -28,6 +28,10 @@ export class FacilitiesService {
     return this.apiService.get('/facility/' + id);
   }
 
+  getFacilitySignature(id: number): Observable<Facility> {
+    return this.apiService.get('/facility/signature/' + id);
+  }
+
   getOidcDetails(id: number): Observable<Map<String, PerunAttribute>> {
     return this.apiService.get('/facility/oidcDetails/' + id);
   }

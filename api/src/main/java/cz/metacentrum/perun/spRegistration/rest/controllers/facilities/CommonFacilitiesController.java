@@ -45,9 +45,22 @@ public class CommonFacilitiesController {
 	{
 		log.trace("facilityDetail(user(): {}, facilityId: {})", user.getId(), facilityId);
 
-		Facility facility = service.getDetailedFacility(facilityId, user.getId());
+		Facility facility = service.getDetailedFacility(facilityId, user.getId(), true);
 
 		log.trace("facilityDetail() returns: {}", facility);
+		return facility;
+	}
+
+	@GetMapping(path = "/api/facility/signature/{facilityId}")
+	public Facility facilityDetailSignature(@SessionAttribute("user") User user,
+											@PathVariable("facilityId") Long facilityId)
+			throws UnauthorizedActionException, InternalErrorException, ConnectorException
+	{
+		log.trace("facilityDetailSignature(user(): {}, facilityId: {})", user.getId(), facilityId);
+
+		Facility facility = service.getDetailedFacility(facilityId, user.getId(), false);
+
+		log.trace("facilityDetailSignature() returns: {}", facility);
 		return facility;
 	}
 
