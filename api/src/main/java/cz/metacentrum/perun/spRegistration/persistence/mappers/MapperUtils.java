@@ -1,12 +1,13 @@
 package cz.metacentrum.perun.spRegistration.persistence.mappers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class MapperUtils {
 	 * @return Mapped Facility object.
 	 * @throws IllegalArgumentException Thrown when param "facilityJson" is NULL, equal to JSONObject.NULL or empty.
 	 */
-	public static Facility mapFacility(JSONObject facilityJson) {
+	public static Facility mapFacility(JsonNode facilityJson) {
 		log.trace("mapFacility({})", facilityJson);
 
 		if (Utils.checkParamsInvalid(facilityJson)) {
@@ -50,7 +51,7 @@ public class MapperUtils {
 	 * @return Mapped List of Facility objects (filled or empty).
 	 * @throws IllegalArgumentException Thrown when param "facilitiesJson" is NULL, equal to JSONObject.NULL or empty.
 	 */
-	public static List<Facility> mapFacilities(JSONArray facilitiesJson) {
+	public static List<Facility> mapFacilities(JsonNode facilitiesJson) {
 		log.trace("mapFacilities({})", facilitiesJson);
 
 		List<Facility> facilityList = new ArrayList<>();
@@ -60,8 +61,8 @@ public class MapperUtils {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		for (int i = 0; i < facilitiesJson.length(); i++) {
-			JSONObject facilityJson = facilitiesJson.getJSONObject(i);
+		for (int i = 0; i < facilitiesJson.size(); i++) {
+			JsonNode facilityJson = facilitiesJson.get(i);
 			Facility facility = Facility.fromPerunJson(facilityJson);
 			facilityList.add(facility);
 		}
@@ -76,7 +77,7 @@ public class MapperUtils {
 	 * @return Mapped User object.
 	 * @throws IllegalArgumentException Thrown when param "json" is NULL, equal to JSONObject.NULL or empty.
 	 */
-	public static User mapUser(JSONObject json) {
+	public static User mapUser(JsonNode json) {
 		return mapUser(json, null);
 	}
 
@@ -87,7 +88,7 @@ public class MapperUtils {
 	 * @return Mapped User object.
 	 * @throws IllegalArgumentException Thrown when param "json" is NULL, equal to JSONObject.NULL or empty.
 	 */
-	public static User mapUser(JSONObject json, String userMailAttr) {
+	public static User mapUser(JsonNode json, String userMailAttr) {
 		log.trace("mapUser(json: {}, userMailAttr: {})", json, userMailAttr);
 		User user;
 
@@ -98,21 +99,21 @@ public class MapperUtils {
 
 		user = User.fromPerunJson(json);
 		if (userMailAttr != null) {
-			JSONArray attrs = new JSONArray();
+			ArrayNode attrs = JsonNodeFactory.instance.arrayNode();
 
-			if (json.has("attributes")) {
-				attrs = json.getJSONArray("attributes");
-			} else if (json.has("userAttributes")) {
-				attrs = json.getJSONArray("userAttributes");
+			if (json.hasNonNull("attributes")) {
+				attrs = (ArrayNode) json.get("attributes");
+			} else if (json.hasNonNull("userAttributes")) {
+				attrs = (ArrayNode) json.get("userAttributes");
 			}
 
-			for (int i = 0; i < attrs.length(); i++) {
-				JSONObject attrJson = attrs.getJSONObject(i);
-				String namespace = attrJson.getString("namespace");
-				String friendlyName = attrJson.getString("friendlyName");
+			for (int i = 0; i < attrs.size(); i++) {
+				JsonNode attrJson = attrs.get(i);
+				String namespace = attrJson.get("namespace").asText();
+				String friendlyName = attrJson.get("friendlyName").asText();
 				String fullAttrName = namespace + ':' + friendlyName;
 				if (userMailAttr.equals(fullAttrName)) {
-					user.setEmail(attrJson.getString("value"));
+					user.setEmail(attrJson.get("value").asText());
 				}
 			}
 		}
@@ -127,7 +128,7 @@ public class MapperUtils {
 	 * @return Map of Attributes (filled or empty).
 	 * @throws IllegalArgumentException Thrown when input is NULL, equal to JSONObject.NULL or empty.
 	 */
-	public static Map<String, PerunAttribute> mapAttributes(JSONArray attrsJson) {
+	public static Map<String, PerunAttribute> mapAttributes(JsonNode attrsJson) {
 		log.trace("mapAttributes({})", attrsJson);
 
 		if (Utils.checkParamsInvalid()) {
@@ -136,8 +137,8 @@ public class MapperUtils {
 		}
 
 		Map<String, PerunAttribute> attributesMap = new HashMap<>();
-		for (int i = 0; i < attrsJson.length(); i++) {
-			JSONObject attrJson = attrsJson.getJSONObject(i);
+		for (int i = 0; i < attrsJson.size(); i++) {
+			JsonNode attrJson = attrsJson.get(i);
 			PerunAttribute a = PerunAttribute.fromJsonOfPerun(attrJson);
 			PerunAttributeDefinition def = a.getDefinition();
 			a.setDefinition(def);
@@ -155,7 +156,7 @@ public class MapperUtils {
 	 * @return Mapped PerunAttribute object.
 	 * @throws IllegalArgumentException Thrown when input is NULL, equal to JSONObject.NULL or empty.
 	 */
-	public static PerunAttribute mapAttribute(JSONObject attrJson) {
+	public static PerunAttribute mapAttribute(JsonNode attrJson) {
 		log.trace("mapAttribute({})", attrJson);
 
 		if (Utils.checkParamsInvalid(attrJson)) {
@@ -174,7 +175,7 @@ public class MapperUtils {
 	 * @param json JSON from Perun with attribute definition.
 	 * @return Mapped PerunAttributeDefinition object.
 	 */
-	public static PerunAttributeDefinition mapAttrDefinition(JSONObject json) {
+	public static PerunAttributeDefinition mapAttrDefinition(JsonNode json) {
 		log.trace("mapAttrDefinition({})", json);
 		PerunAttributeDefinition perunAttributeDefinition;
 
@@ -189,7 +190,7 @@ public class MapperUtils {
 		return perunAttributeDefinition;
 	}
 
-	public static List<User> mapUsers(JSONArray jsonArray, String userMailAttr) {
+	public static List<User> mapUsers(JsonNode jsonArray, String userMailAttr) {
 		List<User> mappedUsers = new ArrayList<>();
 
 		if (Utils.checkParamsInvalid(jsonArray)) {
@@ -197,8 +198,8 @@ public class MapperUtils {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		for (int i = 0; i < jsonArray.length(); i++) {
-			mappedUsers.add(mapUser(jsonArray.getJSONObject(i), userMailAttr));
+		for (int i = 0; i < jsonArray.size(); i++) {
+			mappedUsers.add(mapUser(jsonArray.get(i), userMailAttr));
 		}
 
 		return mappedUsers;

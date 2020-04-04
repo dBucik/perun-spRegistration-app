@@ -1,5 +1,10 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
@@ -23,8 +28,6 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeExcepti
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -284,7 +287,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject decryptedCode = decryptRequestCode(code);
+		JsonNode decryptedCode = decryptRequestCode(code);
 		boolean isExpired = isExpiredCode(decryptedCode);
 
 		if (isExpired) {
@@ -292,7 +295,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new ExpiredCodeException("Code has expired");
 		}
 
-		Long requestId = decryptedCode.getLong(REQUEST_ID_KEY);
+		Long requestId = decryptedCode.get(REQUEST_ID_KEY).asLong();
 		log.debug("Fetching request for id: {}", requestId);
 		Request request = requestManager.getRequestById(requestId);
 
@@ -317,7 +320,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject decryptedCode = decryptRequestCode(code);
+		JsonNode decryptedCode = decryptRequestCode(code);
 		boolean isExpired = isExpiredCode(decryptedCode);
 
 		if (isExpired) {
@@ -325,7 +328,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new ExpiredCodeException("Code has expired");
 		}
 
-		Long requestId = decryptedCode.getLong(REQUEST_ID_KEY);
+		Long requestId = decryptedCode.get(REQUEST_ID_KEY).asLong();
 		boolean signed = requestManager.addSignature(requestId, user.getId(), user.getName(), approved, code);
 		Request req = requestManager.getRequestById(requestId);
 
@@ -580,7 +583,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject decrypted = decryptAddAdminCode(code);
+		JsonNode decrypted = decryptAddAdminCode(code);
 		boolean isValid = (!isExpiredCode(decrypted) && validateCode(code));
 
 		if (! isValid) {
@@ -588,7 +591,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new ExpiredCodeException("Code is invalid");
 		}
 
-		Long facilityId = decrypted.getLong(FACILITY_ID_KEY);
+		Long facilityId = decrypted.get(FACILITY_ID_KEY).asLong();
 		boolean added = perunConnector.addFacilityAdmin(facilityId, user.getId());
 		boolean deletedCode = requestManager.deleteUsedCode(code);
 		boolean successful = (added && deletedCode);
@@ -614,7 +617,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject decrypted = decryptAddAdminCode(code);
+		JsonNode decrypted = decryptAddAdminCode(code);
 		boolean isValid = (!isExpiredCode(decrypted) && validateCode(code));
 
 		if (! isValid) {
@@ -758,7 +761,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return res;
 	}
 
-	private JSONObject decryptRequestCode(String code) throws InvalidKeyException, BadPaddingException,
+	private JsonNode decryptRequestCode(String code) throws InvalidKeyException, BadPaddingException,
 			IllegalBlockSizeException, MalformedCodeException
 	{
 		log.trace("decryptRequestCode({})", code);
@@ -771,11 +774,11 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		String decrypted = ServiceUtils.decrypt(code, appConfig.getSecret());
 
 		try {
-			JSONObject decryptedAsJson = new JSONObject(decrypted);
+			JsonNode decryptedAsJson = new ObjectMapper().readTree(decrypted);
 
 			log.trace("decryptRequestCode() returns: {}", decryptedAsJson);
 			return decryptedAsJson;
-		} catch (JSONException e) {
+		} catch (JsonProcessingException e) {
 			throw new MalformedCodeException();
 		}
 	}
@@ -791,7 +794,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject object = new JSONObject();
+		ObjectNode object = JsonNodeFactory.instance.objectNode();
 		object.put(REQUEST_ID_KEY, requestId);
 		object.put(FACILITY_ID_KEY, facilityId);
 		object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
@@ -804,7 +807,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return encoded;
 	}
 
-	private JSONObject decryptAddAdminCode(String code)
+	private JsonNode decryptAddAdminCode(String code)
 			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException
 	{
 		log.trace("decryptAddAdminCode({})", code);
@@ -817,10 +820,10 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		String decrypted = ServiceUtils.decrypt(code, appConfig.getSecret());
 
 		try {
-			JSONObject decryptedAsJson = new JSONObject(decrypted);
+			JsonNode decryptedAsJson = new ObjectMapper().readTree(decrypted);
 			log.trace("decryptAddAdminCode() returns: {}", decryptedAsJson);
 			return decryptedAsJson;
-		} catch (JSONException e) {
+		} catch (JsonProcessingException e) {
 			throw new MalformedCodeException();
 		}
 	}
@@ -835,7 +838,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject object = new JSONObject();
+		ObjectNode object = JsonNodeFactory.instance.objectNode();
 		object.put(FACILITY_ID_KEY, facilityId);
 		object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
 		object.put(REQUESTED_MAIL_KEY, requestedMail);
@@ -847,7 +850,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return encoded;
 	}
 
-	private boolean isExpiredCode(JSONObject codeInJson) {
+	private boolean isExpiredCode(JsonNode codeInJson) {
 		log.trace("isExpiredCode({})", codeInJson);
 
 		if (Utils.checkParamsInvalid(codeInJson)) {
@@ -858,7 +861,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		long daysValidPeriod = appConfig.getConfirmationPeriodDays();
 		long hoursValidPeriod = appConfig.getConfirmationPeriodHours();
 
-		LocalDateTime createdAt = LocalDateTime.parse(codeInJson.getString(CREATED_AT_KEY));
+		LocalDateTime createdAt = LocalDateTime.parse(codeInJson.get(CREATED_AT_KEY).asText());
 		LocalDateTime validUntil = createdAt.plusDays(daysValidPeriod).plusHours(hoursValidPeriod);
 
 		boolean isExpired = LocalDateTime.now().isAfter(validUntil);

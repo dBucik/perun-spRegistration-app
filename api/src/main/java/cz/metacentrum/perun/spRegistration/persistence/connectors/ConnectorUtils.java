@@ -19,7 +19,7 @@ public class ConnectorUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(ConnectorUtils.class);
 
-	public static String dealWithHttpClientErrorException(HttpClientErrorException ex, String message) throws ConnectorException {
+	public static JsonNode dealWithHttpClientErrorException(HttpClientErrorException ex, String message) throws ConnectorException {
 		log.trace("dealWithHttpClientErrorException(ex: {}, message: {})", ex, message);
 
 		MediaType contentType = null;

@@ -1,7 +1,7 @@
 package cz.metacentrum.perun.spRegistration;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Utils {
 
@@ -27,14 +27,14 @@ public class Utils {
 				if (strObj.isEmpty()) {
 					return true;
 				}
-			} else if (JSONArray.class.equals(o.getClass())) {
-				JSONArray jsonArray = (JSONArray) o;
-				if (JSONObject.NULL.equals(jsonArray) || jsonArray.isEmpty()) {
+			} else if (ArrayNode.class.equals(o.getClass())) {
+				ArrayNode jsonArray = (ArrayNode) o;
+				if (jsonArray.isNull() || jsonArray.isEmpty()) {
 					return false;
 				}
-			} else if (JSONObject.class.equals(o.getClass())) {
-				JSONObject jsonObject = (JSONObject) o;
-				if (JSONObject.NULL.equals(jsonObject) || jsonObject.isEmpty()) {
+			} else if (ObjectNode.class.equals(o.getClass())) {
+				ObjectNode jsonObject = (ObjectNode) o;
+				if (jsonObject.isNull() || jsonObject.isEmpty()) {
 					return false;
 				}
 			}

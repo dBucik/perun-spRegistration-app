@@ -1,7 +1,9 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,10 +114,10 @@ public class Facility extends PerunEntity {
 	 * Convert object to JSON representation
 	 * @return JSON String
 	 */
-	public JSONObject toJson() {
-		JSONObject res = new JSONObject();
+	public JsonNode toJson() {
+		ObjectNode res = JsonNodeFactory.instance.objectNode();
 		if (this.getId() == null) {
-			res.put("id", JSONObject.NULL);
+			res.set("id", JsonNodeFactory.instance.nullNode());
 		} else {
 			res.put("id", getId());
 		}
@@ -131,14 +133,14 @@ public class Facility extends PerunEntity {
 	 * @param json JSON from Perun
 	 * @return Facility object or null
 	 */
-	public static Facility fromPerunJson(JSONObject json) {
+	public static Facility fromPerunJson(JsonNode json) {
 		if (Utils.checkParamsInvalid(json)) {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Long id = json.getLong("id");
-		String name = json.getString("name");
-		String description = json.optString("description", "");
+		Long id = json.get("id").asLong();
+		String name = json.get("name").asText();
+		String description = json.hasNonNull("description") ? json.get("description").asText() : null;
 
 		return new Facility(id, name, description);
 	}

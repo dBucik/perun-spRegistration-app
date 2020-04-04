@@ -32,12 +32,6 @@
             <artifactId>javax.mail-api</artifactId>
         </dependency>
 
-        <!-- JSON -->
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-        </dependency>
-
         <!-- MySQL driver -->
         <dependency>
             <groupId>mysql</groupId>

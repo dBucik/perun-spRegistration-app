@@ -1,8 +1,10 @@
 package cz.metacentrum.perun.spRegistration.persistence.connectors.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
 import cz.metacentrum.perun.spRegistration.Utils;
-import cz.metacentrum.perun.spRegistration.persistence.PersistenceUtils;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.ConnectorUtils;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
@@ -12,8 +14,6 @@ import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -78,7 +78,7 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public Facility createFacilityInPerun(JSONObject facilityJson) throws ConnectorException, BadRequestException {
+	public Facility createFacilityInPerun(JsonNode facilityJson) throws ConnectorException, BadRequestException {
 		log.trace("createFacilityInPerun({})", facilityJson);
 
 		if (Utils.checkParamsInvalid(facilityJson)) {
@@ -90,7 +90,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityJson);
 
 		try {
-			JSONObject res = new JSONObject(makeRpcPostCall(FACILITIES_MANAGER, "createFacility", params));
+			JsonNode res = makeRpcPostCall(FACILITIES_MANAGER, "createFacility", params);
 			Facility facility = MapperUtils.mapFacility(res);
 
 			log.trace("createFacilityInPerun() returns: {}", facility);
@@ -105,7 +105,7 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public Facility updateFacilityInPerun(JSONObject facilityJson) throws ConnectorException, BadRequestException {
+	public Facility updateFacilityInPerun(JsonNode facilityJson) throws ConnectorException, BadRequestException {
 		log.trace("updateFacilityInPerun({})", facilityJson);
 
 		if (Utils.checkParamsInvalid(facilityJson)) {
@@ -116,7 +116,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityJson);
 
 		try {
-			JSONObject res = new JSONObject(makeRpcPostCall(FACILITIES_MANAGER, "updateFacility", params));
+			JsonNode res = makeRpcPostCall(FACILITIES_MANAGER, "updateFacility", params);
 			Facility facility = MapperUtils.mapFacility(res);
 
 			log.trace("updateFacilityInPerun() returns: {}", facility);
@@ -161,7 +161,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("id", facilityId);
 
-		JSONObject res = makeRpcGetCallForObject(FACILITIES_MANAGER, "getFacilityById", params);
+		JsonNode res = makeRpcGetCallForObject(FACILITIES_MANAGER, "getFacilityById", params);
 		Facility facility = MapperUtils.mapFacility(res);
 
 		List<User> admins = getAdminsForFacility(facilityId, userEmailAttr);
@@ -189,7 +189,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		attributesWithSearchingValues.put(proxyIdentifierAttr, proxyIdentifier);
 		params.put("attributesWithSearchingValues", attributesWithSearchingValues);
 
-		JSONArray res = new JSONArray(makeRpcPostCall(SEARCHER, "getFacilities", params));
+		JsonNode res = makeRpcPostCall(SEARCHER, "getFacilities", params);
 		List<Facility> facilities = MapperUtils.mapFacilities(res);
 
 		log.trace("getFacilitiesByProxyIdentifier() returns: {}", facilities);
@@ -208,7 +208,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("user", userId);
 
-		JSONArray res = makeRpcGetCallForArray(FACILITIES_MANAGER, "getFacilitiesWhereUserIsAdmin", params);
+		JsonNode res = makeRpcGetCallForArray(FACILITIES_MANAGER, "getFacilitiesWhereUserIsAdmin", params);
 		List<Facility> facilities = MapperUtils.mapFacilities(res);
 
 		log.trace("getFacilitiesWhereUserIsAdmin() returns: {}", facilities);
@@ -228,7 +228,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("attributeName", attrName);
 
-		JSONObject res = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
+		JsonNode res = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
 		PerunAttribute attribute = MapperUtils.mapAttribute(res);
 
 		log.trace("getFacilityAttribute() returns: {}", attribute);
@@ -248,7 +248,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("facility", facilityId);
 		params.put("attrNames", attrNames);
 
-		JSONArray res = makeRpcGetCallForArray(ATTRIBUTES_MANAGER, "getAttributes", params);
+		JsonNode res = makeRpcGetCallForArray(ATTRIBUTES_MANAGER, "getAttributes", params);
 		Map<String, PerunAttribute> attributeMap = MapperUtils.mapAttributes(res);
 
 		log.trace("getFacilityAttributes() returns: {}", attributeMap);
@@ -256,7 +256,7 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public boolean setFacilityAttribute(Long facilityId, JSONObject attrJson) throws ConnectorException {
+	public boolean setFacilityAttribute(Long facilityId, JsonNode attrJson) throws ConnectorException {
 		log.trace("setFacilityAttribute(facilityId: {}, attrJson: {})", facilityId, attrJson);
 
 		if (Utils.checkParamsInvalid(facilityId, attrJson)) {
@@ -275,7 +275,7 @@ public class PerunConnectorRpc implements PerunConnector {
 	}
 
 	@Override
-	public boolean setFacilityAttributes(Long facilityId, JSONArray attrsJsons) throws ConnectorException {
+	public boolean setFacilityAttributes(Long facilityId, JsonNode attrsJsons) throws ConnectorException {
 		log.trace("setFacilityAttributes(facilityId: {}, attrsJsons: {})", facilityId, attrsJsons);
 
 		if (Utils.checkParamsInvalid(facilityId, attrsJsons)) {
@@ -307,7 +307,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("extSourceName", extSourceName);
 		params.put("extLogin", extLogin);
 
-		JSONObject res = makeRpcGetCallForObject(USERS_MANAGER, "getUserByExtSourceNameAndExtLogin", params);
+		JsonNode res = makeRpcGetCallForObject(USERS_MANAGER, "getUserByExtSourceNameAndExtLogin", params);
 		if (res == null) {
 			throw new ConnectorException("Should not found more than one user");
 		}
@@ -317,7 +317,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("user", user.getId().intValue());
 		params.put("attributeName", userEmailAttr);
 
-		JSONObject attr = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
+		JsonNode attr = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttribute", params);
 		PerunAttribute attribute = MapperUtils.mapAttribute(attr);
 		user.setEmail(attribute.valueAsString());
 
@@ -377,7 +377,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		Map<String, Object> params = new LinkedHashMap<>();
 		params.put("attributeName", attributeName);
 
-		JSONObject res = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttributeDefinition", params);
+		JsonNode res = makeRpcGetCallForObject(ATTRIBUTES_MANAGER, "getAttributeDefinition", params);
 		PerunAttributeDefinition definition = MapperUtils.mapAttrDefinition(res);
 
 		log.trace("getAttributeDefinition() returns: {}", definition);
@@ -397,7 +397,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("attributeName", attrName);
 		params.put("attributeValue", attrValue);
 
-		JSONArray res = makeRpcGetCallForArray(FACILITIES_MANAGER, "getFacilitiesByAttribute", params);
+		JsonNode res = makeRpcGetCallForArray(FACILITIES_MANAGER, "getFacilitiesByAttribute", params);
 		List<Facility> facilities = MapperUtils.mapFacilities(res);
 
 		log.trace("getFacilitiesByAttribute() returns: {}", facilities);
@@ -414,7 +414,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		params.put("allUserAttributes", false);
 		params.put("onlyDirectAdmins", false);
 
-		JSONArray res = makeRpcGetCallForArray(FACILITIES_MANAGER, "getRichAdmins", params);
+		JsonNode res = makeRpcGetCallForArray(FACILITIES_MANAGER, "getRichAdmins", params);
 		List<User> admins = MapperUtils.mapUsers(res, userEmailAttr);
 		for (User u: admins) {
 			u.setAdmin(appAdminIds.contains(u.getId()));
@@ -424,7 +424,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		return admins;
 	}
 
-	private JSONObject makeRpcGetCallForObject(String manager, String method, Map<String, Object> map) throws ConnectorException {
+	private JsonNode makeRpcGetCallForObject(String manager, String method, Map<String, Object> map) throws ConnectorException {
 		log.trace("makeRpcGetCallForObject(manager: {}, method: {}, map: {}", manager, method, map);
 
 		if (Utils.checkParamsInvalid(manager, method)) {
@@ -432,18 +432,16 @@ public class PerunConnectorRpc implements PerunConnector {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		String response = makeRpcGetCall(manager, method, map);
-		if (response == null || response.equalsIgnoreCase("null")) {
+		JsonNode response = makeRpcGetCall(manager, method, map);
+		if (response == null || (response instanceof NullNode)) {
 			return null;
 		}
 
-		JSONObject result = new JSONObject(response);
-
-		log.trace("makeRpcCallForObject() returns: {}",result);
-		return result;
+		log.trace("makeRpcCallForObject() returns: {}", response);
+		return response;
 	}
 
-	private JSONArray makeRpcGetCallForArray(String manager, String method, Map<String, Object> map) throws ConnectorException {
+	private JsonNode makeRpcGetCallForArray(String manager, String method, Map<String, Object> map) throws ConnectorException {
 		log.trace("makeRpcCallForArray(manager: {}, method: {}, map: {}", manager, method, map);
 
 		if (Utils.checkParamsInvalid(manager, method)) {
@@ -451,18 +449,16 @@ public class PerunConnectorRpc implements PerunConnector {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		String response = makeRpcGetCall(manager, method, map);
-		if (response == null || response.equalsIgnoreCase("null")) {
+		JsonNode response = makeRpcGetCall(manager, method, map);
+		if (response == null || (response instanceof NullNode)) {
 			return null;
 		}
 
-		JSONArray result = new JSONArray(response);
-
-		log.trace("makeRpcGetCallForArray() returns: {}",result);
-		return result;
+		log.trace("makeRpcGetCallForArray() returns: {}", response);
+		return response;
 	}
 
-	private String makeRpcGetCall(String manager, String method, Map<String, Object> map) throws ConnectorException {
+	private JsonNode makeRpcGetCall(String manager, String method, Map<String, Object> map) throws ConnectorException {
 		log.trace("makeRpcGetCall(manager: {}, method: {}, map: {})", manager, method, map);
 
 		if (Utils.checkParamsInvalid(manager, method)) {
@@ -481,19 +477,14 @@ public class PerunConnectorRpc implements PerunConnector {
 			//we will use post as perun has a complicated way to use get requests...
 			//sending post will always succeed and deliver the parameters
 			JsonNode response = restTemplate.postForObject(actionUrl, map, JsonNode.class);
-
-			String result = (response != null) ? PersistenceUtils.prettyPrintJsonString(response) : null;
-			log.trace("makeRpcGetCall() returns: {}", result);
-			return result;
+			log.trace("makeRpcGetCall() returns: {}", response);
+			return response;
 		} catch (HttpClientErrorException ex) {
 			return ConnectorUtils.dealWithHttpClientErrorException(ex, "Could not connect to Perun RPC");
-		} catch (IOException e) {
-			log.error("cannot parse response to String", e);
-			throw new ConnectorException("cannot connect to Perun RPC", e);
 		}
 	}
 
-	private String makeRpcPostCall(String manager, String method, Map<String, Object> map) throws ConnectorException {
+	private JsonNode makeRpcPostCall(String manager, String method, Map<String, Object> map) throws ConnectorException {
 		log.trace("makeRpcPostCall(manager: {}, method: {}, params: {})", manager, method, map);
 
 		if (Utils.checkParamsInvalid(manager, method)) {
@@ -511,9 +502,8 @@ public class PerunConnectorRpc implements PerunConnector {
 			HttpEntity<byte[]> entity = prepareJsonBody(map);
 			JsonNode response = restTemplate.postForObject(actionUrl, entity, JsonNode.class);
 
-			String result = (response != null) ? PersistenceUtils.prettyPrintJsonString(response) : null;
-			log.trace("makeRpcPostCall() returns: {}", result);
-			return result;
+			log.trace("makeRpcPostCall() returns: {}", response);
+			return response;
 		} catch (HttpClientErrorException ex) {
 			return ConnectorUtils.dealWithHttpClientErrorException(ex, "Could not connect to Perun RPC");
 		} catch (IOException e) {
@@ -522,7 +512,7 @@ public class PerunConnectorRpc implements PerunConnector {
 		}
 	}
 
-	private HttpEntity<byte[]> prepareJsonBody(Map<String, Object> map) {
+	private HttpEntity<byte[]> prepareJsonBody(Map<String, Object> map) throws JsonProcessingException {
 		log.trace("prepareJsonBody({})", map);
 
 		if (Utils.checkParamsInvalid(map)) {
@@ -530,15 +520,12 @@ public class PerunConnectorRpc implements PerunConnector {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject obj = new JSONObject();
-		for (Map.Entry<String, Object> entry: map.entrySet()) {
-			obj.put(entry.getKey(), entry.getValue());
-		}
+		String body = new ObjectMapper().writeValueAsString(map);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
-		HttpEntity<byte[]> result = new HttpEntity<>(StandardCharsets.UTF_8.encode(obj.toString()).array(), headers);
+		HttpEntity<byte[]> result = new HttpEntity<>(StandardCharsets.UTF_8.encode(body).array(), headers);
 		log.trace("prepareJsonBody() returns: {}", result);
 		return result;
 	}

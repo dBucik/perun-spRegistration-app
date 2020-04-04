@@ -28,7 +28,6 @@
         <frontend-plugin.version>1.9.1</frontend-plugin.version>
         <node.version>v8.4.0</node.version>
         <npm.version>5.3.0</npm.version>
-        <json.version>20190722</json.version>
 
         <!-- APP PROPERTIES -->
         <server.port>8080</server.port>
@@ -52,11 +51,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.json</groupId>
-                <artifactId>json</artifactId>
-                <version>${json.version}</version>
-            </dependency>
             <dependency>
                 <groupId>cz.metacentrum.perun</groupId>
                 <artifactId>spRegistration-gui</artifactId>

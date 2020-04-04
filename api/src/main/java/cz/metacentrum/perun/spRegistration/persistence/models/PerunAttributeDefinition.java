@@ -1,8 +1,10 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
-import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -42,22 +44,22 @@ public class PerunAttributeDefinition extends PerunEntity {
 		this.friendlyNameParameter = friendlyNameParameter;
 	}
 
-	public static PerunAttributeDefinition fromPerunJson(JSONObject jsonObject) {
-		if (Utils.checkParamsInvalid(jsonObject)) {
+	public static PerunAttributeDefinition fromPerunJson(JsonNode jsonNode) {
+		if (Utils.checkParamsInvalid(jsonNode)) {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Long id = jsonObject.getLong("id");
-		String friendlyName = jsonObject.getString("friendlyName");
-		String namespace = jsonObject.getString("namespace");
-		String description = jsonObject.getString("description");
-		String type = jsonObject.getString("type");
-		String displayName = jsonObject.getString("displayName");
-		boolean writable = jsonObject.getBoolean("writable");
-		boolean unique = jsonObject.getBoolean("unique");
-		String entity = jsonObject.getString("entity");
-		String baseFriendlyName = jsonObject.getString("baseFriendlyName");
-		String friendlyNameParameter = jsonObject.getString("friendlyNameParameter");
+		Long id = jsonNode.get("id").asLong();
+		String friendlyName = jsonNode.get("friendlyName").asText();
+		String namespace = jsonNode.get("namespace").asText();
+		String description = jsonNode.get("description").asText();
+		String type = jsonNode.get("type").asText();
+		String displayName = jsonNode.get("displayName").asText();
+		boolean writable = jsonNode.get("writable").asBoolean();
+		boolean unique = jsonNode.get("unique").asBoolean();
+		String entity = jsonNode.get("entity").asText();
+		String baseFriendlyName = jsonNode.get("baseFriendlyName").asText();
+		String friendlyNameParameter = jsonNode.get("friendlyNameParameter").asText();
 
 		return new PerunAttributeDefinition(id, friendlyName, namespace, description, type, displayName, writable,
 				unique, entity, baseFriendlyName, friendlyNameParameter);
@@ -147,8 +149,8 @@ public class PerunAttributeDefinition extends PerunEntity {
 		this.friendlyNameParameter = friendlyNameParameter;
 	}
 
-	public JSONObject toJson() {
-		JSONObject res = new JSONObject();
+	public JsonNode toJson() {
+		ObjectNode res = JsonNodeFactory.instance.objectNode();
 		res.put("id", super.getId());
 		res.put("friendlyName", friendlyName);
 		res.put("namespace", namespace);

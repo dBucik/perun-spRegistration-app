@@ -1,10 +1,11 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -118,9 +119,9 @@ public class Request {
 	 */
 	@JsonIgnore
 	public String getAttributesAsJsonForDb() {
-		JSONObject obj = new JSONObject();
+		ObjectNode obj = JsonNodeFactory.instance.objectNode();
 		for (Map.Entry<String ,PerunAttribute> a: attributes.entrySet()) {
-			obj.put(a.getKey(), a.getValue().toJsonForDb());
+			obj.set(a.getKey(), a.getValue().toJsonForDb());
 		}
 
 		return obj.toString();
@@ -131,14 +132,14 @@ public class Request {
 	 * @return JSON with attributes or null.
 	 */
 	@JsonIgnore
-	public JSONArray getAttributesAsJsonArrayForPerun() {
+	public ArrayNode getAttributesAsJsonArrayForPerun() {
 		if (attributes == null || attributes.isEmpty()) {
 			return null;
 		}
 
-		JSONArray res = new JSONArray();
+		ArrayNode res = JsonNodeFactory.instance.arrayNode();
 		for (PerunAttribute a: attributes.values()) {
-			res.put(a.toJson());
+			res.add(a.toJson());
 		}
 
 		return res;
