@@ -1,0 +1,40 @@
+<configuration packagingData="true" debug="false" scan="false" scanPeriod="30 seconds">
+    <contextName>${log.contextName}</contextName>
+
+    <if condition='isDefined("catalina.base")'>
+        <then>
+            <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>/var/log/spreg/${CONTEXT_NAME}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>/var/log/spreg/${CONTEXT_NAME}.log.%d{yyyy-MM-dd}</fileNamePattern>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>%d %-5level %logger - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </then>
+        <else>
+            <appender name="FILE" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>%d [%thread] %-5level %logger{120} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </else>
+    </if>
+    <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+        <!-- PASSED FROM POM.XML / MAVEN BUILD PROPS -->
+        <facility>${log.facility}</facility>
+        <throwableExcluded>true</throwableExcluded>
+        <suffixPattern>[%thread] %cn : %-5level %logger{40} - %m%n%xException</suffixPattern>
+    </appender>
+
+    <root level="info">
+        <!-- PASSED FROM POM.XML / MAVEN BUILD PROPS -->
+        <appender-ref ref="${log.to}"/>
+    </root>
+
+    <!-- keep Spring quiet -->
+    <logger name="org.springframework" level="warn"/>
+    <logger name="cz.metacentrum.perun" level="${log.level}" />
+
+</configuration>
