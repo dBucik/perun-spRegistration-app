@@ -15,13 +15,6 @@
     <artifactId>spRegistration-api</artifactId>
     <packaging>war</packaging>
 
-    <properties>
-        <log.to>FILE</log.to>
-        <log.contextName>spreg</log.contextName>
-        <log.facility>LOCAL7</log.facility>
-        <log.level>trace</log.level>
-    </properties>
-
     <name>SpRegistration API</name>
     <description>Backend part of SpRegistration Application</description>
 
@@ -79,21 +72,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>logback.xml</include>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
