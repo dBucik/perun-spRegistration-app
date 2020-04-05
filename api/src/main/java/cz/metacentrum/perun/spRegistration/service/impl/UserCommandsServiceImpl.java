@@ -21,7 +21,6 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
@@ -29,9 +28,11 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeExcepti
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.service.mails.MailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.BadPaddingException;
@@ -49,13 +50,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static cz.metacentrum.perun.spRegistration.service.MailsService.REQUEST_CREATED;
-import static cz.metacentrum.perun.spRegistration.service.MailsService.REQUEST_MODIFIED;
-import static cz.metacentrum.perun.spRegistration.service.MailsService.REQUEST_SIGNED;
+import static cz.metacentrum.perun.spRegistration.service.mails.MailsService.REQUEST_CREATED;
+import static cz.metacentrum.perun.spRegistration.service.mails.MailsService.REQUEST_MODIFIED;
+import static cz.metacentrum.perun.spRegistration.service.mails.MailsService.REQUEST_SIGNED;
 
 /**
  * Implementation of UserCommandsService.
@@ -77,19 +77,19 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
 	private final Config config;
-	private final Properties messagesProperties;
-	
-	@Autowired
-	private MailsService mailsService;
+	private final MailsService mailsService;
+
+	@Value("#{'${mail.approval.default-authorities.mails}'.split(',')}")
+	private List<String> defaultAuthorities;
 
 	@Autowired
 	public UserCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
-								   AppConfig appConfig, Properties messagesProperties) {
+								   AppConfig appConfig, MailsService mailsService) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.config = config;
-		this.messagesProperties = messagesProperties;
+		this.mailsService = mailsService;
 	}
 
 	@Override
@@ -934,8 +934,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		if (authorities == null || authorities.isEmpty()) {
-			String prop = messagesProperties.getProperty("moveToProduction.authorities");
-			emails = Arrays.asList(prop.split(","));
+			emails = defaultAuthorities;
 		} else {
 			Map<String, List<String>> authsMap = appConfig.getProdTransferAuthoritiesMailsMap();
 			for (String authoritiesInput: authorities) {

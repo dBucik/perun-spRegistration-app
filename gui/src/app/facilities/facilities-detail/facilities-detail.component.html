@@ -11,7 +11,7 @@
           <p>{{facility.description}}</p>
         </div>
         <!-- BUTTONS -->
-        <div class="col-md-4 mt-4 controls text-right">
+        <div class="col-md-4 mt-4 mb-2 controls text-right">
           <ng-container *ngIf="moveToProductionActive || facility.activeRequestId">
             <p>{{'FACILITIES.ACTIVE_REQUEST_WARNING' | translate}}</p>
             <button class="btn-block mb-1" mat-raised-button color="accent"
@@ -38,6 +38,7 @@
       </div>
     </div>
     <div class="w-100"><!-- SPACER --></div>
+    <!-- ATTRIBUTES -->
     <div class="col mt-3">
         <mat-tab-group class="pb-3">
           <mat-tab label="{{ 'COMMON.ATTRIBUTES.SERVICE' | translate }}">
