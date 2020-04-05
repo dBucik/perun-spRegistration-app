@@ -178,6 +178,26 @@
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
+    <bean id="mailSenderProps" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="mail.smtp.auth">false</prop>
+                <prop key="mail.smtp.starttls.enable">false</prop>
+                <prop key="mail.smtp.connectiontimeout">5000</prop>
+                <prop key="mail.smtp.timeout">3000</prop>
+                <prop key="mail.smtp.writetimeout">5000</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <!--TODO: fromProps-->
+        <property name="host" value="localhsot"/>
+        <property name="port" value="25"/>
+        <property name="protocol" value="smtp"/>
+        <property name="javaMailProperties" ref="mailSenderProps"/>
+    </bean>
+
     <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig">
         <property name="perunConnector" ref="perunConnector" />
         <property name="appAdminIds" value="#{'${appAdminIds}'.split('\s*,\s*')}" />

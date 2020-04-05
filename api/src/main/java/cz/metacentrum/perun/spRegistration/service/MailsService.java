@@ -7,17 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 import java.util.Map;
 import java.util.Properties;
 
@@ -68,6 +63,9 @@ public class MailsService {
 
 	@Value("${host.url}")
 	private String hostUrl;
+
+	@Autowired
+	private JavaMailSender javaMailSender;
 
 	public void notifyAuthorities(Request req, Map<String, String> authoritiesLinksMap) {
 		for (String email: authoritiesLinksMap.keySet()) {
@@ -129,23 +127,18 @@ public class MailsService {
 			log.error("Could not send mail, to == null");
 			return false;
 		}
-		Properties props = new Properties();
-		props.put("mail.smtp.host", host);
-		Session session = Session.getDefaultInstance(props);
+
 		try {
-			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(from));
-			message.setContent(msg, "text/html; charset=utf-8" );
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-			message.setSubject(subject);
-			MimeBodyPart mimeBodyPart = new MimeBodyPart();
-			mimeBodyPart.setContent(msg, "text/html; charset=utf-8");
-			Multipart multipart = new MimeMultipart();
-			multipart.addBodyPart(mimeBodyPart);
-			message.setContent(multipart);
+			MimeMessage message = javaMailSender.createMimeMessage();
+
+			MimeMessageHelper helper = new MimeMessageHelper(message, true);
+			helper.setFrom(from);
+			helper.setTo(to);
+			helper.setSubject(subject);
+			helper.setText(msg, true);
 
 			log.debug("sending message");
-			Transport.send(message);
+			javaMailSender.send(message);
 		} catch (MessagingException e) {
 			log.debug("sendMail() returns: FALSE");
 			return false;
