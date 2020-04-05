@@ -861,7 +861,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		long daysValidPeriod = appConfig.getConfirmationPeriodDays();
 		long hoursValidPeriod = appConfig.getConfirmationPeriodHours();
 
-		LocalDateTime createdAt = LocalDateTime.parse(codeInJson.get(CREATED_AT_KEY).asText());
+		LocalDateTime createdAt = LocalDateTime.parse(codeInJson.get(CREATED_AT_KEY).textValue());
 		LocalDateTime validUntil = createdAt.plusDays(daysValidPeriod).plusHours(hoursValidPeriod);
 
 		boolean isExpired = LocalDateTime.now().isAfter(validUntil);

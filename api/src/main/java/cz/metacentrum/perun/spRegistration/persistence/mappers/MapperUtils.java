@@ -109,11 +109,11 @@ public class MapperUtils {
 
 			for (int i = 0; i < attrs.size(); i++) {
 				JsonNode attrJson = attrs.get(i);
-				String namespace = attrJson.get("namespace").asText();
-				String friendlyName = attrJson.get("friendlyName").asText();
+				String namespace = attrJson.get("namespace").textValue();
+				String friendlyName = attrJson.get("friendlyName").textValue();
 				String fullAttrName = namespace + ':' + friendlyName;
 				if (userMailAttr.equals(fullAttrName)) {
-					user.setEmail(attrJson.get("value").asText());
+					user.setEmail(attrJson.get("value").textValue());
 				}
 			}
 		}

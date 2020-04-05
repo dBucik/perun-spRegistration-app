@@ -158,11 +158,11 @@ public class User extends PerunEntity {
 		}
 
 		Long id = json.get("id").asLong();
-		String firstName = json.hasNonNull("firstName") ? json.get("firstName").asText() : null;
-		String middleName = json.hasNonNull("middleName") ? json.get("middleName").asText() : null;;
-		String lastName = json.hasNonNull("lastName") ? json.get("lastName").asText() : null;;
-		String titleBefore = json.hasNonNull("titleBefore") ? json.get("titleBefore").asText() : null;;
-		String titleAfter = json.hasNonNull("titleAfter") ? json.get("titleAfter").asText() : null;;
+		String firstName = json.hasNonNull("firstName") ? json.get("firstName").textValue() : null;
+		String middleName = json.hasNonNull("middleName") ? json.get("middleName").textValue() : null;;
+		String lastName = json.hasNonNull("lastName") ? json.get("lastName").textValue() : null;;
+		String titleBefore = json.hasNonNull("titleBefore") ? json.get("titleBefore").textValue() : null;;
+		String titleAfter = json.hasNonNull("titleAfter") ? json.get("titleAfter").textValue() : null;;
 
 		return new User(id, titleBefore, firstName, middleName, lastName, titleAfter);
 	}

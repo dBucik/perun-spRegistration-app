@@ -58,7 +58,7 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
       this.emails = [];
     }
 
-    if (this.selectEmailsEnabled && this.emails.length === 0) {
+    if (this.specifyFromList && this.emails.length === 0) {
       this.translate.get('FACILITIES.EMAIL_ERROR_FILL').subscribe(result => {
         this.snackBar.open(result, null, {duration: 5000});
       });

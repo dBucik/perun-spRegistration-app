@@ -189,6 +189,7 @@ public class MailsService {
 	}
 
 	private String replaceApprovalLink(String containerString, String link) {
+		log.trace("replaceApprovalLink({}, {})", containerString, link);
 		if (containerString.contains(APPROVAL_LINK_FIELD)) {
 			return containerString.replaceAll(APPROVAL_LINK_FIELD, wrapInAnchorElement(link));
 		}
@@ -197,6 +198,7 @@ public class MailsService {
 	}
 
 	private String replacePlaceholders(String containerString, Facility fac) {
+		log.trace("replacePlaceholders({}, {})", containerString, fac);
 		containerString = replacePlaceholder(containerString, SERVICE_NAME_FIELD, fac.getName());
 		containerString = replacePlaceholder(containerString, SERVICE_DESCRIPTION_FIELD, fac.getDescription());
 
@@ -204,6 +206,7 @@ public class MailsService {
 	}
 
 	private String replacePlaceholders(String containerString, Request req) {
+		log.trace("replacePlaceholders({}, {})", containerString, req);
 		String requestLink = hostUrl + "/auth/requests/detail/" + req.getReqId();
 
 		containerString = replacePlaceholder(containerString, REQUEST_ID_FIELD, req.getReqId().toString());
@@ -223,6 +226,7 @@ public class MailsService {
 	}
 
 	private String replacePlaceholder(String container, String replaceKey, String replaceWith) {
+		log.trace("replacePlaceholder({}, {}, {})", container, replaceKey, replaceWith);
 		if (container.contains(replaceKey)) {
 			return container.replace(replaceKey, replaceWith);
 		}
@@ -240,10 +244,12 @@ public class MailsService {
 	}
 
 	private String getSubject(String action, String role) {
+		log.trace("getSubject({}, {})", action, role);
 		return messagesProperties.getProperty(getPropertyPrefix(action) + '.' + role.toLowerCase() + '.' + "subject");
 	}
 
 	private String getMessage(String action, String role) {
+		log.trace("getMessage({}, {})", action, role);
 		return messagesProperties.getProperty(getPropertyPrefix(action) + '.' + role.toLowerCase() + '.' + "message");
 	}
 

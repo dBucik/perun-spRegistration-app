@@ -50,16 +50,16 @@ public class PerunAttributeDefinition extends PerunEntity {
 		}
 
 		Long id = jsonNode.get("id").asLong();
-		String friendlyName = jsonNode.get("friendlyName").asText();
-		String namespace = jsonNode.get("namespace").asText();
-		String description = jsonNode.get("description").asText();
-		String type = jsonNode.get("type").asText();
-		String displayName = jsonNode.get("displayName").asText();
+		String friendlyName = jsonNode.get("friendlyName").textValue();
+		String namespace = jsonNode.get("namespace").textValue();
+		String description = jsonNode.get("description").textValue();
+		String type = jsonNode.get("type").textValue();
+		String displayName = jsonNode.get("displayName").textValue();
 		boolean writable = jsonNode.get("writable").asBoolean();
 		boolean unique = jsonNode.get("unique").asBoolean();
-		String entity = jsonNode.get("entity").asText();
-		String baseFriendlyName = jsonNode.get("baseFriendlyName").asText();
-		String friendlyNameParameter = jsonNode.get("friendlyNameParameter").asText();
+		String entity = jsonNode.get("entity").textValue();
+		String baseFriendlyName = jsonNode.get("baseFriendlyName").textValue();
+		String friendlyNameParameter = jsonNode.get("friendlyNameParameter").textValue();
 
 		return new PerunAttributeDefinition(id, friendlyName, namespace, description, type, displayName, writable,
 				unique, entity, baseFriendlyName, friendlyNameParameter);

@@ -139,8 +139,8 @@ public class Facility extends PerunEntity {
 		}
 
 		Long id = json.get("id").asLong();
-		String name = json.get("name").asText();
-		String description = json.hasNonNull("description") ? json.get("description").asText() : null;
+		String name = json.get("name").textValue();
+		String description = json.hasNonNull("description") ? json.get("description").textValue() : null;
 
 		return new Facility(id, name, description);
 	}

@@ -203,10 +203,10 @@ public class PerunAttribute {
 			return null;
 		}
 
-		String type = json.get("type").asText();
+		String type = json.get("type").textValue();
 		Object newValue = getValue(json, "newValue", type);
 		Object oldValue = getValue(json, "oldValue", type);
-		String comment = json.hasNonNull("comment") ? json.get("comment").asText() : null;
+		String comment = json.hasNonNull("comment") ? json.get("comment").textValue() : null;
 
 		PerunAttributeDefinition def = attributeDefinitionMap.get(name);
 		AttrInput input = inputMap.get(name);
@@ -333,7 +333,7 @@ public class PerunAttribute {
 		switch (type) {
 			case STRING_TYPE:
 			case LARGE_STRING_TYPE:
-				return json.get(key).asText();
+				return json.get(key).textValue();
 			case INTEGER_TYPE:
 				return json.get(key).asLong();
 			case BOOLEAN_TYPE:
@@ -344,7 +344,7 @@ public class PerunAttribute {
 				List<String> arrValue = new ArrayList<>();
 
 				for (int i = 0; i < arr.size(); i++) {
-					arrValue.add(arr.get(i).toString());
+					arrValue.add(arr.get(i).textValue());
 				}
 
 				return arrValue;
@@ -355,7 +355,7 @@ public class PerunAttribute {
 				Iterator<String> keys = obj.fieldNames();
 				while (keys.hasNext()) {
 					String mapKey = keys.next();
-					mapValue.put(mapKey, obj.get(mapKey).toString());
+					mapValue.put(mapKey, obj.get(mapKey).textValue());
 				}
 
 				return mapValue;
