@@ -86,15 +86,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		request.setStatus(RequestStatus.APPROVED);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		Set<String> allowedAttrs = appConfig.getPerunAttributeDefinitionsMap().keySet();
-		Set<String> requestedAttrs = request.getAttributes().keySet();
-		Set<String> notAllowed = requestedAttrs.stream()
-				.filter(attrName -> !allowedAttrs.contains(attrName))
-				.collect(Collectors.toSet());
-
-		if (!notAllowed.isEmpty()) {
-			throw new InternalErrorException("Cannot approve, requested attributes are not allowed");
-		}
+		request.updateAttributes(new ArrayList<>(), false, appConfig);
 
 		boolean requestProcessed = processApprovedRequest(request);
 		boolean requestUpdated = requestManager.updateRequest(request);
@@ -176,8 +168,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			throw new CannotChangeStatusException("Cannot ask for changes, request not marked as WAITING_FOR_APPROVAL");
 		}
 
-		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMapAttrs(attributes, appConfig);
-		request.updateAttributes(convertedAttributes, false);
+		request.updateAttributes(attributes, false, appConfig);
 		request.setStatus(RequestStatus.WAITING_FOR_CHANGES);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
@@ -412,7 +403,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		Facility actualFacility = perunConnector.getFacilityById(facilityId);
 		Map<String, PerunAttribute> oldAttributes = perunConnector.getFacilityAttributes(facilityId,
-				new ArrayList<>(request.getAttributes().keySet()));
+				request.getAttributeNames());
 
 		if (actualFacility == null) {
 			log.error("Facility with ID: {} does not exist in Perun", facilityId);

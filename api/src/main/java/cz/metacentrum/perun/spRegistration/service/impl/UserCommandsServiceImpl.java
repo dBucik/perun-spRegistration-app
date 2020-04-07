@@ -9,6 +9,7 @@ import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
@@ -102,7 +103,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		Request req = null;
 		try {
-			req = createRequest(null, userId, attributes, RequestAction.REGISTER_NEW_SP);
+			req = createRequest(null, userId, RequestAction.REGISTER_NEW_SP, attributes);
 		} catch (ActiveRequestExistsException e) {
 			//this cannot happen as the registration is for new service and thus facility id will be always null
 		}
@@ -157,7 +158,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			return null;
 		}
 
-		Request req = createRequest(facilityId, userId, attributes, RequestAction.UPDATE_FACILITY);
+		Request req = createRequest(facilityId, userId, RequestAction.UPDATE_FACILITY, attributes);
 		if (req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
@@ -188,7 +189,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
 		boolean isOidc = ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttribute());
 		List<String> keptAttrs = getAttrsToKeep(isOidc);
-		Map<String, PerunAttribute> facilityAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
+		List<PerunAttribute> facilityAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
 
 		Request req = createRequest(facilityId, userId, RequestAction.DELETE_FACILITY, facilityAttributes);
 		if (req.getReqId() == null) {
@@ -223,8 +224,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		log.info("Updating request");
-		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMapAttrs(attributes, appConfig);
-		request.updateAttributes(convertedAttributes, true);
+		request.updateAttributes(attributes, true, appConfig);
 
 		request.setStatus(RequestStatus.WAITING_FOR_APPROVAL);
 		request.setModifiedBy(userId);
@@ -260,7 +260,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
 		}
 
-		Map<String, PerunAttribute> filteredAttributes = filterNotNullAttributes(fac);
+		List<PerunAttribute> filteredAttributes = filterNotNullAttributes(fac);
 
 		Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, filteredAttributes);
 
@@ -417,8 +417,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
 		boolean isOidc = ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttribute());
 		List<String> keptAttrs = getAttrsToKeep(isOidc);
-
-		facility.setAttrs(ServiceUtils.filterFacilityAttrs(attrs, keptAttrs));
+		List<PerunAttribute> filteredAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
+		Map<AttributeCategory, Map<String, PerunAttribute>> facilityAttributes = convertToStruct(filteredAttributes, appConfig);
 
 		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
@@ -453,10 +453,12 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new InternalErrorException("Could not fetch facility for id: " + facilityId);
 		}
 
-		for (Map.Entry<String, PerunAttribute> attr: facility.getAttrs().entrySet()) {
-			AttrInput input = config.getInputMap().get(attr.getKey());
-			attr.getValue().setInput(input);
-		}
+		facility.getAttrs()
+				.values()
+				.forEach(
+						attrsInCategory -> attrsInCategory.values()
+								.forEach(attr -> attr.setInput(config.getInputMap().get(attr.getFullName())))
+				);
 
 		log.trace("getDetailedFacilityWithInputs() returns: {}", facility);
 		return facility;
@@ -680,14 +682,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 	/* PRIVATE METHODS */
 
-	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes, RequestAction action)
-			throws InternalErrorException, ActiveRequestExistsException
-	{
-		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMapAttrs(attributes, appConfig);
-		return createRequest(facilityId, userId, action, convertedAttributes);
-	}
-
-	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes)
+	private Request createRequest(Long facilityId, Long userId, RequestAction action, List<PerunAttribute> attributes)
 			throws InternalErrorException, ActiveRequestExistsException
 	{
 		log.trace("createRequest(facilityId: {}, userId: {}, action: {}, attributes: {})",
@@ -702,7 +697,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		request.setFacilityId(facilityId);
 		request.setStatus(RequestStatus.WAITING_FOR_APPROVAL);
 		request.setAction(action);
-		request.setAttributes(attributes);
+		request.updateAttributes(attributes, true, appConfig);
 		request.setReqUserId(userId);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
@@ -870,7 +865,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return isExpired;
 	}
 
-	private Map<String, PerunAttribute> filterNotNullAttributes(Facility facility) {
+	private List<PerunAttribute> filterNotNullAttributes(Facility facility) {
 		log.trace("filterNotNullAttributes({})", facility);
 
 		if (Utils.checkParamsInvalid(facility)) {
@@ -878,12 +873,15 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Map<String, PerunAttribute> filteredAttributes = new HashMap<>();
-		for (Map.Entry<String, PerunAttribute> entry : facility.getAttrs().entrySet()) {
-			if (entry.getValue().getValue() != null) {
-				filteredAttributes.put(entry.getKey(), entry.getValue());
-			}
-		}
+		List<PerunAttribute> filteredAttributes = new ArrayList<>();
+		facility.getAttrs()
+				.values()
+				.forEach(
+						attrsInCategory -> attrsInCategory.values()
+						.stream()
+						.filter(attr -> attr.getValue() != null)
+						.forEach(filteredAttributes::add)
+				);
 
 		log.trace("filterNotNullAttributes() returns: {}", filteredAttributes);
 		return filteredAttributes;
@@ -1034,5 +1032,26 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		log.trace("generateLinksForAuthorities() returns: {}", linksMap);
 		return linksMap;
+	}
+
+	private Map<AttributeCategory, Map<String, PerunAttribute>> convertToStruct(List<PerunAttribute> filteredAttributes, AppConfig appConfig) {
+		if (filteredAttributes == null) {
+			return null;
+		}
+
+		Map<AttributeCategory, Map<String, PerunAttribute>> map = new HashMap<>();
+		map.put(AttributeCategory.SERVICE, new HashMap<>());
+		map.put(AttributeCategory.ORGANIZATION, new HashMap<>());
+		map.put(AttributeCategory.PROTOCOL, new HashMap<>());
+		map.put(AttributeCategory.ACCESS_CONTROL, new HashMap<>());
+
+		if (!filteredAttributes.isEmpty()) {
+			for (PerunAttribute attribute : filteredAttributes) {
+				AttributeCategory category = appConfig.getAttrCategory(attribute.getFullName());
+				map.get(category).put(attribute.getFullName(), attribute);
+			}
+		}
+
+		return map;
 	}
 }

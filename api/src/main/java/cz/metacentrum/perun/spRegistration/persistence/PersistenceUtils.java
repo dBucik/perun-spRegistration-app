@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
@@ -12,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,7 +46,7 @@ public class PersistenceUtils {
 	 * @return List of initialized attributes
 	 * @throws ConnectorException Thrown when problem while communicating with Perun RPC occur.
 	 */
-	public static List<AttrInput> initializeAttributes(PerunConnector connector, AppConfig appConfig, Properties props) throws ConnectorException, UnsupportedEncodingException {
+	public static List<AttrInput> initializeAttributes(PerunConnector connector, AppConfig appConfig, Properties props, AttributeCategory category) throws ConnectorException, UnsupportedEncodingException {
 		log.trace("Initializing attribute inputs - START");
 		List<AttrInput> inputs = new ArrayList<>();
 		log.debug("Locales enabled: {}", appConfig.getAvailableLanguages());
@@ -63,6 +63,7 @@ public class PersistenceUtils {
 
 			PerunAttributeDefinition def = connector.getAttributeDefinition(attrName);
 			appConfig.getPerunAttributeDefinitionsMap().put(def.getFullName(), def);
+			appConfig.getAttributeCategoryMap().put(def.getFullName(), category);
 
 			Map<String, String> name = getTranslations(appConfig, "name", baseProp, props);
 			Map<String, String> desc = getTranslations(appConfig, "desc", baseProp, props);

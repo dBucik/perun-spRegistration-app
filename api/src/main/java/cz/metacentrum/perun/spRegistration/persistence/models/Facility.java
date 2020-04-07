@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class Facility extends PerunEntity {
 	private boolean testEnv;
 	private boolean editable = false;
 	private List<User> admins = new ArrayList<>();
-	private Map<String, PerunAttribute> attrs = new HashMap<>();
+	private Map<AttributeCategory, Map<String, PerunAttribute>> attrs = new HashMap<>();
 
 	public Facility(Long id) {
 		super(id);
@@ -102,11 +103,11 @@ public class Facility extends PerunEntity {
 		this.admins = admins;
 	}
 
-	public Map<String, PerunAttribute> getAttrs() {
+	public Map<AttributeCategory, Map<String, PerunAttribute>> getAttrs() {
 		return attrs;
 	}
 
-	public void setAttrs(Map<String, PerunAttribute> attrs) {
+	public void setAttrs(Map<AttributeCategory, Map<String, PerunAttribute>> attrs) {
 		this.attrs = attrs;
 	}
 

@@ -1,9 +1,8 @@
 package cz.metacentrum.perun.spRegistration.service;
 
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -59,44 +59,27 @@ public class ServiceUtils {
 	}
 
 	/**
-	 * Transform list of attributes to map. Also add definitions to attributes.
-	 * @param attributes Attributes
-	 * @param appConfig config containing definitions map
-	 * @return converted attributes as map
-	 */
-	public static Map<String, PerunAttribute> transformListToMapAttrs(List<PerunAttribute> attributes, AppConfig appConfig) {
-		Map<String, PerunAttribute> convertedAttributes = new HashMap<>();
-		for (PerunAttribute a: attributes) {
-			PerunAttributeDefinition def = appConfig.getAttrDefinition(a.getFullName());
-			a.setDefinition(def);
-			convertedAttributes.put(a.getFullName(), a);
-		}
-
-		return convertedAttributes;
-	}
-
-	/**
 	 * Filter facility attributes - keep only ones with name in list.
 	 * @param attrsMap Map of attributes to be filtered.
 	 * @param toKeep Names of attributes that should be kept.
 	 * @return NULL if param "attrsMap" or "toKeep" is NULL, empty map if param "attrsMap" or "toKeep" is empty,
 	 * Filtered map otherwise.
 	 */
-	public static Map<String, PerunAttribute> filterFacilityAttrs(Map<String, PerunAttribute> attrsMap, List<String> toKeep) {
+	public static List<PerunAttribute> filterFacilityAttrs(Map<String, PerunAttribute> attrsMap, List<String> toKeep) {
 		log.trace("filterFacilityAttrs(attrsMap: {}, toKeep: {})", attrsMap, toKeep);
 		if (attrsMap == null) {
 			return null;
 		} else if (attrsMap.isEmpty()) {
-			return new HashMap<>();
+			return new ArrayList<>();
 		} else if (toKeep == null) {
 			return null;
 		} else if (toKeep.isEmpty()) {
-			return new HashMap<>();
+			return new ArrayList<>();
 		}
 
-		Map<String, PerunAttribute> filteredAttributes = new HashMap<>();
+		List<PerunAttribute> filteredAttributes = new ArrayList<>();
 		for (String keptAttr: toKeep) {
-			filteredAttributes.put(keptAttr, attrsMap.get(keptAttr));
+			filteredAttributes.add(attrsMap.get(keptAttr));
 		}
 
 		log.trace("filterFacilityAttrs() returns: {}", filteredAttributes);
@@ -112,28 +95,11 @@ public class ServiceUtils {
 	public static boolean isOidcRequest(Request request, String entityIdAttr) {
 		log.trace("isOidcRequest(request: {})", request);
 		boolean isOidc = true;
-		if (request.getAttributes().containsKey(entityIdAttr)) {
-			isOidc = (null == request.getAttributes().get(entityIdAttr).getValue());
+		if (request.getAttributes().get(AttributeCategory.PROTOCOL).containsKey(entityIdAttr)) {
+			isOidc = (null == request.getAttributes().get(AttributeCategory.PROTOCOL).get(entityIdAttr).getValue());
 		}
 
 		log.trace("isOidcRequest() returns: {}", isOidc);
-		return isOidc;
-	}
-
-	/**
-	 * Decide if facility represents OIDC service.
-	 * @param facility facility
-	 * @param entityIdAttr Identifier of entity id attr.
-	 * @return True if is OIDC service, false otherwise.
-	 */
-	public static boolean isOidcFacility(Facility facility, String entityIdAttr) {
-		log.trace("isOidcFacility(facility: {})", facility);
-		boolean isOidc = true;
-		if (facility.getAttrs().containsKey(entityIdAttr)) {
-			isOidc = (null == facility.getAttrs().get(entityIdAttr).getValue());
-		}
-
-		log.trace("isOidcFacility() returns: {}", isOidc);
 		return isOidc;
 	}
 

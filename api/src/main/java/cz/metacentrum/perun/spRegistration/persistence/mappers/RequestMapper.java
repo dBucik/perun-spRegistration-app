@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
@@ -57,7 +58,7 @@ public class RequestMapper implements RowMapper<Request> {
 		log.trace("mapRow(resultSet: {}, i: {})", resultSet, i);
 
 		String attrsJsonStr = resultSet.getString(ATTRIBUTES_KEY);
-		Map<String, PerunAttribute> attrs = null;
+		Map<AttributeCategory, Map<String, PerunAttribute>> attrs = null;
 		try {
 			attrs = mapAttributes(attrsJsonStr);
 		} catch (JsonProcessingException e) {
@@ -82,21 +83,31 @@ public class RequestMapper implements RowMapper<Request> {
 		return request;
 	}
 
-	private Map<String, PerunAttribute> mapAttributes(String attrsJsonStr) throws JsonProcessingException {
+	private Map<AttributeCategory, Map<String, PerunAttribute>> mapAttributes(String attrsJsonStr) throws JsonProcessingException {
 		log.trace("mapAttributes({})", attrsJsonStr);
 
-		Map<String, PerunAttribute> attributes = new HashMap<>();
+		Map<AttributeCategory, Map<String, PerunAttribute>> attributes = new HashMap<>();
 
 		if (!Utils.checkParamsInvalid(attrsJsonStr)) {
-			ObjectNode obj = (ObjectNode) new ObjectMapper().readTree(attrsJsonStr);
-			Iterator<String> keys = obj.fieldNames();
+			ObjectNode json = (ObjectNode) new ObjectMapper().readTree(attrsJsonStr);
+			Iterator<String> categoryKeys = json.fieldNames();
 
-			while (keys.hasNext()) {
-				String key = keys.next();
-				PerunAttribute mappedAttribute = PerunAttribute.fromJsonOfDb(key, obj.get(key), definitionMap, attrInputMap);
-				if (mappedAttribute != null) {
-					attributes.put(key, mappedAttribute);
+			while (categoryKeys.hasNext()) {
+				String key = categoryKeys.next();
+				AttributeCategory category = AttributeCategory.fromString(key);
+				ObjectNode categoryJson = (ObjectNode) json.get(key);
+				Map<String, PerunAttribute> mappedAttributesForCategory = new HashMap<>();
+				Iterator<String> attributeKeys = categoryJson.fieldNames();
+				while (attributeKeys.hasNext()) {
+					String attrName = attributeKeys.next();
+					PerunAttribute mappedAttribute = PerunAttribute.fromJsonOfDb(attrName, categoryJson.get(attrName),
+							definitionMap, attrInputMap);
+					if (mappedAttribute != null) {
+						mappedAttributesForCategory.put(key, mappedAttribute);
+					}
 				}
+
+				attributes.put(category, mappedAttributesForCategory);
 			}
 		}
 
