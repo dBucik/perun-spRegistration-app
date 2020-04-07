@@ -1,7 +1,30 @@
-import {PerunAttribute} from './PerunAttribute';
 import {User} from './User';
+import {AttributesEntity} from "./AttributesEntity";
 
-export interface Facility {
+export class Facility extends AttributesEntity {
+  constructor(item: any) {
+    if (!item) {
+      return;
+    }
+    super(item.attributes);
+    this.id = item.id;
+    this.name = item.name;
+    this.description = item.description;
+    this.testEnv = item.testEnv;
+    this.activeRequestId = item.activeRequestId;
+    this.editable = item.editable;
+    this.saml = item.saml;
+    this.oidc = item.oidc;
+    if (this.saml && this.oidc) {
+      this.protocolType = "SAML / OIDC";
+    } else if (this.saml) {
+      this.protocolType = "SAML";
+    } else if (this.oidc) {
+      this.protocolType = "OIDC";
+    }
+    this.admins = item.admins;
+  }
+
   id: number;
   name: string;
   description: string;
@@ -10,6 +33,7 @@ export interface Facility {
   editable: boolean;
   saml: boolean;
   oidc: boolean;
-  attrs: Map<string, PerunAttribute>;
+  protocolType: string;
   admins: User[];
+
 }

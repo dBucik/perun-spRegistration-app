@@ -36,7 +36,15 @@
     "ERROR" : "Something went wrong",
     "DETAIL_ITEM_NAME" : "Option",
     "DETAIL_ITEM_VALUE" : "Value",
-    "SUBMIT" : "Submit"
+    "SUBMIT" : "Submit",
+    "ATTRIBUTES": {
+      "SERVICE": "Service",
+      "ORGANIZATION": "Organization",
+      "PROTOCOL": "SAML/OIDC",
+      "ACCESS_CONTROL": "Access"
+    },
+    "SHOW_MORE": "Show more",
+    "SHOW_LESS": "Show less"
   },
   "REQUESTS": {
     "FACILITY_ID": "Service Identifier",
@@ -86,8 +94,6 @@
       "MOVE_TO_PRODUCTION": "Move to production"
     },
     "CHANGED_TO_WFC": "Successfully requested changes",
-    "SHOW_MORE": "Show more",
-    "SHOW_LESS": "Show less",
     "COMMENTS_FROM_ADMIN": "Comments from administrator",
     "SET_WFC": "Request changes",
     "APPROVED": "Request approved",
@@ -141,7 +147,6 @@
     "CLIENT_ID": "Client ID",
     "CLIENT_SECRET": "Client SECRET",
     "REGENERATE_CLIENT_SECRET": "Generate new client secret",
-    "ATTRIBUTES": "Properties",
     "MANAGERS": "Managers",
     "MANAGER_NAME": "Name",
     "MANAGER_EMAIL": "Contact email",
@@ -156,5 +161,14 @@
     "DECRYPT": "Decrypt value",
     "DECRYPT_INPUT": "Input to be decrypted",
     "DECRYPT_OUTPUT": "Decrypted output"
+  },
+  "PAGINATOR": {
+    "ITEMS_PER_PAGE_LABEL": "Items per page: ",
+    "NEXT_PAGE_LABEL": "Next",
+    "PREVIOUS_PAGE_LABEL": "Previous",
+    "FIRST_PAGE_LABEL": "First",
+    "LAST_PAGE_LABEL": "Last",
+    "RANGE_PAGE_LABEL_1": "0 of {{length}}",
+    "RANGE_PAGE_LABEL_2": "{{startIndex}} - {{endIndex}} of {{length}}"
   }
 }

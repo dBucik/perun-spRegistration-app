@@ -11,9 +11,16 @@
         </encoder>
     </appender>
 
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <root level="info">
         <!-- PASSED FROM POM.XML / MAVEN BUILD PROPS -->
         <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </root>
 
     <!-- keep Spring quiet -->

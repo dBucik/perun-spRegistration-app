@@ -49,7 +49,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserAnimationsModule,
     MatDialogModule
   ],
-  providers: [],
+  providers: [ ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

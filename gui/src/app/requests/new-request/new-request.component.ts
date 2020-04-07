@@ -120,6 +120,7 @@ export class NewRequestComponent implements OnInit {
     this.selected = 'oidc';
 
     this.configService.getOidcApplicationItems().subscribe(items => {
+      items = items.map(category => category.map(item => new ApplicationItem(item)));
       this.applicationItemGroups = NewRequestComponent.sortItems(NewRequestComponent.filterItems(items));
       this.revealForm();
     });
@@ -130,6 +131,7 @@ export class NewRequestComponent implements OnInit {
     this.selected = 'saml';
 
     this.configService.getSamlApplicationItems().subscribe(items => {
+      items = items.map(category => category.map(item => new ApplicationItem(item)));
       this.applicationItemGroups = NewRequestComponent.sortItems(NewRequestComponent.filterItems(items));
       this.revealForm();
     });

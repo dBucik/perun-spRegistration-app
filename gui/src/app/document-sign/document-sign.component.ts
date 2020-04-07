@@ -33,7 +33,7 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
         this.hash = params.code;
         this.facilitiesService.getRequestDetailsWithHash(this.hash).subscribe(request => {
           this.facilitiesService.getFacilitySignature(request.facilityId).subscribe(facility => {
-            this.facility = facility;
+            this.facility = new Facility(facility);
             this.loading = false;
           }, error => {
             this.loading = false;

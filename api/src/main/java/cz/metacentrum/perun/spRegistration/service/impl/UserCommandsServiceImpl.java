@@ -419,6 +419,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		List<String> keptAttrs = getAttrsToKeep(isOidc);
 		List<PerunAttribute> filteredAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
 		Map<AttributeCategory, Map<String, PerunAttribute>> facilityAttributes = convertToStruct(filteredAttributes, appConfig);
+		facility.setAttributes(facilityAttributes);
 
 		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
@@ -448,12 +449,12 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Facility facility = getDetailedFacility(facilityId, userId, true);
-		if (facility == null || facility.getAttrs() == null) {
+		if (facility == null || facility.getAttributes() == null) {
 			log.error("Could not fetch facility for id: {}", facilityId);
 			throw new InternalErrorException("Could not fetch facility for id: " + facilityId);
 		}
 
-		facility.getAttrs()
+		facility.getAttributes()
 				.values()
 				.forEach(
 						attrsInCategory -> attrsInCategory.values()
@@ -874,7 +875,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		List<PerunAttribute> filteredAttributes = new ArrayList<>();
-		facility.getAttrs()
+		facility.getAttributes()
 				.values()
 				.forEach(
 						attrsInCategory -> attrsInCategory.values()

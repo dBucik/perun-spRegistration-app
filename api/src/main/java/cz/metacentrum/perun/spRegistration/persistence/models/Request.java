@@ -124,7 +124,7 @@ public class Request {
 	 * @return JSON with attributes.
 	 */
 	@JsonIgnore
-	public String getAttributesAsJsonForDb() {
+	public String getAttributesAsJsonForDb(AppConfig appConfig) {
 		if (this.attributes == null || this.attributes.isEmpty()) {
 			return "";
 		}
@@ -135,7 +135,10 @@ public class Request {
 			AttributeCategory category = categoryMapEntry.getKey();
 			Map<String, PerunAttribute> attributeMap = categoryMapEntry.getValue();
 			for (Map.Entry<String, PerunAttribute> a : attributeMap.entrySet()) {
-				obj.set(a.getKey(), a.getValue().toJsonForDb());
+				PerunAttributeDefinition def = appConfig.getAttrDefinition(a.getKey());
+				PerunAttribute attribute = a.getValue();
+				attribute.setDefinition(def);
+				obj.set(a.getKey(), attribute.toJsonForDb());
 			}
 			root.set(category.toString(), obj);
 		}

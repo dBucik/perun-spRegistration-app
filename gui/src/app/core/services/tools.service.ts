@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import {Observable, of} from 'rxjs';
-import {ApplicationItem} from '../models/ApplicationItem';
-import {PageConfig} from '../models/PageConfig';
 
 @Injectable({
   providedIn: 'root'

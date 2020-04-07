@@ -103,7 +103,7 @@ public class RequestMapper implements RowMapper<Request> {
 					PerunAttribute mappedAttribute = PerunAttribute.fromJsonOfDb(attrName, categoryJson.get(attrName),
 							definitionMap, attrInputMap);
 					if (mappedAttribute != null) {
-						mappedAttributesForCategory.put(key, mappedAttribute);
+						mappedAttributesForCategory.put(attrName, mappedAttribute);
 					}
 				}
 

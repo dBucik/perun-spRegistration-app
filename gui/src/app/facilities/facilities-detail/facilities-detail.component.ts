@@ -7,6 +7,10 @@ import { MatDialog } from '@angular/material/dialog';
 import {FacilitiesDetailDialogComponent} from './facilities-detail-dialog/facilities-detail-dialog.component';
 import {RequestsService} from '../../core/services/requests.service';
 import {Subscription} from 'rxjs';
+import {PerunAttribute} from "../../core/models/PerunAttribute";
+import {User} from "../../core/models/User";
+import {FacilityDetailItem} from "../../core/models/items/FacilityDetailItem";
+import {FacilityDetailUserItem} from "../../core/models/items/FacilityDetailUserItem";
 
 export interface DialogData {
   parent: FacilitiesDetailComponent;
@@ -32,14 +36,15 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
 
   displColumnsAttrs: string[] = ['fullname', 'value'];
   displColumnsAdmins: string[] = ['managerName', 'managerMail'];
-  facilityAttributes: any[];
-  facilityAdmins: any[];
+
+  facilityAttrsService: FacilityDetailItem[] = [];
+  facilityAttrsOrganization: FacilityDetailItem[] = [];
+  facilityAttrsProtocol: FacilityDetailItem[] = [];
+  facilityAttrsAccessControl: FacilityDetailItem[] = [];
+  facilityAdmins: FacilityDetailUserItem[] = [];
 
   loading = true;
-  loadingProtocol = false;
   facility: Facility;
-  samlDetails: any[];
-  oidcDetails: any[];
   moveToProductionActive = false;
 
   running = 0;
@@ -47,55 +52,44 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   isUserAdmin: boolean;
 
   private mapAttributes() {
-    this.facilityAttributes = [];
-      for (const urn of Object.keys(this.facility.attrs)) {
-        const item = this.facility.attrs[urn];
-        this.facilityAttributes.push(
-          {
-            'urn': urn,
-            'value': item.value,
-            'name': item.definition.displayName,
-            'description': item.definition.description,
-          }
-        );
-    }
+    this.facility.serviceAttrs().forEach((attr, urn) => {
+      this.facilityAttrsService.push(new FacilityDetailItem(urn, attr));
+    });
+
+    this.facility.organizationAttrs().forEach((attr, urn) => {
+      this.facilityAttrsOrganization.push(new FacilityDetailItem(urn, attr));
+    });
+
+    this.facility.protocolAttrs().forEach((attr, urn) => {
+      this.facilityAttrsProtocol.push(new FacilityDetailItem(urn, attr));
+    });
+
+    this.facility.accessControlAttrs().forEach((attr, urn) => {
+      this.facilityAttrsAccessControl.push(new FacilityDetailItem(urn, attr));
+    });
   }
 
   private mapAdmins() {
     this.facilityAdmins = [];
-    for (const user of this.facility.admins) {
-      this.facilityAdmins.push(
-        {
-          'name': user.fullName,
-          'email': user.email
-        }
-      );
-    }
+    this.facility.admins.forEach(user => {
+      this.facilityAdmins.push(new FacilityDetailUserItem(new User(user)));
+    });
   }
 
   ngOnInit() {
     this.sub = this.route.params.subscribe(params => {
       this.isUserAdmin = AppComponent.isApplicationAdmin();
-      this.facilitiesService.getFacility(params['id']).subscribe(facility => {
-        this.startMethod();
+      this.facilitiesService.getFacility(params['id']).subscribe((data) => {
+        this.facility = new Facility(data);
 
-        this.facility = facility;
         this.mapAttributes();
         this.mapAdmins();
 
-        if (facility.oidc) {
-          this.loadOidcDetails(params['id']);
+        if (this.facility.activeRequestId) {
+          console.log("here");
+          this.loadMoveToProductionActive(this.facility.activeRequestId);
         }
-
-        if (facility.saml) {
-          this.loadSamlDetails(params['id']);
-        }
-
-        if (facility.activeRequestId) {
-          this.loadMoveToProductionActive(facility.activeRequestId);
-        }
-
-        this.endMethod();
+        this.loading = false;
       }, error => {
         this.loading = false;
         console.log(error);
@@ -105,58 +99,9 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     this.isUserAdmin = AppComponent.isApplicationAdmin();
   }
 
-  endMethod(): void {
-    this.running--;
-    if (this.running === 0) {
-      this.loading = false;
-    }
-  }
-
-  loadOidcDetails(id: number) {
-    this.startLoadingProtocolDetails();
-    this.facilitiesService.getOidcDetails(id).subscribe(oidcDetails => {
-      this.oidcDetails = [];
-      for (const urn of Object.keys(oidcDetails)) {
-        const item = oidcDetails[urn];
-        this.oidcDetails.push(
-          {
-            'urn': urn,
-            'value': item.value,
-            'name': item.definition.displayName,
-            'description': item.definition.description,
-          }
-        );
-      }
-
-      this.endLoadingProtocolDetails();
-    });
-  }
-
-  loadSamlDetails(id: number) {
-    this.startLoadingProtocolDetails();
-    this.facilitiesService.getSamlDetails(id).subscribe(samlDetails => {
-      this.samlDetails = [];
-      for (const urn of Object.keys(samlDetails)) {
-        const item = samlDetails[urn];
-        this.samlDetails.push(
-          {
-            'urn': urn,
-            'value': item.value,
-            'name': item.definition.displayName,
-            'description': item.definition.description,
-          }
-        );
-      }
-
-      this.endLoadingProtocolDetails();
-    });
-  }
-
   loadMoveToProductionActive(activeRequestId: number) {
-    this.startMethod();
     this.requestsService.getRequest(activeRequestId).subscribe(request => {
       this.moveToProductionActive = (request.action === 'MOVE_TO_PRODUCTION');
-      this.endMethod();
     });
   }
 
@@ -187,11 +132,8 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   }
 
   regenerateClientSecret(): void {
-    this.startLoadingProtocolDetails();
 
     this.facilitiesService.regenerateClientSecret(this.facility.id).subscribe(next => {
-      this.loadOidcDetails(this.facility.id);
-      this.endLoadingProtocolDetails();
     });
   }
 
@@ -207,24 +149,6 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
       }
 
       return false;
-    }
-  }
-
-  private startMethod() {
-    this.loading = true;
-    this.running++;
-  }
-
-  private startLoadingProtocolDetails() {
-    this.loadingProtocol = true;
-    this.running++;
-  }
-
-  private endLoadingProtocolDetails() {
-    this.loadingProtocol = false;
-    this.running--;
-    if (this.running === 0) {
-      this.loading = false;
     }
   }
 }

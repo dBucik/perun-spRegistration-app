@@ -5,9 +5,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {TranslateService} from '@ngx-translate/core';
 import {ApplicationItemComponent} from '../../requests/new-request/application-item/application-item.component';
 import {ApplicationItem} from '../../core/models/ApplicationItem';
-import {PerunAttribute} from '../../core/models/PerunAttribute';
 import {FacilitiesService} from '../../core/services/facilities.service';
 import {Facility} from '../../core/models/Facility';
+import { UrnValuePair } from '../../core/models/UrnValuePair';
 
 @Component({
   selector: 'app-facilities-edit',
@@ -32,9 +32,14 @@ export class FacilitiesEditComponent implements OnInit {
   isFormVisible = false;
   isCardBodyVisible = false;
   loading = true;
-  snackBarDurationMs = 8000;
+  snackBarDurationMs = 5000;
 
   facility: Facility;
+
+  showServiceMore: boolean = false;
+  showOrganizationMore: boolean = false;
+  showProtocolMore: boolean = false;
+  showAccessControlMore: boolean = false;
 
   // translations
   errorText: string;
@@ -43,21 +48,10 @@ export class FacilitiesEditComponent implements OnInit {
   errorWronglyFilledItem: string;
   errorRequestAlreadyExists: string;
 
-  applicationItems: ApplicationItem[];
-
-
-  private static filterItems(items: ApplicationItem[]): ApplicationItem[] {
-
-    const filteredItems: ApplicationItem[] = [];
-
-    items.forEach(item => {
-      if (item.displayed) {
-        filteredItems.push(item);
-      }
-    });
-
-    return filteredItems;
-  }
+  serviceAttrs: ApplicationItem[] = [];
+  organizationAttrs: ApplicationItem[] = [];
+  protocolAttrs: ApplicationItem[] = [];
+  accessControlAttrs: ApplicationItem[] = [];
 
   ngOnInit() {
     this.translate.get('FACILITIES.NEW_VALUES_ERROR_MESSAGE')
@@ -79,11 +73,6 @@ export class FacilitiesEditComponent implements OnInit {
     this.isFormVisible = true;
   }
 
-  onLoading() {
-    this.loading = true;
-    this.isCardBodyVisible = false;
-  }
-
   submitRequest() {
     this.loading = true;
     if (this.facility.activeRequestId != null) {
@@ -91,13 +80,13 @@ export class FacilitiesEditComponent implements OnInit {
       return;
     }
 
-    const perunAttributes: PerunAttribute[] = [];
+    const perunAttributes: UrnValuePair[] = [];
 
     // set to false when one attribute has wrong value
     let allGood = true;
     this.items.forEach(i => {
       const attr = i.getAttribute();
-      const perunAttr = new PerunAttribute(attr.value, attr.urn);
+      const perunAttr = new UrnValuePair(attr.value, attr.urn);
       if (!i.hasCorrectValue()) {
         this.snackBar.open(this.errorWronglyFilledItem, null, {duration: 6000});
         allGood = false;
@@ -127,19 +116,10 @@ export class FacilitiesEditComponent implements OnInit {
   private getAttributes(): void {
     this.sub = this.route.params.subscribe(params => {
       this.facilityService.getFacilityWithInputs(params['id']).subscribe(facility => {
-        this.facility = facility;
-
-        this.applicationItems = [];
-        for (const [key, value] of Object.entries(this.facility.attrs)) {
-          value.input.oldValue = value.value;
-          value.input.comment = value.comment;
-          this.applicationItems.push(value.input);
-          value.input.isEdit = false;
-        }
-
-        this.applicationItems = FacilitiesEditComponent.filterItems(this.applicationItems);
+        this.facility = new Facility(facility);
+        this.pushInputs();
+        this.filterAndSortArrays();
         this.revealForm();
-
         this.loading = false;
       }, error => {
         this.loading = false;
@@ -147,5 +127,78 @@ export class FacilitiesEditComponent implements OnInit {
       });
     });
   }
+
+  private pushInputs() {
+    this.clearArrays();
+    this.facility.serviceAttrs().forEach((attr, _) => {
+      this.serviceAttrs.push(attr.input);
+    });
+
+    this.facility.organizationAttrs().forEach((attr, _) => {
+      this.organizationAttrs.push(attr.input);
+    });
+
+    this.facility.protocolAttrs().forEach((attr, _) => {
+      this.protocolAttrs.push(attr.input);
+    });
+
+    this.facility.accessControlAttrs().forEach((attr, _) => {
+      this.accessControlAttrs.push(attr.input);
+    });
+  }
+
+  private filterAndSortArrays() {
+    this.serviceAttrs = FacilitiesEditComponent.filterAndSort(this.serviceAttrs);
+    this.organizationAttrs = FacilitiesEditComponent.filterAndSort(this.organizationAttrs);
+    this.protocolAttrs = FacilitiesEditComponent.filterAndSort(this.protocolAttrs);
+    this.accessControlAttrs = FacilitiesEditComponent.filterAndSort(this.accessControlAttrs);
+  }
+
+  clearArrays(): void {
+    this.serviceAttrs = [];
+    this.organizationAttrs = [];
+    this.protocolAttrs = [];
+    this.accessControlAttrs = [];
+  }
+
+  private changeServiceShowMore() {
+    this.showServiceMore = !this.showServiceMore;
+    this.ngOnInit();
+  }
+
+  private changeOrganizationShowMore() {
+    this.showOrganizationMore = !this.showOrganizationMore;
+    this.ngOnInit();
+  }
+
+  private changeProtocolShowMore() {
+    this.showProtocolMore = !this.showProtocolMore;
+    this.ngOnInit();
+  }
+
+  private changeAccessShowMore() {
+    this.showAccessControlMore = !this.showAccessControlMore;
+    this.ngOnInit();
+  }
+
+  private static filterAndSort(items: ApplicationItem[]): ApplicationItem[] {
+    items = this.filterItems(items);
+    items = this.sortItems(items);
+    return items;
+  }
+
+  private static filterItems(items: ApplicationItem[]): ApplicationItem[] {
+    items.filter((item) => { return item.displayed });
+    return items
+  }
+
+  private static sortItems(items: ApplicationItem[]): ApplicationItem[] {
+    items.sort((a, b) => {
+      return a.displayPosition - b.displayPosition;
+    });
+
+    return items;
+  }
+
 }
 

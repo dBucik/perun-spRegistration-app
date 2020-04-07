@@ -3,6 +3,7 @@ export class Attribute {
     this.urn = urn;
     this.value = value;
   }
+
   urn: string;
   value: any;
 }

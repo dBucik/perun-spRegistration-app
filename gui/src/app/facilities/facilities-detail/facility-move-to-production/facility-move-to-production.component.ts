@@ -39,7 +39,7 @@ export class FacilityMoveToProductionComponent implements OnInit, OnDestroy {
         this.configService.isAuthoritiesEnabled().subscribe(response => {
           this.selectEmailsEnabled = response;
           this.specifyFromList = response;
-          this.facility = facility;
+          this.facility = new Facility(facility);
           this.emails = [];
           this.loading = false;
         });

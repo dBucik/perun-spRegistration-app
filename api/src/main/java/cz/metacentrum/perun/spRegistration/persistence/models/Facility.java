@@ -27,7 +27,7 @@ public class Facility extends PerunEntity {
 	private boolean testEnv;
 	private boolean editable = false;
 	private List<User> admins = new ArrayList<>();
-	private Map<AttributeCategory, Map<String, PerunAttribute>> attrs = new HashMap<>();
+	private Map<AttributeCategory, Map<String, PerunAttribute>> attributes = new HashMap<>();
 
 	public Facility(Long id) {
 		super(id);
@@ -103,12 +103,12 @@ public class Facility extends PerunEntity {
 		this.admins = admins;
 	}
 
-	public Map<AttributeCategory, Map<String, PerunAttribute>> getAttrs() {
-		return attrs;
+	public Map<AttributeCategory, Map<String, PerunAttribute>> getAttributes() {
+		return attributes;
 	}
 
-	public void setAttrs(Map<AttributeCategory, Map<String, PerunAttribute>> attrs) {
-		this.attrs = attrs;
+	public void setAttributes(Map<AttributeCategory, Map<String, PerunAttribute>> attributes) {
+		this.attributes = attributes;
 	}
 
 	/**
@@ -154,7 +154,7 @@ public class Facility extends PerunEntity {
 				", testEnv=" + testEnv +
 				", activeRequestId=" + activeRequestId +
 				", canEdit=" + editable +
-				", attrs=" + attrs +
+				", attrs=" + attributes +
 				'}';
 	}
 
@@ -168,11 +168,11 @@ public class Facility extends PerunEntity {
 				Objects.equals(name, facility.name) &&
 				Objects.equals(description, facility.description) &&
 				Objects.equals(activeRequestId, facility.activeRequestId) &&
-				Objects.equals(attrs, facility.attrs);
+				Objects.equals(attributes, facility.attributes);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, description, testEnv, activeRequestId, editable, attrs);
+		return Objects.hash(name, description, testEnv, activeRequestId, editable, attributes);
 	}
 }

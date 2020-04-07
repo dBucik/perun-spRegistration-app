@@ -53,7 +53,7 @@ export class AllFacilitiesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.facilitiesSubscription = this.facilitiesService.getAllFacilities().subscribe(facilities => {
       this.loading = false;
-      this.facilities = facilities;
+      this.facilities = facilities.map(f => new Facility(f));
       this.dataSource = new MatTableDataSource<Facility>(facilities);
     }, error => {
       this.loading = false;
