@@ -8,6 +8,7 @@ export class RequestDetailItem {
     this.comment = attr.comment;
     this.name = attr.definition.displayName;
     this.description = attr.definition.description;
+    this.position = attr.input.displayPosition;
   }
 
   urn: string;
@@ -16,4 +17,5 @@ export class RequestDetailItem {
   name: string;
   comment: string;
   description: string;
-};
+  position: number;
+}

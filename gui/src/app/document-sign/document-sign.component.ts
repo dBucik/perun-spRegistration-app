@@ -5,6 +5,9 @@ import {Subscription} from 'rxjs';
 import {Facility} from '../core/models/Facility';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {TranslateService} from '@ngx-translate/core';
+import {FacilityDetailItem} from "../core/models/items/FacilityDetailItem";
+import {FacilityDetailUserItem} from "../core/models/items/FacilityDetailUserItem";
+import {User} from "../core/models/User";
 
 @Component({
   selector: 'app-document-sign',
@@ -12,7 +15,6 @@ import {TranslateService} from '@ngx-translate/core';
   styleUrls: ['./document-sign.component.scss']
 })
 export class DocumentSignComponent implements OnInit, OnDestroy {
-
   constructor(
     private route: ActivatedRoute,
     private facilitiesService: FacilitiesService,
@@ -22,10 +24,17 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
   ) {}
 
   private sub: Subscription;
-  loading = true;
 
+  loading = true;
   private hash: string;
+
   private facility: Facility;
+  facilityAttrsService: FacilityDetailItem[] = [];
+  facilityAttrsOrganization: FacilityDetailItem[] = [];
+  facilityAdmins: FacilityDetailUserItem[] = [];
+
+  displColumnsAttrs: string[] = ['fullname', 'value'];
+  displColumnsAdmins: string[] = ['managerName', 'managerMail'];
 
   ngOnInit() {
     this.sub = this.route.queryParams.subscribe(params => {
@@ -34,6 +43,8 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
         this.facilitiesService.getRequestDetailsWithHash(this.hash).subscribe(request => {
           this.facilitiesService.getFacilitySignature(request.facilityId).subscribe(facility => {
             this.facility = new Facility(facility);
+            this.mapAttributes();
+            this.mapAdmins();
             this.loading = false;
           }, error => {
             this.loading = false;
@@ -43,6 +54,22 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
       } else {
         this.router.navigate(['/notFound']);
       }
+    });
+  }
+
+  private mapAttributes() {
+    this.facility.serviceAttrs().forEach((attr, urn) => {
+      this.facilityAttrsService.push(new FacilityDetailItem(urn, attr));
+    });
+
+    this.facility.organizationAttrs().forEach((attr, urn) => {
+      this.facilityAttrsOrganization.push(new FacilityDetailItem(urn, attr));
+    });
+  }
+
+  private mapAdmins() {
+    this.facility.admins.forEach(user => {
+      this.facilityAdmins.push(new FacilityDetailUserItem(new User(user)));
     });
   }
 
@@ -66,6 +93,21 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
         this.router.navigate(['/auth']);
       });
     });
+  }
+
+  isUndefined(value) {
+    // TODO: extract to one common method, also used in request-detail
+    if (value === undefined || value === null) {
+      return true;
+    } else {
+      if (value instanceof Array || value instanceof String) {
+        return value.length === 0;
+      } else if (value instanceof Object) {
+        return value.constructor === Object && Object.entries(value).length === 0;
+      }
+
+      return false;
+    }
   }
 
 }

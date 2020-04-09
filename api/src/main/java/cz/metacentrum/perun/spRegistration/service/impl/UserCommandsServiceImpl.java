@@ -425,11 +425,11 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		facility.setTestEnv(inTest);
 
 		Map<String, PerunAttribute> protocolAttrs = perunConnector.getFacilityAttributes(facilityId, Arrays.asList(
-				appConfig.getIsOidcAttributeName(), appConfig.getIsSamlAttributeName()));
+				appConfig.getIsOidcAttributeName(), appConfig.getIsSamlAttributeName(), appConfig.getMasterProxyIdentifierAttribute()));
 		facility.setOidc(protocolAttrs.get(appConfig.getIsOidcAttributeName()).valueAsBoolean());
 		facility.setSaml(protocolAttrs.get(appConfig.getIsSamlAttributeName()).valueAsBoolean());
 
-		PerunAttribute proxyAttrs = perunConnector.getFacilityAttribute(facilityId, appConfig.getMasterProxyIdentifierAttribute());
+		PerunAttribute proxyAttrs = protocolAttrs.get(appConfig.getMasterProxyIdentifierAttribute());
 		boolean canBeEdited = appConfig.getMasterProxyIdentifierAttributeValue().equals(proxyAttrs.valueAsString());
 		facility.setEditable(canBeEdited);
 
@@ -1051,6 +1051,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		if (!filteredAttributes.isEmpty()) {
 			for (PerunAttribute attribute : filteredAttributes) {
 				AttributeCategory category = appConfig.getAttrCategory(attribute.getFullName());
+				attribute.setInput(config.getInputMap().get(attribute.getFullName()));
 				map.get(category).put(attribute.getFullName(), attribute);
 			}
 		}

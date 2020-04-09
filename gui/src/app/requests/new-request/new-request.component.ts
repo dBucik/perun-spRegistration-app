@@ -21,7 +21,8 @@ export class NewRequestComponent implements OnInit {
     private requestsService: RequestsService,
     private snackBar: MatSnackBar,
     private translate: TranslateService,
-    private router: Router) { }
+    private router: Router
+  ) { }
 
   @ViewChildren(RequestCreationStepComponent)
   steps: QueryList<RequestCreationStepComponent>;
@@ -80,7 +81,6 @@ export class NewRequestComponent implements OnInit {
       })));
     });
 
-    console.log(sortedItems);
     return sortedItems;
   }
 

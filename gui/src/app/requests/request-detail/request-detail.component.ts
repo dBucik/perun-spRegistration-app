@@ -12,6 +12,7 @@ import {AppComponent} from "../../app.component";
 import {RequestSignature} from "../../core/models/RequestSignature";
 import {RequestDetailDialogComponent} from "./request-detail-dialog/request-detail-dialog.component";
 import {RequestDetailItem} from "../../core/models/items/RequestDetailItem";
+import {FacilityDetailItem} from "../../core/models/items/FacilityDetailItem";
 
 export interface DialogData {
   isApprove: boolean;
@@ -38,7 +39,6 @@ export class RequestDetailComponent implements OnInit, DoCheck {
   }
 
   private sub: Subscription;
-  //TODO edit datatype
   requestAttrsService: RequestDetailItem[] = [];
   requestAttrsOrganization: RequestDetailItem[] = [];
   requestAttrsProtocol: RequestDetailItem[] = [];
@@ -76,6 +76,11 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     this.request.accessControlAttrs().forEach((attr, urn) => {
       this.requestAttrsAccessControl.push(new RequestDetailItem(attr));
     });
+
+    this.requestAttrsService = RequestDetailComponent.sortItems(this.requestAttrsService);
+    this.requestAttrsOrganization = RequestDetailComponent.sortItems(this.requestAttrsOrganization);
+    this.requestAttrsProtocol = RequestDetailComponent.sortItems(this.requestAttrsProtocol);
+    this.requestAttrsAccessControl = RequestDetailComponent.sortItems(this.requestAttrsAccessControl);
   }
 
   ngOnInit() {
@@ -236,6 +241,14 @@ export class RequestDetailComponent implements OnInit, DoCheck {
 
   changeArrow(){
     this.icon = !this.icon;
+  }
+
+  private static sortItems(items: RequestDetailItem[]): RequestDetailItem[] {
+    items.sort((a, b) => {
+      return a.position - b.position;
+    });
+
+    return items;
   }
 
 }

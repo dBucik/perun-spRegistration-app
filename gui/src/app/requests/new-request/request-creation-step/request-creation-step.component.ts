@@ -43,7 +43,6 @@ export class RequestCreationStepComponent implements OnInit {
   }
 
   private attributesHasCorrectValues(): boolean {
-
     const attributeItems = this.items.toArray();
 
     for (const i of attributeItems) {

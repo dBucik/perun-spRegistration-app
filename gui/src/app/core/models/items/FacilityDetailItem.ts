@@ -7,10 +7,16 @@ export class FacilityDetailItem {
     this.value = attr.value;
     this.name = attr.definition.displayName;
     this.description = attr.definition.description;
+    if (attr.input) {
+      this.position = attr.input.displayPosition;
+    } else {
+      this.position = 0;
+    }
   }
 
   urn: string;
   value: any;
   name: string;
   description: string;
+  position: number;
 }

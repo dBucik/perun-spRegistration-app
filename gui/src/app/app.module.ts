@@ -17,6 +17,8 @@ import {PerunHeaderComponent} from './perun-header/perun-header.component';
 import {PerunFooterCstComponent} from './perun-footer-cst/perun-footer-cst.component';
 import {ToolsComponent} from './tools/tools.component';
 import {MatDialogModule} from '@angular/material/dialog';
+import {MatTabsModule} from '@angular/material/tabs';
+import {AttributeValuePipe} from './attribute-value.pipe';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -29,27 +31,29 @@ export function HttpLoaderFactory(http: HttpClient) {
     DocumentSignComponent,
     PerunFooterCstComponent,
     PerunHeaderComponent,
-    ToolsComponent
+    ToolsComponent,
+    AttributeValuePipe
   ],
   imports: [
-    AppRoutingModule,
-    BrowserModule,
-    CoreModule,
-    FacilitiesModule,
-    HttpClientModule,
-    MainMenuModule,
-    SharedModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
-    }),
-    BrowserAnimationsModule,
-    MatDialogModule
+      AppRoutingModule,
+      BrowserModule,
+      CoreModule,
+      FacilitiesModule,
+      HttpClientModule,
+      MainMenuModule,
+      SharedModule,
+      TranslateModule.forRoot({
+          loader: {
+              provide: TranslateLoader,
+              useFactory: HttpLoaderFactory,
+              deps: [HttpClient]
+          }
+      }),
+      BrowserAnimationsModule,
+      MatDialogModule,
+      MatTabsModule
   ],
   providers: [ ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

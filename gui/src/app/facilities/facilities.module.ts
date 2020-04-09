@@ -40,7 +40,6 @@ import { PaginatorI18n } from '../core/parts/paginatorI18n';
     FacilityAddAdminComponent,
     FacilityAddAdminSignComponent,
     AllFacilitiesComponent,
-    FacilityAttributeValuePipe,
     FacilityEnvironmentPipe,
     FacilityProtocolPipe
   ],

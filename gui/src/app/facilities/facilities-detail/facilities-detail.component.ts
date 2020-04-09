@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FacilitiesService} from '../../core/services/facilities.service';
 import {Facility} from '../../core/models/Facility';
@@ -68,6 +68,11 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     this.facility.accessControlAttrs().forEach((attr, urn) => {
       this.facilityAttrsAccessControl.push(new FacilityDetailItem(urn, attr));
     });
+
+    this.facilityAttrsService = FacilitiesDetailComponent.sortItems(this.facilityAttrsService);
+    this.facilityAttrsOrganization = FacilitiesDetailComponent.sortItems(this.facilityAttrsOrganization);
+    this.facilityAttrsProtocol = FacilitiesDetailComponent.sortItems(this.facilityAttrsProtocol);
+    this.facilityAttrsAccessControl = FacilitiesDetailComponent.sortItems(this.facilityAttrsAccessControl);
   }
 
   private mapAdmins() {
@@ -161,5 +166,13 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
 
       return false;
     }
+  }
+
+  private static sortItems(items: FacilityDetailItem[]): FacilityDetailItem[] {
+    items.sort((a, b) => {
+      return a.position - b.position;
+    });
+
+    return items;
   }
 }
