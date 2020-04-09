@@ -11,8 +11,8 @@ public enum AttributeCategory {
     public String toString() {
         switch (this) {
             case SERVICE: return "SERVICE";
-            case PROTOCOL: return "ORGANIZATION";
-            case ORGANIZATION: return "PROTOCOL";
+            case PROTOCOL: return "PROTOCOL";
+            case ORGANIZATION: return "ORGANIZATION";
             case ACCESS_CONTROL: return "ACCESS_CONTROL";
             default: throw new IllegalStateException("Unrecognized enum value");
         }
@@ -24,8 +24,8 @@ public enum AttributeCategory {
         }
         switch (s.toUpperCase()) {
             case "SERVICE": return SERVICE;
-            case "PROTOCOL": return ORGANIZATION;
-            case "ORGANIZATION": return PROTOCOL;
+            case "PROTOCOL": return PROTOCOL;
+            case "ORGANIZATION": return ORGANIZATION;
             case "ACCESS_CONTROL": return ACCESS_CONTROL;
             default: return null;
         }

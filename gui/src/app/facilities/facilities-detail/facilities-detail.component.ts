@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FacilitiesService} from '../../core/services/facilities.service';
 import {Facility} from '../../core/models/Facility';
@@ -44,6 +44,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   facilityAdmins: FacilityDetailUserItem[] = [];
 
   loading = true;
+  loadingProtocol = false;
   facility: Facility;
   moveToProductionActive = false;
 
@@ -86,7 +87,6 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
         this.mapAdmins();
 
         if (this.facility.activeRequestId) {
-          console.log("here");
           this.loadMoveToProductionActive(this.facility.activeRequestId);
         }
         this.loading = false;
@@ -132,8 +132,19 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   }
 
   regenerateClientSecret(): void {
-
-    this.facilitiesService.regenerateClientSecret(this.facility.id).subscribe(next => {
+    this.loadingProtocol = true;
+    this.facilitiesService.regenerateClientSecret(this.facility.id).subscribe(data => {
+      const attr = new PerunAttribute(data)
+      let index = -1;
+      this.facilityAttrsProtocol.forEach(pair => {
+        if (pair.urn === attr.fullName) {
+          index = this.facilityAttrsProtocol.indexOf(pair);
+        }
+      });
+      if (index != -1) {
+        this.facilityAttrsProtocol[index] = new FacilityDetailItem(attr.fullName, attr);
+      }
+      this.loadingProtocol = false;
     });
   }
 

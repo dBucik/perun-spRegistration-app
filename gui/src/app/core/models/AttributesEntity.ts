@@ -4,7 +4,7 @@ export class AttributesEntity {
   constructor(attributes: any) {
     if (attributes) {
       if (attributes.hasOwnProperty('SERVICE')) {
-        AttributesEntity.setToMap(attributes['SERVICE'], this.serviceAttrs);
+        AttributesEntity.setToMap(attributes['SERVICE'], this.service);
       }
       if (attributes.hasOwnProperty('ORGANIZATION')) {
         AttributesEntity.setToMap(attributes['ORGANIZATION'], this.organization);
@@ -30,7 +30,7 @@ export class AttributesEntity {
   accessControl: Map<string, PerunAttribute> = new Map<string, PerunAttribute>();
 
   public serviceAttrs(): Map<string, PerunAttribute> {
-    return this.serviceAttrs;
+    return this.service;
   }
 
   public organizationAttrs(): Map<string, PerunAttribute> {

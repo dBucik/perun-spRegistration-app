@@ -909,6 +909,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 					.map(AttrInput::getName)
 					.collect(Collectors.toList())
 			);
+			keptAttrs.add(appConfig.getClientIdAttribute());
+			keptAttrs.add(appConfig.getClientSecretAttribute());
 		} else {
 			keptAttrs.addAll(config.getSamlInputs()
 					.stream()

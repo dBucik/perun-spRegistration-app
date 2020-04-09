@@ -235,7 +235,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(masterProxyIdentifierAttribute);
 		perunAttributeDefinitionsMap.put(masterProxyIdentifierAttribute, def);
-		attributeCategoryMap.put(masterProxyIdentifierAttribute, AttributeCategory.SERVICE);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.SERVICE);
 	}
 
 	public String getProxyIdentifierAttribute() {
@@ -247,7 +247,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(proxyIdentifierAttribute);
 		perunAttributeDefinitionsMap.put(proxyIdentifierAttribute, def);
-		attributeCategoryMap.put(masterProxyIdentifierAttribute, AttributeCategory.SERVICE);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.SERVICE);
 	}
 
 	public String getIsTestSpAttribute() {
@@ -259,7 +259,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(isTestSpAttribute);
 		perunAttributeDefinitionsMap.put(isTestSpAttribute, def);
-		attributeCategoryMap.put(masterProxyIdentifierAttribute, AttributeCategory.SERVICE);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.SERVICE);
 	}
 
 	public String getShowOnServicesListAttributeName() {
@@ -271,7 +271,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(showOnServicesListAttributeName);
 		perunAttributeDefinitionsMap.put(showOnServicesListAttributeName, def);
-		attributeCategoryMap.put(masterProxyIdentifierAttribute, AttributeCategory.SERVICE);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.SERVICE);
 	}
 
 	public String getAdminsAttributeName() {
@@ -307,7 +307,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(clientIdAttribute);
 		perunAttributeDefinitionsMap.put(clientIdAttribute, def);
-		attributeCategoryMap.put(masterProxyIdentifierAttribute, AttributeCategory.PROTOCOL);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.PROTOCOL);
 	}
 
 	public String getClientSecretAttribute() {
@@ -319,7 +319,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(clientSecretAttribute);
 		perunAttributeDefinitionsMap.put(clientSecretAttribute, def);
-		attributeCategoryMap.put(masterProxyIdentifierAttribute, AttributeCategory.PROTOCOL);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.PROTOCOL);
 	}
 
 	public String getIsSamlAttributeName() {
@@ -331,7 +331,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(isSamlAttributeName);
 		perunAttributeDefinitionsMap.put(isSamlAttributeName, def);
-		attributeCategoryMap.put(masterProxyIdentifierAttribute, AttributeCategory.PROTOCOL);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.PROTOCOL);
 	}
 
 	public String getIsOidcAttributeName() {
@@ -343,7 +343,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(isOidcAttributeName);
 		perunAttributeDefinitionsMap.put(isOidcAttributeName, def);
-		attributeCategoryMap.put(masterProxyIdentifierAttribute, AttributeCategory.PROTOCOL);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.PROTOCOL);
 	}
 
 	public String getMasterProxyIdentifierAttributeValue() {
