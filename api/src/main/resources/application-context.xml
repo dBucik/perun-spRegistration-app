@@ -13,7 +13,8 @@
     <context:property-placeholder properties-ref="facilitySamlAttributes" order="3" ignore-unresolvable="true"/>
     <context:property-placeholder properties-ref="facilityOidcAttributes" order="4" ignore-unresolvable="true"/>
     <context:property-placeholder properties-ref="facilityOrganizationAttributes" order="5" ignore-unresolvable="true"/>
-    <context:property-placeholder properties-ref="facilityAccessControlAttributes" order="6" />
+    <context:property-placeholder properties-ref="facilityAccessControlAttributes" order="6" ignore-unresolvable="true"/>
+    <context:property-placeholder properties-ref="messagesProperties" order="7" null-value="@null" />
 
     <tx:annotation-driven proxy-target-class="true" />
 
@@ -52,7 +53,6 @@
                 <prop key="approval.confirmationPeriod.days">30</prop>
                 <prop key="approval.confirmationPeriod.hours">0</prop>
                 <prop key="approval.allowToSpecifyOwn">true</prop>
-                <prop key="approval.defaultAuthorities.mails">mail1@there.com,mail2@there.com</prop>
                 <!-- APP FRONTEND ADDITIONS -->
                 <prop key="app.footer.html"/> <!-- TODO: move to frontend config -->
                 <prop key="app.header.html"/> <!-- TODO: move to frontend config -->
@@ -84,35 +84,49 @@
     <bean id="messagesProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
-                <prop key="appAdmin.emails">appAdminIds@test.com,adminsMailingList@test.com</prop>
-                <prop key="host">localhost</prop>
-                <prop key="from">test@mail.com</prop>
-                <prop key="footer">&lt;br/&gt; &lt;br/&gt;Best regards, &lt;br/&gt; test.mail.com &lt;br/&gt; service registration</prop>
-                <prop key="moveToProduction.authorities">${approval.defaultAuthorities.mails}</prop>
+                <prop key="mail.host">localhost</prop>
+                <prop key="mail.port">25</prop>
+                <prop key="mail.protocol">smtp</prop>
 
-                <prop key="create.user.subject">Created a new request %REQUEST_ID%</prop>
-                <prop key="create.user.message">Your request for action %ACTION% and service %SERVICE_NAME% has been created. Assigned ID: %REQUEST_ID%</prop>
-                <prop key="create.admin.subject">Created a new request %REQUEST_ID%</prop>
-                <prop key="create.admin.message">A new request for action %ACTION% and service %SERVICE_NAME% has been created. Assigned ID: %REQUEST_ID%</prop>
+                <prop key="mail.auth.username">@null</prop>
+                <prop key="mail.auth.password">@null</prop>
 
-                <prop key="update.user.subject">Request %REQUEST_ID% updated</prop>
-                <prop key="update.user.message">Request %REQUEST_ID% updated</prop>
-                <prop key="update.admin.subject">Request %REQUEST_ID% updated</prop>
-                <prop key="update.admin.message">Request %REQUEST_ID% updated</prop>
+                <prop key="mail.smtp.auth">false</prop>
+                <prop key="mail.smtp.starttls.enable">false</prop>
+                <prop key="mail.smtp.connectiontimeout">3000</prop>
+                <prop key="mail.smtp.timeout">5000</prop>
+                <prop key="mail.smtp.writetimeout">3000</prop>
+                <prop key="mail.debug">false</prop>
 
-                <prop key="status_updated.user.subject">Updated status of request %REQUEST_ID%</prop>
-                <prop key="status_updated.user.message">Status has been updated to %NEW_STATUS%</prop>
+                <prop key="mail.app.admins.mails">appAdminIds@test.com,adminsMailingList@test.com</prop>
+                <prop key="mail.approval.default-authorities.mails">mail1@there.com,mail2@there.com</prop>
+                <prop key="mail.from">test@mail.com</prop>
+                <prop key="mail.subject.prefix">CESNET AAI - </prop>
+                <prop key="mail.footer">&lt;br/&gt; &lt;br/&gt;Best regards, &lt;br/&gt; test.mail.com &lt;br/&gt; service registration</prop>
 
-                <prop key="signed.user.subject">Request %REQUEST_ID% signed</prop>
-                <prop key="signed.user.message">Request %REQUEST_ID% signed</prop>
-                <prop key="signed.admin.subject">Request %REQUEST_ID% signed</prop>
-                <prop key="signed.admin.message">Request %REQUEST_ID% signed</prop>
+                <prop key="create.user.subject.en">Created a new request %REQUEST_ID%</prop>
+                <prop key="create.user.message.en">Your request for action %ACTION% and service %SERVICE_NAME% has been created. Assigned ID: %REQUEST_ID%</prop>
+                <prop key="create.admin.subject.en">Created a new request %REQUEST_ID%</prop>
+                <prop key="create.admin.message.en">A new request for action %ACTION% and service %SERVICE_NAME% has been created. Assigned ID: %REQUEST_ID%</prop>
 
-                <prop key="production.authorities.subject">Approve transfer to production: %SERVICE_NAME%</prop>
-                <prop key="production.authorities.message">For an approval of moving service %SERVICE_NAME% to production visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
+                <prop key="update.user.subject.en">Request %REQUEST_ID% updated</prop>
+                <prop key="update.user.message.en">Request %REQUEST_ID% updated</prop>
+                <prop key="update.admin.subject.en">Request %REQUEST_ID% updated</prop>
+                <prop key="update.admin.message.en">Request %REQUEST_ID% updated</prop>
 
-                <prop key="admins.add.subject">Approve request to become admin: %SERVICE_NAME%</prop>
-                <prop key="admins.add.message">For approval of becoming admin of %SERVICE_NAME% visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
+                <prop key="status_updated.user.subject.en">Updated status of request %REQUEST_ID%</prop>
+                <prop key="status_updated.user.message.en">Status has been updated to %NEW_STATUS%</prop>
+
+                <prop key="signed.user.subject.en">Request %REQUEST_ID% signed</prop>
+                <prop key="signed.user.message.en">Request %REQUEST_ID% signed</prop>
+                <prop key="signed.admin.subject.en">Request %REQUEST_ID% signed</prop>
+                <prop key="signed.admin.message.en">Request %REQUEST_ID% signed</prop>
+
+                <prop key="production.authorities.subject.en">Approve transfer to production: %SERVICE_NAME%</prop>
+                <prop key="production.authorities.message.en">For an approval of moving service %SERVICE_NAME% to production visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
+
+                <prop key="admins.add.subject.en">Approve request to become admin: %SERVICE_NAME%</prop>
+                <prop key="admins.add.message.en">For approval of becoming admin of %SERVICE_NAME% visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
             </props>
         </property>
         <property name="locations">

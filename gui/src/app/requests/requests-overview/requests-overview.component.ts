@@ -4,7 +4,7 @@ import { RequestsService } from '../../core/services/requests.service';
 import { Subscription } from 'rxjs';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import {MatPaginator} from '@angular/material/paginator';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-requests-overview',
@@ -54,7 +54,7 @@ export class RequestsOverviewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.requestsSubscription = this.requestsService.getUserRequests().subscribe(requests => {
       this.loading = false;
-      this.requests = requests;
+      this.requests = requests.map(r => new Request(r));
       this.dataSource = new MatTableDataSource<Request>(requests);
     }, error => {
       this.loading = false;
@@ -69,4 +69,5 @@ export class RequestsOverviewComponent implements OnInit, OnDestroy {
   doFilter = (value: string) => {
     this.dataSource.filter = value.trim().toLocaleLowerCase();
   }
+
 }

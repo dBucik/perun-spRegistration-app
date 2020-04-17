@@ -1,7 +1,9 @@
 package cz.metacentrum.perun.spRegistration.persistence.configs;
 
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -27,6 +29,7 @@ public class AppConfig {
 	private Set<Long> appAdminIds;
 	private String loginExtSource;
 	private Map<String, PerunAttributeDefinition> perunAttributeDefinitionsMap = new HashMap<>();
+	private Map<String, AttributeCategory> attributeCategoryMap = new HashMap<>();
 	private String[] protocolsEnabled = new String[] {};
 	private List<String> availableLanguages = new ArrayList<>();
 	private PerunConnector perunConnector;
@@ -213,6 +216,14 @@ public class AppConfig {
 		this.adminsEndpoint = adminsEndpoint;
 	}
 
+	public Map<String, AttributeCategory> getAttributeCategoryMap() {
+		return attributeCategoryMap;
+	}
+
+	public void setAttributeCategoryMap(Map<String, AttributeCategory> attributeCategoryMap) {
+		this.attributeCategoryMap = attributeCategoryMap;
+	}
+
 	// ATTRIBUTES
 
 	public String getMasterProxyIdentifierAttribute() {
@@ -224,6 +235,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(masterProxyIdentifierAttribute);
 		perunAttributeDefinitionsMap.put(masterProxyIdentifierAttribute, def);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.SERVICE);
 	}
 
 	public String getProxyIdentifierAttribute() {
@@ -235,6 +247,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(proxyIdentifierAttribute);
 		perunAttributeDefinitionsMap.put(proxyIdentifierAttribute, def);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.SERVICE);
 	}
 
 	public String getIsTestSpAttribute() {
@@ -246,6 +259,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(isTestSpAttribute);
 		perunAttributeDefinitionsMap.put(isTestSpAttribute, def);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.SERVICE);
 	}
 
 	public String getShowOnServicesListAttributeName() {
@@ -257,6 +271,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(showOnServicesListAttributeName);
 		perunAttributeDefinitionsMap.put(showOnServicesListAttributeName, def);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.SERVICE);
 	}
 
 	public String getAdminsAttributeName() {
@@ -292,6 +307,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(clientIdAttribute);
 		perunAttributeDefinitionsMap.put(clientIdAttribute, def);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.PROTOCOL);
 	}
 
 	public String getClientSecretAttribute() {
@@ -303,6 +319,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(clientSecretAttribute);
 		perunAttributeDefinitionsMap.put(clientSecretAttribute, def);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.PROTOCOL);
 	}
 
 	public String getIsSamlAttributeName() {
@@ -314,6 +331,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(isSamlAttributeName);
 		perunAttributeDefinitionsMap.put(isSamlAttributeName, def);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.PROTOCOL);
 	}
 
 	public String getIsOidcAttributeName() {
@@ -325,6 +343,7 @@ public class AppConfig {
 
 		PerunAttributeDefinition def = perunConnector.getAttributeDefinition(isOidcAttributeName);
 		perunAttributeDefinitionsMap.put(isOidcAttributeName, def);
+		attributeCategoryMap.put(def.getFullName(), AttributeCategory.PROTOCOL);
 	}
 
 	public String getMasterProxyIdentifierAttributeValue() {
@@ -392,4 +411,35 @@ public class AppConfig {
 		return s.substring(0, 32);
 	}
 
+	public Map<AttributeCategory, Map<String, PerunAttribute>> filterInvalidAttributes(Map<AttributeCategory, Map<String, PerunAttribute>> attributes) {
+		if (attributes == null) {
+			return null;
+		} else if (attributes.isEmpty()) {
+			return attributes;
+		}
+
+		Map<AttributeCategory, Map<String, PerunAttribute>> valid = new HashMap<>();
+		for (Map.Entry<AttributeCategory, Map<String, PerunAttribute>> categoryMapEntry : attributes.entrySet()) {
+			AttributeCategory category = categoryMapEntry.getKey();
+			Map<String, PerunAttribute> attributeMap = categoryMapEntry.getValue();
+			Map<String, PerunAttribute> validInCategory = new HashMap<>();
+			for (String attrName : attributeMap.keySet()) {
+				if (perunAttributeDefinitionsMap.containsKey(attrName)) {
+					validInCategory.put(attrName, attributeMap.get(attrName));
+				}
+			}
+			valid.put(category, validInCategory);
+		}
+
+		return valid;
+
+	}
+
+	public AttributeCategory getAttrCategory(String fullName) {
+		if (fullName == null) {
+			throw new IllegalArgumentException("Full name cannot be null");
+		}
+
+		return attributeCategoryMap.get(fullName);
+	}
 }

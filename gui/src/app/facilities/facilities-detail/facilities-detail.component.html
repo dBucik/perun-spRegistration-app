@@ -1,20 +1,28 @@
 <div class="container-fluid pt-5">
   <mat-spinner class="ml-auto mr-auto" *ngIf="loading" color=""></mat-spinner>
-  <div *ngIf="!loading" class="card mb-4 shadow-sm">
-    <div class="card-body p-3 p-lg-5">
+  <div *ngIf="!loading" class="row mb-4 p-lg-5 p-4 border-dark shadow">
+    <div class="col">
       <div class="row">
-        <div class="col-sm-9">
+        <!-- PAGE TITLE -->
+        <div class="col-md-8">
           <h2 class="card-title">
             {{'FACILITIES.DETAIL_TITLE' | translate}}{{facility.id}} - {{facility.name}}
           </h2>
-          <p>{{'FACILITIES.DESCRIPTION' | translate}}: {{facility.description}}</p>
+          <p>{{facility.description}}</p>
         </div>
-        <div class="col-sm-3 mt-4 controls text-right">
+        <!-- BUTTONS -->
+        <div class="col-md-4 mt-4 mb-2 controls text-right">
           <ng-container *ngIf="moveToProductionActive || facility.activeRequestId">
             <p>{{'FACILITIES.ACTIVE_REQUEST_WARNING' | translate}}</p>
             <button class="btn-block mb-1" mat-raised-button color="accent"
                     [routerLink]="['/auth/requests/detail', facility.activeRequestId]">
               {{'FACILITIES.SEE_ACTIVE_REQUEST' | translate}}
+            </button>
+          </ng-container>
+          <ng-container *ngIf="facility.editable && !facility.activeRequestId">
+            <button class="btn-block mb-1" mat-raised-button color="accent"
+                    [routerLink]="['/auth/facilities/edit', facility.id]">
+              {{'FACILITIES.EDIT_FACILITY' | translate}}
             </button>
           </ng-container>
           <ng-container *ngIf="facility.editable && !facility.activeRequestId">
@@ -28,19 +36,15 @@
           </ng-container>
         </div>
       </div>
-
-      <div class="row mt-3">
-        <mat-tab-group class="p-1">
-          <mat-tab label="{{ 'FACILITIES.ATTRIBUTES' | translate }}">
-            <div class="col-sm-12 text-right mb-2" *ngIf="facility.editable && !facility.activeRequestId">
-              <button class="col-md-3 col-sm-6 mt-3 mr-0" mat-raised-button color="accent"
-                      [routerLink]="['/auth/facilities/edit', facility.id]">
-                {{'FACILITIES.EDIT_FACILITY' | translate}}
-              </button>
-            </div>
-            <table mat-table [dataSource]="facilityAttributes" class="w-100">
-              <ng-container matColumnDef="fullname" class="mr-5">
-                <th mat-header-cell class="w-25" *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
+    </div>
+    <div class="w-100"><!-- SPACER --></div>
+    <!-- ATTRIBUTES -->
+    <div class="col mt-3">
+        <mat-tab-group class="pb-3">
+          <mat-tab label="{{ 'COMMON.ATTRIBUTES.SERVICE' | translate }}">
+            <table mat-table [dataSource]="facilityAttrsService" class="w-100">
+              <ng-container matColumnDef="fullname">
+                <th mat-header-cell *matHeaderCellDef class="w-25">{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
                 <td mat-cell *matCellDef="let item" class="font-thick">
                   {{item.name}}
                   <span>
@@ -49,7 +53,7 @@
                 </td>
               </ng-container>
               <ng-container matColumnDef="value">
-                <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
+                <th mat-header-cell *matHeaderCellDef class="w-75">{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
                 <td mat-cell *matCellDef="let item">
                   <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
                     {{'UNDEFINED' | translate}}
@@ -65,61 +69,97 @@
             </table>
           </mat-tab>
 
-          <mat-tab *ngIf="facility.oidc" label="OIDC">
-            <mat-spinner class="ml-auto mr-auto" *ngIf="loadingProtocol"></mat-spinner>
-            <ng-container *ngIf="!loadingProtocol">
-              <div class="col-sm-12 text-right mb-2">
-                <button class="col-md-3 col-sm-6 mt-3 mr-0" mat-raised-button color="accent" (click)="regenerateClientSecret()">
-                  {{'FACILITIES.REGENERATE_CLIENT_SECRET' | translate}}
-                </button>
-              </div>
-              <table mat-table [dataSource]="oidcDetails" class="w-100">
-                <ng-container matColumnDef="fullname" class="mr-5">
-                  <th mat-header-cell class="w-25" *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
-                  <td mat-cell *matCellDef="let property" class="font-thick">{{ property.name }}</td>
-                </ng-container>
-                <ng-container matColumnDef="value">
-                  <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
-                  <td mat-cell *matCellDef="let item">
-                    <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
-                      {{'UNDEFINED' | translate}}
-                    </div>
-                    <ng-template #notNullValue>
-                      <span [outerHTML]="item.value | facilityAttributeValue"></span>
-                    </ng-template>
-                  </td>
-                </ng-container>
-                <tr mat-header-row *matHeaderRowDef="displColumnsAttrs; sticky: true"></tr>
-                <tr mat-row *matRowDef="let row; columns: displColumnsAttrs;" class="hover-dark"></tr>
-              </table>
-            </ng-container>
-          </mat-tab>
+          <!-- ORGANIZATION -->
+          <mat-tab label="{{ 'COMMON.ATTRIBUTES.ORGANIZATION' | translate }}">
+            <table mat-table [dataSource]="facilityAttrsOrganization" class="w-100">
+              <ng-container matColumnDef="fullname" class="mr-5">
+                <th mat-header-cell  *matHeaderCellDef class="w-25">{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
+                <td mat-cell *matCellDef="let item" class="font-thick">
+                  {{item.name}}
+                  <span>
+                    <mat-icon [matTooltip]="item.description" class="text-muted fs-1">info</mat-icon>
+                  </span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef class="w-75">{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
+                <td mat-cell *matCellDef="let item">
+                  <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
+                    {{'UNDEFINED' | translate}}
+                  </div>
+                  <ng-template #notNullValue>
+                    <span [outerHTML]="item.value | facilityAttributeValue"></span>
+                  </ng-template>
+                </td>
+              </ng-container>
 
-          <mat-tab *ngIf="facility.saml" label="SAML">
-            <mat-spinner class="ml-auto mr-auto" *ngIf="loadingProtocol"></mat-spinner>
-            <ng-container *ngIf="!loadingProtocol">
-              <table mat-table [dataSource]="samlDetails" class="w-100">
-                <ng-container matColumnDef="fullname" class="mr-5">
-                  <th mat-header-cell class="w-25" *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
-                  <td mat-cell *matCellDef="let property" class="font-thick">{{ property.name }}</td>
-                </ng-container>
-                <ng-container matColumnDef="value">
-                  <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
-                  <td mat-cell *matCellDef="let item">
-                    <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
-                      {{'UNDEFINED' | translate}}
-                    </div>
-                    <ng-template #notNullValue>
-                      <span [outerHTML]="item.value | facilityAttributeValue"></span>
-                    </ng-template>
-                  </td>
-                </ng-container>
-                <tr mat-header-row *matHeaderRowDef="displColumnsAttrs; sticky: true"></tr>
-                <tr mat-row *matRowDef="let row; columns: displColumnsAttrs;" class="hover-dark"></tr>
-              </table>
-            </ng-container>
+              <tr mat-header-row *matHeaderRowDef="displColumnsAttrs; sticky:true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displColumnsAttrs;" class="hover-dark"></tr>
+            </table>
           </mat-tab>
+          <!-- PROTOCOL -->
+          <mat-tab label="{{ 'COMMON.ATTRIBUTES.PROTOCOL' | translate }}">
+            <div class="col-sm-12 text-right mb-2" *ngIf="facility.oidc" >
+              <button class="col-md-3 col-sm-6 mt-3 mr-0" mat-raised-button color="accent" (click)="regenerateClientSecret()">
+                {{'FACILITIES.REGENERATE_CLIENT_SECRET' | translate}}
+              </button>
+            </div>
+            <mat-spinner class="ml-auto mr-auto" *ngIf="loadingProtocol" color=""></mat-spinner>
+            <table mat-table [dataSource]="facilityAttrsProtocol"  *ngIf="!loadingProtocol" class="w-100">
+              <ng-container matColumnDef="fullname" class="mr-5">
+                <th mat-header-cell  *matHeaderCellDef class="w-25">{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
+                <td mat-cell *matCellDef="let item" class="font-thick">
+                  {{item.name}}
+                  <span>
+                    <mat-icon [matTooltip]="item.description" class="text-muted fs-1">info</mat-icon>
+                  </span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef class="w-75">{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
+                <td mat-cell *matCellDef="let item">
+                  <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
+                    {{'UNDEFINED' | translate}}
+                  </div>
+                  <ng-template #notNullValue>
+                    <span [outerHTML]="item.value | facilityAttributeValue"></span>
+                  </ng-template>
+                </td>
+              </ng-container>
 
+              <tr mat-header-row *matHeaderRowDef="displColumnsAttrs; sticky:true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displColumnsAttrs;" class="hover-dark"></tr>
+            </table>
+          </mat-tab>
+          <!-- ACCESS_CONTROL -->
+          <mat-tab label="{{ 'COMMON.ATTRIBUTES.ACCESS_CONTROL' | translate }}">
+            <table mat-table [dataSource]="facilityAttrsAccessControl" class="w-100">
+              <ng-container matColumnDef="fullname" class="mr-5">
+                <th mat-header-cell  *matHeaderCellDef class="w-25">{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
+                <td mat-cell *matCellDef="let item" class="font-thick">
+                  {{item.name}}
+                  <span>
+                    <mat-icon [matTooltip]="item.description" class="text-muted fs-1">info</mat-icon>
+                  </span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef class="w-75">{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
+                <td mat-cell *matCellDef="let item">
+                  <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
+                    {{'UNDEFINED' | translate}}
+                  </div>
+                  <ng-template #notNullValue>
+                    <span [outerHTML]="item.value | facilityAttributeValue"></span>
+                  </ng-template>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displColumnsAttrs; sticky:true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displColumnsAttrs;" class="hover-dark"></tr>
+            </table>
+          </mat-tab>
+          <!-- MANAGERS -->
           <mat-tab label="{{ 'FACILITIES.MANAGERS' | translate }}">
             <div class="col-sm-12 text-right mb-2">
               <button class="col-md-3 col-sm-6 mt-3 mr-0" mat-raised-button color="accent" (click)="addFacilityAdmin()">
@@ -128,11 +168,11 @@
             </div>
             <table mat-table [dataSource]="facilityAdmins" class="w-100">
               <ng-container matColumnDef="managerName" class="mr-5">
-                <th mat-header-cell *matHeaderCellDef>{{'FACILITIES.MANAGER_NAME' | translate}}</th>
+                <th mat-header-cell *matHeaderCellDef class="w-50">{{'FACILITIES.MANAGER_NAME' | translate}}</th>
                 <td mat-cell *matCellDef="let manager" class="font-thick">{{ manager.name }}</td>
               </ng-container>
               <ng-container matColumnDef="managerMail">
-                <th mat-header-cell *matHeaderCellDef>{{'FACILITIES.MANAGER_EMAIL' | translate}}</th>
+                <th mat-header-cell *matHeaderCellDef class="w-50">{{'FACILITIES.MANAGER_EMAIL' | translate}}</th>
                 <td mat-cell *matCellDef="let manager">
                   <a href="mailto:{{ manager.email }}">{{ manager.email }}</a>
                 </td>
@@ -144,6 +184,5 @@
           </mat-tab>
         </mat-tab-group>
       </div>
-    </div>
   </div>
 </div>

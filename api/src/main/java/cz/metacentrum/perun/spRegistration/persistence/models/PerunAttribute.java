@@ -1,8 +1,11 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -141,8 +144,8 @@ public class PerunAttribute {
 	 * Convert to JSON object
 	 * @return JSON Object
 	 */
-	public JSONObject toJson() {
-		JSONObject json = definition.toJson();
+	public JsonNode toJson() {
+		ObjectNode json = (ObjectNode) definition.toJson();
 		putValue(json, "value", definition.getType(), false);
 
 		return json;
@@ -152,8 +155,8 @@ public class PerunAttribute {
 	 * Convert to JSON object in format for DB
 	 * @return JSON Object
 	 */
-	public JSONObject toJsonForDb() {
-		JSONObject obj = new JSONObject();
+	public JsonNode toJsonForDb() {
+		ObjectNode obj = JsonNodeFactory.instance.objectNode();
 		obj.put("type", definition.getType());
 		putValue(obj, "oldValue", definition.getType(), true);
 		putValue(obj, "newValue", definition.getType(), false);
@@ -167,7 +170,7 @@ public class PerunAttribute {
 	 * @param json JSON from Perun
 	 * @return PerunAttribute or null
 	 */
-	public static PerunAttribute fromJsonOfPerun(JSONObject json) {
+	public static PerunAttribute fromJsonOfPerun(JsonNode json) {
 		if (Utils.checkParamsInvalid(json)) {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
@@ -190,20 +193,20 @@ public class PerunAttribute {
 	 * @param inputMap map containing inputs
 	 * @return PerunAttribute or null
 	 */
-	public static PerunAttribute fromJsonOfDb(String name, JSONObject json, Map<String,
+	public static PerunAttribute fromJsonOfDb(String name, JsonNode json, Map<String,
 			PerunAttributeDefinition> attributeDefinitionMap, Map<String, AttrInput> inputMap) {
 		if (name == null || name.isEmpty() ||
-				json == null || json.isEmpty() || json.equals(JSONObject.NULL) ||
+				json == null || json.isEmpty() ||
 				attributeDefinitionMap == null || attributeDefinitionMap.isEmpty() ||
 				inputMap == null || inputMap.isEmpty() ||
 				!attributeDefinitionMap.containsKey(name) || ! inputMap.containsKey(name)) {
 			return null;
 		}
 
-		String type = json.getString("type");
+		String type = json.get("type").textValue();
 		Object newValue = getValue(json, "newValue", type);
 		Object oldValue = getValue(json, "oldValue", type);
-		String comment = json.optString("comment", null);
+		String comment = json.hasNonNull("comment") ? json.get("comment").textValue() : null;
 
 		PerunAttributeDefinition def = attributeDefinitionMap.get(name);
 		AttrInput input = inputMap.get(name);
@@ -276,26 +279,26 @@ public class PerunAttribute {
 		}
 	}
 
-	private void putValue(JSONObject json, String key, String type, boolean isOldValue) {
-		Object value = null;
+	private void putValue(ObjectNode json, String key, String type, boolean isOldValue) {
+		JsonNode value = null;
 		switch (type) {
 			case STRING_TYPE:
 			case LARGE_STRING_TYPE:
-				value = valueAsString(isOldValue);
+				value = JsonNodeFactory.instance.textNode(valueAsString(isOldValue));
 				break;
 			case INTEGER_TYPE:
-				value = valueAsLong(isOldValue);
+				value = JsonNodeFactory.instance.numberNode(valueAsLong(isOldValue));
 				break;
 			case BOOLEAN_TYPE:
-				value = valueAsBoolean(isOldValue);
+				value = JsonNodeFactory.instance.booleanNode(valueAsBoolean(isOldValue));
 				break;
 			case ARRAY_TYPE:
 			case LARGE_ARRAY_LIST_TYPE:
 				List<String> arrValue = valueAsArray(isOldValue);
 				if (arrValue != null) {
-					JSONArray arr = new JSONArray();
+					ArrayNode arr = JsonNodeFactory.instance.arrayNode();
 					for (String sub: arrValue) {
-						arr.put(sub);
+						arr.add(sub);
 					}
 					value = arr;
 				}
@@ -304,7 +307,7 @@ public class PerunAttribute {
 			case MAP_TYPE:
 				Map<String, String> mapValue = valueAsMap(isOldValue);
 				if (mapValue != null) {
-					JSONObject obj = new JSONObject();
+					ObjectNode obj = JsonNodeFactory.instance.objectNode();
 					for (Map.Entry<String, String> sub: mapValue.entrySet()) {
 						obj.put(sub.getKey(), sub.getValue());
 					}
@@ -314,45 +317,45 @@ public class PerunAttribute {
 		}
 
 		if (value == null) {
-			json.put(key, JSONObject.NULL);
+			json.set(key, JsonNodeFactory.instance.nullNode());
 		} else {
-			json.put(key, value);
+			json.set(key, value);
 		}
 	}
 
-	private static Object getValue(JSONObject json, String key, String type) {
-		if (json.get(key) == JSONObject.NULL && BOOLEAN_TYPE.equals(type)) {
+	private static Object getValue(JsonNode json, String key, String type) {
+		if (json.get(key) instanceof NullNode && BOOLEAN_TYPE.equals(type)) {
 			return false;
 		}
-		if (json.get(key) == JSONObject.NULL) {
+		if (json.get(key) instanceof NullNode) {
 			return null;
 		}
 		switch (type) {
 			case STRING_TYPE:
 			case LARGE_STRING_TYPE:
-				return json.getString(key);
+				return json.get(key).textValue();
 			case INTEGER_TYPE:
-				return json.getInt(key);
+				return json.get(key).asLong();
 			case BOOLEAN_TYPE:
-				return json.getBoolean(key);
+				return json.get(key).asBoolean();
 			case ARRAY_TYPE:
 			case LARGE_ARRAY_LIST_TYPE:
-				JSONArray arr = json.getJSONArray(key);
+				ArrayNode arr = (ArrayNode) json.get(key);
 				List<String> arrValue = new ArrayList<>();
 
-				for (int i = 0; i < arr.length(); i++) {
-					arrValue.add(arr.get(i).toString());
+				for (int i = 0; i < arr.size(); i++) {
+					arrValue.add(arr.get(i).textValue());
 				}
 
 				return arrValue;
 			case MAP_TYPE:
-				JSONObject obj = json.getJSONObject(key);
+				ObjectNode obj = (ObjectNode) json.get(key);
 				Map<String, String> mapValue = new LinkedHashMap<>();
 
-				Iterator<String> keys = obj.keys();
+				Iterator<String> keys = obj.fieldNames();
 				while (keys.hasNext()) {
 					String mapKey = keys.next();
-					mapValue.put(mapKey, obj.get(mapKey).toString());
+					mapValue.put(mapKey, obj.get(mapKey).textValue());
 				}
 
 				return mapValue;

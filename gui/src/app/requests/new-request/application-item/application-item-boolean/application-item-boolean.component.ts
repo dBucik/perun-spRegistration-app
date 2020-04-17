@@ -2,7 +2,6 @@ import {Component, Input, OnInit} from '@angular/core';
 import {ApplicationItem} from "../../../../core/models/ApplicationItem";
 import {RequestItem} from "../../../../core/models/RequestItem";
 import {Attribute} from "../../../../core/models/Attribute";
-import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons";
 import {TranslateService} from "@ngx-translate/core";
 
 @Component({
@@ -13,8 +12,6 @@ import {TranslateService} from "@ngx-translate/core";
 export class ApplicationItemBooleanComponent implements OnInit, RequestItem {
 
   constructor(private translate: TranslateService) { }
-
-  helpIcon = faQuestionCircle;
 
   @Input()
   applicationItem: ApplicationItem;

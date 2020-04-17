@@ -1,5 +1,7 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
@@ -11,12 +13,11 @@ import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
-import cz.metacentrum.perun.spRegistration.service.MailsService;
+import cz.metacentrum.perun.spRegistration.service.mails.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,15 +86,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		request.setStatus(RequestStatus.APPROVED);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-		Set<String> allowedAttrs = appConfig.getPerunAttributeDefinitionsMap().keySet();
-		Set<String> requestedAttrs = request.getAttributes().keySet();
-		Set<String> notAllowed = requestedAttrs.stream()
-				.filter(attrName -> !allowedAttrs.contains(attrName))
-				.collect(Collectors.toSet());
-
-		if (!notAllowed.isEmpty()) {
-			throw new InternalErrorException("Cannot approve, requested attributes are not allowed");
-		}
+		request.updateAttributes(new ArrayList<>(), false, appConfig);
 
 		boolean requestProcessed = processApprovedRequest(request);
 		boolean requestUpdated = requestManager.updateRequest(request);
@@ -175,8 +168,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			throw new CannotChangeStatusException("Cannot ask for changes, request not marked as WAITING_FOR_APPROVAL");
 		}
 
-		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMapAttrs(attributes, appConfig);
-		request.updateAttributes(convertedAttributes, false);
+		request.updateAttributes(attributes, false, appConfig);
 		request.setStatus(RequestStatus.WAITING_FOR_CHANGES);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
@@ -355,7 +347,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			PerunAttribute authProtocol = generateAuthProtocolAttribute(ServiceUtils.isOidcRequest(request,
 					appConfig.getEntityIdAttribute()));
 
-			JSONArray attributes = request.getAttributesAsJsonArrayForPerun();
+			ArrayNode attributes = request.getAttributesAsJsonArrayForPerun();
 			if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
 				for (int i = 0; i < 10; i++) {
 					PerunAttribute clientId = generateClientIdAttribute();
@@ -372,11 +364,11 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 				perunConnector.setFacilityAttribute(facility.getId(), clientSecret.toJson());
 			}
 
-			attributes.put(testSp.toJson());
-			attributes.put(showOnServiceList.toJson());
-			attributes.put(proxyIdentifiers.toJson());
-			attributes.put(masterProxyIdentifiers.toJson());
-			attributes.put(authProtocol.toJson());
+			attributes.add(testSp.toJson());
+			attributes.add(showOnServiceList.toJson());
+			attributes.add(proxyIdentifiers.toJson());
+			attributes.add(masterProxyIdentifiers.toJson());
+			attributes.add(authProtocol.toJson());
 			boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(), attributes);
 
 			boolean successful = (adminSet && attributesSet);
@@ -411,7 +403,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		Facility actualFacility = perunConnector.getFacilityById(facilityId);
 		Map<String, PerunAttribute> oldAttributes = perunConnector.getFacilityAttributes(facilityId,
-				new ArrayList<>(request.getAttributes().keySet()));
+				request.getAttributeNames());
 
 		if (actualFacility == null) {
 			log.error("Facility with ID: {} does not exist in Perun", facilityId);
@@ -437,8 +429,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			log.warn("Caught ConnectorException", e);
 			try {
 				perunConnector.updateFacilityInPerun(actualFacility.toJson());
-				JSONArray oldAttrsArray = new JSONArray();
-				oldAttributes.values().forEach(a -> oldAttrsArray.put(a.toJson()));
+				ArrayNode oldAttrsArray = JsonNodeFactory.instance.arrayNode();
+				oldAttributes.values().forEach(a -> oldAttrsArray.add(a.toJson()));
 				perunConnector.setFacilityAttributes(actualFacility.getId(), oldAttrsArray);
 			} catch (ConnectorException ex) {
 				log.warn("Caught ConnectorException", ex);
@@ -476,9 +468,9 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		PerunAttribute testSp = generateTestSpAttribute(false);
 		PerunAttribute showOnServiceList = generateShowOnServiceListAttribute(true);
 
-		JSONArray attributes = request.getAttributesAsJsonArrayForPerun();
-		attributes.put(testSp.toJson());
-		attributes.put(showOnServiceList.toJson());
+		ArrayNode attributes = request.getAttributesAsJsonArrayForPerun();
+		attributes.add(testSp.toJson());
+		attributes.add(showOnServiceList.toJson());
 
 		boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(), attributes);
 

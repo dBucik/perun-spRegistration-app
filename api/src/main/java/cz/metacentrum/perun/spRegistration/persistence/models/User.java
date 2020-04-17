@@ -2,8 +2,8 @@ package cz.metacentrum.perun.spRegistration.persistence.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import cz.metacentrum.perun.spRegistration.Utils;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Objects;
@@ -152,17 +152,17 @@ public class User extends PerunEntity {
 	 * @param json JSON from Perun
 	 * @return User or null
 	 */
-	public static User fromPerunJson(JSONObject json) {
+	public static User fromPerunJson(JsonNode json) {
 		if (Utils.checkParamsInvalid(json)) {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Long id = json.getLong("id");
-		String firstName = json.optString("firstName", "");
-		String middleName = json.optString("middleName", "");
-		String lastName = json.optString("lastName", "");
-		String titleBefore = json.optString("titleBefore", "");
-		String titleAfter = json.optString("titleAfter", "");
+		Long id = json.get("id").asLong();
+		String firstName = json.hasNonNull("firstName") ? json.get("firstName").textValue() : null;
+		String middleName = json.hasNonNull("middleName") ? json.get("middleName").textValue() : null;;
+		String lastName = json.hasNonNull("lastName") ? json.get("lastName").textValue() : null;;
+		String titleBefore = json.hasNonNull("titleBefore") ? json.get("titleBefore").textValue() : null;;
+		String titleAfter = json.hasNonNull("titleAfter") ? json.get("titleAfter").textValue() : null;;
 
 		return new User(id, titleBefore, firstName, middleName, lastName, titleAfter);
 	}

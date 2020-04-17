@@ -1,9 +1,15 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
@@ -15,7 +21,6 @@ import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
@@ -23,11 +28,11 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeExcepti
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
-import org.json.JSONException;
-import org.json.JSONObject;
+import cz.metacentrum.perun.spRegistration.service.mails.MailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.BadPaddingException;
@@ -45,13 +50,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static cz.metacentrum.perun.spRegistration.service.MailsService.REQUEST_CREATED;
-import static cz.metacentrum.perun.spRegistration.service.MailsService.REQUEST_MODIFIED;
-import static cz.metacentrum.perun.spRegistration.service.MailsService.REQUEST_SIGNED;
+import static cz.metacentrum.perun.spRegistration.service.mails.MailsService.REQUEST_CREATED;
+import static cz.metacentrum.perun.spRegistration.service.mails.MailsService.REQUEST_MODIFIED;
+import static cz.metacentrum.perun.spRegistration.service.mails.MailsService.REQUEST_SIGNED;
 
 /**
  * Implementation of UserCommandsService.
@@ -73,19 +77,19 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
 	private final Config config;
-	private final Properties messagesProperties;
-	
-	@Autowired
-	private MailsService mailsService;
+	private final MailsService mailsService;
+
+	@Value("#{'${mail.approval.default-authorities.mails}'.split(',')}")
+	private List<String> defaultAuthorities;
 
 	@Autowired
 	public UserCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
-								   AppConfig appConfig, Properties messagesProperties) {
+								   AppConfig appConfig, MailsService mailsService) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.config = config;
-		this.messagesProperties = messagesProperties;
+		this.mailsService = mailsService;
 	}
 
 	@Override
@@ -99,7 +103,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		Request req = null;
 		try {
-			req = createRequest(null, userId, attributes, RequestAction.REGISTER_NEW_SP);
+			req = createRequest(null, userId, RequestAction.REGISTER_NEW_SP, attributes);
 		} catch (ActiveRequestExistsException e) {
 			//this cannot happen as the registration is for new service and thus facility id will be always null
 		}
@@ -154,7 +158,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			return null;
 		}
 
-		Request req = createRequest(facilityId, userId, attributes, RequestAction.UPDATE_FACILITY);
+		Request req = createRequest(facilityId, userId, RequestAction.UPDATE_FACILITY, attributes);
 		if (req.getReqId() == null) {
 			log.error("Could not create request");
 			throw new InternalErrorException("Could not create request");
@@ -185,7 +189,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
 		boolean isOidc = ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttribute());
 		List<String> keptAttrs = getAttrsToKeep(isOidc);
-		Map<String, PerunAttribute> facilityAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
+		List<PerunAttribute> facilityAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
 
 		Request req = createRequest(facilityId, userId, RequestAction.DELETE_FACILITY, facilityAttributes);
 		if (req.getReqId() == null) {
@@ -220,8 +224,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		log.info("Updating request");
-		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMapAttrs(attributes, appConfig);
-		request.updateAttributes(convertedAttributes, true);
+		request.updateAttributes(attributes, true, appConfig);
 
 		request.setStatus(RequestStatus.WAITING_FOR_APPROVAL);
 		request.setModifiedBy(userId);
@@ -257,7 +260,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
 		}
 
-		Map<String, PerunAttribute> filteredAttributes = filterNotNullAttributes(fac);
+		List<PerunAttribute> filteredAttributes = filterNotNullAttributes(fac);
 
 		Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, filteredAttributes);
 
@@ -284,7 +287,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject decryptedCode = decryptRequestCode(code);
+		JsonNode decryptedCode = decryptRequestCode(code);
 		boolean isExpired = isExpiredCode(decryptedCode);
 
 		if (isExpired) {
@@ -292,7 +295,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new ExpiredCodeException("Code has expired");
 		}
 
-		Long requestId = decryptedCode.getLong(REQUEST_ID_KEY);
+		Long requestId = decryptedCode.get(REQUEST_ID_KEY).asLong();
 		log.debug("Fetching request for id: {}", requestId);
 		Request request = requestManager.getRequestById(requestId);
 
@@ -317,7 +320,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject decryptedCode = decryptRequestCode(code);
+		JsonNode decryptedCode = decryptRequestCode(code);
 		boolean isExpired = isExpiredCode(decryptedCode);
 
 		if (isExpired) {
@@ -325,7 +328,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new ExpiredCodeException("Code has expired");
 		}
 
-		Long requestId = decryptedCode.getLong(REQUEST_ID_KEY);
+		Long requestId = decryptedCode.get(REQUEST_ID_KEY).asLong();
 		boolean signed = requestManager.addSignature(requestId, user.getId(), user.getName(), approved, code);
 		Request req = requestManager.getRequestById(requestId);
 
@@ -414,18 +417,19 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, attrsToFetch);
 		boolean isOidc = ServiceUtils.isOidcAttributes(attrs, appConfig.getEntityIdAttribute());
 		List<String> keptAttrs = getAttrsToKeep(isOidc);
-
-		facility.setAttrs(ServiceUtils.filterFacilityAttrs(attrs, keptAttrs));
+		List<PerunAttribute> filteredAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
+		Map<AttributeCategory, Map<String, PerunAttribute>> facilityAttributes = convertToStruct(filteredAttributes, appConfig);
+		facility.setAttributes(facilityAttributes);
 
 		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
 
 		Map<String, PerunAttribute> protocolAttrs = perunConnector.getFacilityAttributes(facilityId, Arrays.asList(
-				appConfig.getIsOidcAttributeName(), appConfig.getIsSamlAttributeName()));
+				appConfig.getIsOidcAttributeName(), appConfig.getIsSamlAttributeName(), appConfig.getMasterProxyIdentifierAttribute()));
 		facility.setOidc(protocolAttrs.get(appConfig.getIsOidcAttributeName()).valueAsBoolean());
 		facility.setSaml(protocolAttrs.get(appConfig.getIsSamlAttributeName()).valueAsBoolean());
 
-		PerunAttribute proxyAttrs = perunConnector.getFacilityAttribute(facilityId, appConfig.getMasterProxyIdentifierAttribute());
+		PerunAttribute proxyAttrs = protocolAttrs.get(appConfig.getMasterProxyIdentifierAttribute());
 		boolean canBeEdited = appConfig.getMasterProxyIdentifierAttributeValue().equals(proxyAttrs.valueAsString());
 		facility.setEditable(canBeEdited);
 
@@ -445,15 +449,17 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Facility facility = getDetailedFacility(facilityId, userId, true);
-		if (facility == null || facility.getAttrs() == null) {
+		if (facility == null || facility.getAttributes() == null) {
 			log.error("Could not fetch facility for id: {}", facilityId);
 			throw new InternalErrorException("Could not fetch facility for id: " + facilityId);
 		}
 
-		for (Map.Entry<String, PerunAttribute> attr: facility.getAttrs().entrySet()) {
-			AttrInput input = config.getInputMap().get(attr.getKey());
-			attr.getValue().setInput(input);
-		}
+		facility.getAttributes()
+				.values()
+				.forEach(
+						attrsInCategory -> attrsInCategory.values()
+								.forEach(attr -> attr.setInput(config.getInputMap().get(attr.getFullName())))
+				);
 
 		log.trace("getDetailedFacilityWithInputs() returns: {}", facility);
 		return facility;
@@ -580,7 +586,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject decrypted = decryptAddAdminCode(code);
+		JsonNode decrypted = decryptAddAdminCode(code);
 		boolean isValid = (!isExpiredCode(decrypted) && validateCode(code));
 
 		if (! isValid) {
@@ -588,7 +594,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new ExpiredCodeException("Code is invalid");
 		}
 
-		Long facilityId = decrypted.getLong(FACILITY_ID_KEY);
+		Long facilityId = decrypted.get(FACILITY_ID_KEY).asLong();
 		boolean added = perunConnector.addFacilityAdmin(facilityId, user.getId());
 		boolean deletedCode = requestManager.deleteUsedCode(code);
 		boolean successful = (added && deletedCode);
@@ -614,7 +620,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject decrypted = decryptAddAdminCode(code);
+		JsonNode decrypted = decryptAddAdminCode(code);
 		boolean isValid = (!isExpiredCode(decrypted) && validateCode(code));
 
 		if (! isValid) {
@@ -677,14 +683,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 	/* PRIVATE METHODS */
 
-	private Request createRequest(Long facilityId, Long userId, List<PerunAttribute> attributes, RequestAction action)
-			throws InternalErrorException, ActiveRequestExistsException
-	{
-		Map<String, PerunAttribute> convertedAttributes = ServiceUtils.transformListToMapAttrs(attributes, appConfig);
-		return createRequest(facilityId, userId, action, convertedAttributes);
-	}
-
-	private Request createRequest(Long facilityId, Long userId, RequestAction action, Map<String,PerunAttribute> attributes)
+	private Request createRequest(Long facilityId, Long userId, RequestAction action, List<PerunAttribute> attributes)
 			throws InternalErrorException, ActiveRequestExistsException
 	{
 		log.trace("createRequest(facilityId: {}, userId: {}, action: {}, attributes: {})",
@@ -699,7 +698,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		request.setFacilityId(facilityId);
 		request.setStatus(RequestStatus.WAITING_FOR_APPROVAL);
 		request.setAction(action);
-		request.setAttributes(attributes);
+		request.updateAttributes(attributes, true, appConfig);
 		request.setReqUserId(userId);
 		request.setModifiedBy(userId);
 		request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
@@ -758,7 +757,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return res;
 	}
 
-	private JSONObject decryptRequestCode(String code) throws InvalidKeyException, BadPaddingException,
+	private JsonNode decryptRequestCode(String code) throws InvalidKeyException, BadPaddingException,
 			IllegalBlockSizeException, MalformedCodeException
 	{
 		log.trace("decryptRequestCode({})", code);
@@ -771,11 +770,11 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		String decrypted = ServiceUtils.decrypt(code, appConfig.getSecret());
 
 		try {
-			JSONObject decryptedAsJson = new JSONObject(decrypted);
+			JsonNode decryptedAsJson = new ObjectMapper().readTree(decrypted);
 
 			log.trace("decryptRequestCode() returns: {}", decryptedAsJson);
 			return decryptedAsJson;
-		} catch (JSONException e) {
+		} catch (JsonProcessingException e) {
 			throw new MalformedCodeException();
 		}
 	}
@@ -791,7 +790,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject object = new JSONObject();
+		ObjectNode object = JsonNodeFactory.instance.objectNode();
 		object.put(REQUEST_ID_KEY, requestId);
 		object.put(FACILITY_ID_KEY, facilityId);
 		object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
@@ -804,7 +803,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return encoded;
 	}
 
-	private JSONObject decryptAddAdminCode(String code)
+	private JsonNode decryptAddAdminCode(String code)
 			throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException
 	{
 		log.trace("decryptAddAdminCode({})", code);
@@ -817,10 +816,10 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		String decrypted = ServiceUtils.decrypt(code, appConfig.getSecret());
 
 		try {
-			JSONObject decryptedAsJson = new JSONObject(decrypted);
+			JsonNode decryptedAsJson = new ObjectMapper().readTree(decrypted);
 			log.trace("decryptAddAdminCode() returns: {}", decryptedAsJson);
 			return decryptedAsJson;
-		} catch (JSONException e) {
+		} catch (JsonProcessingException e) {
 			throw new MalformedCodeException();
 		}
 	}
@@ -835,7 +834,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		JSONObject object = new JSONObject();
+		ObjectNode object = JsonNodeFactory.instance.objectNode();
 		object.put(FACILITY_ID_KEY, facilityId);
 		object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
 		object.put(REQUESTED_MAIL_KEY, requestedMail);
@@ -847,7 +846,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return encoded;
 	}
 
-	private boolean isExpiredCode(JSONObject codeInJson) {
+	private boolean isExpiredCode(JsonNode codeInJson) {
 		log.trace("isExpiredCode({})", codeInJson);
 
 		if (Utils.checkParamsInvalid(codeInJson)) {
@@ -858,7 +857,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		long daysValidPeriod = appConfig.getConfirmationPeriodDays();
 		long hoursValidPeriod = appConfig.getConfirmationPeriodHours();
 
-		LocalDateTime createdAt = LocalDateTime.parse(codeInJson.getString(CREATED_AT_KEY));
+		LocalDateTime createdAt = LocalDateTime.parse(codeInJson.get(CREATED_AT_KEY).textValue());
 		LocalDateTime validUntil = createdAt.plusDays(daysValidPeriod).plusHours(hoursValidPeriod);
 
 		boolean isExpired = LocalDateTime.now().isAfter(validUntil);
@@ -867,7 +866,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return isExpired;
 	}
 
-	private Map<String, PerunAttribute> filterNotNullAttributes(Facility facility) {
+	private List<PerunAttribute> filterNotNullAttributes(Facility facility) {
 		log.trace("filterNotNullAttributes({})", facility);
 
 		if (Utils.checkParamsInvalid(facility)) {
@@ -875,12 +874,15 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Map<String, PerunAttribute> filteredAttributes = new HashMap<>();
-		for (Map.Entry<String, PerunAttribute> entry : facility.getAttrs().entrySet()) {
-			if (entry.getValue().getValue() != null) {
-				filteredAttributes.put(entry.getKey(), entry.getValue());
-			}
-		}
+		List<PerunAttribute> filteredAttributes = new ArrayList<>();
+		facility.getAttributes()
+				.values()
+				.forEach(
+						attrsInCategory -> attrsInCategory.values()
+						.stream()
+						.filter(attr -> attr.getValue() != null)
+						.forEach(filteredAttributes::add)
+				);
 
 		log.trace("filterNotNullAttributes() returns: {}", filteredAttributes);
 		return filteredAttributes;
@@ -907,6 +909,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 					.map(AttrInput::getName)
 					.collect(Collectors.toList())
 			);
+			keptAttrs.add(appConfig.getClientIdAttribute());
+			keptAttrs.add(appConfig.getClientSecretAttribute());
 		} else {
 			keptAttrs.addAll(config.getSamlInputs()
 					.stream()
@@ -930,8 +934,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		if (authorities == null || authorities.isEmpty()) {
-			String prop = messagesProperties.getProperty("moveToProduction.authorities");
-			emails = Arrays.asList(prop.split(","));
+			emails = defaultAuthorities;
 		} else {
 			Map<String, List<String>> authsMap = appConfig.getProdTransferAuthoritiesMailsMap();
 			for (String authoritiesInput: authorities) {
@@ -1031,5 +1034,27 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		log.trace("generateLinksForAuthorities() returns: {}", linksMap);
 		return linksMap;
+	}
+
+	private Map<AttributeCategory, Map<String, PerunAttribute>> convertToStruct(List<PerunAttribute> filteredAttributes, AppConfig appConfig) {
+		if (filteredAttributes == null) {
+			return null;
+		}
+
+		Map<AttributeCategory, Map<String, PerunAttribute>> map = new HashMap<>();
+		map.put(AttributeCategory.SERVICE, new HashMap<>());
+		map.put(AttributeCategory.ORGANIZATION, new HashMap<>());
+		map.put(AttributeCategory.PROTOCOL, new HashMap<>());
+		map.put(AttributeCategory.ACCESS_CONTROL, new HashMap<>());
+
+		if (!filteredAttributes.isEmpty()) {
+			for (PerunAttribute attribute : filteredAttributes) {
+				AttributeCategory category = appConfig.getAttrCategory(attribute.getFullName());
+				attribute.setInput(config.getInputMap().get(attribute.getFullName()));
+				map.get(category).put(attribute.getFullName(), attribute);
+			}
+		}
+
+		return map;
 	}
 }

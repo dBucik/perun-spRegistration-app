@@ -15,15 +15,17 @@ import { RequestStatusPipe } from './request-status.pipe';
 import { RequestActionPipe } from './request-action.pipe';
 import { RequestApprovedPipe } from './request-approved.pipe';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import {MatTabsModule} from "@angular/material/tabs";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    RequestsRoutingModule,
-    SharedModule,
-    MatDialogModule,
-    MatPaginatorModule
-  ],
+    imports: [
+        CommonModule,
+        RequestsRoutingModule,
+        SharedModule,
+        MatDialogModule,
+        MatPaginatorModule,
+        MatTabsModule
+    ],
   declarations: [
     RequestsOverviewComponent,
     NewRequestComponent,

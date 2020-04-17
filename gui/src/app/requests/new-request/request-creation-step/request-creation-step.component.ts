@@ -5,6 +5,7 @@ import { MatStepper } from '@angular/material/stepper';
 import {ApplicationItemComponent} from '../application-item/application-item.component';
 import {PerunAttribute} from '../../../core/models/PerunAttribute';
 import {TranslateService} from '@ngx-translate/core';
+import {UrnValuePair} from "../../../core/models/UrnValuePair";
 
 @Component({
   selector: 'app-request-creation-step',
@@ -34,7 +35,7 @@ export class RequestCreationStepComponent implements OnInit {
 
     this.items.forEach(i => {
       const attr = i.getAttribute();
-      const perunAttr = new PerunAttribute(attr.value, attr.urn);
+      const perunAttr = new UrnValuePair(attr.value, attr.urn);
       perunAttributes.push(perunAttr);
     });
 
@@ -42,7 +43,6 @@ export class RequestCreationStepComponent implements OnInit {
   }
 
   private attributesHasCorrectValues(): boolean {
-
     const attributeItems = this.items.toArray();
 
     for (const i of attributeItems) {

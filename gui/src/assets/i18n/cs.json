@@ -6,7 +6,7 @@
   "LOGIN_MESSAGE": "Pro pokračovaní do aplikace se prosím přihlašte.",
   "LOGIN": "Přihlásit se",
   "UNDEFINED": "Nedefinováno",
-  "SEARCH": "Hledanej výraz",
+  "SEARCH": "Hledaný výraz",
   "PROTOCOL": "Protokol",
   "ERROR": {
     "GENERAL_ERROR_TITLE": "Něco se pokazilo.",
@@ -33,7 +33,15 @@
     "ERROR" : "Něco se pokazilo",
     "DETAIL_ITEM_NAME" : "Vlastnost",
     "DETAIL_ITEM_VALUE" : "Hodnota",
-    "SUBMIT" : "Odeslat"
+    "SUBMIT" : "Odeslat",
+    "ATTRIBUTES": {
+      "SERVICE": "Služba",
+      "ORGANIZATION": "Organizace",
+      "PROTOCOL": "SAML/OIDC",
+      "ACCESS_CONTROL": "Přístup"
+    },
+    "SHOW_MORE": "Zobrazit víc",
+    "SHOW_LESS": "Zobrazit míň"
   },
   "REQUESTS": {
     "FACILITY_ID": "Identifikátor služby",
@@ -83,8 +91,6 @@
       "MOVE_TO_PRODUCTION": "Přesunout do produkce"
     },
     "CHANGED_TO_WFC": "Změny byly vyžádany",
-    "SHOW_MORE": "Zobrazit víc",
-    "SHOW_LESS": "Zobrazit míň",
     "COMMENTS_FROM_ADMIN": "Komentáře od administrátora",
     "SET_WFC": "Vyžádat změny",
     "APPROVED": "Žádost schválena",
@@ -138,7 +144,6 @@
     "CLIENT_ID": "Client ID",
     "CLIENT_SECRET": "Client SECRET",
     "REGENERATE_CLIENT_SECRET": "Vygenerovat nové client secret",
-    "ATTRIBUTES": "Nastavení",
     "MANAGERS": "Správci",
     "MANAGER_NAME": "Jméno správce",
     "MANAGER_EMAIL": "Kontaktní email",
@@ -153,5 +158,14 @@
     "DECRYPT": "Rozšifrování hodnoty",
     "DECRYPT_INPUT": "Zadejte vstup pro rozšifrování",
     "DECRYPT_OUTPUT": "Výstup po rozšifrování"
+  },
+  "PAGINATOR": {
+    "ITEMS_PER_PAGE_LABEL": "Na stránku",
+    "NEXT_PAGE_LABEL": "Další",
+    "PREVIOUS_PAGE_LABEL": "Předchozí",
+    "FIRST_PAGE_LABEL": "Začátek",
+    "LAST_PAGE_LABEL": "Konec",
+    "RANGE_PAGE_LABEL_1": "0 z {{length}}",
+    "RANGE_PAGE_LABEL_2": "{{startIndex}} - {{endIndex}} z {{length}}"
   }
 }

@@ -89,7 +89,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.configService.getPageConfig().subscribe(pageConfig => {
-      AppComponent.pageConfig = pageConfig;
+      AppComponent.pageConfig = new PageConfig(pageConfig);
       if (pageConfig !== null && pageConfig !== undefined) {
         this.appTitle = pageConfig.headerLabel;
         this.logoUrl = pageConfig.logoUrl;
@@ -132,7 +132,7 @@ export class AppComponent implements OnInit {
   private setAndGetUser() {
     this.userService.getUser().subscribe(user => {
       if (user !== undefined && user !== null) {
-        AppComponent.setUser(user);
+        AppComponent.setUser(new User(user));
       } else {
         this.goOnLogin();
       }

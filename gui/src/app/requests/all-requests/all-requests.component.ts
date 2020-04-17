@@ -39,7 +39,7 @@ export class AllRequestsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.requestsSubscription = this.requestsService.getAllRequests().subscribe(requests => {
       this.loading = false;
-      this.requests = requests;
+      this.requests = requests.map(r => new Request(r));
       this.dataSource = new MatTableDataSource<Request>(requests);
     }, error => {
       this.loading = false;

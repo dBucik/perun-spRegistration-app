@@ -1,6 +1,7 @@
 package cz.metacentrum.perun.spRegistration.persistence.configs;
 
 import cz.metacentrum.perun.spRegistration.persistence.PersistenceUtils;
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
@@ -18,8 +19,8 @@ public class AttrsConfig {
 
 	private List<AttrInput> inputs;
 
-	public AttrsConfig(AppConfig appConfig, PerunConnector perunConnector, Properties attrsProps) throws ConnectorException, UnsupportedEncodingException {
-		inputs = PersistenceUtils.initializeAttributes(perunConnector, appConfig, attrsProps);
+	public AttrsConfig(AppConfig appConfig, PerunConnector perunConnector, Properties attrsProps, AttributeCategory category) throws ConnectorException, UnsupportedEncodingException {
+		inputs = PersistenceUtils.initializeAttributes(perunConnector, appConfig, attrsProps, category);
 	}
 
 	List<AttrInput> getInputs() {

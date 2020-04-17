@@ -16,7 +16,9 @@ import {FacilityEnvironmentPipe} from './facility-environment.pipe';
 import {MatTabsModule} from '@angular/material/tabs';
 import {FacilityProtocolPipe} from './facility-protocol.pipe';
 import {MatDialogModule} from '@angular/material/dialog';
-import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatPaginatorIntl, MatPaginatorModule} from '@angular/material/paginator';
+import {TranslateService} from "@ngx-translate/core";
+import { PaginatorI18n } from '../core/parts/paginatorI18n';
 
 @NgModule({
   imports: [
@@ -38,12 +40,18 @@ import {MatPaginatorModule} from '@angular/material/paginator';
     FacilityAddAdminComponent,
     FacilityAddAdminSignComponent,
     AllFacilitiesComponent,
-    FacilityAttributeValuePipe,
     FacilityEnvironmentPipe,
     FacilityProtocolPipe
   ],
   entryComponents: [
     FacilitiesDetailDialogComponent,
+  ],
+  providers: [
+    {
+      provide: MatPaginatorIntl, deps: [TranslateService],
+      useFactory: (translateService: TranslateService) => new PaginatorI18n(translateService).getPaginatorIntl()
+    }
   ]
+
 })
 export class FacilitiesModule { }

@@ -34,7 +34,7 @@ export class FacilityAddAdminComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.sub = this.route.params.subscribe(params => {
       this.facilitiesService.getFacility(params['id']).subscribe(facility => {
-        this.facility = facility;
+        this.facility = new Facility(facility);
         this.emails = [];
         this.loading = false;
       });

@@ -1,13 +1,12 @@
 package cz.metacentrum.perun.spRegistration.persistence.connectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,7 @@ public interface PerunConnector {
 	 * @throws ConnectorException Thrown when problem while communicating with Perun RPC occur.
 	 * @throws IllegalArgumentException Thrown when param "facilityJson" is NULL, equals JSONObject.NULL or empty.
 	 */
-	Facility createFacilityInPerun(JSONObject facilityJson) throws ConnectorException, BadRequestException;
+	Facility createFacilityInPerun(JsonNode facilityJson) throws ConnectorException, BadRequestException;
 
 	/**
 	 * Update existing facility in Perun.
@@ -36,7 +35,7 @@ public interface PerunConnector {
 	 * @throws ConnectorException Thrown when problem while communicating with Perun RPC occur.
 	 * @throws IllegalArgumentException Thrown when param "facilityJson" is NULL, equals JSONObject.NULL or empty.
 	 */
-	Facility updateFacilityInPerun(JSONObject facilityJson) throws ConnectorException, BadRequestException;
+	Facility updateFacilityInPerun(JsonNode facilityJson) throws ConnectorException, BadRequestException;
 
 	/**
 	 * Delete facility from Perun.
@@ -113,7 +112,7 @@ public interface PerunConnector {
 	 * @throws IllegalArgumentException Thrown when param "facilityId" is NULL, when param "attrJson" is NULL or empty
 	 * or equals to JSONObject.NULL.
 	 */
-	boolean setFacilityAttribute(Long facilityId, JSONObject attrJson) throws ConnectorException;
+	boolean setFacilityAttribute(Long facilityId, JsonNode attrJson) throws ConnectorException;
 
 	/**
 	 * Set attributes for facility in Perun.
@@ -124,7 +123,7 @@ public interface PerunConnector {
 	 * @throws IllegalArgumentException Thrown when param "facilityId" is NULL, when param "attrsJson" is NULL,
 	 * empty or equals JSONObject.NULL.
 	 */
-	boolean setFacilityAttributes(Long facilityId, JSONArray attrsJsons) throws ConnectorException;
+	boolean setFacilityAttributes(Long facilityId, JsonNode attrsJsons) throws ConnectorException;
 
 	/**
 	 * Get user from Perun.

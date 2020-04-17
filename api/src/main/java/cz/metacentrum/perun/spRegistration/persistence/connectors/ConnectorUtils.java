@@ -19,7 +19,7 @@ public class ConnectorUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(ConnectorUtils.class);
 
-	public static String dealWithHttpClientErrorException(HttpClientErrorException ex, String message) throws ConnectorException {
+	public static JsonNode dealWithHttpClientErrorException(HttpClientErrorException ex, String message) throws ConnectorException {
 		log.trace("dealWithHttpClientErrorException(ex: {}, message: {})", ex, message);
 
 		MediaType contentType = null;
@@ -29,9 +29,10 @@ public class ConnectorUtils {
 		if (contentType != null && "json".equalsIgnoreCase(contentType.getSubtype())) {
 			try {
 				String body = ex.getResponseBodyAsString();
-				String exErrorId = new ObjectMapper().readValue(body, JsonNode.class).path("errorId").asText("");
-				String exName = new ObjectMapper().readValue(body, JsonNode.class).path("name").asText("");
-				String exMessage = new ObjectMapper().readValue(body, JsonNode.class).path("message").asText("");
+				JsonNode error = new ObjectMapper().readValue(body, JsonNode.class);
+				String exErrorId = error.path("errorId").textValue();
+				String exName = error.path("name").textValue();
+				String exMessage = error.path("message").textValue();
 
 				String errMessage = "Error from Perun: { id: " + exErrorId + ", name: " + exName + ", message: " + exMessage + " }";
 				throw new ConnectorException(errMessage, ex);

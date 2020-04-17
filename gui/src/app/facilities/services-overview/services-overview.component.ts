@@ -31,7 +31,7 @@ export class ServicesOverviewComponent implements OnInit, OnDestroy {
     this.setDataSource();
   }
 
-  displayedColumns: string[] = ['id', 'name', 'description', 'environment', 'protocol'];
+  displayedColumns: string[] = ['id', 'name', 'description', 'environment', 'protocolType'];
   dataSource: MatTableDataSource<Facility>;
   loading = true;
 
@@ -47,14 +47,23 @@ export class ServicesOverviewComponent implements OnInit, OnDestroy {
       if (!!this.paginator) {
         this.dataSource.paginator = this.paginator;
       }
+
+      this.dataSource.sortingDataAccessor = (rowObject, columnName) => {
+        switch(columnName) {
+          case 'environment':
+            return rowObject['testEnv'];
+          default:
+            return rowObject[columnName];
+        }
+      };
     }
   }
 
   ngOnInit() {
     this.facilitiesSubscription = this.facilitiesService.getMyFacilities().subscribe(facilities => {
       this.loading = false;
-      this.myFacilities = facilities;
-      this.dataSource = new MatTableDataSource<Facility>(facilities);
+      this.myFacilities = facilities.map(f => new Facility(f));
+      this.dataSource = new MatTableDataSource<Facility>(this.myFacilities);
     }, error => {
         this.loading = false;
         console.log(error);

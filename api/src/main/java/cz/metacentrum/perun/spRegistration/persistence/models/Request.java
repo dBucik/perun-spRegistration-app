@@ -1,15 +1,22 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Class represents request made by user. It contains all the data that needs to be stored.
@@ -24,7 +31,7 @@ public class Request {
 	private RequestStatus status;
 	private RequestAction action;
 	private Long reqUserId;
-	private Map<String, PerunAttribute> attributes = new HashMap<>();
+	private Map<AttributeCategory, Map<String, PerunAttribute>> attributes = new HashMap<>();
 	private Timestamp modifiedAt;
 	private Long modifiedBy;
 
@@ -68,11 +75,11 @@ public class Request {
 		this.reqUserId = reqUserId;
 	}
 
-	public Map<String, PerunAttribute> getAttributes() {
+	public Map<AttributeCategory, Map<String, PerunAttribute>> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(Map<String, PerunAttribute> attributes) {
+	public void setAttributes(Map<AttributeCategory, Map<String, PerunAttribute>> attributes) {
 		this.attributes = attributes;
 	}
 
@@ -94,7 +101,7 @@ public class Request {
 
 	@JsonIgnore
 	public String getFacilityName() {
-		PerunAttribute attr = attributes.get("urn:perun:facility:attribute-def:def:serviceName");
+		PerunAttribute attr = attributes.get(AttributeCategory.SERVICE).get("urn:perun:facility:attribute-def:def:serviceName");
 		if (attr == null) {
 			return null;
 		}
@@ -104,7 +111,7 @@ public class Request {
 
 	@JsonIgnore
 	public String getFacilityDescription() {
-		PerunAttribute attr = attributes.get("urn:perun:facility:attribute-def:def:serviceDescription");
+		PerunAttribute attr = attributes.get(AttributeCategory.SERVICE).get("urn:perun:facility:attribute-def:def:serviceDescription");
 		if (attr == null) {
 			return null;
 		}
@@ -117,13 +124,26 @@ public class Request {
 	 * @return JSON with attributes.
 	 */
 	@JsonIgnore
-	public String getAttributesAsJsonForDb() {
-		JSONObject obj = new JSONObject();
-		for (Map.Entry<String ,PerunAttribute> a: attributes.entrySet()) {
-			obj.put(a.getKey(), a.getValue().toJsonForDb());
+	public String getAttributesAsJsonForDb(AppConfig appConfig) {
+		if (this.attributes == null || this.attributes.isEmpty()) {
+			return "";
 		}
 
-		return obj.toString();
+		ObjectNode root = JsonNodeFactory.instance.objectNode();
+		for (Map.Entry<AttributeCategory, Map<String, PerunAttribute>> categoryMapEntry : attributes.entrySet()) {
+			ObjectNode obj = JsonNodeFactory.instance.objectNode();
+			AttributeCategory category = categoryMapEntry.getKey();
+			Map<String, PerunAttribute> attributeMap = categoryMapEntry.getValue();
+			for (Map.Entry<String, PerunAttribute> a : attributeMap.entrySet()) {
+				PerunAttributeDefinition def = appConfig.getAttrDefinition(a.getKey());
+				PerunAttribute attribute = a.getValue();
+				attribute.setDefinition(def);
+				obj.set(a.getKey(), attribute.toJsonForDb());
+			}
+			root.set(category.toString(), obj);
+		}
+
+		return root.toString();
 	}
 
 	/**
@@ -131,15 +151,13 @@ public class Request {
 	 * @return JSON with attributes or null.
 	 */
 	@JsonIgnore
-	public JSONArray getAttributesAsJsonArrayForPerun() {
+	public ArrayNode getAttributesAsJsonArrayForPerun() {
 		if (attributes == null || attributes.isEmpty()) {
 			return null;
 		}
 
-		JSONArray res = new JSONArray();
-		for (PerunAttribute a: attributes.values()) {
-			res.put(a.toJson());
-		}
+		ArrayNode res = JsonNodeFactory.instance.arrayNode();
+		attributes.values().forEach(e -> e.values().forEach(a -> res.add(a.toJson())));
 
 		return res;
 	}
@@ -150,11 +168,13 @@ public class Request {
 	 * @return Administrator contact
 	 */
 	public String getAdminContact(String attrKey) {
-		if (attributes == null || !attributes.containsKey(attrKey) || attributes.get(attrKey) == null) {
-			return null;
+		if (attributes != null && !attributes.containsKey(AttributeCategory.SERVICE) &&
+				attributes.get(AttributeCategory.SERVICE).containsKey(attrKey) && attributes.get(AttributeCategory.SERVICE).get(attrKey) != null)
+		{
+			attributes.get(AttributeCategory.SERVICE).get(attrKey).valueAsString();
 		}
 
-		return attributes.get(attrKey).valueAsString();
+		return null;
 	}
 
 	@Override
@@ -192,18 +212,44 @@ public class Request {
 		return (int) res;
 	}
 
-	public void updateAttributes(Map<String, PerunAttribute> attrsToUpdate, boolean clearComment) {
-		for (Map.Entry<String, PerunAttribute> entry: attrsToUpdate.entrySet()) {
-			if (this.attributes.containsKey(entry.getKey())) {
-				PerunAttribute old = this.attributes.get(entry.getKey());
-				old.setValue(entry.getValue().getValue());
-				old.setComment(clearComment ? null : entry.getValue().getComment());
+	public void updateAttributes(List<PerunAttribute> attrsToUpdate, boolean clearComment, AppConfig appConfig) {
+		if (attrsToUpdate == null) {
+			return;
+		}
+
+		if (this.attributes == null) {
+			this.attributes = new HashMap<>();
+		}
+
+		for (PerunAttribute attr: attrsToUpdate) {
+			AttributeCategory category = appConfig.getAttrCategory(attr.getFullName());
+			if (!this.attributes.containsKey(category)) {
+				this.attributes.put(category, new HashMap<>());
+			}
+			Map<String, PerunAttribute> categoryAttrsMap = this.attributes.get(category);
+			if (categoryAttrsMap.containsKey(attr.getFullName())) {
+				PerunAttribute old = categoryAttrsMap.get(attr.getFullName());
+				old.setValue(attr.getValue());
+				old.setComment(clearComment ? null : attr.getComment());
 			} else {
-				this.attributes.put(entry.getKey(), entry.getValue());
+				categoryAttrsMap.put(attr.getFullName(), attr);
 				if (clearComment) {
-					entry.getValue().setComment(null);
+					attr.setComment(null);
 				}
 			}
 		}
+		this.attributes = appConfig.filterInvalidAttributes(attributes);
+	}
+
+	public List<String> getAttributeNames() {
+		Set<String> res = new HashSet<>();
+
+		if (this.attributes != null && !this.attributes.isEmpty()) {
+			this.attributes.values().forEach(
+					e -> e.values().forEach(a -> res.add(a.getFullName()))
+			);
+		}
+
+		return new ArrayList<>(res);
 	}
 }

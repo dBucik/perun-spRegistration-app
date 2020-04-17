@@ -1,7 +1,10 @@
 package cz.metacentrum.perun.spRegistration.persistence.models;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
-import org.json.JSONObject;
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +27,7 @@ public class Facility extends PerunEntity {
 	private boolean testEnv;
 	private boolean editable = false;
 	private List<User> admins = new ArrayList<>();
-	private Map<String, PerunAttribute> attrs = new HashMap<>();
+	private Map<AttributeCategory, Map<String, PerunAttribute>> attributes = new HashMap<>();
 
 	public Facility(Long id) {
 		super(id);
@@ -100,22 +103,22 @@ public class Facility extends PerunEntity {
 		this.admins = admins;
 	}
 
-	public Map<String, PerunAttribute> getAttrs() {
-		return attrs;
+	public Map<AttributeCategory, Map<String, PerunAttribute>> getAttributes() {
+		return attributes;
 	}
 
-	public void setAttrs(Map<String, PerunAttribute> attrs) {
-		this.attrs = attrs;
+	public void setAttributes(Map<AttributeCategory, Map<String, PerunAttribute>> attributes) {
+		this.attributes = attributes;
 	}
 
 	/**
 	 * Convert object to JSON representation
 	 * @return JSON String
 	 */
-	public JSONObject toJson() {
-		JSONObject res = new JSONObject();
+	public JsonNode toJson() {
+		ObjectNode res = JsonNodeFactory.instance.objectNode();
 		if (this.getId() == null) {
-			res.put("id", JSONObject.NULL);
+			res.set("id", JsonNodeFactory.instance.nullNode());
 		} else {
 			res.put("id", getId());
 		}
@@ -131,14 +134,14 @@ public class Facility extends PerunEntity {
 	 * @param json JSON from Perun
 	 * @return Facility object or null
 	 */
-	public static Facility fromPerunJson(JSONObject json) {
+	public static Facility fromPerunJson(JsonNode json) {
 		if (Utils.checkParamsInvalid(json)) {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Long id = json.getLong("id");
-		String name = json.getString("name");
-		String description = json.optString("description", "");
+		Long id = json.get("id").asLong();
+		String name = json.get("name").textValue();
+		String description = json.hasNonNull("description") ? json.get("description").textValue() : null;
 
 		return new Facility(id, name, description);
 	}
@@ -151,7 +154,7 @@ public class Facility extends PerunEntity {
 				", testEnv=" + testEnv +
 				", activeRequestId=" + activeRequestId +
 				", canEdit=" + editable +
-				", attrs=" + attrs +
+				", attrs=" + attributes +
 				'}';
 	}
 
@@ -165,11 +168,11 @@ public class Facility extends PerunEntity {
 				Objects.equals(name, facility.name) &&
 				Objects.equals(description, facility.description) &&
 				Objects.equals(activeRequestId, facility.activeRequestId) &&
-				Objects.equals(attrs, facility.attrs);
+				Objects.equals(attributes, facility.attributes);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, description, testEnv, activeRequestId, editable, attrs);
+		return Objects.hash(name, description, testEnv, activeRequestId, editable, attributes);
 	}
 }

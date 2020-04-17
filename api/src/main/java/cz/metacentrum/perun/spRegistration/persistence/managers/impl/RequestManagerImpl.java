@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -46,9 +45,11 @@ public class RequestManagerImpl implements RequestManager {
 	private final RequestMapper REQUEST_MAPPER;
 	private final RequestSignatureMapper REQUEST_SIGNATURE_MAPPER;
 	private NamedParameterJdbcTemplate jdbcTemplate;
+	private final Config config;
 
 	@Autowired
 	public RequestManagerImpl(Config config) {
+		this.config = config;
 		REQUEST_SIGNATURE_MAPPER = new RequestSignatureMapper();
 		REQUEST_MAPPER = new RequestMapper(config);
 	}
@@ -96,7 +97,7 @@ public class RequestManagerImpl implements RequestManager {
 		params.addValue("status", request.getStatus().getAsInt());
 		params.addValue("action", request.getAction().getAsInt());
 		params.addValue("req_user_id", request.getReqUserId());
-		params.addValue("attributes", request.getAttributesAsJsonForDb());
+		params.addValue("attributes", request.getAttributesAsJsonForDb(config.getAppConfig()));
 		params.addValue("modified_by", request.getModifiedBy());
 
 		int updatedCount = jdbcTemplate.update(query, params, key, new String[] { "id" });
@@ -141,7 +142,7 @@ public class RequestManagerImpl implements RequestManager {
 		params.addValue("status", request.getStatus().getAsInt());
 		params.addValue("action", request.getAction().getAsInt());
 		params.addValue("req_user_id", request.getReqUserId());
-		params.addValue("attributes", request.getAttributesAsJsonForDb());
+		params.addValue("attributes", request.getAttributesAsJsonForDb(config.getAppConfig()));
 		params.addValue("modified_by", request.getModifiedBy());
 		params.addValue("req_id", request.getReqId());
 

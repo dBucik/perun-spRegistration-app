@@ -4,8 +4,7 @@ import { Observable } from "rxjs";
 import { Facility } from "../models/Facility";
 import { Request } from "../models/Request";
 import {PerunAttribute} from "../models/PerunAttribute";
-import {OidcDetails} from "../models/OidcDetails";
-import {ClientSecret} from "../models/ClientSecret";
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -30,14 +29,6 @@ export class FacilitiesService {
 
   getFacilitySignature(id: number): Observable<Facility> {
     return this.apiService.get('/facility/signature/' + id);
-  }
-
-  getOidcDetails(id: number): Observable<Map<String, PerunAttribute>> {
-    return this.apiService.get('/facility/oidcDetails/' + id);
-  }
-
-  getSamlDetails(id: number): Observable<Map<String, PerunAttribute>> {
-    return this.apiService.get('/facility/samlDetails/' + id);
   }
 
   createRequest(id: number, emails: string[]): Observable<number> {
