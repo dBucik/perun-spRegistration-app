@@ -54,7 +54,7 @@
         </div>
         <!-- BUTTONS -->
         <div class="col-md-4 mt-4 mb-2 controls text-right">
-          <ng-container *ngIf="request.facilityId">
+          <ng-container *ngIf="request.facilityId && request.action !== 'DELETE_FACILITY' && request.status !== 'APPROVED'">
             <button class="btn-block mb-3" mat-raised-button color="accent"
                     [routerLink]="['/auth/facilities/detail', request.facilityId]">
               {{'REQUESTS.SEE_FACILITY' | translate}}
