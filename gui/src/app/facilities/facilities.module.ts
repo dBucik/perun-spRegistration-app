@@ -19,6 +19,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatPaginatorIntl, MatPaginatorModule} from '@angular/material/paginator';
 import {TranslateService} from "@ngx-translate/core";
 import { PaginatorI18n } from '../core/parts/paginatorI18n';
+import {FacilityDetailItemLocalePipe} from "./facility-detail-item-locale.pipe";
 
 @NgModule({
   imports: [
@@ -41,7 +42,8 @@ import { PaginatorI18n } from '../core/parts/paginatorI18n';
     FacilityAddAdminSignComponent,
     AllFacilitiesComponent,
     FacilityEnvironmentPipe,
-    FacilityProtocolPipe
+    FacilityProtocolPipe,
+    FacilityDetailItemLocalePipe
   ],
   entryComponents: [
     FacilitiesDetailDialogComponent,
