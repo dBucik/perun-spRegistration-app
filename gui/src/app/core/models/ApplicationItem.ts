@@ -5,12 +5,21 @@ export class ApplicationItem {
       return
     }
     this.name = item.name;
+
+    this.description = new Map<string, string>();
+    for (const k of Object.keys(item.description)) {
+      this.description.set(k, item.description[k]);
+    }
+
+    this.displayName = new Map<string, string>();
+    for (const k of Object.keys(item.displayName)) {
+      this.displayName.set(k.toLowerCase(), item.displayName[k]);
+    }
+
     this.required = item.required;
     this.displayPosition = item.displayPosition;
     this.displayed = item.displayed;
     this.regex = item.regex;
-    this.description = item.description;
-    this.displayName = item.displayName;
     this.type = item.type;
     this.allowedKeys = item.allowedKeys;
     this.allowedValues = item.allowedValues;

@@ -16,6 +16,7 @@ import { RequestActionPipe } from './request-action.pipe';
 import { RequestApprovedPipe } from './request-approved.pipe';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import {MatTabsModule} from "@angular/material/tabs";
+import { RequestDetailItemLocalePipe } from './request-detail-item-locale.pipe';
 
 @NgModule({
     imports: [
@@ -38,7 +39,8 @@ import {MatTabsModule} from "@angular/material/tabs";
     RequestActionPipe,
     AllRequestsComponent,
     RequestDetailDialogComponent,
-    RequestApprovedPipe
+    RequestApprovedPipe,
+    RequestDetailItemLocalePipe
   ],
   entryComponents: [
     RequestDetailDialogComponent
