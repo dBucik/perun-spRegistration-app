@@ -66,9 +66,10 @@ export class ApplicationItemListComponent implements RequestItem, OnInit {
   }
 
   ngOnInit(): void {
-    const browserLang = this.translate.getDefaultLang();
-    this.translatedDescription = this.applicationItem.description[browserLang];
-    this.translatedName = this.applicationItem.displayName[browserLang];
+    const browserLang = this.translate.getBrowserLang();
+    this.translatedName = this.applicationItem.getLocalizedName(browserLang);
+    this.translatedDescription = this.applicationItem.getLocalizedDescription(browserLang);
+
     if (this.applicationItem.oldValue != null) {
       this.values = this.applicationItem.oldValue;
     }

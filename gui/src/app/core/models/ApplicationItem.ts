@@ -41,4 +41,20 @@ export class ApplicationItem {
   comment: string;
   oldValue: any;
   isEdit: boolean;
+
+  public getLocalizedName(lang: string) {
+    if (this.displayName.has(lang)) {
+      return this.displayName.get(lang);
+    } else {
+      return this.displayName.get('en');
+    }
+  }
+
+  public getLocalizedDescription(lang: string) {
+    if (this.description.has(lang)) {
+      return this.description.get(lang);
+    } else {
+      return this.description.get('en');
+    }
+  }
 }
