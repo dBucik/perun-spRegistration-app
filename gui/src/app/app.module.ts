@@ -19,6 +19,7 @@ import {ToolsComponent} from './tools/tools.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatTabsModule} from '@angular/material/tabs';
 import {AttributeValuePipe} from './attribute-value.pipe';
+import {DocumentSignItemLocalePipe} from "./document-sign-item-locale.pipe";
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -32,7 +33,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     PerunFooterCstComponent,
     PerunHeaderComponent,
     ToolsComponent,
-    AttributeValuePipe
+    AttributeValuePipe,
+    DocumentSignItemLocalePipe
   ],
   imports: [
       AppRoutingModule,
