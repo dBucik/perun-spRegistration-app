@@ -283,7 +283,7 @@ public class MailsService {
 
 	private String getMessage(String action, String role) {
 		log.trace("getMessage({}, {})", action, role);
-		StringJoiner joiner = new StringJoiner("<br/><hr/><br/>");
+		StringJoiner joiner = new StringJoiner("<br/><br/><hr/><br/>");
 		for (String lang : appConfig.getAvailableLanguages()) {
 			String msg = getSingleEntry(action, role, lang, "message");
 			if (! NULL_KEY.equals(msg)) {
