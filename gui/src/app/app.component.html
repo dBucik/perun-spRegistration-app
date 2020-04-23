@@ -1,7 +1,7 @@
 <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
 <div *ngIf="!loading">
   <mat-toolbar color="primary" class="fixed-top" role="heading">
-    <button mat-icon-button class="mr-2 no-focus-outline d-block" (click)="toggleSideBar()">
+    <button *ngIf="hasUser()" mat-icon-button class="mr-2 no-focus-outline d-block" (click)="toggleSideBar()">
       <mat-icon>menu</mat-icon>
     </button>
     <a [routerLink]="hasUser() ? '/auth' : '/'" class="site-title ml-2">
