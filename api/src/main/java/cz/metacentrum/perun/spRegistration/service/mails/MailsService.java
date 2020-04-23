@@ -174,7 +174,7 @@ public class MailsService {
 		try {
 			MimeMessage message = mailSender.createMimeMessage();
 
-			MimeMessageHelper helper = new MimeMessageHelper(message, true);
+			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 			helper.setFrom(from);
 			helper.setTo(to);
 			helper.setSubject(subject);
