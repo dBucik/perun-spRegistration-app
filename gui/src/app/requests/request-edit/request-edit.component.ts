@@ -117,23 +117,25 @@ export class RequestEditComponent implements OnInit {
   private pushInputs() {
     this.clearArrays();
     this.request.serviceAttrs().forEach((attr, _) => {
-      this.pushInput(attr, this.commentedServiceAttrs, this.serviceAttrs);
+      RequestEditComponent.pushInput(attr, this.commentedServiceAttrs, this.serviceAttrs);
     });
 
     this.request.organizationAttrs().forEach((attr, _) => {
-      this.pushInput(attr, this.commentedOrganizationAttrs, this.organizationAttrs);
+      RequestEditComponent.pushInput(attr, this.commentedOrganizationAttrs, this.organizationAttrs);
     });
 
     this.request.protocolAttrs().forEach((attr, _) => {
-      this.pushInput(attr, this.commentedProtocolAttrs, this.protocolAttrs);
+      RequestEditComponent.pushInput(attr, this.commentedProtocolAttrs, this.protocolAttrs);
     });
 
     this.request.accessControlAttrs().forEach((attr, _) => {
-      this.pushInput(attr, this.commentedAccessControlAttrs, this.accessControlAttrs);
+      RequestEditComponent.pushInput(attr, this.commentedAccessControlAttrs, this.accessControlAttrs);
     });
   }
 
-  private pushInput(attr: PerunAttribute, commentedDest: ApplicationItem[], regularDest: ApplicationItem[]) {
+  private static pushInput(attr: PerunAttribute, commentedDest: ApplicationItem[], regularDest: ApplicationItem[]) {
+    attr.input.oldValue = attr.value;
+
     if (attr.comment) {
       attr.input.isEdit = true;
       attr.input.comment = attr.comment;
