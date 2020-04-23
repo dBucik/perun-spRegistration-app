@@ -135,6 +135,7 @@
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
+        <property name="fileEncoding" value="UTF-8"/>
     </bean>
 
     <bean id="enLocale" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -144,6 +145,7 @@
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
+        <property name="fileEncoding" value="UTF-8"/>
     </bean>
 
     <bean id="csLocale" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -153,6 +155,7 @@
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true"/>
+        <property name="fileEncoding" value="UTF-8"/>
     </bean>
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
