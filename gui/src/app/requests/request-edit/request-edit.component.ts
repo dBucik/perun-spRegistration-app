@@ -159,22 +159,18 @@ export class RequestEditComponent implements OnInit {
 
   private changeServiceShowMore(){
     this.showServiceMore = !this.showServiceMore;
-    this.ngOnInit();
   }
 
   private changeOrganizationShowMore(){
     this.showOrganizationMore = !this.showOrganizationMore;
-    this.ngOnInit();
   }
 
   private changeProtocolShowMore(){
     this.showProtocolMore = !this.showProtocolMore;
-    this.ngOnInit();
   }
 
   private changeAccessShowMore(){
     this.showAccessControlMore = !this.showAccessControlMore;
-    this.ngOnInit();
   }
 
   private static filterAndSort(items: ApplicationItem[]): ApplicationItem[] {
