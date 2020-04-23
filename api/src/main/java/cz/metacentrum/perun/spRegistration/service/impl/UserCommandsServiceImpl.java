@@ -653,34 +653,6 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return isValid;
 	}
 
-	@Override
-	public Map<String, PerunAttribute> getOidcDetails(Long facilityId, Long id) throws ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
-		log.trace("getOidcClientIdAndSercret({}, {})", facilityId, id);
-		Set<String> attrNames = config.getOidcInputs().stream().map(AttrInput::getName).collect(Collectors.toSet());
-		attrNames.add(appConfig.getClientIdAttribute());
-		attrNames.add(appConfig.getClientSecretAttribute());
-
-		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, new ArrayList<>(attrNames));
-		PerunAttribute clientSecret = attrs.get(appConfig.getClientSecretAttribute());
-		String value = ServiceUtils.decrypt(clientSecret.valueAsString(), appConfig.getSecret());
-		clientSecret.setValue(value);
-
-		log.trace("getOidcClientIdAndSecret() returns: {}", attrs);
-		return attrs;
-	}
-
-	@Override
-	public Map<String, PerunAttribute> getSamlDetails(Long facilityId, Long id) throws ConnectorException {
-		log.trace("getOidcClientIdAndSercret({}, {})", facilityId, id);
-		Set<String> attrNames = config.getSamlInputs().stream().map(AttrInput::getName).collect(Collectors.toSet());
-
-
-		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, new ArrayList<>(attrNames));
-
-		log.trace("getOidcClientIdAndSercret() returns: {}", attrs);
-		return attrs;
-  }
-
 	/* PRIVATE METHODS */
 
 	private Request createRequest(Long facilityId, Long userId, RequestAction action, List<PerunAttribute> attributes)

@@ -18,7 +18,6 @@ import javax.crypto.IllegalBlockSizeException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Service layer with methods specific for Users.
@@ -262,13 +261,4 @@ public interface UserCommandsService {
 	 */
 	boolean validateCode(String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException, CodeNotStoredException;
 
-	/**
-	 * Get oidc detail
-	 * @param facilityId Id of facility
-	 * @param id userId
-	 * @return Map
-	 */
-	Map<String, PerunAttribute> getOidcDetails(Long facilityId, Long id) throws ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException;
-
- 	Map<String, PerunAttribute> getSamlDetails(Long facilityId, Long id) throws ConnectorException;
 }
