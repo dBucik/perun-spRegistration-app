@@ -32,8 +32,8 @@
                   <app-application-item [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
-              <div class="container-fluid mt-1" *ngIf="accessControlAttrs.length > 0 && showServiceMore">
-                <div class="container-fluid" *ngFor="let applicationItems of accessControlAttrs">
+              <div class="container-fluid mt-1" *ngIf="serviceAttrs.length > 0 && showServiceMore">
+                <div class="container-fluid" *ngFor="let applicationItems of serviceAttrs">
                   <app-application-item [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
@@ -52,8 +52,8 @@
                   <app-application-item [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
-              <div class="container-fluid mt-1" *ngIf="accessControlAttrs.length > 0 && showOrganizationMore">
-                <div class="container-fluid" *ngFor="let applicationItems of accessControlAttrs">
+              <div class="container-fluid mt-1" *ngIf="organizationAttrs.length > 0 && showOrganizationMore">
+                <div class="container-fluid" *ngFor="let applicationItems of organizationAttrs">
                   <app-application-item [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
@@ -72,8 +72,8 @@
                   <app-application-item [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
-              <div class="container-fluid mt-1" *ngIf="accessControlAttrs.length > 0 && showProtocolMore">
-                <div class="container-fluid" *ngFor="let applicationItems of accessControlAttrs">
+              <div class="container-fluid mt-1" *ngIf="protocolAttrs.length > 0 && showProtocolMore">
+                <div class="container-fluid" *ngFor="let applicationItems of protocolAttrs">
                   <app-application-item [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
