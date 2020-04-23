@@ -168,8 +168,9 @@ public class Request {
 	 * @return Administrator contact
 	 */
 	public String getAdminContact(String attrKey) {
-		if (attributes != null && !attributes.containsKey(AttributeCategory.SERVICE) &&
-				attributes.get(AttributeCategory.SERVICE).containsKey(attrKey) && attributes.get(AttributeCategory.SERVICE).get(attrKey) != null)
+		if (attributes != null && attributes.containsKey(AttributeCategory.SERVICE) &&
+				attributes.get(AttributeCategory.SERVICE).containsKey(attrKey)
+				&& attributes.get(AttributeCategory.SERVICE).get(attrKey) != null)
 		{
 			attributes.get(AttributeCategory.SERVICE).get(attrKey).valueAsString();
 		}

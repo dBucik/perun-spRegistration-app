@@ -273,7 +273,7 @@ public class MailsService {
 		StringJoiner joiner = new StringJoiner(" / ");
 		for (String lang : appConfig.getAvailableLanguages()) {
 			String subj = getSingleEntry(action, role, lang, "subject");
-			if (! NULL_KEY.equals(subj)) {
+			if (subj != null && !NULL_KEY.equals(subj)) {
 				joiner.add(subj);
 			}
 		}
@@ -286,7 +286,7 @@ public class MailsService {
 		StringJoiner joiner = new StringJoiner("<br/><br/><hr/><br/>");
 		for (String lang : appConfig.getAvailableLanguages()) {
 			String msg = getSingleEntry(action, role, lang, "message");
-			if (! NULL_KEY.equals(msg)) {
+			if (msg != null && !NULL_KEY.equals(msg)) {
 				joiner.add(msg);
 			}
 		}

@@ -115,7 +115,7 @@
                 <prop key="update.admin.message.en">Request %REQUEST_ID% updated</prop>
 
                 <prop key="status_updated.user.subject.en">Updated status of request %REQUEST_ID%</prop>
-                <prop key="status_updated.user.message.en">Status has been updated to %NEW_STATUS%</prop>
+                <prop key="status_updated.user.message.en">Status has been updated to %EN_NEW_STATUS%</prop>
 
                 <prop key="signed.user.subject.en">Request %REQUEST_ID% signed</prop>
                 <prop key="signed.user.message.en">Request %REQUEST_ID% signed</prop>
