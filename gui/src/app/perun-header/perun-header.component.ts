@@ -6,23 +6,23 @@ import {AppComponent} from '../app.component';
   templateUrl: './perun-header.component.html',
   styleUrls: ['./perun-header.component.scss']
 })
-export class PerunHeaderComponent implements OnInit {
+export class PerunHeaderComponent {
 
   constructor( ) { }
 
   private static header: string;
 
   public static setHeader(header: string) {
-    PerunHeaderComponent.header = header;
+    if (!header) {
+      this.header = '<div></div>';
+    } else {
+      this.header = header;
+    }
+    PerunHeaderComponent.header = this.header;
   }
 
   public getHeader(): string {
     return PerunHeaderComponent.header;
   }
 
-  ngOnInit(): void {
-    if (AppComponent.getPageConfig() !== null && AppComponent.getPageConfig() !== undefined) {
-      PerunHeaderComponent.header = AppComponent.getPageConfig().headerHtml;
-    }
-  }
 }

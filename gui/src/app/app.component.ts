@@ -54,21 +54,15 @@ export class AppComponent implements OnInit {
   currentUrl = '';
   logoUrl = '';
   appTitle = '';
-  footerHtml = '<div></div>';
-  headerHtml = '<div></div>';
 
   lastWindowWidth: number;
 
   public static isApplicationAdmin(): boolean {
-    if (this.user === undefined || this.user === null) {
-      return false;
+    if (this.user) {
+      return this.user.isAppAdmin;
     }
 
-    return this.user.isAppAdmin;
-  }
-
-  public static getPageConfig(): PageConfig {
-    return this.pageConfig;
+    return false;
   }
 
   public static getUser(): User {
@@ -93,14 +87,12 @@ export class AppComponent implements OnInit {
       if (pageConfig !== null && pageConfig !== undefined) {
         this.appTitle = pageConfig.headerLabel;
         this.logoUrl = pageConfig.logoUrl;
-        this.footerHtml = pageConfig.footerHtml;
-        this.headerHtml = pageConfig.headerHtml;
-        PerunFooterCstComponent.setFooter(this.footerHtml);
-        PerunHeaderComponent.setHeader(this.headerHtml);
+        PerunFooterCstComponent.setFooter(pageConfig.footerHtml);
+        PerunHeaderComponent.setHeader(pageConfig.headerHtml);
       }
 
-      PerunFooterCstComponent.setFooter(this.footerHtml);
-      PerunHeaderComponent.setHeader(this.headerHtml);
+      PerunFooterCstComponent.setFooter(null);
+      PerunHeaderComponent.setHeader(null);
       this.loading = false;
     });
     this.setAndGetUser();
