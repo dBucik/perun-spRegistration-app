@@ -131,18 +131,22 @@ export class FacilitiesEditComponent implements OnInit {
   private pushInputs() {
     this.clearArrays();
     this.facility.serviceAttrs().forEach((attr, _) => {
+      attr.input.oldValue = attr.value;
       this.serviceAttrs.push(attr.input);
     });
 
     this.facility.organizationAttrs().forEach((attr, _) => {
+      attr.input.oldValue = attr.value;
       this.organizationAttrs.push(attr.input);
     });
 
     this.facility.protocolAttrs().forEach((attr, _) => {
+      attr.input.oldValue = attr.value;
       this.protocolAttrs.push(attr.input);
     });
 
     this.facility.accessControlAttrs().forEach((attr, _) => {
+      attr.input.oldValue = attr.value;
       this.accessControlAttrs.push(attr.input);
     });
   }
