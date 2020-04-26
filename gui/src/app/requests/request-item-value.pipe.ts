@@ -25,18 +25,18 @@ export class RequestItemValuePipe implements PipeTransform {
           output += `<li>${val}</li>`;
         }
       }
-      return `<ul class="pad1 ul-attr">${output}</ul>`;
+      return `<ul class="m-0 pb-0">${output}</ul>`;
     }
     if (value instanceof Object) {
       let output = '';
       for (const key of Object.keys(value)) {
         if (value[key].match(this.regex)) {
-          output += `<div>${key} :  <a target="_blank" href="${value[key]}">${value[key]}</a></div>`;
+          output += `<li>${key} :  <a target="_blank" href="${value[key]}">${value[key]}</a></li>`;
         } else {
-          output += `<div>${key} :  ${value[key]}</div>`;
+          output += `<li>${key} :  ${value[key]}</li>`;
         }
       }
-      return `<div class="pad1" >${output}</div>`;
+      return `<ul class="m-0 pb-0">${output}</ul>`;
     }
     if (value.toString().match(this.regex)) {
       return `<a target="_blank" href="${value}">${value}</a>`;

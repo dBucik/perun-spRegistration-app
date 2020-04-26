@@ -31,8 +31,7 @@
     "OIDC": "OIDC",
     "SAML": "SAML",
     "ERROR" : "Něco se pokazilo",
-    "DETAIL_ITEM_NAME" : "Vlastnost",
-    "DETAIL_ITEM_VALUE" : "Hodnota",
+    "NAME" : "Jméno",
     "SUBMIT" : "Odeslat",
     "ATTRIBUTES": {
       "SERVICE": "Služba",
@@ -76,8 +75,11 @@
     "REQUEST_CHANGES_COMMENT" : "Komentář",
     "SET_REQUEST_WFA" : "Požádat o schválení",
     "EDIT_REQUEST" : "Upravit požadované nastavení",
-    "USERS_WHO_SIGNED": "Uživatelé, kteří podepsali tuto žádost ",
+    "APPROVALS": "Rozhodnutí od autorit:",
     "NO_SIGNATURE_GIVEN": "Tato žádost ještě nebyla nikým podepsána",
+    "ADD_COMMENT": "Stiskem zobrazíte/skryjete pole pro zadávaní komentáře",
+    "INPUT_COMMENT": "Zadejte komentář",
+    "ADMINISTRATOR_COMMENT": "Komentář od správce",
     "STATUSPIPE": {
       "APPROVED": "Schváleno",
       "REJECTED": "Zamítnuto",

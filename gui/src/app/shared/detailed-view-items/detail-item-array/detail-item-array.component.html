@@ -1,0 +1,13 @@
+<detail-item-sub-comment-button #buttonComponent [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
+                                [showComment]="!!item.comment"></detail-item-sub-comment-button>
+
+<div class="p-0 m-0">
+  <p class="mb-1"><span class="font-thick">{{item.name | itemLocalePipe}}</span></p>
+  <p class="text-muted mb-1">
+    <span class="small" [innerHTML]="item.description | itemLocalePipe"></span>
+  </p>
+  <div class="mb-0" [innerHTML]="item.value | detailedViewItemValuePipe"></div>
+</div>
+
+<detail-item-sub-comment [includeComment]="includeComment" [item]="item" [isAppAdmin]="isAppAdmin"
+                         [buttonComponent]="buttonComponent"></detail-item-sub-comment>

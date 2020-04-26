@@ -11,8 +11,8 @@ import {TranslateService} from "@ngx-translate/core";
 import {AppComponent} from "../../app.component";
 import {RequestSignature} from "../../core/models/RequestSignature";
 import {RequestDetailDialogComponent} from "./request-detail-dialog/request-detail-dialog.component";
-import {RequestDetailItem} from "../../core/models/items/RequestDetailItem";
-import {FacilityDetailItem} from "../../core/models/items/FacilityDetailItem";
+import {DetailViewItem} from "../../core/models/items/DetailViewItem";
+import {DetailedViewItemsComponent} from "../../shared/detailed-view-items/detailed-view-items.component";
 
 export interface DialogData {
   isApprove: boolean;
@@ -34,15 +34,15 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     private snackBar: MatSnackBar,
     private translate: TranslateService,
     private router: Router
-  ) {
+  ) { }
 
-  }
+  @ViewChild(DetailedViewItemsComponent, {static: false}) detailedViewItemsComponent: DetailedViewItemsComponent;
 
   private sub: Subscription;
-  requestAttrsService: RequestDetailItem[] = [];
-  requestAttrsOrganization: RequestDetailItem[] = [];
-  requestAttrsProtocol: RequestDetailItem[] = [];
-  requestAttrsAccessControl: RequestDetailItem[] = [];
+  requestAttrsService: DetailViewItem[] = [];
+  requestAttrsOrganization: DetailViewItem[] = [];
+  requestAttrsProtocol: DetailViewItem[] = [];
+  requestAttrsAccessControl: DetailViewItem[] = [];
 
   displayedColumns: string[] = ['name', 'value'];
 
@@ -64,17 +64,17 @@ export class RequestDetailComponent implements OnInit, DoCheck {
   isApplicationAdmin: boolean;
 
   private mapAttributes() {
-    this.request.serviceAttrs().forEach((attr, urn) => {
-      this.requestAttrsService.push(new RequestDetailItem(attr));
+    this.request.serviceAttrs().forEach((attr, _) => {
+      this.requestAttrsService.push(new DetailViewItem(attr));
     });
-    this.request.organizationAttrs().forEach((attr, urn) => {
-      this.requestAttrsOrganization.push(new RequestDetailItem(attr));
+    this.request.organizationAttrs().forEach((attr, _) => {
+      this.requestAttrsOrganization.push(new DetailViewItem(attr));
     });
-    this.request.protocolAttrs().forEach((attr, urn) => {
-      this.requestAttrsProtocol.push(new RequestDetailItem(attr));
+    this.request.protocolAttrs().forEach((attr, _) => {
+      this.requestAttrsProtocol.push(new DetailViewItem(attr));
     });
-    this.request.accessControlAttrs().forEach((attr, urn) => {
-      this.requestAttrsAccessControl.push(new RequestDetailItem(attr));
+    this.request.accessControlAttrs().forEach((attr, _) => {
+      this.requestAttrsAccessControl.push(new DetailViewItem(attr));
     });
 
     this.requestAttrsService = RequestDetailComponent.sortItems(this.requestAttrsService);
@@ -147,7 +147,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
   }
 
   reject() {
-    this.requestsService.rejectRequest(this.request.reqId).subscribe(bool => {
+    this.requestsService.rejectRequest(this.request.reqId).subscribe(_ => {
       this.loading = false;
       this.snackBar.open(this.successRejectMessage, null, {duration: 6000});
       this.router.navigate(['/auth/requests/allRequests']);
@@ -173,7 +173,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     this.fillComments();
     const array = this.generateCommentedItems();
 
-    this.requestsService.askForChanges(this.request.reqId, array).subscribe(bool => {
+    this.requestsService.askForChanges(this.request.reqId, array).subscribe(_ => {
       this.loading = false;
       this.snackBar.open(this.successSetWFCMessage, null, {duration: 6000});
       this.ngOnInit()
@@ -243,7 +243,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     this.icon = !this.icon;
   }
 
-  private static sortItems(items: RequestDetailItem[]): RequestDetailItem[] {
+  private static sortItems(items: DetailViewItem[]): DetailViewItem[] {
     items.sort((a, b) => {
       return a.position - b.position;
     });

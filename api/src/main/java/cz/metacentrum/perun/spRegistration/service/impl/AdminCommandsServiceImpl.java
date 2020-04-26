@@ -161,9 +161,10 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		if (request == null) {
 			log.error("Could not fetch request with ID: {} from database", requestId);
 			throw new InternalErrorException("Could not fetch request with ID: " + requestId + " from database");
-		} else if (! RequestStatus.WAITING_FOR_APPROVAL.equals(request.getStatus())) {
-			log.error("Cannot ask for changes, request not marked as WAITING_FOR_APPROVAL");
-			throw new CannotChangeStatusException("Cannot ask for changes, request not marked as WAITING_FOR_APPROVAL");
+		} else if (!RequestStatus.WAITING_FOR_APPROVAL.equals(request.getStatus()) &&
+					!RequestStatus.WAITING_FOR_CHANGES.equals(request.getStatus())) {
+			log.error("Cannot ask for changes, request not marked as WFA nor WFC");
+			throw new CannotChangeStatusException("Cannot ask for changes, request not marked as WFA nor WFC");
 		}
 
 		request.updateAttributes(attributes, false, appConfig);

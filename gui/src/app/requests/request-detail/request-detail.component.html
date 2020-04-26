@@ -6,50 +6,23 @@
         <!-- PAGE TITLE + APPROVALS-->
         <div class="col-md-8">
           <h2 class="card-title">{{'REQUESTS.DETAIL_TITLE' | translate}}{{request.reqId}}</h2>
-          <div>
-            {{'REQUESTS.STATUS' | translate}}: <span [innerHTML]=" request.status | requestStatusPipe "></span>
+          <div><span class="font-thick mr-1">{{'REQUESTS.STATUS' | translate}}:</span>
+            <span [innerHTML]=" request.status | requestStatusPipe "></span>
           </div>
-          <div>
-            {{'REQUESTS.ACTION' | translate}}: <span [innerHTML]=" request.action | requestActionPipe "></span>
+          <div><span class="font-thick mr-1">{{'REQUESTS.ACTION' | translate}}:</span>
+            <span [innerHTML]=" request.action | requestActionPipe "></span>
           </div>
-          <div class="mb-4">{{'REQUESTS.DETAIL_EDITED' | translate}}: {{ request.modifiedAt | date }}</div>
+          <div class="mb-4"><span class="font-thick mr-1">{{'REQUESTS.DETAIL_EDITED' | translate}}:</span>
+            {{ request.modifiedAt | date: 'dd/MM/yyyy'}}</div>
           <ng-container *ngIf="request.action == 'MOVE_TO_PRODUCTION'">
-            <mat-accordion hideToggle="true">
-              <mat-expansion-panel [disabled]="expansionPanelDisabled" class="shadow-none">
-                <mat-expansion-panel-header collapsedHeight="auto" expandedHeight="auto" class="pl-0" (click)="changeArrow()">
-                  <mat-panel-title>
-                    <div *ngIf="expansionPanelDisabled" class="font-italic">
-                      {{'REQUESTS.NO_SIGNATURE_GIVEN' | translate}}
-                    </div>
-                    <div *ngIf="!expansionPanelDisabled" class="pt-2">
-                      <mat-icon inline="true">{{icon  ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</mat-icon>
-                      <span [matBadge]="signatures.length.toString()" matBadgeColor="accent" matBadgeOverlap="false" matBadgeSize="medium" matBadgePosition="above after">{{'REQUESTS.USERS_WHO_SIGNED' | translate}}   </span>
-                    </div>
-                  </mat-panel-title>
-                </mat-expansion-panel-header>
-                <table mat-table [dataSource]="signatures" class="w-100">
-                  <ng-container matColumnDef="name" >
-                    <th mat-header-cell *matHeaderCellDef> {{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
-                    <td mat-cell *matCellDef="let sign"> {{sign.name}} </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="signedAt">
-                    <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.DETAIL_DATE' | translate}} </th>
-                    <td mat-cell *matCellDef="let sign"> {{sign.signedAt | date:'medium'}} </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="approved">
-                    <th mat-header-cell *matHeaderCellDef> {{'REQUESTS.DETAIL_APPROVED' | translate}} </th>
-                    <td mat-cell *matCellDef="let sign">
-                      <span [outerHTML]="sign.approved | requestApprovedPipe"></span>
-                    </td>
-                  </ng-container>
-
-                  <tr mat-header-row *matHeaderRowDef="columns; sticky: true" class="h-50"></tr>
-                  <tr mat-row *matRowDef="let row; columns: columns;" class="h-50 pad1"></tr>
-                </table>
-              </mat-expansion-panel>
-            </mat-accordion>
+            <h5>{{'REQUESTS.APPROVALS' | translate}}</h5>
+            <ul>
+              <li *ngFor="let signature of signatures">
+                <span class="mr-2">{{signature.name}} -</span>
+                <span class="text-muted mr-2">{{signature.signedAt | date: 'dd/MM/yyyy'}}</span>
+                <span [innerHTML]="signature.approved | requestApprovedPipe"></span>
+              </li>
+            </ul>
           </ng-container>
         </div>
         <!-- BUTTONS -->
@@ -60,23 +33,23 @@
               {{'REQUESTS.SEE_FACILITY' | translate}}
             </button>
           </ng-container>
-          <ng-container *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
+          <ng-container *ngIf="isApplicationAdmin || request.status=='WAITING_FOR_APPROVAL'">
             <button class="btn-block" mat-raised-button color="accent" (click)="openApproveDialog()">
               {{'REQUESTS.DETAIL_APPROVE' | translate}}
             </button>
           </ng-container>
-          <ng-container *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
+          <ng-container *ngIf="isApplicationAdmin || request.status=='WAITING_FOR_APPROVAL'">
             <button mat-raised-button color="warn" class="btn-block" (click)="openRejectDialog()">
               {{'REQUESTS.DETAIL_REJECT' | translate}}
             </button>
           </ng-container>
-          <ng-container *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
-            <button class="btn-block" mat-raised-button color="accent" (click)="openSetWFCDialog()">
+          <ng-container *ngIf="isApplicationAdmin && (request.status=='WAITING_FOR_APPROVAL' || request.status=='WAITING_FOR_CHANGES')">
+            <button class="btn-block" mat-raised-button color="primary" (click)="openSetWFCDialog()">
               {{'REQUESTS.DETAIL_REQUEST_CHANGES' | translate}}
             </button>
           </ng-container>
           <ng-container *ngIf="(isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL') || (request.status=='WAITING_FOR_CHANGES')">
-            <button class="btn-block" mat-raised-button [routerLink]="['/auth/requests/editRequest', request.reqId]">
+            <button class="btn-block" mat-raised-button color="accent" [routerLink]="['/auth/requests/editRequest', request.reqId]">
               {{'REQUESTS.EDIT_REQUEST' | translate}}
             </button>
           </ng-container>
@@ -92,172 +65,27 @@
       <div class="row mt-3">
         <div class="col">
           <mat-tab-group class="p-1">
-              <mat-tab label="{{ 'COMMON.ATTRIBUTES.SERVICE' | translate }}">
-                <table mat-table [dataSource]="requestAttrsService" class="w-100">
-                  <ng-container matColumnDef="name" class="mr-5">
-                    <th mat-header-cell class="w-25" *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
-                    <td mat-cell *matCellDef="let item" class="font-thick">
-                      {{item.name | requestDetailItemLocale}}
-                      <span><mat-icon [matTooltip]="item.description | requestDetailItemLocale" class="text-muted fs-1">info</mat-icon></span>
-                    </td>
-                  </ng-container>
-                  <ng-container matColumnDef="value">
-                    <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
-                    <td mat-cell *matCellDef="let item">
-                      <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
-                        {{'UNDEFINED' | translate}}
-                      </div>
-                      <ng-template #notNullValue>
-                        <span [outerHTML]="item.value | requestItemValue"></span>
-                      </ng-template>
-                    </td>
-                  </ng-container>
-                  <ng-container matColumnDef="comment" *ngIf="request.status === 'WAITING_FOR_APPROVAL' || request.status === 'WAITING_FOR_CHANGES'">
-                    <th mat-header-cell *matHeaderCellDef class="w-40">{{'REQUESTS.REQUEST_CHANGES_COMMENT' | translate}}</th>
-                    <td mat-cell *matCellDef="let item">
-                      <mat-form-field *ngIf="isApplicationAdmin" class="w-100">
-                        <input #input="ngModel" matInput [(ngModel)]="item.comment" name="{{item.name}}" id="{{item.name}}" type="text">
-                      </mat-form-field>
-                      <div *ngIf="(!isApplicationAdmin && item.comment !== undefined && item.comment !== null); else elseBlock">
-                        {{item.comment}}
-                      </div>
-                      <ng-template #elseBlock>
-                        <div *ngIf="!isApplicationAdmin" class="text-muted font-italic">{{ 'REQUESTS.NO_COMMENT' | translate }}</div>
-                      </ng-template>
-                    </td>
-                  </ng-container>
-
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
-                  <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-dark"></tr>
-                </table>
-              </mat-tab>
-              <!-- ORGANIZATION -->
-              <mat-tab label="{{ 'COMMON.ATTRIBUTES.ORGANIZATION' | translate }}">
-                <table mat-table [dataSource]="requestAttrsOrganization" class="w-100">
-                  <ng-container matColumnDef="name" class="mr-5">
-                    <th mat-header-cell class="w-25" *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
-                    <td mat-cell *matCellDef="let item" class="font-thick">
-                      {{item.name | requestDetailItemLocale}}
-                      <span>
-                      <mat-icon [matTooltip]="item.description | requestDetailItemLocale" class="text-muted fs-1">info</mat-icon>
-                    </span>
-                    </td>
-                  </ng-container>
-                  <ng-container matColumnDef="value">
-                    <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
-                    <td mat-cell *matCellDef="let item">
-                      <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
-                        {{'UNDEFINED' | translate}}
-                      </div>
-                      <ng-template #notNullValue>
-                        <span [outerHTML]="item.value | requestItemValue"></span>
-                      </ng-template>
-                    </td>
-                  </ng-container>
-                  <ng-container matColumnDef="comment" class="w-25" *ngIf="request.status === 'WAITING_FOR_APPROVAL' || request.status === 'WAITING_FOR_CHANGES'">
-                    <th mat-header-cell *matHeaderCellDef>{{'REQUESTS.REQUEST_CHANGES_COMMENT' | translate}}</th>
-                    <td mat-cell *matCellDef="let item">
-                      <mat-form-field *ngIf="isApplicationAdmin" class="w-100">
-                        <input #input="ngModel" matInput [(ngModel)]="item.comment" name="{{item.name}}" id="{{item.name}}" type="text">
-                      </mat-form-field>
-                      <div *ngIf="(!isApplicationAdmin && item.comment !== undefined && item.comment !== null); else elseBlock">
-                        {{item.comment}}
-                      </div>
-                      <ng-template #elseBlock>
-                        <div *ngIf="!isApplicationAdmin" class="text-muted font-italic">{{ 'REQUESTS.NO_COMMENT' | translate }}</div>
-                      </ng-template>
-                    </td>
-                  </ng-container>
-
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
-                  <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-dark"></tr>
-                </table>
-              </mat-tab>
-              <!-- PROTOCOL -->
-              <mat-tab label="{{ 'COMMON.ATTRIBUTES.PROTOCOL' | translate }}">
-                <table mat-table [dataSource]="requestAttrsProtocol" class="w-100">
-                  <ng-container matColumnDef="name" class="mr-5">
-                    <th mat-header-cell class="w-25" *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
-                    <td mat-cell *matCellDef="let item" class="font-thick">
-                      {{item.name | requestDetailItemLocale}}
-                      <span>
-                      <mat-icon [matTooltip]="item.description | requestDetailItemLocale" class="text-muted fs-1">info</mat-icon>
-                    </span>
-                    </td>
-                  </ng-container>
-                  <ng-container matColumnDef="value">
-                    <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
-                    <td mat-cell *matCellDef="let item">
-                      <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
-                        {{'UNDEFINED' | translate}}
-                      </div>
-                      <ng-template #notNullValue>
-                        <span [outerHTML]="item.value | requestItemValue"></span>
-                      </ng-template>
-                    </td>
-                  </ng-container>
-                  <ng-container matColumnDef="comment" class="w-25" *ngIf="request.status === 'WAITING_FOR_APPROVAL' || request.status === 'WAITING_FOR_CHANGES'">
-                    <th mat-header-cell *matHeaderCellDef>{{'REQUESTS.REQUEST_CHANGES_COMMENT' | translate}}</th>
-                    <td mat-cell *matCellDef="let item">
-                      <mat-form-field *ngIf="isApplicationAdmin" class="w-100">
-                        <input #input="ngModel" matInput [(ngModel)]="item.comment" name="{{item.name}}" id="{{item.name}}" type="text">
-                      </mat-form-field>
-                      <div *ngIf="(!isApplicationAdmin && item.comment !== undefined && item.comment !== null); else elseBlock">
-                        {{item.comment}}
-                      </div>
-                      <ng-template #elseBlock>
-                        <div *ngIf="!isApplicationAdmin" class="text-muted font-italic">{{ 'REQUESTS.NO_COMMENT' | translate }}</div>
-                      </ng-template>
-                    </td>
-                  </ng-container>
-
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
-                  <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-dark"></tr>
-                </table>
-              </mat-tab>
-              <!-- ACCESS_CONTROL -->
-              <mat-tab label="{{ 'COMMON.ATTRIBUTES.ACCESS_CONTROL' | translate }}">
-                <table mat-table [dataSource]="requestAttrsAccessControl" class="w-100">
-                  <ng-container matColumnDef="name" class="mr-5">
-                    <th mat-header-cell class="w-25" *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_NAME' | translate}}</th>
-                    <td mat-cell *matCellDef="let item" class="font-thick">
-                      {{item.name | requestDetailItemLocale}}
-                      <span>
-                      <mat-icon [matTooltip]="item.description | requestDetailItemLocale" class="text-muted fs-1">info</mat-icon>
-                    </span>
-                    </td>
-                  </ng-container>
-                  <ng-container matColumnDef="value">
-                    <th mat-header-cell *matHeaderCellDef>{{'COMMON.DETAIL_ITEM_VALUE' | translate}}</th>
-                    <td mat-cell *matCellDef="let item">
-                      <div *ngIf="isUndefined(item.value); else notNullValue" class="font-italic text-muted">
-                        {{'UNDEFINED' | translate}}
-                      </div>
-                      <ng-template #notNullValue>
-                        <span [outerHTML]="item.value | requestItemValue"></span>
-                      </ng-template>
-                    </td>
-                  </ng-container>
-                  <ng-container matColumnDef="comment" class="w-25" *ngIf="request.status === 'WAITING_FOR_APPROVAL' || request.status === 'WAITING_FOR_CHANGES'">
-                    <th mat-header-cell *matHeaderCellDef>{{'REQUESTS.REQUEST_CHANGES_COMMENT' | translate}}</th>
-                    <td mat-cell *matCellDef="let item">
-                      <mat-form-field *ngIf="isApplicationAdmin" class="w-100">
-                        <input #input="ngModel" matInput [(ngModel)]="item.comment" name="{{item.name}}" id="{{item.name}}" type="text">
-                      </mat-form-field>
-                      <div *ngIf="(!isApplicationAdmin && item.comment !== undefined && item.comment !== null); else elseBlock">
-                        {{item.comment}}
-                      </div>
-                      <ng-template #elseBlock>
-                        <div *ngIf="!isApplicationAdmin" class="text-muted font-italic">{{ 'REQUESTS.NO_COMMENT' | translate }}</div>
-                      </ng-template>
-                    </td>
-                  </ng-container>
-
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
-                  <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-dark"></tr>
-                </table>
-              </mat-tab>
-            </mat-tab-group>
+            <!-- SERVICE -->
+            <mat-tab label="{{ 'COMMON.ATTRIBUTES.SERVICE' | translate }}">
+              <detailed-view-items [attrs]="requestAttrsService" [isAppAdmin]="isApplicationAdmin"
+                                   [includeComment]="true"></detailed-view-items>
+            </mat-tab>
+            <!-- ORGANIZATION -->
+            <mat-tab label="{{ 'COMMON.ATTRIBUTES.ORGANIZATION' | translate }}">
+              <detailed-view-items [attrs]="requestAttrsOrganization" [isAppAdmin]="isApplicationAdmin"
+                                   [includeComment]="true"></detailed-view-items>
+            </mat-tab>
+            <!-- PROTOCOL -->
+            <mat-tab label="{{ 'COMMON.ATTRIBUTES.PROTOCOL' | translate }}">
+              <detailed-view-items [attrs]="requestAttrsProtocol" [isAppAdmin]="isApplicationAdmin"
+                                   [includeComment]="true"></detailed-view-items>
+            </mat-tab>
+            <!-- ACCESS_CONTROL -->
+            <mat-tab label="{{ 'COMMON.ATTRIBUTES.ACCESS_CONTROL' | translate }}">
+              <detailed-view-items [attrs]="requestAttrsAccessControl" [isAppAdmin]="isApplicationAdmin"
+                                   [includeComment]="true"></detailed-view-items>
+            </mat-tab>
+          </mat-tab-group>
         </div>
       </div>
     </div>
