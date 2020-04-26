@@ -1,6 +1,7 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.facilities;
 
 
+import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
@@ -14,6 +15,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.security.InvalidKeyException;
 
 /**
  * Controller handling common actions related to Facilities.
@@ -35,8 +40,7 @@ public class CommonFacilitiesController {
 	@GetMapping(path = "/api/facility/{facilityId}")
 	public Facility facilityDetail(@SessionAttribute("user") User user,
 								   @PathVariable("facilityId") Long facilityId)
-			throws UnauthorizedActionException, InternalErrorException, ConnectorException
-	{
+			throws UnauthorizedActionException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("facilityDetail(user(): {}, facilityId: {})", user.getId(), facilityId);
 
 		Facility facility = service.getDetailedFacility(facilityId, user.getId(), true);
@@ -48,11 +52,12 @@ public class CommonFacilitiesController {
 	@GetMapping(path = "/api/facility/signature/{facilityId}")
 	public Facility facilityDetailSignature(@SessionAttribute("user") User user,
 											@PathVariable("facilityId") Long facilityId)
-			throws UnauthorizedActionException, InternalErrorException, ConnectorException
-	{
+			throws UnauthorizedActionException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("facilityDetailSignature(user(): {}, facilityId: {})", user.getId(), facilityId);
 
 		Facility facility = service.getDetailedFacility(facilityId, user.getId(), false);
+		facility.getAttributes().get(AttributeCategory.PROTOCOL).clear();
+		facility.getAttributes().get(AttributeCategory.ACCESS_CONTROL).clear();
 
 		log.trace("facilityDetailSignature() returns: {}", facility);
 		return facility;

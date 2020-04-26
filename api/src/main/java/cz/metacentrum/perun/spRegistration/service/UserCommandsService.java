@@ -188,7 +188,7 @@ public interface UserCommandsService {
 	 * @throws IllegalArgumentException Thrown when param "facilityId" is NULL, when param "userId" is NULL.
 	 */
 	Facility getDetailedFacility(Long facilityId, Long userId, boolean checkAdmin)
-			throws UnauthorizedActionException, ConnectorException, InternalErrorException;
+			throws UnauthorizedActionException, ConnectorException, InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException;
 
 	/**
 	 * Get detailed facility.
@@ -200,7 +200,7 @@ public interface UserCommandsService {
 	 * @throws IllegalArgumentException Thrown when param "facilityId" is NULL, when param "userId" is NULL.
 	 */
 	Facility getDetailedFacilityWithInputs(Long facilityId, Long userId)
-			throws UnauthorizedActionException, ConnectorException, InternalErrorException;
+			throws UnauthorizedActionException, ConnectorException, InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException;
 
 	/**
 	 * Add users as admins (managers) for facility in Perun.

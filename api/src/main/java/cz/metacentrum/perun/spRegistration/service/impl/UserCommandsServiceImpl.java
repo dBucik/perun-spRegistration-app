@@ -392,8 +392,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 	@Override
 	public Facility getDetailedFacility(Long facilityId, Long userId, boolean checkAdmin)
-			throws UnauthorizedActionException, ConnectorException, InternalErrorException
-	{
+			throws UnauthorizedActionException, ConnectorException, InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("getDetailedFacility(facilityId: {}, userId: {}, checkAdmin: {})", facilityId, userId, checkAdmin);
 
 		if (Utils.checkParamsInvalid(facilityId, userId)) {
@@ -420,6 +419,13 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		List<PerunAttribute> filteredAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
 		Map<AttributeCategory, Map<String, PerunAttribute>> facilityAttributes = convertToStruct(filteredAttributes, appConfig);
 		facility.setAttributes(facilityAttributes);
+		if (isOidc) {
+			PerunAttribute clientSecret = facility.getAttributes()
+					.get(AttributeCategory.PROTOCOL).get(appConfig.getClientSecretAttribute());
+			String valEncrypted = clientSecret.valueAsString();
+			String decrypted = ServiceUtils.decrypt(valEncrypted, appConfig.getSecret());
+			clientSecret.setValue(decrypted);
+		}
 
 		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
@@ -439,8 +445,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 	@Override
 	public Facility getDetailedFacilityWithInputs(Long facilityId, Long userId)
-			throws UnauthorizedActionException, ConnectorException, InternalErrorException
-	{
+			throws UnauthorizedActionException, ConnectorException, InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("getDetailedFacilityWithInputs(facilityId: {}, userId: {})", facilityId, userId);
 
 		if (Utils.checkParamsInvalid(facilityId, userId)) {

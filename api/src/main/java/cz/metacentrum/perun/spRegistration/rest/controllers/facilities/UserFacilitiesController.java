@@ -97,8 +97,7 @@ public class UserFacilitiesController {
 	@GetMapping(path = "/api/facilityWithInputs/{facilityId}")
 	public Facility getDetailedFacilityWithInputs(@SessionAttribute("user") User user,
 												  @PathVariable("facilityId") Long facilityId)
-			throws UnauthorizedActionException, InternalErrorException, ConnectorException
-	{
+			throws UnauthorizedActionException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("getDetailedFacilityWithInputs(user: {}, facilityId: {})", user, facilityId);
 		Facility facility = service.getDetailedFacilityWithInputs(facilityId, user.getId());
 
