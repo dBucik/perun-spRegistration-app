@@ -35,6 +35,7 @@
                 <prop key="availableLanguages">en,cs</prop>
                 <prop key="host.url">http://spreg.com/spreg</prop>
                 <prop key="secret">secretSaltGoesHere123!X$</prop>
+                <prop key="logout.url">https://spreg.aai.cesnet.cz/Shibboleth.sso/Logout?target=https%3A%2F%2Fspreg.aai.cesnet.cz%2Fspreg%2F</prop>
                 <!-- ATTRS -->
                 <prop key="attr.userEmail">urn:perun:user:attribute-def:def:preferredMail</prop>
                 <prop key="attr.proxyIdentifier">urn:perun:facility:attribute-def:def:proxyIdentifiers</prop>
@@ -211,6 +212,7 @@
         <property name="secret" value="${secret}" />
         <property name="signaturesEndpointUrl" value="${host.url}/auth/sign"/>
         <property name="adminsEndpoint" value="${host.url}/auth/facilities/addAdmin/sign"/>
+        <property name="logoutUrl" value="${logout.url}"/>
         <property name="prodTransferAuthoritiesMailsMap" ref="prodTransferAuthoritiesMailsMap" />
         <property name="masterProxyIdentifierAttribute" value="${attr.masterProxyIdentifier}" />
         <property name="masterProxyIdentifierAttributeValue" value="${attr.masterProxyIdentifier.value}" />

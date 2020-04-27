@@ -49,7 +49,7 @@ export class AppComponent implements OnInit {
 
   static pageConfig: PageConfig;
   static user: User;
-  static activeLang: string;
+  static activeLang = 'en';
 
   sidenavOpen = true;
   loading = true;
@@ -112,6 +112,12 @@ export class AppComponent implements OnInit {
 
     this.sidenavMode = window.innerWidth > this.minWidth ? 'side' : 'over';
     this.lastWindowWidth = window.innerWidth;
+  }
+
+  public logout(): void {
+    this.userService.unsetUser().subscribe(resp => {
+      window.location.href = AppComponent.pageConfig.logoutUrl;
+    });
   }
 
   public changeLanguage(lang: string) {

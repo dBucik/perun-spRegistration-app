@@ -90,6 +90,7 @@ public class ConfigController {
 		pageConfig.put("headerLabel", config.getAppConfig().getHeaderTitle());
 		pageConfig.put("footerHtml", config.getAppConfig().getFooterHTML());
 		pageConfig.put("headerHtml", config.getAppConfig().getHeaderHTML());
+		pageConfig.put("logoutUrl", config.getAppConfig().getLogoutUrl());
 
 		log.trace("getPageConfig() returns: {}", pageConfig);
 		return pageConfig;

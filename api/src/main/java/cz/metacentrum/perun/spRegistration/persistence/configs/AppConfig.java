@@ -32,6 +32,8 @@ public class AppConfig {
 	private Map<String, AttributeCategory> attributeCategoryMap = new HashMap<>();
 	private String[] protocolsEnabled = new String[] {};
 	private List<String> availableLanguages = new ArrayList<>();
+	private String logoutUrl;
+
 	private PerunConnector perunConnector;
 	private String showOnServicesListAttributeName;
 	private String isTestSpAttribute;
@@ -362,12 +364,20 @@ public class AppConfig {
 		this.proxyIdentifierAttributeValue = proxyIdentifierAttributeValue;
 	}
 
+	public void setLogoutUrl(String logoutUrl) {
+		this.logoutUrl = logoutUrl;
+	}
+
+	public String getLogoutUrl() {
+		return logoutUrl;
+	}
+
 	@Override
 	public String toString() {
 		return	"appAdminIds: " + appAdminIds + "'\n" +
 				"loginExtSource: '" + loginExtSource + "'\n" +
 				"perunAttributeDefinitionsMap: " + perunAttributeDefinitionsMap + "'\n" +
-				"protocolsEnabled=" + protocolsEnabled + "'\n" +
+				"protocolsEnabled=" + Arrays.toString(protocolsEnabled) + "'\n" +
 				"availableLanguages=" + availableLanguages + "'\n" +
 				"perunConnector=" + perunConnector + "'\n" +
 				"footerHTML: '" + footerHTML + "'\n" +

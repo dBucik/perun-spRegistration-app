@@ -16,4 +16,8 @@ export class UsersService {
     return this.apiService.get('/getUser');
   }
 
+  unsetUser(): Observable<boolean> {
+    return this.apiService.get('/unsetUser');
+  }
+
 }

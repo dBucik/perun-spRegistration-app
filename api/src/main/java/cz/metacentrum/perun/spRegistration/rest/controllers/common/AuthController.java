@@ -2,7 +2,6 @@ package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +46,16 @@ public class AuthController {
 
 		log.trace("getUser() returns: {}", user);
 		return user;
+	}
+
+	@GetMapping(path = "/api/unsetUser")
+	public boolean unsetUser(HttpServletRequest req) {
+		HttpSession sess = req.getSession();
+		if (sess != null && sess.getAttribute("user") != null) {
+			sess.setAttribute("user", null);
+		}
+
+		return true;
 	}
 
 }
