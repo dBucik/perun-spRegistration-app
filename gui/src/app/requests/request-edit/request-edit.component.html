@@ -29,12 +29,13 @@
               </div>
               <div class="container-fluid" *ngIf="commentedServiceAttrs.length > 0">
                 <div class="container-fluid" *ngFor="let applicationItems of commentedServiceAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #commentedServiceItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
-              <div class="container-fluid mt-1" *ngIf="serviceAttrs.length > 0 && showServiceMore">
+              <div class="container-fluid mt-1"
+                   [style.display]="(serviceAttrs.length > 0 && showServiceMore) ? 'block' : 'none'">
                 <div class="container-fluid" *ngFor="let applicationItems of serviceAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #serviceItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
             </div>
@@ -49,12 +50,13 @@
               </div>
               <div class="container-fluid" *ngIf="commentedOrganizationAttrs.length > 0">
                 <div class="container-fluid" *ngFor="let applicationItems of commentedOrganizationAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #commentedOrgItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
-              <div class="container-fluid mt-1" *ngIf="organizationAttrs.length > 0 && showOrganizationMore">
+              <div class="container-fluid mt-1"
+                   [style.display]="(organizationAttrs.length > 0 && showOrganizationMore) ? 'block' : 'none'">
                 <div class="container-fluid" *ngFor="let applicationItems of organizationAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #orgItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
             </div>
@@ -69,12 +71,13 @@
               </div>
               <div class="container-fluid" *ngIf="commentedProtocolAttrs.length > 0">
                 <div class="container-fluid" *ngFor="let applicationItems of commentedProtocolAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #commentedProtocolItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
-              <div class="container-fluid mt-1" *ngIf="protocolAttrs.length > 0 && showProtocolMore">
+              <div class="container-fluid mt-1"
+                   [style.display]="(protocolAttrs.length > 0 && showProtocolMore) ? 'block' : 'none'">
                 <div class="container-fluid" *ngFor="let applicationItems of protocolAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #protocolItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
             </div>
@@ -89,12 +92,13 @@
               </div>
               <div class="container-fluid" *ngIf="commentedAccessControlAttrs.length > 0">
                 <div class="container-fluid" *ngFor="let applicationItems of commentedAccessControlAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #commentedAccessItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
-              <div class="container-fluid mt-1" *ngIf="accessControlAttrs.length > 0 && showAccessControlMore">
+              <div class="container-fluid mt-1"
+                   [style.display]="(accessControlAttrs.length > 0 && showAccessControlMore) ? 'block' : 'none'">
                 <div class="container-fluid" *ngFor="let applicationItems of accessControlAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #accessItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
             </div>

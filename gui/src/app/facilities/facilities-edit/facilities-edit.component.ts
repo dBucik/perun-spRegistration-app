@@ -8,6 +8,7 @@ import {ApplicationItem} from '../../core/models/ApplicationItem';
 import {FacilitiesService} from '../../core/services/facilities.service';
 import {Facility} from '../../core/models/Facility';
 import { UrnValuePair } from '../../core/models/UrnValuePair';
+import {PerunAttribute} from "../../core/models/PerunAttribute";
 
 @Component({
   selector: 'app-facilities-edit',
@@ -25,8 +26,10 @@ export class FacilitiesEditComponent implements OnInit {
     private router: Router) {
   }
 
-  @ViewChildren(ApplicationItemComponent)
-  items: QueryList<ApplicationItemComponent>;
+  @ViewChildren('serviceItems') serviceItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('orgItems') orgItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('protocolItems') protocolItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('accessItems') accessItems: QueryList<ApplicationItemComponent>;
 
   private sub: any;
   isFormVisible = false;
@@ -81,20 +84,35 @@ export class FacilitiesEditComponent implements OnInit {
     }
 
     const perunAttributes: UrnValuePair[] = [];
+    console.log(this.serviceItems);
+    console.log(this.orgItems);
+    console.log(this.protocolItems);
+    console.log(this.accessItems);
 
     // set to false when one attribute has wrong value
     let allGood = true;
-    this.items.forEach(i => {
-      const attr = i.getAttribute();
-      const perunAttr = new UrnValuePair(attr.value, attr.urn);
-      if (!i.hasCorrectValue()) {
-        this.snackBar.open(this.errorWronglyFilledItem, null, {duration: 6000});
+    this.serviceItems.forEach(i => {
+      if (!this.validate(i, perunAttributes)) {
         allGood = false;
-        this.loading = false;
-        return;
       }
-      perunAttributes.push(perunAttr);
     });
+    this.orgItems.forEach(i => {
+      if (!this.validate(i, perunAttributes)) {
+        allGood = false;
+      }
+    });
+    this.protocolItems.forEach(i => {
+      if (!this.validate(i, perunAttributes)) {
+        allGood = false;
+      }
+    });
+    this.accessItems.forEach(i => {
+      if (!this.validate(i, perunAttributes)) {
+        allGood = false;
+      }
+    });
+
+    console.log(perunAttributes);
 
     if (!allGood) {
       return;
@@ -111,6 +129,18 @@ export class FacilitiesEditComponent implements OnInit {
         this.router.navigate(['/auth/requests/detail/' + reqId]);
       }
     });
+  }
+
+  private validate(i : ApplicationItemComponent, perunAttributes: PerunAttribute[]): boolean {
+    const attr = i.getAttribute();
+    const perunAttr = new UrnValuePair(attr.value, attr.urn);
+    if (!i.hasCorrectValue()) {
+      this.snackBar.open(this.errorWronglyFilledItem, null, {duration: 6000});
+      this.loading = false;
+      return false;
+    }
+    perunAttributes.push(perunAttr);
+    return true;
   }
 
   private getAttributes(): void {
@@ -167,22 +197,18 @@ export class FacilitiesEditComponent implements OnInit {
 
   private changeServiceShowMore() {
     this.showServiceMore = !this.showServiceMore;
-    this.ngOnInit();
   }
 
   private changeOrganizationShowMore() {
     this.showOrganizationMore = !this.showOrganizationMore;
-    this.ngOnInit();
   }
 
   private changeProtocolShowMore() {
     this.showProtocolMore = !this.showProtocolMore;
-    this.ngOnInit();
   }
 
   private changeAccessShowMore() {
     this.showAccessControlMore = !this.showAccessControlMore;
-    this.ngOnInit();
   }
 
   private static filterAndSort(items: ApplicationItem[]): ApplicationItem[] {

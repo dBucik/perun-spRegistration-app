@@ -23,11 +23,16 @@ export class RequestEditComponent implements OnInit {
     private requestsService: RequestsService,
     private snackBar: MatSnackBar,
     private translate: TranslateService,
-    private router: Router) {
-  }
+    private router: Router) { }
 
-  @ViewChildren(ApplicationItemComponent)
-  items: QueryList<ApplicationItemComponent>;
+  @ViewChildren('commentedServiceItems') commentedServiceItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('serviceItems') serviceItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('commentedOrgItems') commentedOrgItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('orgItems') orgItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('commentedProtocolItems') commentedProtocolItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('protocolItems') protocolItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('commentedAccessItems') commentedAccessItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('accessItems') accessItems: QueryList<ApplicationItemComponent>;
 
   private sub: any;
   loading = true;
@@ -75,16 +80,31 @@ export class RequestEditComponent implements OnInit {
 
     let perunAttributes: UrnValuePair[] = [];
 
-    this.items.forEach(i => {
-      let attr = i.getAttribute();
-      let perunAttr = new UrnValuePair(attr.value, attr.urn);
-      perunAttributes.push(perunAttr);
-    });
+    this.serviceItems.forEach(i => { RequestEditComponent.pushAttr(i, perunAttributes); });
+    this.commentedServiceItems.forEach(i => { RequestEditComponent.pushAttr(i, perunAttributes); });
+    this.orgItems.forEach(i => { RequestEditComponent.pushAttr(i, perunAttributes); });
+    this.commentedOrgItems.forEach(i => { RequestEditComponent.pushAttr(i, perunAttributes); });
+    this.protocolItems.forEach(i => { RequestEditComponent.pushAttr(i, perunAttributes); });
+    this.commentedProtocolItems.forEach(i => { RequestEditComponent.pushAttr(i, perunAttributes); });
+    this.accessItems.forEach(i => { RequestEditComponent.pushAttr(i, perunAttributes); });
+    this.commentedAccessItems.forEach(i => { RequestEditComponent.pushAttr(i, perunAttributes); });
 
     this.requestsService.updateRequest(this.request.reqId, perunAttributes).subscribe(_ => {
       this.snackBar.open(this.successActionText, null, {duration: this.snackBarDurationMs});
       this.router.navigate(['/auth/requests/detail/' + this.request.reqId]);
     });
+  }
+
+  private clearArrays(): void {
+    this.commentedServiceAttrs = [];
+    this.commentedOrganizationAttrs = [];
+    this.commentedProtocolAttrs = [];
+    this.commentedAccessControlAttrs = [];
+
+    this.serviceAttrs = [];
+    this.organizationAttrs = [];
+    this.protocolAttrs = [];
+    this.accessControlAttrs = [];
   }
 
   private getAttributes(): void {
@@ -133,30 +153,6 @@ export class RequestEditComponent implements OnInit {
     });
   }
 
-  private static pushInput(attr: PerunAttribute, commentedDest: ApplicationItem[], regularDest: ApplicationItem[]) {
-    attr.input.oldValue = attr.value;
-
-    if (attr.comment) {
-      attr.input.isEdit = true;
-      attr.input.comment = attr.comment;
-      commentedDest.push(attr.input);
-    } else {
-      regularDest.push(attr.input);
-    }
-  }
-
-  clearArrays(): void {
-    this.commentedServiceAttrs = [];
-    this.commentedOrganizationAttrs = [];
-    this.commentedProtocolAttrs = [];
-    this.commentedAccessControlAttrs = [];
-
-    this.serviceAttrs = [];
-    this.organizationAttrs = [];
-    this.protocolAttrs = [];
-    this.accessControlAttrs = [];
-  }
-
   private changeServiceShowMore(){
     this.showServiceMore = !this.showServiceMore;
   }
@@ -190,6 +186,24 @@ export class RequestEditComponent implements OnInit {
     });
 
     return items;
+  }
+
+  private static pushInput(attr: PerunAttribute, commentedDest: ApplicationItem[], regularDest: ApplicationItem[]) {
+    attr.input.oldValue = attr.value;
+
+    if (attr.comment) {
+      attr.input.isEdit = true;
+      attr.input.comment = attr.comment;
+      commentedDest.push(attr.input);
+    } else {
+      regularDest.push(attr.input);
+    }
+  }
+
+  private static pushAttr(i: ApplicationItemComponent, perunAttributes: PerunAttribute[]) {
+    let attr = i.getAttribute();
+    let perunAttr = new UrnValuePair(attr.value, attr.urn);
+    perunAttributes.push(perunAttr);
   }
 
 }

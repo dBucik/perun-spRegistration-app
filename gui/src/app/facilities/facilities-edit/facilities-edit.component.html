@@ -24,9 +24,10 @@
                 </button>
                 <hr/>
               </div>
-              <div class="container-fluid mt-1" *ngIf="accessControlAttrs.length > 0 && showServiceMore">
+              <div class="container-fluid mt-1"
+                   [style.display]="(serviceAttrs.length > 0 && showServiceMore) ? 'block' : 'none'">
                 <div class="container-fluid" *ngFor="let applicationItems of serviceAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #serviceItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
             </div>
@@ -39,9 +40,10 @@
                 </button>
                 <hr/>
               </div>
-              <div class="container-fluid mt-1" *ngIf="accessControlAttrs.length > 0 && showOrganizationMore">
+              <div class="container-fluid mt-1"
+                   [style.display]="(organizationAttrs.length > 0 && showOrganizationMore) ? 'block' : 'none'">
                 <div class="container-fluid" *ngFor="let applicationItems of organizationAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #orgItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
             </div>
@@ -54,9 +56,10 @@
                 </button>
                 <hr/>
               </div>
-              <div class="container-fluid mt-1" *ngIf="accessControlAttrs.length > 0 && showProtocolMore">
+              <div class="container-fluid mt-1"
+                   [style.display]="(protocolAttrs.length > 0 && showProtocolMore) ? 'block' : 'none'">
                 <div class="container-fluid" *ngFor="let applicationItems of protocolAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #protocolItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
             </div>
@@ -69,9 +72,10 @@
                 </button>
                 <hr/>
               </div>
-              <div class="container-fluid mt-1" *ngIf="accessControlAttrs.length > 0 && showAccessControlMore">
+              <div class="container-fluid mt-1"
+                   [style.display]="(accessControlAttrs.length > 0 && showAccessControlMore) ? 'block' : 'none'">
                 <div class="container-fluid" *ngFor="let applicationItems of accessControlAttrs">
-                  <app-application-item [applicationItem]="applicationItems"></app-application-item>
+                  <app-application-item #accessItems [applicationItem]="applicationItems"></app-application-item>
                 </div>
               </div>
             </div>
