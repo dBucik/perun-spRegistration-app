@@ -8,17 +8,28 @@
       <img [src]="logoUrl" class="logo mr-3" alt="logo"/>
       <span class="d-none d-sm-inline-block">{{ appTitle }}</span>
     </a>
-    <div class="user-info d-none d-md-inline-block" *ngIf="hasUser()">
-      <mat-icon class="mr-1">person</mat-icon>
-      <span>{{ getUser().getFullName() }}</span>
-    </div>
-    <div class="user-info d-inline-block d-md-none">
-      <button mat-icon-button class="mr-2 no-focus-outline d-block" [matMenuTriggerFor]="userDetail">
-        <mat-icon>person</mat-icon>
-      </button>
-      <mat-menu #userDetail yPosition="below" xPosition="before">
-        <p class="mt-3" mat-menu-item>{{ getUser().getFullName }}</p>
-      </mat-menu>
+    <div class="titlebar-right">
+      <div class="langs mr-1">
+        <button mat-icon-button class="mr-2 no-focus-outline d-block" [matMenuTriggerFor]="langMenu">
+          <mat-icon>translate</mat-icon>
+        </button>
+        <mat-menu #langMenu yPosition="below" xPosition="before">
+          <button mat-menu-item *ngFor="let lang of langs" (click)="changeLanguage(lang)">{{ lang | languageEntry }}</button>
+        </mat-menu>
+      </div>
+      <div class="user-info">
+        <div class="d-none d-md-inline-block" *ngIf="hasUser()">
+          <span>{{ getUser().getFullName() }}</span>
+        </div>
+        <div class="d-md-none d-inline-block">
+          <button mat-icon-button class="mr-2 no-focus-outline d-block" [matMenuTriggerFor]="userDetail">
+            <mat-icon>person</mat-icon>
+          </button>
+          <mat-menu #userDetail yPosition="below" xPosition="before">
+            <p class="mt-3" mat-menu-item>{{ getUser().getFullName }}</p>
+          </mat-menu>
+        </div>
+      </div>
     </div>
   </mat-toolbar>
 

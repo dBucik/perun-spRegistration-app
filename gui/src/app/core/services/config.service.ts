@@ -40,4 +40,8 @@ export class ConfigService {
   getProdTransferEntries(): Observable<string[]> {
     return this.apiService.get('/config/prodTransferEntries');
   }
+
+  getLanguages(): Observable<string[]> {
+    return this.apiService.get('/config/langs');
+  }
 }

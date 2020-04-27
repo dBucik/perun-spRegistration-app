@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { HostListener } from '@angular/core';
@@ -8,6 +8,7 @@ import { PageConfig } from './core/models/PageConfig';
 import { User } from './core/models/User';
 import { PerunFooterCstComponent } from './perun-footer-cst/perun-footer-cst.component';
 import { PerunHeaderComponent } from './perun-header/perun-header.component';
+import {MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-root',
@@ -23,29 +24,32 @@ export class AppComponent implements OnInit {
     private router: Router
   ) {
     this.onResize();
-
-    const browserLang = translate.getBrowserLang();
-
-    if (!AppComponent.supportedLangs.includes(browserLang)) {
-      translate.setDefaultLang('en');
-    } else {
-      translate.setDefaultLang(browserLang);
-    }
-
     this.currentUrl = this.router.url;
+    this.loading = true;
+    this.configService.getLanguages().subscribe(langs => {
+      this.langs = langs;
+      const browserLang = this.translate.getBrowserLang();
+      if (!this.langs.includes(browserLang)) {
+        AppComponent.activeLang = browserLang;
+      } else {
+        AppComponent.activeLang = 'en'
+      }
+      this.translate.setDefaultLang(AppComponent.activeLang);
+    });
+
 
     router.events.subscribe(_ => {
       this.currentUrl = this.router.url;
       if (this.currentUrl.includes('auth') && !this.hasUser()) {
-        this.setAndGetUser();
+      this.setAndGetUser();
       }
     });
     this.setAndGetUser();
   }
 
-  static supportedLangs: Array<string> = ['en', 'cs'];
   static pageConfig: PageConfig;
   static user: User;
+  static activeLang: string;
 
   sidenavOpen = true;
   loading = true;
@@ -54,6 +58,7 @@ export class AppComponent implements OnInit {
   currentUrl = '';
   logoUrl = '';
   appTitle = '';
+  langs: string[];
 
   lastWindowWidth: number;
 
@@ -107,6 +112,11 @@ export class AppComponent implements OnInit {
 
     this.sidenavMode = window.innerWidth > this.minWidth ? 'side' : 'over';
     this.lastWindowWidth = window.innerWidth;
+  }
+
+  public changeLanguage(lang: string) {
+    AppComponent.activeLang = lang;
+    this.translate.setDefaultLang(AppComponent.activeLang);
   }
 
   public toggleSideBar() {
