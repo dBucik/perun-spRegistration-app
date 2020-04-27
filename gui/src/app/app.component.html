@@ -20,7 +20,7 @@
           </mat-menu>
         </div>
       </div>
-      <div class="langs">
+      <div class="langs" *ngIf="langs && langs.length > 1">
         <button mat-icon-button class="no-focus-outline d-block" [matMenuTriggerFor]="langMenu">
           <mat-icon>translate</mat-icon>
         </button>
