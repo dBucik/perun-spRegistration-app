@@ -172,9 +172,21 @@
         <constructor-arg name="dataSource" ref="dataSource"/>
     </bean>
 
+    <bean id="nameParameterJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+        <constructor-arg name="dataSource" ref="dataSource"/>
+    </bean>
+
     <bean id="transactionManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="providedServicesManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.ProvidedServiceManagerImpl">
+        <constructor-arg name="namedParameterJdbcTemplate" ref="nameParameterJdbcTemplate"/>
     </bean>
 
     <bean id="perunConnector" class="cz.metacentrum.perun.spRegistration.persistence.connectors.impl.PerunConnectorRpc">
@@ -183,10 +195,6 @@
         <property name="perunRpcPassword" value="${rpc.password}"/>
         <property name="userEmailAttr" value="${attr.userEmail}"/>
         <property name="appAdminIds" value="#{'${appAdminIds}'.split('\s*,\s*')}" />
-    </bean>
-
-    <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
     </bean>
 
     <bean id="prodTransferAuthoritiesMailsMap" class="org.springframework.beans.factory.config.PropertiesFactoryBean" >
