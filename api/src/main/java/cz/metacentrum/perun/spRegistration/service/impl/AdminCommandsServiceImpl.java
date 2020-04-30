@@ -1,16 +1,21 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.persistence.enums.ServiceEnvironment;
+import cz.metacentrum.perun.spRegistration.persistence.enums.ServiceProtocol;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.persistence.managers.ProvidedServiceManager;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.persistence.models.ProvidedService;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
@@ -46,17 +51,19 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 	private static final Logger log = LoggerFactory.getLogger(AdminCommandsServiceImpl.class);
 
 	private final RequestManager requestManager;
+	private final ProvidedServiceManager providedServicesManager;
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
+	private final MailsService mailsService;
 
 	@Autowired
-	private MailsService mailsService;
-
-	@Autowired
-	public AdminCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, AppConfig appConfig) {
+	public AdminCommandsServiceImpl(RequestManager requestManager, ProvidedServiceManager providedServicesManager,
+									PerunConnector perunConnector, AppConfig appConfig, MailsService mailsService) {
 		this.requestManager = requestManager;
+		this.providedServicesManager = providedServicesManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
+		this.mailsService = mailsService;
 	}
 
 	@Override
@@ -335,7 +342,17 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		request.setFacilityId(facility.getId());
+
+		ProvidedService sp = new ProvidedService();
+		sp.setFacilityId(facility.getId());
+		sp.setName(request.getFacilityName());
+		sp.setDescription(request.getFacilityDescription());
+		sp.setEnvironment(ServiceEnvironment.TESTING);
+		sp.setProtocol(ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute()) ?
+				ServiceProtocol.OIDC : ServiceProtocol.SAML);
+
 		try {
+			providedServicesManager.create(sp);
 			boolean adminSet = perunConnector.addFacilityAdmin(facility.getId(), request.getReqUserId());
 
 			PerunAttribute testSp = generateTestSpAttribute(true);
@@ -377,7 +394,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 			}
 			log.trace("registerNewFacilityToPerun returns: {}", successful);
 			return successful;
-		} catch (ConnectorException e) {
+		} catch (ConnectorException | JsonProcessingException e) {
 			log.error("Caught ConnectorException", e);
 			try {
 				perunConnector.deleteFacilityFromPerun(facility.getId());
@@ -409,21 +426,22 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		try {
-			//boolean facilityCoreUpdated = updateFacilityNameAndDesc(actualFacility, request);
+			ProvidedService sp = providedServicesManager.getByFacilityId(facilityId);
+			sp.setName(request.getFacilityName());
+			sp.setDescription(request.getFacilityDescription());
+			providedServicesManager.update(sp);
+
 			boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(),
 					request.getAttributesAsJsonArrayForPerun());
-			//boolean successful = (facilityCoreUpdated && attributesSet);
-			boolean successful = attributesSet;
-			if (!successful) {
-				//log.error("Some operations failed - facilityCoreUpdated: {}, attributesSet: {}", facilityCoreUpdated, attributesSet);
-				log.error("Some operations failed - attributesSet: {}", attributesSet);
+			if (!attributesSet) {
+				log.error("Some operations failed - attributes were not set in Perun");
 			} else {
 				log.info("Facility has been updated in Perun");
 			}
 
-			log.trace("updateFacilityInPerun returns: {}", successful);
-			return successful;
-		} catch (ConnectorException e) {
+			log.trace("updateFacilityInPerun returns: {}", attributesSet);
+			return attributesSet;
+		} catch (ConnectorException | JsonProcessingException e) {
 			log.warn("Caught ConnectorException", e);
 			try {
 				perunConnector.updateFacilityInPerun(actualFacility.toJson());
@@ -448,7 +466,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		Long facilityId = extractFacilityIdFromRequest(request);
 
 		boolean facilityRemoved = perunConnector.deleteFacilityFromPerun(facilityId);
-
+		providedServicesManager.deleteByFacilityId(facilityId);
 		if (!facilityRemoved) {
 			log.error("Some operations failed - facilityRemoved: {}", false);
 		} else {
@@ -469,6 +487,15 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		ArrayNode attributes = request.getAttributesAsJsonArrayForPerun();
 		attributes.add(testSp.toJson());
 		attributes.add(showOnServiceList.toJson());
+
+		try {
+			ProvidedService sp = providedServicesManager.getByFacilityId(extractFacilityIdFromRequest(request));
+			sp.setEnvironment(ServiceEnvironment.PRODUCTION);
+			providedServicesManager.update(sp);
+		} catch (InternalErrorException | JsonProcessingException e) {
+			log.error("Failed to update environment for SP in DB", e);
+			return false;
+		}
 
 		boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(), attributes);
 
