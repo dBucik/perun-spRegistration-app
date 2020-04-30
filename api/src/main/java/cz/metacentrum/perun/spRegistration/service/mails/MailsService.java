@@ -233,8 +233,10 @@ public class MailsService {
 
 	private String replacePlaceholders(String containerString, Facility fac) {
 		log.trace("replacePlaceholders({}, {})", containerString, fac);
-		containerString = replacePlaceholder(containerString, SERVICE_NAME_FIELD, fac.getName());
-		containerString = replacePlaceholder(containerString, SERVICE_DESCRIPTION_FIELD, fac.getDescription());
+		containerString = replacePlaceholder(containerString, SERVICE_NAME_FIELD,
+				fac.getName(), "");
+		containerString = replacePlaceholder(containerString, SERVICE_DESCRIPTION_FIELD,
+				fac.getDescription(), "");
 
 		return containerString;
 	}
@@ -243,14 +245,22 @@ public class MailsService {
 		log.trace("replacePlaceholders({}, {})", containerString, req);
 		String requestLink = hostUrl + "/auth/requests/detail/" + req.getReqId();
 
-		containerString = replacePlaceholder(containerString, REQUEST_ID_FIELD, req.getReqId().toString());
-		containerString = replacePlaceholder(containerString, EN_NEW_STATUS_FIELD, req.getStatus().toString("en"));
-		containerString = replacePlaceholder(containerString, CS_NEW_STATUS_FIELD, req.getStatus().toString("cs"));
-		containerString = replacePlaceholder(containerString, SERVICE_NAME_FIELD, req.getFacilityName());
-		containerString = replacePlaceholder(containerString, SERVICE_DESCRIPTION_FIELD, req.getFacilityDescription());
-		containerString = replacePlaceholder(containerString, REQUEST_DETAIL_LINK_FIELD, wrapInAnchorElement(requestLink));
-		containerString = replacePlaceholder(containerString, ACTION_FIELD, req.getAction().toString());
-		containerString = replacePlaceholder(containerString, USER_INFO_FIELD, req.getReqUserId().toString());
+		containerString = replacePlaceholder(containerString, REQUEST_ID_FIELD,
+				req.getReqId().toString(), "");
+		containerString = replacePlaceholder(containerString, EN_NEW_STATUS_FIELD,
+				req.getStatus().toString("en"), "");
+		containerString = replacePlaceholder(containerString, CS_NEW_STATUS_FIELD,
+				req.getStatus().toString("cs"), "");
+		containerString = replacePlaceholder(containerString, SERVICE_NAME_FIELD,
+				req.getFacilityName(), "");
+		containerString = replacePlaceholder(containerString, SERVICE_DESCRIPTION_FIELD,
+				req.getFacilityDescription(), "");
+		containerString = replacePlaceholder(containerString, REQUEST_DETAIL_LINK_FIELD,
+				wrapInAnchorElement(requestLink), "-");
+		containerString = replacePlaceholder(containerString, ACTION_FIELD,
+				req.getAction().toString(), "");
+		containerString = replacePlaceholder(containerString, USER_INFO_FIELD,
+				req.getReqUserId().toString(), "");
 
 		return containerString;
 	}
@@ -259,10 +269,14 @@ public class MailsService {
 		return "<a href=\"" + link + "\">" + link + "</a>";
 	}
 
-	private String replacePlaceholder(String container, String replaceKey, String replaceWith) {
+	private String replacePlaceholder(String container, String replaceKey, String replaceWith, String def) {
 		log.trace("replacePlaceholder({}, {}, {})", container, replaceKey, replaceWith);
 		if (container.contains(replaceKey)) {
-			return container.replace(replaceKey, replaceWith);
+			if (replaceWith != null) {
+				return container.replace(replaceKey, replaceWith);
+			} else {
+				return container.replace(replaceKey, def);
+			}
 		}
 
 		return container;
