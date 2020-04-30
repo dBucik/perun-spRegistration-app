@@ -14,10 +14,12 @@ import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.persistence.managers.ProvidedServiceManager;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.persistence.models.ProvidedService;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
@@ -78,18 +80,20 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private final AppConfig appConfig;
 	private final Config config;
 	private final MailsService mailsService;
+	private final ProvidedServiceManager providedServiceManager;
 
 	@Value("#{'${mail.approval.default-authorities.mails}'.split(',')}")
 	private List<String> defaultAuthorities;
 
 	@Autowired
 	public UserCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
-								   AppConfig appConfig, MailsService mailsService) {
+								   AppConfig appConfig, MailsService mailsService, ProvidedServiceManager providedServiceManager) {
 		this.requestManager = requestManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.config = config;
 		this.mailsService = mailsService;
+		this.providedServiceManager = providedServiceManager;
 	}
 
 	@Override
@@ -518,7 +522,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public List<Facility> getAllFacilitiesWhereUserIsAdmin(Long userId) throws ConnectorException {
+	public List<ProvidedService> getAllFacilitiesWhereUserIsAdmin(Long userId) throws ConnectorException {
 		log.trace("getAllFacilitiesWhereUserIsAdmin({})", userId);
 
 		if (Utils.checkParamsInvalid(userId)) {
@@ -526,47 +530,17 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(
-				appConfig.getProxyIdentifierAttribute(), appConfig.getProxyIdentifierAttributeValue());
-		Map<Long, Facility> proxyFacilitiesMap = ServiceUtils.transformListToMapFacilities(proxyFacilities);
-		if (proxyFacilitiesMap == null || proxyFacilitiesMap.isEmpty()) {
-			return new ArrayList<>();
-		}
 
 		List<Facility> userFacilities = perunConnector.getFacilitiesWhereUserIsAdmin(userId);
 		if (userFacilities == null || userFacilities.isEmpty()) {
 			return new ArrayList<>();
 		}
 
-		List<Facility> testFacilities = perunConnector.getFacilitiesByAttribute(
-				appConfig.getIsTestSpAttribute(), "true");
-		Map<Long, Facility> testFacilitiesMap = ServiceUtils.transformListToMapFacilities(testFacilities);
-		if (testFacilitiesMap == null) {
-			testFacilitiesMap = new HashMap<>();
-		}
+		List<Long> facilityIds = userFacilities.stream().map(Facility::getId).collect(Collectors.toList());
+		List<ProvidedService> sps = providedServiceManager.getAllForFacilities(facilityIds);
 
-		List<Facility> oidcFacilities = perunConnector.getFacilitiesByAttribute(
-				appConfig.getIsOidcAttributeName(), "true");
-		Map<Long, Facility> oidcFacilitiesMap = ServiceUtils.transformListToMapFacilities(oidcFacilities);
-
-		List<Facility> samlFacilities = perunConnector.getFacilitiesByAttribute(
-				appConfig.getIsSamlAttributeName(), "true");
-		Map<Long, Facility> samlFacilitiesMap = ServiceUtils.transformListToMapFacilities(samlFacilities);
-
-		List<Facility> filteredFacilities = new ArrayList<>();
-
-		for (Facility f : userFacilities) {
-			if (proxyFacilitiesMap.containsKey(f.getId())) {
-				filteredFacilities.add(f);
-
-				f.setOidc(oidcFacilitiesMap.containsKey(f.getId()));
-				f.setSaml(samlFacilitiesMap.containsKey(f.getId()));
-				f.setTestEnv(testFacilitiesMap.containsKey(f.getId()));
-			}
-		}
-
-		log.trace("getAllFacilitiesWhereUserIsAdmin returns: {}", filteredFacilities);
-		return filteredFacilities;
+		log.trace("getAllFacilitiesWhereUserIsAdmin returns: {}", sps);
+		return sps;
 	}
 
 	@Override
@@ -725,7 +699,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		boolean result = false;
+		boolean result;
 
 		if (appConfig.isAppAdmin(userId)) {
 			result = true;

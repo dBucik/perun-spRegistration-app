@@ -210,46 +210,21 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 	}
 
 	@Override
-	public List<Facility> getAllFacilities(Long userId) throws UnauthorizedActionException, ConnectorException {
-		log.trace("getAllFacilities({})", userId);
+	public List<ProvidedService> getAllServices(Long userId) throws UnauthorizedActionException, ConnectorException {
+		log.trace("getAllServices({})", userId);
 
 		if (Utils.checkParamsInvalid(userId)) {
 			log.error("Wrong parameters passed: (userId: {})", userId);
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		} else if (! appConfig.isAppAdmin(userId)) {
-			log.error("User cannot list all facilities, user not an admin");
-			throw new UnauthorizedActionException("User cannot list all facilities, user does not have role APP_ADMIN");
+			log.error("User cannot list all services, user not an admin");
+			throw new UnauthorizedActionException("User cannot list all services, user does not have role APP_ADMIN");
 		}
 
-		List<Facility> proxyFacilities = perunConnector.getFacilitiesByProxyIdentifier(
-				appConfig.getProxyIdentifierAttribute(), appConfig.getProxyIdentifierAttributeValue());
-		Map<Long, Facility> proxyFacilitiesMap = ServiceUtils.transformListToMapFacilities(proxyFacilities);
+		List<ProvidedService> result = providedServicesManager.getAll();
 
-		if (proxyFacilitiesMap == null || proxyFacilitiesMap.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		List<Facility> testFacilities = perunConnector.getFacilitiesByAttribute(
-				appConfig.getIsTestSpAttribute(), "true");
-		Map<Long, Facility> testFacilitiesMap = ServiceUtils.transformListToMapFacilities(testFacilities);
-
-		List<Facility> oidcFacilities = perunConnector.getFacilitiesByAttribute(
-				appConfig.getIsOidcAttributeName(), "true");
-		Map<Long, Facility> oidcFacilitiesMap = ServiceUtils.transformListToMapFacilities(oidcFacilities);
-
-		List<Facility> samlFacilities = perunConnector.getFacilitiesByAttribute(
-				appConfig.getIsSamlAttributeName(), "true");
-		Map<Long, Facility> samlFacilitiesMap = ServiceUtils.transformListToMapFacilities(samlFacilities);
-
-		proxyFacilitiesMap.forEach((facId, val) -> {
-			Facility f = proxyFacilitiesMap.get(facId);
-			f.setTestEnv(testFacilitiesMap.containsKey(facId));
-			f.setOidc(oidcFacilitiesMap.containsKey(facId));
-			f.setSaml(samlFacilitiesMap.containsKey(facId));
-		});
-
-		log.trace("getAllFacilities returns: {}", proxyFacilities);
-		return proxyFacilities;
+		log.trace("getAllServices() returns: {}", result);
+		return result;
 	}
 
 	@Override

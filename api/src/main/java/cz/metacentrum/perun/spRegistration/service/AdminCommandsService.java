@@ -2,11 +2,9 @@ package cz.metacentrum.perun.spRegistration.service;
 
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.persistence.models.ProvidedService;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
@@ -82,7 +80,7 @@ public interface AdminCommandsService {
 	 * @throws ConnectorException Thrown when problem while communicating with Perun RPC occur.
 	 * @throws IllegalArgumentException Thrown when param "adminId" is NULL.
 	 */
-	List<Facility> getAllFacilities(Long adminId) throws UnauthorizedActionException, ConnectorException;
+	List<ProvidedService> getAllServices(Long adminId) throws UnauthorizedActionException, ConnectorException;
 
 	/**
 	 * Regenerate Client secret for OIDC facility

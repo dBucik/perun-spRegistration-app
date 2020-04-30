@@ -1,11 +1,10 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.facilities;
 
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.persistence.models.ProvidedService;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.security.InvalidKeyException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controller handling ADMIN actions related to Facilities.
@@ -42,12 +39,12 @@ public class AdminFacilitiesController {
 	}
 
 	@GetMapping(path = "/api/allFacilities")
-	public List<Facility> allFacilities(@SessionAttribute("user") User user)
+	public List<ProvidedService> allFacilities(@SessionAttribute("user") User user)
 			throws ConnectorException, UnauthorizedActionException
 	{
 		log.trace("allFacilities({})", user.getId());
 
-		List<Facility> facilityList = service.getAllFacilities(user.getId());
+		List<ProvidedService> facilityList = service.getAllServices(user.getId());
 
 		log.trace("allFacilities() returns: {}", facilityList);
 		return facilityList;

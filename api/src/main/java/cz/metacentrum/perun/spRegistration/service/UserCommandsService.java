@@ -4,6 +4,7 @@ import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestE
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.persistence.models.ProvidedService;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
@@ -156,7 +157,7 @@ public interface UserCommandsService {
 	 * @throws ConnectorException Thrown when problem while communicating with Perun RPC occur.
 	 * @throws IllegalArgumentException Thrown when param "userId" is NULL.
 	 */
-	List<Facility> getAllFacilitiesWhereUserIsAdmin(Long userId) throws ConnectorException;
+	List<ProvidedService> getAllFacilitiesWhereUserIsAdmin(Long userId) throws ConnectorException;
 
 	/**
 	 * Get all requests user can access (is requester or admin(manager) of facility)

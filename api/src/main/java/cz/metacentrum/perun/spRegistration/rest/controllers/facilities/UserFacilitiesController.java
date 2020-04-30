@@ -2,6 +2,7 @@ package cz.metacentrum.perun.spRegistration.rest.controllers.facilities;
 
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
+import cz.metacentrum.perun.spRegistration.persistence.models.ProvidedService;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.rest.ApiUtils;
 import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
@@ -42,10 +43,10 @@ public class UserFacilitiesController {
 	}
 
 	@GetMapping(path = "/api/userFacilities")
-	public List<Facility> userFacilities(@SessionAttribute("user") User user) throws ConnectorException	{
+	public List<ProvidedService> userFacilities(@SessionAttribute("user") User user) throws ConnectorException	{
 		log.trace("userFacilities({})", user.getId());
 
-		List<Facility> facilityList = service.getAllFacilitiesWhereUserIsAdmin(user.getId());
+		List<ProvidedService> facilityList = service.getAllFacilitiesWhereUserIsAdmin(user.getId());
 
 		log.trace("userFacilities() returns: {}", facilityList);
 		return facilityList;
