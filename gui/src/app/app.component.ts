@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { HostListener } from '@angular/core';
@@ -8,7 +8,6 @@ import { PageConfig } from './core/models/PageConfig';
 import { User } from './core/models/User';
 import { PerunFooterCstComponent } from './perun-footer-cst/perun-footer-cst.component';
 import { PerunHeaderComponent } from './perun-header/perun-header.component';
-import {MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-root',
@@ -26,6 +25,7 @@ export class AppComponent implements OnInit {
     this.onResize();
     this.currentUrl = this.router.url;
     this.loading = true;
+
     this.configService.getLanguages().subscribe(langs => {
       this.langs = langs;
       const browserLang = this.translate.getBrowserLang();
@@ -100,6 +100,7 @@ export class AppComponent implements OnInit {
       PerunHeaderComponent.setHeader(null);
       this.loading = false;
     });
+
     this.setAndGetUser();
   }
 

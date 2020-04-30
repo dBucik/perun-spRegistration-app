@@ -320,8 +320,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		ProvidedService sp = new ProvidedService();
 		sp.setFacilityId(facility.getId());
-		sp.setName(request.getFacilityName());
-		sp.setDescription(request.getFacilityDescription());
+		sp.setName(request.getFacilityName(appConfig.getServiceNameAttributeName()));
+		sp.setDescription(request.getFacilityDescription(appConfig.getServiceDescAttributeName()));
 		sp.setEnvironment(ServiceEnvironment.TESTING);
 		sp.setProtocol(ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute()) ?
 				ServiceProtocol.OIDC : ServiceProtocol.SAML);
@@ -402,8 +402,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		try {
 			ProvidedService sp = providedServicesManager.getByFacilityId(facilityId);
-			sp.setName(request.getFacilityName());
-			sp.setDescription(request.getFacilityDescription());
+			sp.setName(request.getFacilityName(appConfig.getServiceNameAttributeName()));
+			sp.setDescription(request.getFacilityDescription(appConfig.getServiceDescAttributeName()));
 			providedServicesManager.update(sp);
 
 			boolean attributesSet = perunConnector.setFacilityAttributes(request.getFacilityId(),

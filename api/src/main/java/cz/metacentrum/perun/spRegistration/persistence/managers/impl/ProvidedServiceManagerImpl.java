@@ -48,8 +48,8 @@ public class ProvidedServiceManagerImpl implements ProvidedServiceManager {
         params.addValue("facility_id", sp.getFacilityId());
         params.addValue("name", sp.nameAsJsonString());
         params.addValue("description", sp.descriptionAsJsonString());
-        params.addValue("environment", sp.getEnvironment());
-        params.addValue("protocol", sp.getProtocol());
+        params.addValue("environment", sp.getEnvironment().toString());
+        params.addValue("protocol", sp.getProtocol().toString());
 
         int updatedCount = jdbcTemplate.update(query, params, key, new String[] { "id" });
 
@@ -91,8 +91,8 @@ public class ProvidedServiceManagerImpl implements ProvidedServiceManager {
         params.addValue("facility_id", sp.getFacilityId());
         params.addValue("name", sp.nameAsJsonString());
         params.addValue("description", sp.descriptionAsJsonString());
-        params.addValue("environment", sp.getEnvironment());
-        params.addValue("protocol", sp.getProtocol());
+        params.addValue("environment", sp.getEnvironment().toString());
+        params.addValue("protocol", sp.getProtocol().toString());
         params.addValue("id", sp.getId());
 
         int updatedCount = jdbcTemplate.update(query, params);
@@ -241,7 +241,7 @@ public class ProvidedServiceManagerImpl implements ProvidedServiceManager {
                 .add("WHERE").add(sub.toString())
                 .toString();
 
-        List<ProvidedService> providedServices = jdbcTemplate.query(query, MAPPER);
+        List<ProvidedService> providedServices = jdbcTemplate.query(query, params, MAPPER);
 
         log.trace("getAll returns: {}", providedServices);
         return providedServices;
