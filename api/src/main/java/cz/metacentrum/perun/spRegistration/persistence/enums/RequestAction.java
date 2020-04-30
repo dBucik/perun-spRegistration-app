@@ -46,12 +46,17 @@ public enum RequestAction {
 
 	@Override
 	public String toString() {
+		return super.toString();
+	}
+
+	public String toString(String lang) {
 		switch (this) {
-			case REGISTER_NEW_SP: return "Register a new service";
-			case UPDATE_FACILITY: return "Update service configuration";
-			case DELETE_FACILITY:  return "Remove service";
-			case MOVE_TO_PRODUCTION: return "Transfer service to production environment";
-			default: return super.toString();
+				case REGISTER_NEW_SP: return "cs".equalsIgnoreCase(lang) ? "Registrace služby" : "Register new service";
+				case UPDATE_FACILITY: return "cs".equalsIgnoreCase(lang) ? "Změna konfigurace" : "Update configuration";
+				case DELETE_FACILITY: return "cs".equalsIgnoreCase(lang) ? "Zmazání služby" : "Remove service";
+				case MOVE_TO_PRODUCTION: return "cs".equalsIgnoreCase(lang) ? "Převod do produkce" : "Transfer to production";
+				default: return this.toString();
 		}
 	}
+
 }

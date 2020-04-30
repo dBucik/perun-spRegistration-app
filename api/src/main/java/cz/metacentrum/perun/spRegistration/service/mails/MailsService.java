@@ -42,11 +42,14 @@ public class MailsService {
 	private static final String REQUEST_ID_FIELD = "%REQUEST_ID%";
 	private static final String EN_NEW_STATUS_FIELD = "%EN_NEW_STATUS%";
 	private static final String CS_NEW_STATUS_FIELD = "%CS_NEW_STATUS%";
-	private static final String SERVICE_NAME_FIELD = "%SERVICE_NAME%";
+	private static final String EN_SERVICE_NAME_FIELD = "%EN_SERVICE_NAME%";
+	private static final String CS_SERVICE_NAME_FIELD = "%CS_SERVICE_NAME%";
+	private static final String EN_SERVICE_DESCRIPTION_FIELD = "%EN_SERVICE_DESCRIPTION%";
+	private static final String CS_SERVICE_DESCRIPTION_FIELD = "%CS_SERVICE_DESCRIPTION%";
 	private static final String APPROVAL_LINK_FIELD = "%APPROVAL_LINK%";
-	private static final String SERVICE_DESCRIPTION_FIELD = "%SERVICE_DESCRIPTION%";
 	private static final String REQUEST_DETAIL_LINK_FIELD = "%REQUEST_DETAIL_LINK%";
-	private static final String ACTION_FIELD = "%ACTION%";
+	private static final String EN_ACTION_FIELD = "%EN_ACTION%";
+	private static final String CS_ACTION_FIELD = "%CS_ACTION%";
 	private static final String USER_INFO_FIELD = "%USER_INFO%";
 	private static final String NULL_KEY = "@null";
 
@@ -233,9 +236,9 @@ public class MailsService {
 
 	private String replacePlaceholders(String containerString, Facility fac) {
 		log.trace("replacePlaceholders({}, {})", containerString, fac);
-		containerString = replacePlaceholder(containerString, SERVICE_NAME_FIELD,
+		containerString = replacePlaceholder(containerString, EN_SERVICE_NAME_FIELD,
 				fac.getName(), "");
-		containerString = replacePlaceholder(containerString, SERVICE_DESCRIPTION_FIELD,
+		containerString = replacePlaceholder(containerString, EN_SERVICE_DESCRIPTION_FIELD,
 				fac.getDescription(), "");
 
 		return containerString;
@@ -249,18 +252,27 @@ public class MailsService {
 				req.getReqId().toString(), "");
 		containerString = replacePlaceholder(containerString, EN_NEW_STATUS_FIELD,
 				req.getStatus().toString("en"), "");
-		containerString = replacePlaceholder(containerString, CS_NEW_STATUS_FIELD,
-				req.getStatus().toString("cs"), "");
-		containerString = replacePlaceholder(containerString, SERVICE_NAME_FIELD,
-				req.getFacilityName(), "");
-		containerString = replacePlaceholder(containerString, SERVICE_DESCRIPTION_FIELD,
-				req.getFacilityDescription(), "");
+		containerString = replacePlaceholder(containerString, EN_SERVICE_NAME_FIELD,
+				req.getFacilityName().get("en"), "");
+		containerString = replacePlaceholder(containerString, EN_SERVICE_DESCRIPTION_FIELD,
+				req.getFacilityDescription().get("en"), "");
 		containerString = replacePlaceholder(containerString, REQUEST_DETAIL_LINK_FIELD,
 				wrapInAnchorElement(requestLink), "-");
-		containerString = replacePlaceholder(containerString, ACTION_FIELD,
-				req.getAction().toString(), "");
+		containerString = replacePlaceholder(containerString, EN_ACTION_FIELD,
+				req.getAction().toString("en"), "");
 		containerString = replacePlaceholder(containerString, USER_INFO_FIELD,
 				req.getReqUserId().toString(), "");
+
+		if (appConfig.getAvailableLanguages().contains("cs")) {
+			containerString = replacePlaceholder(containerString, CS_NEW_STATUS_FIELD,
+					req.getStatus().toString("cs"), "");
+			containerString = replacePlaceholder(containerString, CS_SERVICE_NAME_FIELD,
+					req.getFacilityName().get("cs"), "");
+			containerString = replacePlaceholder(containerString, CS_SERVICE_DESCRIPTION_FIELD,
+					req.getFacilityDescription().get("cs"), "");
+			containerString = replacePlaceholder(containerString, CS_ACTION_FIELD,
+					req.getAction().toString("cs"), "");
+		}
 
 		return containerString;
 	}

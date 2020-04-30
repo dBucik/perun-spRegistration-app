@@ -106,9 +106,9 @@
                 <prop key="mail.footer">&lt;br/&gt; &lt;br/&gt;Best regards, &lt;br/&gt; test.mail.com &lt;br/&gt; service registration</prop>
 
                 <prop key="create.user.subject.en">Created a new request %REQUEST_ID%</prop>
-                <prop key="create.user.message.en">Your request for action %ACTION% and service %SERVICE_NAME% has been created. Assigned ID: %REQUEST_ID%</prop>
+                <prop key="create.user.message.en">Your request for action %EN_ACTION% and service %EN_SERVICE_NAME% has been created. Assigned ID: %REQUEST_ID%</prop>
                 <prop key="create.admin.subject.en">Created a new request %REQUEST_ID%</prop>
-                <prop key="create.admin.message.en">A new request for action %ACTION% and service %SERVICE_NAME% has been created. Assigned ID: %REQUEST_ID%</prop>
+                <prop key="create.admin.message.en">A new request for action %EN_ACTION% and service %EN_SERVICE_NAME% has been created. Assigned ID: %REQUEST_ID%</prop>
 
                 <prop key="update.user.subject.en">Request %REQUEST_ID% updated</prop>
                 <prop key="update.user.message.en">Request %REQUEST_ID% updated</prop>
@@ -123,11 +123,11 @@
                 <prop key="signed.admin.subject.en">Request %REQUEST_ID% signed</prop>
                 <prop key="signed.admin.message.en">Request %REQUEST_ID% signed</prop>
 
-                <prop key="production.authorities.subject.en">Approve transfer to production: %SERVICE_NAME%</prop>
-                <prop key="production.authorities.message.en">For an approval of moving service %SERVICE_NAME% to production visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
+                <prop key="production.authorities.subject.en">Approve transfer to production: %EN_SERVICE_NAME%</prop>
+                <prop key="production.authorities.message.en">For an approval of moving service %EN_SERVICE_NAME% to production visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
 
-                <prop key="admins.add.subject.en">Approve request to become admin: %SERVICE_NAME%</prop>
-                <prop key="admins.add.message.en">For approval of becoming admin of %SERVICE_NAME% visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
+                <prop key="admins.add.subject.en">Approve request to become admin: %EN_SERVICE_NAME%</prop>
+                <prop key="admins.add.message.en">For approval of becoming admin of %EN_SERVICE_NAME% visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
             </props>
         </property>
         <property name="locations">

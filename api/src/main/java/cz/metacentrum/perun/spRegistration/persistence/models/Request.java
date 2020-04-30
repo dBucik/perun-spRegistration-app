@@ -100,23 +100,23 @@ public class Request {
 	}
 
 	@JsonIgnore
-	public String getFacilityName() {
+	public Map<String, String> getFacilityName() {
 		PerunAttribute attr = attributes.get(AttributeCategory.SERVICE).get("urn:perun:facility:attribute-def:def:serviceName");
 		if (attr == null) {
-			return null;
+			return new HashMap<>();
+		} else {
+			return attr.valueAsMap();
 		}
-		Map<String, String> value = attr.valueAsMap();
-		return value.get("en");
 	}
 
 	@JsonIgnore
-	public String getFacilityDescription() {
+	public Map<String, String> getFacilityDescription() {
 		PerunAttribute attr = attributes.get(AttributeCategory.SERVICE).get("urn:perun:facility:attribute-def:def:serviceDescription");
 		if (attr == null) {
-			return null;
+			return new HashMap<>();
+		} else {
+			return attr.valueAsMap();
 		}
-		Map<String, String> value = attr.valueAsMap();
-		return value.get("en");
 	}
 
 	/**

@@ -13,11 +13,11 @@ import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
-import cz.metacentrum.perun.spRegistration.service.mails.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.service.mails.MailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +32,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of AdminCommandsService.
@@ -308,7 +306,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 	private boolean registerNewFacilityToPerun(Request request) throws InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, BadRequestException {
 		log.trace("registerNewFacilityToPerun({})", request);
 
-		String newName = request.getFacilityName();
+		String newName = request.getFacilityName().get("en");
 		Pattern pattern = Pattern.compile("[^A-Za-z0-9]");
 		Pattern pattern2 = Pattern.compile("_+_");
 
@@ -494,44 +492,6 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		log.trace("extractFacilityIdFromRequest() returns: {}", facilityId);
 		return facilityId;
-	}
-
-	private boolean updateFacilityNameAndDesc(Facility actualFacility, Request request) throws ConnectorException, BadRequestException {
-		log.trace("updateFacilityNameAndDesc(actualFacility: {}, request: {})", actualFacility, request);
-
-		if (Utils.checkParamsInvalid(actualFacility, request)) {
-			log.error("Wrong parameters passed: (actualFacility: {}, request: {})", actualFacility, request);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		String newName = request.getFacilityName();
-		newName = Normalizer.normalize(newName, Normalizer.Form.NFD);
-
-		String newDesc = request.getFacilityDescription();
-		boolean changed = false;
-		boolean successful = true;
-
-		Facility newFacility = new Facility(actualFacility.getId(), actualFacility.getName(), actualFacility.getDescription());
-
-		if (newName != null && !Objects.equals(actualFacility.getName(), newName)) {
-			log.debug("Update facility name requested");
-			newFacility.setName(newName);
-			changed = true;
-		}
-
-		if (newDesc != null && !Objects.equals(actualFacility.getDescription(), newDesc)) {
-			log.debug("Update facility description requested");
-			newFacility.setDescription(newDesc);
-			changed = true;
-		}
-
-		if (changed) {
-			log.debug("Updating facility name and/or description");
-			successful = (null != perunConnector.updateFacilityInPerun(newFacility.toJson()));
-		}
-
-		log.trace("updateFacilityNameAndDesc() returns: {}", successful);
-		return successful;
 	}
 
 	private PerunAttribute generateAuthProtocolAttribute(boolean isOidc) {
