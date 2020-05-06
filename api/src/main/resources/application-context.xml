@@ -50,6 +50,8 @@
                 <prop key="attr.entityId">urn:perun:facility:attribute-def:def:entityID</prop>
                 <prop key="attr.isOidc">urn:perun:facility:attribute-def:def:isOidcFacility</prop>
                 <prop key="attr.isSaml">urn:perun:facility:attribute-def:def:isSamlFacility</prop>
+                <prop key="attr.serviceName">urn:perun:facility:attribute-def:def:serviceName</prop>
+                <prop key="attr.serviceDesc">urn:perun:facility:attribute-def:def:serviceDescription</prop>
                 <!-- APPROVALS -->
                 <prop key="approval.confirmationPeriod.days">30</prop>
                 <prop key="approval.confirmationPeriod.hours">0</prop>
@@ -227,6 +229,8 @@
         <property name="isSamlAttributeName" value="${attr.isSaml}"/>
         <property name="adminsAttributeName" value="${attr.administratorContact}" />
         <property name="userEmailAttributeName" value="${attr.userEmail}" />
+        <property name="serviceNameAttributeName" value="${attr.serviceName}"/>
+        <property name="serviceDescAttributeName" value="${attr.serviceDesc}"/>
     </bean>
 
     <import resource="attributes-context.xml" />

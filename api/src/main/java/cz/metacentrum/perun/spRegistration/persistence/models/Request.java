@@ -100,8 +100,8 @@ public class Request {
 	}
 
 	@JsonIgnore
-	public Map<String, String> getFacilityName() {
-		PerunAttribute attr = attributes.get(AttributeCategory.SERVICE).get("urn:perun:facility:attribute-def:def:serviceName");
+	public Map<String, String> getFacilityName(String attrName) {
+		PerunAttribute attr = attributes.get(AttributeCategory.SERVICE).get(attrName);
 		if (attr == null) {
 			return new HashMap<>();
 		} else {
@@ -110,8 +110,8 @@ public class Request {
 	}
 
 	@JsonIgnore
-	public Map<String, String> getFacilityDescription() {
-		PerunAttribute attr = attributes.get(AttributeCategory.SERVICE).get("urn:perun:facility:attribute-def:def:serviceDescription");
+	public Map<String, String> getFacilityDescription(String attrName) {
+		PerunAttribute attr = attributes.get(AttributeCategory.SERVICE).get(attrName);
 		if (attr == null) {
 			return new HashMap<>();
 		} else {

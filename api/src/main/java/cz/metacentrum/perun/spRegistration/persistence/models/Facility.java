@@ -19,8 +19,10 @@ import java.util.Objects;
  */
 public class Facility extends PerunEntity {
 
-	private String name;
-	private String description;
+	private String perunName;
+	private String perunDescription;
+	private Map<String, String> name = new HashMap<>();
+	private Map<String, String> description = new HashMap<>();;
 	private boolean oidc;
 	private boolean saml;
 	private Long activeRequestId;
@@ -33,25 +35,41 @@ public class Facility extends PerunEntity {
 		super(id);
 	}
 
-	public Facility(Long id, String name, String description) {
+	public Facility(Long id, String perunName, String perunDescription) {
 		super(id);
-		this.name = name;
-		this.description = description;
+		this.perunName = perunName;
+		this.perunDescription = perunDescription;
 	}
 
-	public String getName() {
+	public String getPerunName() {
+		return perunName;
+	}
+
+	public void setPerunName(String perunName) {
+		this.perunName = perunName;
+	}
+
+	public void setPerunDescription(String perunDescription) {
+		this.perunDescription = perunDescription;
+	}
+
+	public String getPerunDescription() {
+		return perunDescription;
+	}
+
+	public Map<String, String> getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(Map<String, String> name) {
 		this.name = name;
 	}
 
-	public String getDescription() {
+	public Map<String, String> getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(Map<String, String> description) {
 		this.description = description;
 	}
 
@@ -122,8 +140,8 @@ public class Facility extends PerunEntity {
 		} else {
 			res.put("id", getId());
 		}
-		res.put("name", name);
-		res.put("description", description);
+		res.put("name", perunName);
+		res.put("description", perunDescription);
 		res.put("beanName", "facility");
 
 		return res;

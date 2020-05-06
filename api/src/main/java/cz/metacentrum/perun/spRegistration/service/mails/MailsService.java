@@ -141,7 +141,7 @@ public class MailsService {
 		StringJoiner subject = new StringJoiner(" / ");
 		for (String lang : appConfig.getAvailableLanguages()) {
 			String subj = messagesProperties.getProperty(ADD_ADMIN_SUBJECT_KEY + '.' + lang);
-			if (! NULL_KEY.equals(subj)) {
+			if (null != subj && !NULL_KEY.equals(subj)) {
 				subject.add(subj);
 			}
 		}
@@ -149,7 +149,7 @@ public class MailsService {
 		StringJoiner message = new StringJoiner("<br/><hr/><br/>");
 		for (String lang : appConfig.getAvailableLanguages()) {
 			String msg = messagesProperties.getProperty(ADD_ADMIN_MESSAGE_KEY + '.' + lang);
-			if (! NULL_KEY.equals(msg)) {
+			if (null != msg && !NULL_KEY.equals(msg)) {
 				message.add(msg);
 			}
 		}
@@ -237,9 +237,15 @@ public class MailsService {
 	private String replacePlaceholders(String containerString, Facility fac) {
 		log.trace("replacePlaceholders({}, {})", containerString, fac);
 		containerString = replacePlaceholder(containerString, EN_SERVICE_NAME_FIELD,
-				fac.getName(), "");
+				fac.getName().get("en"), "");
 		containerString = replacePlaceholder(containerString, EN_SERVICE_DESCRIPTION_FIELD,
-				fac.getDescription(), "");
+				fac.getDescription().get("en"), "");
+		if (appConfig.getAvailableLanguages().contains("cs")) {
+			containerString = replacePlaceholder(containerString, CS_SERVICE_NAME_FIELD,
+					fac.getName().get("cs"), "");
+			containerString = replacePlaceholder(containerString, CS_SERVICE_DESCRIPTION_FIELD,
+					fac.getDescription().get("cs"), "");
+		}
 
 		return containerString;
 	}
@@ -253,9 +259,9 @@ public class MailsService {
 		containerString = replacePlaceholder(containerString, EN_NEW_STATUS_FIELD,
 				req.getStatus().toString("en"), "");
 		containerString = replacePlaceholder(containerString, EN_SERVICE_NAME_FIELD,
-				req.getFacilityName().get("en"), "");
+				req.getFacilityName(appConfig.getServiceNameAttributeName()).get("en"), "");
 		containerString = replacePlaceholder(containerString, EN_SERVICE_DESCRIPTION_FIELD,
-				req.getFacilityDescription().get("en"), "");
+				req.getFacilityDescription(appConfig.getServiceDescAttributeName()).get("en"), "");
 		containerString = replacePlaceholder(containerString, REQUEST_DETAIL_LINK_FIELD,
 				wrapInAnchorElement(requestLink), "-");
 		containerString = replacePlaceholder(containerString, EN_ACTION_FIELD,
@@ -267,9 +273,9 @@ public class MailsService {
 			containerString = replacePlaceholder(containerString, CS_NEW_STATUS_FIELD,
 					req.getStatus().toString("cs"), "");
 			containerString = replacePlaceholder(containerString, CS_SERVICE_NAME_FIELD,
-					req.getFacilityName().get("cs"), "");
+					req.getFacilityName(appConfig.getServiceNameAttributeName()).get("cs"), "");
 			containerString = replacePlaceholder(containerString, CS_SERVICE_DESCRIPTION_FIELD,
-					req.getFacilityDescription().get("cs"), "");
+					req.getFacilityDescription(appConfig.getServiceDescAttributeName()).get("cs"), "");
 			containerString = replacePlaceholder(containerString, CS_ACTION_FIELD,
 					req.getAction().toString("cs"), "");
 		}

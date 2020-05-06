@@ -306,7 +306,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 	private boolean registerNewFacilityToPerun(Request request) throws InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, BadRequestException {
 		log.trace("registerNewFacilityToPerun({})", request);
 
-		String newName = request.getFacilityName().get("en");
+		String newName = request.getFacilityName(appConfig.getServiceNameAttributeName()).get("en");
 		Pattern pattern = Pattern.compile("[^A-Za-z0-9]");
 		Pattern pattern2 = Pattern.compile("_+_");
 
@@ -321,8 +321,8 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		}
 
 		Facility facility = new Facility(null);
-		facility.setName(newName);
-		facility.setDescription(newDesc);
+		facility.setPerunName(newName);
+		facility.setPerunDescription(newDesc);
 		try {
 			facility = perunConnector.createFacilityInPerun(facility.toJson());
 		} catch (ConnectorException e) {

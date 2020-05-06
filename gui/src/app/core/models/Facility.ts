@@ -8,8 +8,22 @@ export class Facility extends AttributesEntity {
     }
     super(item.attributes);
     this.id = item.id;
-    this.name = item.name;
-    this.description = item.description;
+    this.perunName = item.perunName;
+    this.perunDescription = item.perunDescription;
+    this.name = new Map<string, string>();
+    if (item.name) {
+      for (const k of Object.keys(item.name)) {
+        this.name.set(k.toLowerCase(), item.name[k]);
+      }
+    }
+
+    this.description = new Map<string, string>();
+    if (item.description) {
+      for (const k of Object.keys(item.description)) {
+        this.description.set(k.toLowerCase(), item.description[k]);
+      }
+    }
+
     this.testEnv = item.testEnv;
     this.activeRequestId = item.activeRequestId;
     this.editable = item.editable;
@@ -26,8 +40,10 @@ export class Facility extends AttributesEntity {
   }
 
   id: number;
-  name: string;
-  description: string;
+  perunName: string;
+  perunDescription: string;
+  name: Map<string, string>;
+  description: Map<string, string>;
   testEnv: boolean;
   activeRequestId: number;
   editable: boolean;
