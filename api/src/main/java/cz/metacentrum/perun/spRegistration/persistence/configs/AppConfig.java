@@ -48,6 +48,8 @@ public class AppConfig {
 	private String userEmailAttributeName;
 	private String isSamlAttributeName;
 	private String isOidcAttributeName;
+	private String serviceNameAttributeName;
+	private String serviceDescAttributeName;
 	private Map<String, List<String>> prodTransferAuthoritiesMailsMap;
 
 	private String footerHTML;
@@ -370,6 +372,22 @@ public class AppConfig {
 
 	public String getLogoutUrl() {
 		return logoutUrl;
+	}
+
+	public String getServiceNameAttributeName() {
+		return serviceNameAttributeName;
+	}
+
+	public void setServiceNameAttributeName(String serviceNameAttributeName) {
+		this.serviceNameAttributeName = serviceNameAttributeName;
+	}
+
+	public String getServiceDescAttributeName() {
+		return serviceDescAttributeName;
+	}
+
+	public void setServiceDescAttributeName(String serviceDescAttributeName) {
+		this.serviceDescAttributeName = serviceDescAttributeName;
 	}
 
 	@Override

@@ -6,9 +6,9 @@
         <!-- PAGE TITLE -->
         <div class="col-md-8">
           <h2 class="card-title">
-            {{'FACILITIES.DETAIL_TITLE' | translate}}{{facility.id}} - {{facility.name}}
+            {{'FACILITIES.DETAIL_TITLE' | translate}}{{facility.id}} - {{facility.name | facilityDetailItemLocale}}
           </h2>
-          <p>{{facility.description}}</p>
+          <p>{{facility.description | facilityDetailItemLocale}}</p>
         </div>
         <!-- BUTTONS -->
         <div class="col-md-4 mt-4 mb-2 controls text-right">

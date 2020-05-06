@@ -419,6 +419,19 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		List<PerunAttribute> filteredAttributes = ServiceUtils.filterFacilityAttrs(attrs, keptAttrs);
 		Map<AttributeCategory, Map<String, PerunAttribute>> facilityAttributes = convertToStruct(filteredAttributes, appConfig);
 		facility.setAttributes(facilityAttributes);
+
+		Map<String, String> name = facility.getAttributes()
+				.get(AttributeCategory.SERVICE)
+				.get(appConfig.getServiceNameAttributeName())
+				.valueAsMap();
+
+		Map<String, String> desc = facility.getAttributes()
+				.get(AttributeCategory.SERVICE)
+				.get(appConfig.getServiceDescAttributeName())
+				.valueAsMap();
+		facility.setName(name);
+		facility.setDescription(desc);
+
 		if (isOidc) {
 			PerunAttribute clientSecret = facility.getAttributes()
 					.get(AttributeCategory.PROTOCOL).get(appConfig.getClientSecretAttribute());
@@ -571,6 +584,12 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			log.error("Could not fetch facility for id: {}", facilityId);
 			throw new InternalErrorException("Could not find facility for id: " + facilityId);
 		}
+
+		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facility.getId(),
+				Arrays.asList(appConfig.getServiceNameAttributeName(), appConfig.getServiceDescAttributeName()));
+
+		facility.setName(attrs.get(appConfig.getServiceNameAttributeName()).valueAsMap());
+		facility.setDescription(attrs.get(appConfig.getServiceDescAttributeName()).valueAsMap());
 
 		Map<String, String> adminCodeMap = generateCodesForAdmins(admins, facilityId);
 		Map<String, String> adminLinkMap = generateLinksForAdmins(facilityId, adminCodeMap);
@@ -977,8 +996,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		for (Map.Entry<String, String> entry : adminCodeMap.entrySet()) {
 			String code = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.toString());
 			String link = appConfig.getAdminsEndpoint()
-					.concat("?facilityName=").concat(facility.getName())
-					.concat("&code=").concat(code);
+					.concat("?code=").concat(code);
 			linksMap.put(entry.getKey(), link);
 			log.debug("Generated code: {}", code); //TODO: remove
 		}
@@ -1003,8 +1021,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		for (Map.Entry<String, String> entry : authorityCodeMap.entrySet()) {
 			String code = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.toString());
 			String link = appConfig.getSignaturesEndpointUrl()
-					.concat("?facilityName=").concat(facility.getName())
-					.concat("&code=").concat(code);
+					.concat("?code=").concat(code);
 			linksMap.put(entry.getKey(), link);
 			log.debug("Generated code: {}", code); //TODO: remove
 		}
