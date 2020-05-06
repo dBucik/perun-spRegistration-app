@@ -3,6 +3,7 @@ package cz.metacentrum.perun.spRegistration.service.mails;
 import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,8 @@ public class MailsService {
 	private static final String EN_ACTION_FIELD = "%EN_ACTION%";
 	private static final String CS_ACTION_FIELD = "%CS_ACTION%";
 	private static final String USER_INFO_FIELD = "%USER_INFO%";
+	private static final String INVITER_NAME = "%INVITER_NAME%";
+	private static final String INVITER_EMAIL = "%INVITER_EMAIL%";
 	private static final String NULL_KEY = "@null";
 
 	@Value("${host.url}")
@@ -89,12 +92,12 @@ public class MailsService {
 		}
 	}
 
-	public boolean notifyNewAdmins(Facility facility, Map<String, String> adminsLinksMap) {
+	public boolean notifyNewAdmins(Facility facility, Map<String, String> adminsLinksMap, User user) {
 		for (String email: adminsLinksMap.keySet()) {
 			String link = adminsLinksMap.get(email);
-			if (!adminAddRemoveNotify(link, facility, email)) {
-				log.warn("Failed to send approval notification to {} for facility id: {}, link: {}",
-						email, facility.getId(), link);
+			if (!adminAddRemoveNotify(link, facility, email, user)) {
+				log.warn("Failed to send approval notification to {} for facility id: {}, link: {}, user: {}",
+						email, facility.getId(), link, user);
 			}
 		}
 
@@ -134,7 +137,7 @@ public class MailsService {
 		return res;
 	}
 
-	public boolean adminAddRemoveNotify(String approvalLink, Facility facility,  String recipient) {
+	public boolean adminAddRemoveNotify(String approvalLink, Facility facility, String recipient, User user) {
 		log.debug("authoritiesApproveProductionTransferNotify(approvalLink: {}, facility: {}, recipient: {})",
 				approvalLink, facility, recipient);
 
@@ -160,6 +163,8 @@ public class MailsService {
 
 		String mailMessage = message.toString();
 		mailMessage = replacePlaceholders(mailMessage, facility);
+		mailMessage = replacePlaceholder(mailMessage, INVITER_NAME, user.getName(), "");
+		mailMessage = replacePlaceholder(mailMessage, INVITER_EMAIL, user.getEmail(), "");
 		mailMessage = replaceApprovalLink(mailMessage, approvalLink);
 
 		boolean res = sendMail(recipient, mailSubject, mailMessage);

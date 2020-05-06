@@ -593,7 +593,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		Map<String, String> adminCodeMap = generateCodesForAdmins(admins, facilityId);
 		Map<String, String> adminLinkMap = generateLinksForAdmins(adminCodeMap);
-		boolean successful = mailsService.notifyNewAdmins(facility, adminLinkMap);
+		boolean successful = mailsService.notifyNewAdmins(facility, adminLinkMap, user);
 
 		log.debug("addAdminsNotify returns: {}", successful);
 		return successful;
