@@ -265,7 +265,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, filteredAttributes);
 
 		Map<String, String> authoritiesCodesMap = generateCodesForAuthorities(req, authorities);
-		Map<String, String> authoritiesLinksMap = generateLinksForAuthorities(authoritiesCodesMap, req);
+		Map<String, String> authoritiesLinksMap = generateLinksForAuthorities(authoritiesCodesMap);
 
 		mailsService.notifyUser(req, REQUEST_CREATED);
 		mailsService.notifyAppAdmins(req, REQUEST_CREATED);
@@ -592,7 +592,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		facility.setDescription(attrs.get(appConfig.getServiceDescAttributeName()).valueAsMap());
 
 		Map<String, String> adminCodeMap = generateCodesForAdmins(admins, facilityId);
-		Map<String, String> adminLinkMap = generateLinksForAdmins(facilityId, adminCodeMap);
+		Map<String, String> adminLinkMap = generateLinksForAdmins(adminCodeMap);
 		boolean successful = mailsService.notifyNewAdmins(facility, adminLinkMap);
 
 		log.debug("addAdminsNotify returns: {}", successful);
@@ -980,17 +980,16 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return adminCodesMap;
 	}
 
-	private Map<String, String> generateLinksForAdmins(Long facilityId, Map<String, String> adminCodeMap)
-			throws ConnectorException, UnsupportedEncodingException
+	private Map<String, String> generateLinksForAdmins(Map<String, String> adminCodeMap)
+			throws UnsupportedEncodingException
 	{
-		log.trace("generateLinksForAdmins(adminCodeMap: {}, facilityId: {})", adminCodeMap, facilityId);
+		log.trace("generateLinksForAdmins(adminCodeMap: {})", adminCodeMap);
 
-		if (Utils.checkParamsInvalid(facilityId, adminCodeMap)) {
-			log.error("Wrong parameters passed: (facilityId: {}, adminCodeMap: {})", facilityId, adminCodeMap);
+		if (Utils.checkParamsInvalid(adminCodeMap)) {
+			log.error("Wrong parameters passed: (adminCodeMap: {})", adminCodeMap);
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Facility facility = perunConnector.getFacilityById(facilityId);
 		Map<String, String> linksMap = new HashMap<>();
 
 		for (Map.Entry<String, String> entry : adminCodeMap.entrySet()) {
@@ -1005,17 +1004,15 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		return linksMap;
 	}
 
-	private Map<String, String> generateLinksForAuthorities(Map<String, String> authorityCodeMap, Request request)
-			throws UnsupportedEncodingException, ConnectorException
-	{
-		log.trace("generateLinksForAuthorities(authorityCodeMap: {}, request: {})", authorityCodeMap, request);
+	private Map<String, String> generateLinksForAuthorities(Map<String, String> authorityCodeMap)
+			throws UnsupportedEncodingException {
+		log.trace("generateLinksForAuthorities(authorityCodeMap: {})", authorityCodeMap);
 
-		if (Utils.checkParamsInvalid(authorityCodeMap, request)) {
-			log.error("Wrong parameters passed: (authorityCodeMap: {}, request: {})", authorityCodeMap, request);
+		if (Utils.checkParamsInvalid(authorityCodeMap)) {
+			log.error("Wrong parameters passed: (authorityCodeMap: {})", authorityCodeMap);
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Facility facility = perunConnector.getFacilityById(request.getFacilityId());
 		Map<String, String> linksMap = new HashMap<>();
 
 		for (Map.Entry<String, String> entry : authorityCodeMap.entrySet()) {
