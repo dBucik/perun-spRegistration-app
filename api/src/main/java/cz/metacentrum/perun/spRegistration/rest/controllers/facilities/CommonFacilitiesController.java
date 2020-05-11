@@ -43,7 +43,7 @@ public class CommonFacilitiesController {
 			throws UnauthorizedActionException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("facilityDetail(user(): {}, facilityId: {})", user.getId(), facilityId);
 
-		Facility facility = service.getDetailedFacility(facilityId, user.getId(), true);
+		Facility facility = service.getDetailedFacility(facilityId, user.getId(), true, true);
 
 		log.trace("facilityDetail() returns: {}", facility);
 		return facility;
@@ -55,7 +55,7 @@ public class CommonFacilitiesController {
 			throws UnauthorizedActionException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("facilityDetailSignature(user(): {}, facilityId: {})", user.getId(), facilityId);
 
-		Facility facility = service.getDetailedFacility(facilityId, user.getId(), false);
+		Facility facility = service.getDetailedFacility(facilityId, user.getId(), false, false);
 		facility.getAttributes().get(AttributeCategory.PROTOCOL).clear();
 		facility.getAttributes().get(AttributeCategory.ACCESS_CONTROL).clear();
 

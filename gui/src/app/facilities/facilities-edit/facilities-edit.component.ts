@@ -84,10 +84,6 @@ export class FacilitiesEditComponent implements OnInit {
     }
 
     const perunAttributes: UrnValuePair[] = [];
-    console.log(this.serviceItems);
-    console.log(this.orgItems);
-    console.log(this.protocolItems);
-    console.log(this.accessItems);
 
     // set to false when one attribute has wrong value
     let allGood = true;
