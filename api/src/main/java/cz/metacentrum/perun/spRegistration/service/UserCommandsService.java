@@ -187,7 +187,7 @@ public interface UserCommandsService {
 	 * @throws ConnectorException Thrown when problem while communicating with Perun RPC occur.
 	 * @throws IllegalArgumentException Thrown when param "facilityId" is NULL, when param "userId" is NULL.
 	 */
-	Facility getDetailedFacility(Long facilityId, Long userId, boolean checkAdmin)
+	Facility getDetailedFacility(Long facilityId, Long userId, boolean checkAdmin, boolean includeClientCredentials)
 			throws UnauthorizedActionException, ConnectorException, InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException;
 
 	/**

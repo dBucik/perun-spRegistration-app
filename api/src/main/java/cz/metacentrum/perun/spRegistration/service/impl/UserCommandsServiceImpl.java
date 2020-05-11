@@ -254,7 +254,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new UnauthorizedActionException("User is not registered as admin for facility, cannot ask for moving to production");
 		}
 
-		Facility fac = getDetailedFacility(facilityId, userId, true);
+		Facility fac = getDetailedFacility(facilityId, userId, true, false);
 		if (fac == null) {
 			log.error("Could not retrieve facility for id: {}", facilityId);
 			throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
@@ -391,7 +391,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	}
 
 	@Override
-	public Facility getDetailedFacility(Long facilityId, Long userId, boolean checkAdmin)
+	public Facility getDetailedFacility(Long facilityId, Long userId, boolean checkAdmin, boolean includeClientCredentials)
 			throws UnauthorizedActionException, ConnectorException, InternalErrorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("getDetailedFacility(facilityId: {}, userId: {}, checkAdmin: {})", facilityId, userId, checkAdmin);
 
@@ -440,6 +440,11 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			clientSecret.setValue(decrypted);
 		}
 
+		if (!includeClientCredentials) {
+			facility.getAttributes().get(AttributeCategory.PROTOCOL).remove(appConfig.getClientIdAttribute());
+			facility.getAttributes().get(AttributeCategory.PROTOCOL).remove(appConfig.getClientSecretAttribute());
+		}
+
 		boolean inTest = attrs.get(appConfig.getIsTestSpAttribute()).valueAsBoolean();
 		facility.setTestEnv(inTest);
 
@@ -466,7 +471,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		Facility facility = getDetailedFacility(facilityId, userId, true);
+		Facility facility = getDetailedFacility(facilityId, userId, true, false);
 		if (facility == null || facility.getAttributes() == null) {
 			log.error("Could not fetch facility for id: {}", facilityId);
 			throw new InternalErrorException("Could not fetch facility for id: " + facilityId);
