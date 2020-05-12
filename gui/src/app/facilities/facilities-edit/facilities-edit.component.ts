@@ -191,19 +191,19 @@ export class FacilitiesEditComponent implements OnInit {
     this.accessControlAttrs = [];
   }
 
-  private changeServiceShowMore() {
+  changeServiceShowMore() {
     this.showServiceMore = !this.showServiceMore;
   }
 
-  private changeOrganizationShowMore() {
+  changeOrganizationShowMore() {
     this.showOrganizationMore = !this.showOrganizationMore;
   }
 
-  private changeProtocolShowMore() {
+  changeProtocolShowMore() {
     this.showProtocolMore = !this.showProtocolMore;
   }
 
-  private changeAccessShowMore() {
+  changeAccessShowMore() {
     this.showAccessControlMore = !this.showAccessControlMore;
   }
 
