@@ -152,7 +152,8 @@
     "MANAGERS": "Managers",
     "MANAGER_NAME": "Name",
     "MANAGER_EMAIL": "Contact email",
-    "PROTOCOL": "SAML/OIDC"
+    "PROTOCOL": "SAML/OIDC",
+    "ARE_YOU_SURE_REGENERATE_CLIENT_SECRET": "Are you sure you want to generate a new CLIENT_SECRET? The old value will not be usable anymore."
   },
   "TOOLS": {
     "CRYPTO_TITLE": "Crypto",

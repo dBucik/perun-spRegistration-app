@@ -3,14 +3,14 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {DialogData} from '../facilities-detail.component';
 
 @Component({
-  selector: 'app-facilities-detail-dialog',
-  templateUrl: './facilities-detail-dialog.component.html',
-  styleUrls: ['./facilities-detail-dialog.component.scss']
+  selector: 'app-facilities-detail-client-secret-dialog',
+  templateUrl: './facilities-detail-client-secret-dialog.component.html',
+  styleUrls: ['./facilities-detail-client-secret-dialog.component.scss']
 })
-export class FacilitiesDetailDialogComponent implements OnInit {
+export class FacilitiesDetailClientSecretDialogComponent implements OnInit {
 
   constructor(
-    public dialogRef: MatDialogRef<FacilitiesDetailDialogComponent>,
+    public dialogRef: MatDialogRef<FacilitiesDetailClientSecretDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) { }
 
@@ -22,7 +22,7 @@ export class FacilitiesDetailDialogComponent implements OnInit {
 
   onYesClick(): void {
     this.data.parent.loading = true;
-    this.data.parent.deleteFacility();
+    this.data.parent.regenerateClientSecret();
     this.dialogRef.close();
   }
 

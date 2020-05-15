@@ -130,6 +130,9 @@
 
                 <prop key="admins.add.subject.en">Approve request to become admin: %EN_SERVICE_NAME%</prop>
                 <prop key="admins.add.message.en">For approval of becoming admin of %EN_SERVICE_NAME% visit &lt;a href="%APPROVAL_LINK%"&gt;this link&lt;/a&gt;</prop>
+
+                <prop key="client.secret.changed.subject.en">Client Secret changed</prop>
+                <prop key="client.secret.changed.message.en">Client Secret for your service %EN_SERVICE_NAME% has been changed. Please visit details of your service to get the new value.</prop>
             </props>
         </property>
         <property name="locations">
