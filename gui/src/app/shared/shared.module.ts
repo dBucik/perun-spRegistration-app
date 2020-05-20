@@ -37,6 +37,18 @@ import {ApplicationItemBooleanComponent} from "../requests/new-request/applicati
 import {ApplicationItemListComponent} from "../requests/new-request/application-item/application-item-list/application-item-list.component";
 import {ApplicationItemMapComponent} from "../requests/new-request/application-item/application-item-map/application-item-map.component";
 import {ApplicationItemSelectComponent} from "../requests/new-request/application-item/application-item-select/application-item-select.component";
+import {DetailItemSubCommentButtonComponent} from "./detailed-view-items/detail-item-sub-comment/detail-item-sub-comment-button/detail-item-sub-comment-button.component";
+import {DetailItemSubCommentUserComponent} from "./detailed-view-items/detail-item-sub-comment/detail-item-sub-comment-user/detail-item-sub-comment-user.component";
+import {DetailItemSubCommentAdminComponent} from "./detailed-view-items/detail-item-sub-comment/detail-item-sub-comment-admin/detail-item-sub-comment-admin.component";
+import {DetailItemSubCommentComponent} from "./detailed-view-items/detail-item-sub-comment/detail-item-sub-comment.component";
+import {DetailItemStringComponent} from "./detailed-view-items/detail-item-string/detail-item-string.component";
+import {DetailItemMapComponent} from "./detailed-view-items/detail-item-map/detail-item-map.component";
+import {DetailItemIntegerComponent} from "./detailed-view-items/detail-item-integer/detail-item-integer.component";
+import {DetailItemBooleanComponent} from "./detailed-view-items/detail-item-boolean/detail-item-boolean.component";
+import {DetailItemArrayComponent} from "./detailed-view-items/detail-item-array/detail-item-array.component";
+import {DetailedViewItemsComponent} from "./detailed-view-items/detailed-view-items.component";
+import {DetailedViewItemValuePipe} from "./detailed-view-item-value.pipe";
+import {ItemLocalePipe} from "./item-locale.pipe";
 
 @NgModule({
   imports: [
@@ -80,39 +92,63 @@ import {ApplicationItemSelectComponent} from "../requests/new-request/applicatio
     ApplicationItemListComponent,
     ApplicationItemMapComponent,
     ApplicationItemSelectComponent,
+    DetailedViewItemsComponent,
+    DetailItemArrayComponent,
+    DetailItemBooleanComponent,
+    DetailItemIntegerComponent,
+    DetailItemMapComponent,
+    DetailItemStringComponent,
+    DetailItemSubCommentComponent,
+    DetailItemSubCommentAdminComponent,
+    DetailItemSubCommentUserComponent,
+    DetailItemSubCommentButtonComponent,
+    DetailedViewItemValuePipe,
+    ItemLocalePipe
   ],
-  exports: [
-    FontAwesomeModule,
-    SortableColumnComponent,
-    SortableTableDirective,
-    TranslateModule,
-    PerunFooterComponent,
-    FormsModule,
-    MatSelectModule,
-    MatInputModule,
-    MatCheckboxModule,
-    MatProgressSpinnerModule,
-    MatRadioModule,
-    MatTooltipModule,
-    MatButtonModule,
-    MatToolbarModule,
-    MatSnackBarModule,
-    MatIconModule,
-    MatTableModule,
-    MatSortModule,
-    MatSidenavModule,
-    MatStepperModule,
-    MatFormFieldModule,
-    ReactiveFormsModule,
-    MatExpansionModule,
-    ReactiveFormsModule,
-    MatProgressBarModule,
-    MatChipsModule,
-    MatMenuModule,
-    MatMenuModule,
-    MatBadgeModule,
-    ApplicationItemComponent
-  ],
+    exports: [
+        FontAwesomeModule,
+        SortableColumnComponent,
+        SortableTableDirective,
+        TranslateModule,
+        PerunFooterComponent,
+        FormsModule,
+        MatSelectModule,
+        MatInputModule,
+        MatCheckboxModule,
+        MatProgressSpinnerModule,
+        MatRadioModule,
+        MatTooltipModule,
+        MatButtonModule,
+        MatToolbarModule,
+        MatSnackBarModule,
+        MatIconModule,
+        MatTableModule,
+        MatSortModule,
+        MatSidenavModule,
+        MatStepperModule,
+        MatFormFieldModule,
+        ReactiveFormsModule,
+        MatExpansionModule,
+        ReactiveFormsModule,
+        MatProgressBarModule,
+        MatChipsModule,
+        MatMenuModule,
+        MatMenuModule,
+        MatBadgeModule,
+        ApplicationItemComponent,
+        DetailedViewItemsComponent,
+        DetailItemArrayComponent,
+        DetailItemBooleanComponent,
+        DetailItemIntegerComponent,
+        DetailItemMapComponent,
+        DetailItemStringComponent,
+        DetailItemSubCommentComponent,
+        DetailItemSubCommentAdminComponent,
+        DetailItemSubCommentUserComponent,
+        DetailItemSubCommentButtonComponent,
+        ItemLocalePipe,
+        DetailedViewItemValuePipe
+    ],
   entryComponents: [
     ErrorDialogComponent
   ]

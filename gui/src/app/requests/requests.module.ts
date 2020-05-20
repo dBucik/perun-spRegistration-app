@@ -19,14 +19,14 @@ import {MatTabsModule} from "@angular/material/tabs";
 import { RequestDetailItemLocalePipe } from './request-detail-item-locale.pipe';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        RequestsRoutingModule,
-        SharedModule,
-        MatDialogModule,
-        MatPaginatorModule,
-        MatTabsModule
-    ],
+  imports: [
+    CommonModule,
+    RequestsRoutingModule,
+    SharedModule,
+    MatDialogModule,
+    MatPaginatorModule,
+    MatTabsModule,
+  ],
   declarations: [
     RequestsOverviewComponent,
     NewRequestComponent,

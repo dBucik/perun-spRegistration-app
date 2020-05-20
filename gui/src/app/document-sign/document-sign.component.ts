@@ -5,9 +5,9 @@ import {Subscription} from 'rxjs';
 import {Facility} from '../core/models/Facility';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {TranslateService} from '@ngx-translate/core';
-import {FacilityDetailItem} from "../core/models/items/FacilityDetailItem";
 import {FacilityDetailUserItem} from "../core/models/items/FacilityDetailUserItem";
 import {User} from "../core/models/User";
+import {DetailViewItem} from "../core/models/items/DetailViewItem";
 
 @Component({
   selector: 'app-document-sign',
@@ -28,13 +28,10 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
   loading = true;
   private hash: string;
 
-  private facility: Facility;
-  facilityAttrsService: FacilityDetailItem[] = [];
-  facilityAttrsOrganization: FacilityDetailItem[] = [];
+  facility: Facility;
+  facilityAttrsService: DetailViewItem[] = [];
+  facilityAttrsOrganization: DetailViewItem[] = [];
   facilityAdmins: FacilityDetailUserItem[] = [];
-
-  displColumnsAttrs: string[] = ['fullname', 'value'];
-  displColumnsAdmins: string[] = ['managerName', 'managerMail'];
 
   ngOnInit() {
     this.sub = this.route.queryParams.subscribe(params => {
@@ -58,12 +55,12 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
   }
 
   private mapAttributes() {
-    this.facility.serviceAttrs().forEach((attr, urn) => {
-      this.facilityAttrsService.push(new FacilityDetailItem(urn, attr));
+    this.facility.serviceAttrs().forEach((attr, _) => {
+      this.facilityAttrsService.push(new DetailViewItem(attr));
     });
 
-    this.facility.organizationAttrs().forEach((attr, urn) => {
-      this.facilityAttrsOrganization.push(new FacilityDetailItem(urn, attr));
+    this.facility.organizationAttrs().forEach((attr, _) => {
+      this.facilityAttrsOrganization.push(new DetailViewItem(attr));
     });
   }
 
@@ -78,7 +75,7 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
   }
 
   approveRequest(): void {
-    this.facilitiesService.approveTransferToProduction(this.hash).subscribe(req => {
+    this.facilitiesService.approveTransferToProduction(this.hash).subscribe(_ => {
       this.translate.get('FACILITIES.DOCUMENT_SIGN_SUCCESS').subscribe(successMessage => {
           this.snackBar.open(successMessage, null, {duration: 5000});
           this.router.navigate(['/auth']);
@@ -87,7 +84,7 @@ export class DocumentSignComponent implements OnInit, OnDestroy {
   }
 
   rejectRequest(): void {
-    this.facilitiesService.rejectTransferToProduction(this.hash).subscribe(req => {
+    this.facilitiesService.rejectTransferToProduction(this.hash).subscribe(_ => {
       this.translate.get('FACILITIES.DOCUMENT_SIGN_SUCCESS').subscribe(successMessage => {
         this.snackBar.open(successMessage, null, {duration: 5000});
         this.router.navigate(['/auth']);

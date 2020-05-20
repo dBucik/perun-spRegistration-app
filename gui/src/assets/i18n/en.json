@@ -34,8 +34,7 @@
     "OIDC": "OIDC",
     "SAML": "SAML",
     "ERROR" : "Something went wrong",
-    "DETAIL_ITEM_NAME" : "Option",
-    "DETAIL_ITEM_VALUE" : "Value",
+    "NAME" : "Name",
     "SUBMIT" : "Submit",
     "ATTRIBUTES": {
       "SERVICE": "Service",
@@ -79,8 +78,11 @@
     "REQUEST_CHANGES_COMMENT" : "Comment",
     "SET_REQUEST_WFA" : "Ask for approval",
     "EDIT_REQUEST" : "Change requested settings",
-    "USERS_WHO_SIGNED": "Users, who approved / rejected this request",
+    "APPROVALS": "Decisions made by authorities:",
     "NO_SIGNATURE_GIVEN": "This request has not been approved / rejected by anyone yet",
+    "ADD_COMMENT": "Click to toggle the input field for comment",
+    "INPUT_COMMENT": "Enter your comment",
+    "ADMINISTRATOR_COMMENT": "Comment from administrator",
     "STATUSPIPE": {
       "APPROVED": "Approved",
       "REJECTED": "Rejected",

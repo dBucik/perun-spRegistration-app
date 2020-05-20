@@ -1,14 +1,15 @@
 import {PerunAttribute} from "../PerunAttribute";
 
-export class RequestDetailItem {
+export class DetailViewItem {
   constructor(attr: PerunAttribute) {
     if (!attr) {
       return;
     }
+
     this.urn = attr.fullName;
     this.value = attr.value;
-    this.oldValue = attr.oldValue;
-    this.comment = attr.comment;
+    this.oldValue = attr.hasOwnProperty('oldValue') ? attr.oldValue : null;
+    this.comment = attr.hasOwnProperty('comment') ? attr.comment : null;
 
     this.name = new Map<string, string>();
     this.description = new Map<string, string>();
@@ -36,6 +37,8 @@ export class RequestDetailItem {
     } else {
       this.position = 0;
     }
+
+    this.type = attr.definition.type;
   }
 
   urn: string;
@@ -45,4 +48,5 @@ export class RequestDetailItem {
   comment: string;
   description: Map<string, string>;
   position: number;
+  type: string;
 }

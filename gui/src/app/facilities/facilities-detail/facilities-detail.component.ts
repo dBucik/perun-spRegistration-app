@@ -9,8 +9,8 @@ import {RequestsService} from '../../core/services/requests.service';
 import {Subscription} from 'rxjs';
 import {PerunAttribute} from "../../core/models/PerunAttribute";
 import {User} from "../../core/models/User";
-import {FacilityDetailItem} from "../../core/models/items/FacilityDetailItem";
 import {FacilityDetailUserItem} from "../../core/models/items/FacilityDetailUserItem";
+import {DetailViewItem} from "../../core/models/items/DetailViewItem";
 
 export interface DialogData {
   parent: FacilitiesDetailComponent;
@@ -34,13 +34,10 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
 
   private sub: Subscription;
 
-  displColumnsAttrs: string[] = ['fullname', 'value'];
-  displColumnsAdmins: string[] = ['managerName', 'managerMail'];
-
-  facilityAttrsService: FacilityDetailItem[] = [];
-  facilityAttrsOrganization: FacilityDetailItem[] = [];
-  facilityAttrsProtocol: FacilityDetailItem[] = [];
-  facilityAttrsAccessControl: FacilityDetailItem[] = [];
+  facilityAttrsService: DetailViewItem[] = [];
+  facilityAttrsOrganization: DetailViewItem[] = [];
+  facilityAttrsProtocol: DetailViewItem[] = [];
+  facilityAttrsAccessControl: DetailViewItem[] = [];
   facilityAdmins: FacilityDetailUserItem[] = [];
 
   loading = true;
@@ -53,20 +50,20 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   isUserAdmin: boolean;
 
   private mapAttributes() {
-    this.facility.serviceAttrs().forEach((attr, urn) => {
-      this.facilityAttrsService.push(new FacilityDetailItem(urn, attr));
+    this.facility.serviceAttrs().forEach((attr, _) => {
+      this.facilityAttrsService.push(new DetailViewItem(attr));
     });
 
-    this.facility.organizationAttrs().forEach((attr, urn) => {
-      this.facilityAttrsOrganization.push(new FacilityDetailItem(urn, attr));
+    this.facility.organizationAttrs().forEach((attr, _) => {
+      this.facilityAttrsOrganization.push(new DetailViewItem(attr));
     });
 
-    this.facility.protocolAttrs().forEach((attr, urn) => {
-      this.facilityAttrsProtocol.push(new FacilityDetailItem(urn, attr));
+    this.facility.protocolAttrs().forEach((attr, _) => {
+      this.facilityAttrsProtocol.push(new DetailViewItem(attr));
     });
 
-    this.facility.accessControlAttrs().forEach((attr, urn) => {
-      this.facilityAttrsAccessControl.push(new FacilityDetailItem(urn, attr));
+    this.facility.accessControlAttrs().forEach((attr, _) => {
+      this.facilityAttrsAccessControl.push(new DetailViewItem(attr));
     });
 
     this.facilityAttrsService = FacilitiesDetailComponent.sortItems(this.facilityAttrsService);
@@ -147,7 +144,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
         }
       });
       if (index != -1) {
-        this.facilityAttrsProtocol[index] = new FacilityDetailItem(attr.fullName, attr);
+        this.facilityAttrsProtocol[index] = new DetailViewItem(attr);
       }
       this.loadingProtocol = false;
     });
@@ -168,7 +165,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  private static sortItems(items: FacilityDetailItem[]): FacilityDetailItem[] {
+  private static sortItems(items: DetailViewItem[]): DetailViewItem[] {
     items.sort((a, b) => {
       return a.position - b.position;
     });
