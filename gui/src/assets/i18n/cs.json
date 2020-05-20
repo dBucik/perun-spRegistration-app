@@ -149,7 +149,8 @@
     "MANAGERS": "Správci",
     "MANAGER_NAME": "Jméno správce",
     "MANAGER_EMAIL": "Kontaktní email",
-    "PROTOCOL": "SAML/OIDC"
+    "PROTOCOL": "SAML/OIDC",
+    "ARE_YOU_SURE_REGENERATE_CLIENT_SECRET": "Ste si jist, že chcete vygenerovat nové CLIENT_SECRET? Předchozí hodnota už nebude použitelná."
   },
   "TOOLS": {
     "CRYPTO_TITLE": "Šifrování",

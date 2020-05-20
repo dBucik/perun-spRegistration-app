@@ -29,6 +29,7 @@ import java.security.InvalidKeyException;
 import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -253,7 +254,7 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 		if (Utils.checkParamsInvalid(userId, facilityId)) {
 			log.error("Wrong parameters passed: (userId: {}, facilityId: {})", userId, facilityId);
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		} else if (! appConfig.isAppAdmin(userId) && !isFacilityAdmin(facilityId, userId)) {
+		} else if (!appConfig.isAppAdmin(userId) && !isFacilityAdmin(facilityId, userId)) {
 			log.error("User is not authorized to regenerate client secret");
 			throw new UnauthorizedActionException("User is not authorized to regenerate client secret");
 		}
@@ -263,6 +264,16 @@ public class AdminCommandsServiceImpl implements AdminCommandsService {
 
 		String decrypted = ServiceUtils.decrypt(clientSecret.valueAsString(), appConfig.getSecret());
 		clientSecret.setValue(decrypted);
+
+		Facility facility = perunConnector.getFacilityById(facilityId);
+		Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facilityId, Arrays.asList(
+				appConfig.getServiceNameAttributeName(), appConfig.getServiceDescAttributeName()));
+
+		facility.setName(attrs.get(appConfig.getServiceNameAttributeName()).valueAsMap());
+		facility.setDescription(attrs.get(appConfig.getServiceDescAttributeName()).valueAsMap());
+
+		mailsService.notifyClientSecretChanged(facility);
+
 		log.trace("regenerateClientSecret({}, {}) returns: {}", userId, facilityId, clientSecret);
 		return clientSecret;
 	}

@@ -4,17 +4,18 @@ import {FacilitiesService} from '../../core/services/facilities.service';
 import {Facility} from '../../core/models/Facility';
 import {AppComponent} from '../../app.component';
 import { MatDialog } from '@angular/material/dialog';
-import {FacilitiesDetailDialogComponent} from './facilities-detail-dialog/facilities-detail-dialog.component';
+import {FacilitiesDetailDeleteDialogComponent} from './facilities-detail-delete-dialog/facilities-detail-delete-dialog.component';
 import {RequestsService} from '../../core/services/requests.service';
 import {Subscription} from 'rxjs';
 import {PerunAttribute} from "../../core/models/PerunAttribute";
 import {User} from "../../core/models/User";
 import {FacilityDetailUserItem} from "../../core/models/items/FacilityDetailUserItem";
 import {DetailViewItem} from "../../core/models/items/DetailViewItem";
+import {FacilitiesDetailClientSecretDialogComponent} from "./facilities-detail-client-secret-dialog/facilities-detail-client-secret-dialog.component";
 
 export interface DialogData {
   parent: FacilitiesDetailComponent;
-  facilityName: string;
+  facilityName: Map<string, string>;
 }
 
 @Component({
@@ -116,9 +117,16 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   }
 
   openDeleteDialog(): void {
-    this.dialog.open(FacilitiesDetailDialogComponent, {
-      width: '400px',
+    this.dialog.open(FacilitiesDetailDeleteDialogComponent, {
+      width: '50%',
       data: {parent: this, facilityName: this.facility.name}
+    });
+  }
+
+  openClientSecretDialog(): void {
+    this.dialog.open(FacilitiesDetailClientSecretDialogComponent, {
+      width: '50%',
+      data: {parent: this, facilityName: undefined}
     });
   }
 

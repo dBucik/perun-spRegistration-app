@@ -52,7 +52,7 @@
         <!-- PROTOCOL -->
         <mat-tab label="{{ 'COMMON.ATTRIBUTES.PROTOCOL' | translate }}">
           <div class="col-sm-12 text-right mb-2" *ngIf="facility.oidc" >
-            <button class="col-md-3 col-sm-6 mt-3 mr-0" mat-raised-button color="accent" (click)="regenerateClientSecret()">
+            <button class="col-md-3 col-sm-6 mt-3 mr-0" mat-raised-button color="accent" (click)="openClientSecretDialog()">
               {{'FACILITIES.REGENERATE_CLIENT_SECRET' | translate}}
             </button>
           </div>

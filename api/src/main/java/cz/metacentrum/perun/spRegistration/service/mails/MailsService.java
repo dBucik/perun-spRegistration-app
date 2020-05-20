@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for sending email notifications.
@@ -36,6 +37,9 @@ public class MailsService {
 
 	private static final String PRODUCTION_AUTHORITIES_MESSAGE_KEY = "production.authorities.message";
 	private static final String PRODUCTION_AUTHORITIES_SUBJECT_KEY = "production.authorities.subject";
+
+	private static final String CLIENT_SECRET_CHANGED_MESSAGE_KEY = "client.secret.changed.message";
+	private static final String CLIENT_SECRET_CHANGED_SUBJECT_KEY = "client.secret.changed.subject";
 
 	private static final String ADD_ADMIN_SUBJECT_KEY = "admins.add.subject";
 	private static final String ADD_ADMIN_MESSAGE_KEY = "admins.add.message";
@@ -111,7 +115,7 @@ public class MailsService {
 		StringJoiner subject = new StringJoiner(" / ");
 		for (String lang : appConfig.getAvailableLanguages()) {
 			String subj = messagesProperties.getProperty(PRODUCTION_AUTHORITIES_SUBJECT_KEY + '.' + lang);
-			if (! NULL_KEY.equals(subj)) {
+			if (subj != null && !NULL_KEY.equals(subj)) {
 				subject.add(subj);
 			}
 		}
@@ -119,7 +123,7 @@ public class MailsService {
 		StringJoiner message = new StringJoiner("<br/><hr/><br/>");
 		for (String lang : appConfig.getAvailableLanguages()) {
 			String msg = messagesProperties.getProperty(PRODUCTION_AUTHORITIES_MESSAGE_KEY + '.' + lang);
-			if (! NULL_KEY.equals(msg)) {
+			if (msg != null && ! NULL_KEY.equals(msg)) {
 				message.add(msg);
 			}
 		}
@@ -351,5 +355,42 @@ public class MailsService {
 			default:
 				return "";
 		}
+	}
+
+	public void notifyClientSecretChanged(Facility facility) {
+		log.debug("notifyClientSecretChanged(facility: {})", facility);
+
+		StringJoiner subject = new StringJoiner(" / ");
+		for (String lang : appConfig.getAvailableLanguages()) {
+			String subj = messagesProperties.getProperty(CLIENT_SECRET_CHANGED_SUBJECT_KEY + '.' + lang);
+			if (subj != null && ! NULL_KEY.equals(subj)) {
+				subject.add(subj);
+			}
+		}
+
+		StringJoiner message = new StringJoiner("<br/><hr/><br/>");
+		for (String lang : appConfig.getAvailableLanguages()) {
+			String msg = messagesProperties.getProperty(CLIENT_SECRET_CHANGED_MESSAGE_KEY + '.' + lang);
+			if (msg != null && !NULL_KEY.equals(msg)) {
+				message.add(msg);
+			}
+		}
+		message.add(footer);
+
+		String mailSubject = subjectPrefix + subject.toString();
+		mailSubject = replacePlaceholders(mailSubject, facility);
+
+		String mailMessage = message.toString();
+		mailMessage = replacePlaceholders(mailMessage, facility);
+
+		List<String> emails = facility.getAdmins().stream().map(User::getEmail).collect(Collectors.toList());
+		int sent = 0;
+		for (String email: emails) {
+			if (sendMail(email, mailSubject, mailMessage)) {
+				sent++;
+			};
+		}
+
+		log.debug("notifyClientSecretChanged() has sent {} notifications out of {}", sent, emails.size());
 	}
 }
