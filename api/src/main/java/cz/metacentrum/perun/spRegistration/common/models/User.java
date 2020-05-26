@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import cz.metacentrum.perun.spRegistration.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -16,66 +17,29 @@ import java.util.StringJoiner;
  */
 public class User extends PerunEntity {
 
-	private String titleBefore;
-	private String firstName;
-	private String middleName;
-	private String lastName;
-	private String titleAfter;
+	private String name;
 	private String email;
+	@JsonIgnore private List<Long> facilitiesWhereAdmin = new ArrayList<>();
+	@JsonProperty("isAppAdmin") private boolean isAdmin = false;
 
-	@JsonIgnore
-	private List<Long> facilitiesWhereAdmin;
-
-	@JsonProperty("isAppAdmin")
-	private boolean isAdmin;
-
-	public User(Long id, String titleBefore, String firstName, String middleName, String lastName, String titleAfter) {
+	public User(Long id) {
 		super(id);
-		this.titleBefore = titleBefore;
-		this.firstName = firstName;
-		this.middleName = middleName;
-		this.lastName = lastName;
-		this.titleAfter = titleAfter;
 	}
 
-	public String getTitleBefore() {
-		return titleBefore;
+	public User(Long id, String name, String email, List<Long> facilitiesWhereAdmin, boolean isAdmin) {
+		super(id);
+		this.name = name;
+		this.email = email;
+		this.facilitiesWhereAdmin = facilitiesWhereAdmin;
+		this.isAdmin = isAdmin;
 	}
 
-	public void setTitleBefore(String titleBefore) {
-		this.titleBefore = titleBefore;
+	public String getName() {
+		return name;
 	}
 
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getMiddleName() {
-		return middleName;
-	}
-
-	public void setMiddleName(String middleName) {
-		this.middleName = middleName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getTitleAfter() {
-		return titleAfter;
-	}
-
-	public void setTitleAfter(String titleAfter) {
-		this.titleAfter = titleAfter;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getEmail() {
@@ -104,29 +68,22 @@ public class User extends PerunEntity {
 	}
 
 	/**
-	 * Get name of user
-	 * @return Composed name
+	 * Parse user from JSON obtained from Perun
+	 * @param json JSON from Perun
+	 * @return User or null
 	 */
-	public String getName() {
-		StringJoiner joiner = new StringJoiner(" ");
-		if (firstName != null && !firstName.isEmpty()) {
-			joiner.add(firstName);
-		}
-		if (middleName != null && !middleName.isEmpty()) {
-			joiner.add(middleName);
-		}
-		if (lastName != null && !lastName.isEmpty()) {
-			joiner.add(lastName);
+	public static User fromPerunJson(JsonNode json) {
+		if (Utils.checkParamsInvalid(json)) {
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		return joiner.toString();
-	}
+		Long id = json.get("id").asLong();
+		String firstName = json.hasNonNull("firstName") ? json.get("firstName").textValue() : null;
+		String middleName = json.hasNonNull("middleName") ? json.get("middleName").textValue() : null;
+		String lastName = json.hasNonNull("lastName") ? json.get("lastName").textValue() : null;
+		String titleBefore = json.hasNonNull("titleBefore") ? json.get("titleBefore").textValue() : null;
+		String titleAfter = json.hasNonNull("titleAfter") ? json.get("titleAfter").textValue() : null;
 
-	/**
-	 * Get full name with titles
-	 * @return Composed name with titles
-	 */
-	public String getFullName() {
 		StringJoiner joiner = new StringJoiner(" ");
 		if (titleBefore != null && !titleBefore.isEmpty()) {
 			joiner.add(titleBefore);
@@ -144,58 +101,34 @@ public class User extends PerunEntity {
 			joiner.add(titleAfter);
 		}
 
-		return joiner.toString();
-	}
-
-	/**
-	 * Parse user from JSON obtained from Perun
-	 * @param json JSON from Perun
-	 * @return User or null
-	 */
-	public static User fromPerunJson(JsonNode json) {
-		if (Utils.checkParamsInvalid(json)) {
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		Long id = json.get("id").asLong();
-		String firstName = json.hasNonNull("firstName") ? json.get("firstName").textValue() : null;
-		String middleName = json.hasNonNull("middleName") ? json.get("middleName").textValue() : null;;
-		String lastName = json.hasNonNull("lastName") ? json.get("lastName").textValue() : null;;
-		String titleBefore = json.hasNonNull("titleBefore") ? json.get("titleBefore").textValue() : null;;
-		String titleAfter = json.hasNonNull("titleAfter") ? json.get("titleAfter").textValue() : null;;
-
-		return new User(id, titleBefore, firstName, middleName, lastName, titleAfter);
+		User user = new User(id);
+		user.setName(joiner.toString());
+		return user;
 	}
 
 	@Override
 	public String toString() {
 		return "User{" +
-				super.toString() +
-				", titleBefore='" + titleBefore + '\'' +
-				", firstName='" + firstName + '\'' +
-				", middleName='" + middleName + '\'' +
-				", lastName='" + lastName + '\'' +
-				", titleAfter='" + titleAfter + '\'' +
+				"name='" + name + '\'' +
 				", email='" + email + '\'' +
 				", facilitiesWhereAdmin=" + facilitiesWhereAdmin +
-				", isAppAdmin=" + isAdmin +
+				", isAdmin=" + isAdmin +
 				'}';
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (! (o instanceof User)) {
-			return false;
-		}
-
-		User them = (User) o;
-		return Objects.equals(this.getId(), them.getId());
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		User user = (User) o;
+		return isAdmin == user.isAdmin &&
+				Objects.equals(name, user.name) &&
+				Objects.equals(email, user.email) &&
+				Objects.equals(facilitiesWhereAdmin, user.facilitiesWhereAdmin);
 	}
 
 	@Override
 	public int hashCode() {
-		long res = 31 * this.getId();
-
-		return (int) res;
+		return Objects.hash(name, email, facilitiesWhereAdmin, isAdmin);
 	}
 }
