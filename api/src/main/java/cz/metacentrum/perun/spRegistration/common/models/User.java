@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.persistence.models;
+package cz.metacentrum.perun.spRegistration.common.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

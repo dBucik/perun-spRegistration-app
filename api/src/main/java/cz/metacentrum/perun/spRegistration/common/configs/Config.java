@@ -1,6 +1,6 @@
-package cz.metacentrum.perun.spRegistration.persistence.configs;
+package cz.metacentrum.perun.spRegistration.common.configs;
 
-import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
+import cz.metacentrum.perun.spRegistration.common.models.AttrInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

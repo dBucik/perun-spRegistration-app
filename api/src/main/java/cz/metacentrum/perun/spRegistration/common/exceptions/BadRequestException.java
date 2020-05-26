@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.persistence.exceptions;
+package cz.metacentrum.perun.spRegistration.common.exceptions;
 
 public class BadRequestException extends Exception {
 	public BadRequestException() {

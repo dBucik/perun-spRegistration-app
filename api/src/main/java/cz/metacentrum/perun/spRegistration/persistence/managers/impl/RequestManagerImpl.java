@@ -1,14 +1,14 @@
 package cz.metacentrum.perun.spRegistration.persistence.managers.impl;
 
 import cz.metacentrum.perun.spRegistration.Utils;
-import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
-import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
-import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
+import cz.metacentrum.perun.spRegistration.common.configs.Config;
+import cz.metacentrum.perun.spRegistration.common.enums.RequestAction;
+import cz.metacentrum.perun.spRegistration.common.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ActiveRequestExistsException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestMapper;
-import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.models.Request;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

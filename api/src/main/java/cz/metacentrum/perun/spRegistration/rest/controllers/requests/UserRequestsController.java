@@ -1,13 +1,13 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.requests;
 
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
-import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ActiveRequestExistsException;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.common.models.Request;
+import cz.metacentrum.perun.spRegistration.common.models.User;
 import cz.metacentrum.perun.spRegistration.service.RequestsService;
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

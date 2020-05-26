@@ -1,9 +1,9 @@
 package cz.metacentrum.perun.spRegistration.service.mails;
 
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
-import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.Request;
+import cz.metacentrum.perun.spRegistration.common.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

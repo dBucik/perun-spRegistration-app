@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.persistence.exceptions;
+package cz.metacentrum.perun.spRegistration.common.exceptions;
 
 /**
  * Exception represents that active requests exists for the given service.

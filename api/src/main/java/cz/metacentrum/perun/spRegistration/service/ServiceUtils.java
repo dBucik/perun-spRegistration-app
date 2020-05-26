@@ -1,9 +1,9 @@
 package cz.metacentrum.perun.spRegistration.service;
 
-import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
-import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
-import cz.metacentrum.perun.spRegistration.persistence.models.Request;
+import cz.metacentrum.perun.spRegistration.common.enums.AttributeCategory;
+import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.common.models.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

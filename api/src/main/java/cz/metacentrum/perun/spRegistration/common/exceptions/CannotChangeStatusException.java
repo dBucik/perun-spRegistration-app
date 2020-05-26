@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.service.exceptions;
+package cz.metacentrum.perun.spRegistration.common.exceptions;
 
 /**
  * Exception thrown when status of Request cannot be changed due to unmet requirements.

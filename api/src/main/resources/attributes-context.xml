@@ -13,7 +13,7 @@
         <property name="fileEncoding" value="UTF-8"/>
     </bean>
 
-    <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+    <bean id="facilityServiceConfig" class="cz.metacentrum.perun.spRegistration.common.configs.AttrsConfig">
         <constructor-arg name="attrsProps" ref="facilityServiceAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
         <constructor-arg name="perunConnector" ref="perunConnector" />
@@ -30,7 +30,7 @@
         <property name="fileEncoding" value="UTF-8"/>
     </bean>
 
-    <bean id="facilityOrganizationConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+    <bean id="facilityOrganizationConfig" class="cz.metacentrum.perun.spRegistration.common.configs.AttrsConfig">
         <constructor-arg name="attrsProps" ref="facilityOrganizationAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
         <constructor-arg name="perunConnector" ref="perunConnector" />
@@ -47,7 +47,7 @@
         <property name="fileEncoding" value="UTF-8"/>
     </bean>
 
-    <bean id="facilitySamlConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+    <bean id="facilitySamlConfig" class="cz.metacentrum.perun.spRegistration.common.configs.AttrsConfig">
         <constructor-arg name="attrsProps" ref="facilitySamlAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
         <constructor-arg name="perunConnector" ref="perunConnector" />
@@ -64,7 +64,7 @@
         <property name="fileEncoding" value="UTF-8"/>
     </bean>
 
-    <bean id="facilityOidcConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+    <bean id="facilityOidcConfig" class="cz.metacentrum.perun.spRegistration.common.configs.AttrsConfig">
         <constructor-arg name="attrsProps" ref="facilityOidcAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
         <constructor-arg name="perunConnector" ref="perunConnector" />
@@ -81,7 +81,7 @@
         <property name="fileEncoding" value="UTF-8"/>
     </bean>
 
-    <bean id="facilityAccessControlConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AttrsConfig">
+    <bean id="facilityAccessControlConfig" class="cz.metacentrum.perun.spRegistration.common.configs.AttrsConfig">
         <constructor-arg name="attrsProps" ref="facilityAccessControlAttributes" />
         <constructor-arg name="appConfig" ref="appConfig" />
         <constructor-arg name="perunConnector" ref="perunConnector" />

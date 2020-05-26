@@ -211,7 +211,7 @@
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
-    <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig">
+    <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.common.configs.AppConfig">
         <property name="perunConnector" ref="perunConnector" />
         <property name="appAdminIds" value="#{'${appAdminIds}'.split('\s*,\s*')}" />
         <property name="loginExtSource" value="${extSource.proxy.entityId}" />
@@ -248,7 +248,7 @@
 
     <import resource="attributes-context.xml" />
 
-    <bean id="config" class="cz.metacentrum.perun.spRegistration.persistence.configs.Config">
+    <bean id="config" class="cz.metacentrum.perun.spRegistration.common.configs.Config">
         <property name="appConfig" ref="appConfig" />
         <property name="facilityServiceConfig" ref="facilityServiceConfig" />
         <property name="facilityOrganizationConfig" ref="facilityOrganizationConfig" />

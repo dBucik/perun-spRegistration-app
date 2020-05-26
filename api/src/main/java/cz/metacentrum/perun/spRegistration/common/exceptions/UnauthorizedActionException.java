@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.service.exceptions;
+package cz.metacentrum.perun.spRegistration.common.exceptions;
 
 /**
  * Exception thrown when user tries to perform action he/she is not authorized to perform.

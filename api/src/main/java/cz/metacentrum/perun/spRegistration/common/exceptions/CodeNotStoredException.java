@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.service.exceptions;
+package cz.metacentrum.perun.spRegistration.common.exceptions;
 
 /**
  * Throw when given code is valid but not found in DB (meaning probably already used)

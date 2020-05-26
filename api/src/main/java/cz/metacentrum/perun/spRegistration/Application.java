@@ -1,6 +1,6 @@
 package cz.metacentrum.perun.spRegistration;
 
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

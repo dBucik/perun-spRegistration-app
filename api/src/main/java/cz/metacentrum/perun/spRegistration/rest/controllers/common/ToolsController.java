@@ -1,10 +1,9 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.rest.ApiUtils;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;

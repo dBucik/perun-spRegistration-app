@@ -1,9 +1,9 @@
-package cz.metacentrum.perun.spRegistration.persistence.configs;
+package cz.metacentrum.perun.spRegistration.common.configs;
 
 import cz.metacentrum.perun.spRegistration.persistence.PersistenceUtils;
-import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
+import cz.metacentrum.perun.spRegistration.common.enums.AttributeCategory;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 
 import java.io.UnsupportedEncodingException;

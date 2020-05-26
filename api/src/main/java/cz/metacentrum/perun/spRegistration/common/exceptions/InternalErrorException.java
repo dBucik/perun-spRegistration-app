@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.service.exceptions;
+package cz.metacentrum.perun.spRegistration.common.exceptions;
 
 /**
  * Exception thrown when some internal error (database inconsistency...) occurs.

@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.persistence.enums;
+package cz.metacentrum.perun.spRegistration.common.enums;
 
 /**
  * Action associated with request.

@@ -1,10 +1,10 @@
-package cz.metacentrum.perun.spRegistration.persistence.models;
+package cz.metacentrum.perun.spRegistration.common.models;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
-import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
+import cz.metacentrum.perun.spRegistration.common.enums.AttributeCategory;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,10 +1,10 @@
 package cz.metacentrum.perun.spRegistration.persistence.managers;
 
-import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
-import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
-import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.enums.RequestAction;
+import cz.metacentrum.perun.spRegistration.common.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ActiveRequestExistsException;
+import cz.metacentrum.perun.spRegistration.common.models.Request;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 
 import java.util.List;
 import java.util.Set;

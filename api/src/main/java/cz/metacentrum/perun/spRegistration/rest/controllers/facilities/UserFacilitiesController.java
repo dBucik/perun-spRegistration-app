@@ -1,16 +1,16 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.facilities;
 
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.User;
 import cz.metacentrum.perun.spRegistration.rest.ApiUtils;
 import cz.metacentrum.perun.spRegistration.service.AddAdminsService;
 import cz.metacentrum.perun.spRegistration.service.FacilitiesService;
-import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

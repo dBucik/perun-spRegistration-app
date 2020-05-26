@@ -1,6 +1,6 @@
 package cz.metacentrum.perun.spRegistration.persistence.managers;
 
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 
 import java.util.List;
 

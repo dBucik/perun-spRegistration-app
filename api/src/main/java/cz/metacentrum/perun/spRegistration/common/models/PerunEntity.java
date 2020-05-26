@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.persistence.models;
+package cz.metacentrum.perun.spRegistration.common.models;
 
 /**
  * Abstract class representing entity in Perun

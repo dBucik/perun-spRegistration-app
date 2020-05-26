@@ -1,13 +1,13 @@
-package cz.metacentrum.perun.spRegistration.persistence.models;
+package cz.metacentrum.perun.spRegistration.common.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
-import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
-import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
+import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.common.enums.AttributeCategory;
+import cz.metacentrum.perun.spRegistration.common.enums.RequestAction;
+import cz.metacentrum.perun.spRegistration.common.enums.RequestStatus;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;

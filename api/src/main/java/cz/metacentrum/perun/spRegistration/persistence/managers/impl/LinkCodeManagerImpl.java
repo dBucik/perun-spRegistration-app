@@ -2,7 +2,7 @@ package cz.metacentrum.perun.spRegistration.persistence.managers.impl;
 
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

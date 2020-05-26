@@ -1,12 +1,12 @@
 package cz.metacentrum.perun.spRegistration.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
-import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;

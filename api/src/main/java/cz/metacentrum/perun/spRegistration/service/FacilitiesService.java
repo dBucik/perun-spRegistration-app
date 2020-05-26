@@ -1,9 +1,9 @@
 package cz.metacentrum.perun.spRegistration.service;
 
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;

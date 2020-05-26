@@ -2,7 +2,7 @@ package cz.metacentrum.perun.spRegistration.persistence.connectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;

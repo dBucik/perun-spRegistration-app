@@ -1,4 +1,4 @@
-package cz.metacentrum.perun.spRegistration.persistence.models;
+package cz.metacentrum.perun.spRegistration.common.models;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

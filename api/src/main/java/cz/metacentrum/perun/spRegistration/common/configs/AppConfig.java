@@ -1,10 +1,10 @@
-package cz.metacentrum.perun.spRegistration.persistence.configs;
+package cz.metacentrum.perun.spRegistration.common.configs;
 
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
-import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
+import cz.metacentrum.perun.spRegistration.common.enums.AttributeCategory;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttributeDefinition;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;

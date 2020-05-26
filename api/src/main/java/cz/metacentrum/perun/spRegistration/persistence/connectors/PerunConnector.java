@@ -1,12 +1,12 @@
 package cz.metacentrum.perun.spRegistration.persistence.connectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.common.exceptions.BadRequestException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttributeDefinition;
+import cz.metacentrum.perun.spRegistration.common.models.User;
 
 import java.util.List;
 import java.util.Map;

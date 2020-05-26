@@ -1,6 +1,6 @@
 package cz.metacentrum.perun.spRegistration.persistence.mappers;
 
-import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
+import cz.metacentrum.perun.spRegistration.common.models.RequestSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;

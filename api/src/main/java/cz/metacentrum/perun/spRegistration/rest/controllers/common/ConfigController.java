@@ -1,8 +1,8 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
-import cz.metacentrum.perun.spRegistration.persistence.configs.Config;
-import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.common.configs.Config;
+import cz.metacentrum.perun.spRegistration.common.models.AttrInput;
+import cz.metacentrum.perun.spRegistration.common.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
