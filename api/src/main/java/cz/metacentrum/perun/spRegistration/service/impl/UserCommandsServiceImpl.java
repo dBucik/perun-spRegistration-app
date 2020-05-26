@@ -14,7 +14,9 @@ import cz.metacentrum.perun.spRegistration.persistence.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
+import cz.metacentrum.perun.spRegistration.persistence.managers.RequestSignatureManager;
 import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
@@ -74,6 +76,8 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private static final String REQUESTED_MAIL_KEY = "requestedMail";
 
 	private final RequestManager requestManager;
+	private final RequestSignatureManager requestSignatureManager;
+	private final LinkCodeManager linkCodeManager;
 	private final PerunConnector perunConnector;
 	private final AppConfig appConfig;
 	private final Config config;
@@ -83,9 +87,11 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 	private List<String> defaultAuthorities;
 
 	@Autowired
-	public UserCommandsServiceImpl(RequestManager requestManager, PerunConnector perunConnector, Config config,
+	public UserCommandsServiceImpl(RequestManager requestManager, RequestSignatureManager requestSignatureManager, LinkCodeManager linkCodeManager, PerunConnector perunConnector, Config config,
 								   AppConfig appConfig, MailsService mailsService) {
 		this.requestManager = requestManager;
+		this.requestSignatureManager = requestSignatureManager;
+		this.linkCodeManager = linkCodeManager;
 		this.perunConnector = perunConnector;
 		this.appConfig = appConfig;
 		this.config = config;
@@ -329,7 +335,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 		}
 
 		Long requestId = decryptedCode.get(REQUEST_ID_KEY).asLong();
-		boolean signed = requestManager.addSignature(requestId, user.getId(), user.getName(), approved, code);
+		boolean signed = requestSignatureManager.addSignature(requestId, user.getId(), user.getName(), approved, code);
 		Request req = requestManager.getRequestById(requestId);
 
 		log.info("Sending mail notification");
@@ -360,7 +366,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new UnauthorizedActionException(Utils.GENERIC_ERROR_MSG);
 		}
 
-		List<RequestSignature> result = requestManager.getRequestSignatures(requestId);
+		List<RequestSignature> result = requestSignatureManager.getRequestSignatures(requestId);
 
 		log.trace("getApprovalsOfProductionTransfer returns: {}", result);
 		return result;
@@ -625,7 +631,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 
 		Long facilityId = decrypted.get(FACILITY_ID_KEY).asLong();
 		boolean added = perunConnector.addFacilityAdmin(facilityId, user.getId());
-		boolean deletedCode = requestManager.deleteUsedCode(code);
+		boolean deletedCode = linkCodeManager.deleteUsedCode(code);
 		boolean successful = (added && deletedCode);
 
 		if (!successful) {
@@ -657,7 +663,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new ExpiredCodeException("Code is invalid");
 		}
 
-		boolean deletedCode = requestManager.deleteUsedCode(code);
+		boolean deletedCode = linkCodeManager.deleteUsedCode(code);
 
 		log.debug("rejectAddAdmin() returns: {}", deletedCode);
 		return deletedCode;
@@ -673,10 +679,10 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
 		} else if (isExpiredCode(decryptRequestCode(code))) {
 			throw new ExpiredCodeException("Code expired");
-		} else if (!requestManager.validateCode(code)) {
+		} else if (!linkCodeManager.validateCode(code)) {
 			throw new CodeNotStoredException("Code not found");
 		}
-		boolean isValid = (!isExpiredCode(decryptRequestCode(code)) && requestManager.validateCode(code));
+		boolean isValid = (!isExpiredCode(decryptRequestCode(code)) && linkCodeManager.validateCode(code));
 
 		log.trace("validateCode() returns: {}", isValid);
 		return isValid;
@@ -954,7 +960,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			authsCodesMap.put(authority, code);
 		}
 
-		requestManager.storeCodes(codes);
+		linkCodeManager.storeCodes(codes);
 
 		log.trace("generateCodesForAuthorities() returns: {}", authsCodesMap);
 		return authsCodesMap;
@@ -979,7 +985,7 @@ public class UserCommandsServiceImpl implements UserCommandsService {
 			adminCodesMap.put(admin, code);
 		}
 
-		requestManager.storeCodes(codes);
+		linkCodeManager.storeCodes(codes);
 
 		log.trace("generateCodesForAdmins() returns: {}", adminCodesMap);
 		return adminCodesMap;

@@ -7,16 +7,13 @@ import cz.metacentrum.perun.spRegistration.persistence.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestMapper;
-import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestSignatureMapper;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -39,32 +36,16 @@ public class RequestManagerImpl implements RequestManager {
 
 	private static final Logger log = LoggerFactory.getLogger(RequestManagerImpl.class);
 	private static final String REQUESTS_TABLE = "requests";
-	private static final String APPROVALS_TABLE = "approvals";
-	private static final String CODES_TABLE = "signatureCodes";
 
 	private final RequestMapper REQUEST_MAPPER;
-	private final RequestSignatureMapper REQUEST_SIGNATURE_MAPPER;
 	private NamedParameterJdbcTemplate jdbcTemplate;
 	private final Config config;
 
 	@Autowired
-	public RequestManagerImpl(Config config) {
+	public RequestManagerImpl(Config config, NamedParameterJdbcTemplate jdbcTemplate) {
 		this.config = config;
-		REQUEST_SIGNATURE_MAPPER = new RequestSignatureMapper();
+		this.jdbcTemplate = jdbcTemplate;
 		REQUEST_MAPPER = new RequestMapper(config);
-	}
-
-	@Override
-	public void setJdbcTemplate(JdbcTemplate template) {
-		if (template == null) {
-			log.error("Illegal parameters passed: template IS NULL");
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		} else if (template.getDataSource() == null) {
-			log.error("Illegal parameters passed: template.dataSource IS NULL");
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-		
-		this.jdbcTemplate = new NamedParameterJdbcTemplate(template.getDataSource());
 	}
 
 	@Override
@@ -385,165 +366,4 @@ public class RequestManagerImpl implements RequestManager {
 		return activeRequestId;
 	}
 
-	@Override
-	@Transactional
-	public boolean addSignature(Long requestId, Long userId, String userName, boolean approved, String code)
-			throws InternalErrorException
-	{
-		log.trace("addSignature(requestId: {}, userId: {}, userName: {}, approved: {})",
-				requestId, userId, userName, approved);
-
-		if (Utils.checkParamsInvalid(requestId, userId, userId, code)) {
-			log.error("Wrong parameters passed: (requestId: {}, user:Id {}, userName: {}, code: {})",
-					requestId, userId, userName, code);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-		
-		String query = new StringJoiner(" ")
-				.add("INSERT INTO").add(APPROVALS_TABLE)
-				.add("(request_id, user_id, name, approved) VALUES (:request_id, :user_id, :username, :approved)")
-				.toString();
-
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("request_id", requestId);
-		params.addValue("user_id", userId);
-		params.addValue("username", userName);
-		params.addValue("approved", approved);
-
-		int updatedCount = jdbcTemplate.update(query, params);
-
-		if (updatedCount == 0) {
-			log.error("Zero approvals have been inserted");
-			throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
-		} else if (updatedCount > 1) {
-			log.error("Only one approval should have been inserted");
-			throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		deleteUsedCode(code);
-		
-		log.trace("addSignature() returns: true");
-		return true;
-	}
-
-	@Override
-	@Transactional
-	public List<RequestSignature> getRequestSignatures(Long requestId) {
-		log.trace("getRequestSignatures({})", requestId);
-
-		if (Utils.checkParamsInvalid(requestId)) {
-			log.error("Illegal parameters passed: (requestId: {})", requestId);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		String query = new StringJoiner(" ")
-				.add("SELECT * FROM").add(APPROVALS_TABLE)
-				.add("WHERE request_id = :request_id")
-				.toString();
-
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("request_id", requestId);
-
-		List<RequestSignature> foundApprovals = jdbcTemplate.query(query, params, REQUEST_SIGNATURE_MAPPER);
-
-		log.trace("getRequestSignatures returns: {}", foundApprovals);
-
-		return foundApprovals;
-	}
-
-	@Override
-	@Transactional
-	public boolean validateCode(String code) {
-		log.trace("validateCode({})", code);
-
-		if (Utils.checkParamsInvalid(code)) {
-			log.error("Wrong parameters passed: (code: {})", code);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		String query = new StringJoiner(" ")
-				.add("SELECT count(code) FROM").add(CODES_TABLE)
-				.add("WHERE code = :code")
-				.toString();
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("code", code);
-
-		Integer foundCodes = jdbcTemplate.queryForObject(query, params, Integer.class);
-		boolean isValid = ((foundCodes != null) && (foundCodes == 1));
-
-		log.trace("validateCode() returns: {}", isValid);
-		return isValid;
-	}
-
-	@Override
-	@Transactional
-	public int storeCodes(List<String> codes) throws InternalErrorException {
-		log.trace("storeCodes({})", codes);
-
-		if (Utils.checkParamsInvalid(codes) || codes.isEmpty()) {
-			log.error("Wrong arguments passed: (codes: {})", codes);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		String query = new StringJoiner(" ")
-				.add("INSERT INTO").add(CODES_TABLE).add("(code)")
-				.add("VALUES (:code)")
-				.toString();
-
-		List<MapSqlParameterSource> batchArgs = new ArrayList<>();
-		for (String code: codes) {
-			MapSqlParameterSource parameters = new MapSqlParameterSource();
-			parameters.addValue("code", code);
-			batchArgs.add(parameters);
-		}
-
-		int[] insertedCodes = jdbcTemplate.batchUpdate(query, batchArgs.toArray(new MapSqlParameterSource[codes.size()]));
-		int sum = 0;
-		for (int i : insertedCodes) {
-			if (i != 1) {
-				log.error("Inserting code failed");
-				throw new InternalErrorException("Inserting code failed");
-			} else {
-				sum++;
-			}
-		}
-
-		if (sum != codes.size()) {
-			log.error("Expected {} inserts, made {}", codes.size(), sum);
-			throw new InternalErrorException("Expected " + codes.size() + " inserts, made " + sum);
-		}
-
-		log.trace("storeCodes() returns: {}", sum);
-		return sum;
-	}
-
-	@Override
-	public boolean deleteUsedCode(String code) throws InternalErrorException {
-		log.trace("deleteUsedCode({})", code);
-
-		if (Utils.checkParamsInvalid(code)) {
-			log.error("Wrong parameters passed: (code: {})", code);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		String query = new StringJoiner(" ")
-				.add("DELETE FROM").add(CODES_TABLE)
-				.add("WHERE code = :code")
-				.toString();
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("code", code);
-
-		int updatedCount = jdbcTemplate.update(query, params);
-
-		if (updatedCount == 0) {
-			log.error("Zero codes deleted, should delete at least one");
-			throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
-		} else if (updatedCount > 1) {
-			log.error("Only one code should be deleted, more deleted: {}", updatedCount);
-			throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
-		} else {
-			log.trace("deleteUsedCode() returns - codes deleted (void method)");
-			return true;
-		}
-	}
 }
