@@ -20,6 +20,7 @@ import cz.metacentrum.perun.spRegistration.common.models.Facility;
 import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.common.models.Request;
 import cz.metacentrum.perun.spRegistration.service.FacilitiesService;
+import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.RequestsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CannotChangeStatusException;
@@ -27,7 +28,7 @@ import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeExceptio
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
-import cz.metacentrum.perun.spRegistration.service.mails.MailsService;
+import cz.metacentrum.perun.spRegistration.service.UtilsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static cz.metacentrum.perun.spRegistration.service.mails.MailsService.REQUEST_CREATED;
-import static cz.metacentrum.perun.spRegistration.service.mails.MailsService.REQUEST_MODIFIED;
+import static cz.metacentrum.perun.spRegistration.service.impl.MailsServiceImpl.REQUEST_CREATED;
+import static cz.metacentrum.perun.spRegistration.service.impl.MailsServiceImpl.REQUEST_MODIFIED;
 
 @Service("requestsService")
 public class RequestsServiceImpl implements RequestsService {
@@ -65,7 +66,7 @@ public class RequestsServiceImpl implements RequestsService {
     private final PerunConnector perunConnector;
     private final AppConfig appConfig;
     private final MailsService mailsService;
-    private final UtilsServiceImpl utilsService;
+    private final UtilsService utilsService;
     private final RequestManager requestManager;
     private final LinkCodeManager linkCodeManager;
     private final FacilitiesService facilitiesService;
@@ -81,7 +82,7 @@ public class RequestsServiceImpl implements RequestsService {
 
     @Autowired
     public RequestsServiceImpl(PerunConnector perunConnector, AppConfig appConfig, MailsService mailsService,
-                               UtilsServiceImpl utilsService, RequestManager requestManager, LinkCodeManager linkCodeManager,
+                               UtilsService utilsService, RequestManager requestManager, LinkCodeManager linkCodeManager,
                                FacilitiesService facilitiesService, Config config) {
         this.perunConnector = perunConnector;
         this.appConfig = appConfig;
@@ -410,7 +411,7 @@ public class RequestsServiceImpl implements RequestsService {
 
         boolean requestProcessed = processApprovedRequest(request);
         boolean requestUpdated = requestManager.updateRequest(request);
-        mailsService.notifyUser(request, MailsService.REQUEST_STATUS_UPDATED);
+        mailsService.notifyUser(request, MailsServiceImpl.REQUEST_STATUS_UPDATED);
 
         boolean successful = (requestProcessed && requestUpdated);
 
@@ -453,7 +454,7 @@ public class RequestsServiceImpl implements RequestsService {
         request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
         boolean requestUpdated = requestManager.updateRequest(request);
-        mailsService.notifyUser(request, MailsService.REQUEST_STATUS_UPDATED);
+        mailsService.notifyUser(request, MailsServiceImpl.REQUEST_STATUS_UPDATED);
 
         if (! requestUpdated) {
             log.error("some operations failed: requestUpdated: false for request: {}", request);
@@ -494,7 +495,7 @@ public class RequestsServiceImpl implements RequestsService {
         request.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 
         boolean requestUpdated = requestManager.updateRequest(request);
-        mailsService.notifyUser(request, MailsService.REQUEST_STATUS_UPDATED);
+        mailsService.notifyUser(request, MailsServiceImpl.REQUEST_STATUS_UPDATED);
 
         if (! requestUpdated) {
             log.error("some operations failed: requestUpdated: false for request: {}", request);

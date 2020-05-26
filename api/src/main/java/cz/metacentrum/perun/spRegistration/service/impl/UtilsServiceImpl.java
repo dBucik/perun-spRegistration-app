@@ -5,18 +5,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
-import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
-import cz.metacentrum.perun.spRegistration.common.models.Facility;
-import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
-import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
-import cz.metacentrum.perun.spRegistration.service.UtilsService;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
-import cz.metacentrum.perun.spRegistration.service.mails.MailsService;
+import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
+import cz.metacentrum.perun.spRegistration.service.MailsService;
+import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
+import cz.metacentrum.perun.spRegistration.service.UtilsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class UtilsServiceImpl implements UtilsService {
     private final MailsService mailsService;
 
     @Autowired
-    public UtilsServiceImpl(LinkCodeManager linkCodeManager, PerunConnector perunConnector, AppConfig appConfig, MailsService mailsService) {
+    public UtilsServiceImpl(LinkCodeManager linkCodeManager, PerunConnector perunConnector, AppConfig appConfig, MailsServiceImpl mailsService) {
         this.linkCodeManager = linkCodeManager;
         this.perunConnector = perunConnector;
         this.appConfig = appConfig;

@@ -1,9 +1,10 @@
-package cz.metacentrum.perun.spRegistration.service.mails;
+package cz.metacentrum.perun.spRegistration.service.impl;
 
 import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.common.models.Facility;
 import cz.metacentrum.perun.spRegistration.common.models.Request;
 import cz.metacentrum.perun.spRegistration.common.models.User;
+import cz.metacentrum.perun.spRegistration.service.MailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,10 @@ import java.util.stream.Collectors;
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>;
  */
-@Service
-public class MailsService {
+@Service("mailsService")
+public class MailsServiceImpl implements MailsService {
 
-	private static final Logger log = LoggerFactory.getLogger(MailsService.class);
+	private static final Logger log = LoggerFactory.getLogger(MailsServiceImpl.class);
 
 	public static final String REQUEST_CREATED = "REQUEST_CREATED";
 	public static final String REQUEST_MODIFIED = "REQUEST_MODIFIED";
@@ -80,12 +81,13 @@ public class MailsService {
 	private final AppConfig appConfig;
 
 	@Autowired
-	public MailsService(JavaMailSender mailSender, Properties messagesProperties, AppConfig appConfig) {
+	public MailsServiceImpl(JavaMailSender mailSender, Properties messagesProperties, AppConfig appConfig) {
 		this.mailSender = mailSender;
 		this.messagesProperties = messagesProperties;
 		this.appConfig = appConfig;
 	}
 
+	@Override
 	public void notifyAuthorities(Request req, Map<String, String> authoritiesLinksMap) {
 		for (String email: authoritiesLinksMap.keySet()) {
 			String link = authoritiesLinksMap.get(email);
@@ -96,6 +98,7 @@ public class MailsService {
 		}
 	}
 
+	@Override
 	public boolean notifyNewAdmins(Facility facility, Map<String, String> adminsLinksMap, User user) {
 		for (String email: adminsLinksMap.keySet()) {
 			String link = adminsLinksMap.get(email);
@@ -108,6 +111,7 @@ public class MailsService {
 		return true;
 	}
 
+	@Override
 	public boolean authoritiesApproveProductionTransferNotify(String approvalLink, Request req, String recipient) {
 		log.debug("authoritiesApproveProductionTransferNotify(approvalLink: {}, req: {}, recipient: {})",
 				approvalLink, req, recipient);
@@ -141,6 +145,7 @@ public class MailsService {
 		return res;
 	}
 
+	@Override
 	public boolean adminAddRemoveNotify(String approvalLink, Facility facility, String recipient, User user) {
 		log.debug("authoritiesApproveProductionTransferNotify(approvalLink: {}, facility: {}, recipient: {})",
 				approvalLink, facility, recipient);
@@ -203,6 +208,7 @@ public class MailsService {
 		return true;
 	}
 
+	@Override
 	public void notifyUser(Request req, String action) {
 		String subject = getSubject(action, "USER");
 		String message = getMessage(action, "USER");
@@ -218,6 +224,7 @@ public class MailsService {
 		}
 	}
 
+	@Override
 	public void notifyAppAdmins(Request req, String action) {
 		String subject = getSubject(action, "ADMIN");
 		String message = getMessage(action, "ADMIN");
@@ -357,6 +364,7 @@ public class MailsService {
 		}
 	}
 
+	@Override
 	public void notifyClientSecretChanged(Facility facility) {
 		log.debug("notifyClientSecretChanged(facility: {})", facility);
 

@@ -7,21 +7,21 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
-import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
-import cz.metacentrum.perun.spRegistration.common.models.Facility;
-import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
-import cz.metacentrum.perun.spRegistration.common.models.User;
-import cz.metacentrum.perun.spRegistration.service.AddAdminsService;
-import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
-import cz.metacentrum.perun.spRegistration.service.UtilsService;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
-import cz.metacentrum.perun.spRegistration.service.mails.MailsService;
+import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.common.models.User;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
+import cz.metacentrum.perun.spRegistration.service.AddAdminsService;
+import cz.metacentrum.perun.spRegistration.service.MailsService;
+import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
+import cz.metacentrum.perun.spRegistration.service.UtilsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,8 @@ public class AddAdminsServiceImpl implements AddAdminsService {
     private final UtilsService utilsService;
 
     @Autowired
-    public AddAdminsServiceImpl(PerunConnector perunConnector, AppConfig appConfig, MailsService mailsService, LinkCodeManager linkCodeManager, UtilsService utilsService) {
+    public AddAdminsServiceImpl(PerunConnector perunConnector, AppConfig appConfig, MailsService mailsService,
+                                LinkCodeManager linkCodeManager, UtilsService utilsService) {
         this.perunConnector = perunConnector;
         this.appConfig = appConfig;
         this.mailsService = mailsService;

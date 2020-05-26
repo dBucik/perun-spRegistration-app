@@ -8,13 +8,13 @@ import cz.metacentrum.perun.spRegistration.persistence.managers.RequestSignature
 import cz.metacentrum.perun.spRegistration.common.models.Request;
 import cz.metacentrum.perun.spRegistration.common.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.common.models.User;
+import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.RequestSignaturesService;
 import cz.metacentrum.perun.spRegistration.service.UtilsService;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
-import cz.metacentrum.perun.spRegistration.service.mails.MailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import javax.crypto.IllegalBlockSizeException;
 import java.security.InvalidKeyException;
 import java.util.List;
 
-import static cz.metacentrum.perun.spRegistration.service.mails.MailsService.REQUEST_SIGNED;
+import static cz.metacentrum.perun.spRegistration.service.impl.MailsServiceImpl.REQUEST_SIGNED;
 
 @Service("requestSignaturesService")
 public class RequestSignaturesServiceImpl implements RequestSignaturesService {
