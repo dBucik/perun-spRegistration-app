@@ -29,8 +29,7 @@ export class FacilityAddAdminSignComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.sub = this.route.queryParams.subscribe(params => {
       this.hash = params.code;
-      this.facility = params.facilityName;
-      if (this.hash == null || this.facility == null) {
+      if (this.hash == null) {
         this.router.navigate(['/notFound']);
       }
       this.loading = false;
