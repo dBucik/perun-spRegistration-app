@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Core application class. Initializes the application an logs some configurations.
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.ImportResource;
 		HibernateJpaAutoConfiguration.class
 })
 @ImportResource("classpath*:application-context.xml")
+@EnableScheduling
 public class Application extends SpringBootServletInitializer {
 
 	private static final Logger log = LoggerFactory.getLogger(Application.class);

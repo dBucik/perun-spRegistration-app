@@ -21,7 +21,13 @@ CREATE TABLE IF NOT EXISTS approvals
     approved   BOOLEAN
 );
 
-CREATE TABLE IF NOT EXISTS signatureCodes
+CREATE TABLE IF NOT EXISTS linkCodes
 (
-    code    TEXT
+    hash CHAR(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci PRIMARY KEY,
+    recipient_email VARCHAR(512) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+    sender_name VARCHAR(512) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+    sender_email VARCHAR(512) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+    expires_at BIGINT NOT NULL,
+    facility_id BIGINT,
+    request_id BIGINT
 );

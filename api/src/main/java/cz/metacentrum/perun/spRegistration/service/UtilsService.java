@@ -1,12 +1,11 @@
 package cz.metacentrum.perun.spRegistration.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -38,10 +37,5 @@ public interface UtilsService {
 
     PerunAttribute generateClientSecretAttribute() throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException;
 
-    boolean isExpiredCode(JsonNode codeInJson);
-
     boolean isAdminInRequest(Long reqUserId, Long userId);
-
-    JsonNode decryptRequestCode(String code) throws InvalidKeyException, BadPaddingException,
-            IllegalBlockSizeException, MalformedCodeException;
 }

@@ -6,6 +6,7 @@ import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.common.models.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.DigestUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -155,6 +156,14 @@ public class ServiceUtils {
 		return uuid;
 	}
 
-
-
+	public static String getHash(String input) {
+		byte[] digest = DigestUtils.md5Digest(input.getBytes());
+		StringBuilder hexString = new StringBuilder();
+		for (byte b : digest) {
+			String hex = Integer.toHexString(0xFF & b);
+			if (hex.length() == 1) hexString.append('0');
+			hexString.append(hex);
+		}
+		return hexString.toString().toUpperCase();
+	}
 }

@@ -1,6 +1,8 @@
 package cz.metacentrum.perun.spRegistration.service;
 
 import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.LinkCode;
 import cz.metacentrum.perun.spRegistration.common.models.User;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
@@ -57,7 +59,6 @@ public interface AddAdminsService {
      * Reject request to be added as a facility admin.
      * @param user user to be added or removed from facility admins.
      * @param code code generated for the approval
-     * @return TRUE if everything went OK, FALSE otherwise.
      * @throws BadPaddingException Thrown when cannot decrypt code.
      * @throws InvalidKeyException Thrown when cannot decrypt code.
      * @throws IllegalBlockSizeException Thrown when cannot decrypt code.
@@ -65,6 +66,16 @@ public interface AddAdminsService {
      * @throws ExpiredCodeException Thrown when used code is expired.
      * @throws IllegalArgumentException Thrown when param "user" is NULL, when param "code" is NULL or empty.
      */
-    boolean rejectAddAdmin(User user, String code) throws IllegalBlockSizeException, BadPaddingException,
+    void rejectAddAdmin(User user, String code) throws IllegalBlockSizeException, BadPaddingException,
             InvalidKeyException, MalformedCodeException, ExpiredCodeException, InternalErrorException, CodeNotStoredException;
+
+    /**
+     * Get details for the given hash. The details can be then displayed on the page.
+     * @param hash Hash identifying the addAdmin code
+     * @return LinkCode.ts object or null
+     */
+    LinkCode getDetails(String hash);
+
+    Facility getFacilityDetails(Long facilityId, User user) throws BadPaddingException, InvalidKeyException,
+            ConnectorException, IllegalBlockSizeException, InternalErrorException, UnauthorizedActionException;
 }

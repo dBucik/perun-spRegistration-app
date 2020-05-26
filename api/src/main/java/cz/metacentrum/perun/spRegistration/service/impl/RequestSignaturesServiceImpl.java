@@ -1,28 +1,25 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
-import cz.metacentrum.perun.spRegistration.persistence.managers.RequestSignatureManager;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.common.models.LinkCode;
 import cz.metacentrum.perun.spRegistration.common.models.Request;
 import cz.metacentrum.perun.spRegistration.common.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.common.models.User;
+import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
+import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
+import cz.metacentrum.perun.spRegistration.persistence.managers.RequestSignatureManager;
 import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.RequestSignaturesService;
 import cz.metacentrum.perun.spRegistration.service.UtilsService;
-import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import java.security.InvalidKeyException;
 import java.util.List;
 
 import static cz.metacentrum.perun.spRegistration.service.impl.MailsServiceImpl.REQUEST_SIGNED;
@@ -39,21 +36,21 @@ public class RequestSignaturesServiceImpl implements RequestSignaturesService {
     private final MailsService mailsService;
     private final AppConfig appConfig;
     private final UtilsService utilsService;
+    private final LinkCodeManager linkCodeManager;
 
     @Autowired
     public RequestSignaturesServiceImpl(RequestSignatureManager requestSignatureManager, RequestManager requestManager,
-                                        MailsService mailsService, AppConfig appConfig, UtilsService utilsService) {
+                                        MailsService mailsService, AppConfig appConfig, UtilsService utilsService, LinkCodeManager linkCodeManager) {
         this.requestSignatureManager = requestSignatureManager;
         this.requestManager = requestManager;
         this.mailsService = mailsService;
         this.appConfig = appConfig;
         this.utilsService = utilsService;
+        this.linkCodeManager = linkCodeManager;
     }
 
     @Override
-    public boolean addSignature(User user, String code, boolean approved)
-            throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
-            ExpiredCodeException, InternalErrorException
+    public boolean addSignature(User user, String code, boolean approved) throws ExpiredCodeException, InternalErrorException
     {
         log.trace("signTransferToProduction(user: {}, code: {})", user, code);
 
@@ -62,15 +59,17 @@ public class RequestSignaturesServiceImpl implements RequestSignaturesService {
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
         }
 
-        JsonNode decryptedCode = utilsService.decryptRequestCode(code);
-        boolean isExpired = utilsService.isExpiredCode(decryptedCode);
+        LinkCode linkCode = linkCodeManager.get(code);
 
-        if (isExpired) {
-            log.error("User trying to approve request with expired code: {}", decryptedCode);
+        if (linkCode == null) {
+            log.error("User trying to approve request with expired code: {}", code);
             throw new ExpiredCodeException("Code has expired");
+        } else if (linkCode.getRequestId() == null) {
+            log.error("User trying to get request with code without request id: {}", linkCode);
+            throw new InternalErrorException("Code has no request id");
         }
 
-        Long requestId = decryptedCode.get(REQUEST_ID_KEY).asLong();
+        Long requestId = linkCode.getRequestId();
         boolean signed = requestSignatureManager.addSignature(requestId, user.getId(), user.getName(), approved, code);
         Request req = requestManager.getRequestById(requestId);
 

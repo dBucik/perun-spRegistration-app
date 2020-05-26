@@ -10,6 +10,7 @@ import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeExceptio
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.common.models.User;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -64,7 +65,7 @@ public interface RequestsService {
     /**
      * Ask for moving the service to the production environment.
      * @param facilityId ID of facility in Perun.
-     * @param userId ID of requesting user.
+     * @param user Requesting user.
      * @param authorities List to whom the emails should be sent
      * @return Id of created request
      * @throws UnauthorizedActionException when user is not authorized to perform this action.
@@ -76,7 +77,7 @@ public interface RequestsService {
      * @throws InternalErrorException Thrown when cannot find Facility for given ID.
      * @throws IllegalArgumentException Thrown when param "facilityId" is NULL, when param "userId" is NULL.
      */
-    Long createMoveToProductionRequest(Long facilityId, Long userId, List<String> authorities)
+    Long createMoveToProductionRequest(Long facilityId, User user, List<String> authorities)
             throws UnauthorizedActionException, InternalErrorException, ConnectorException,
             ActiveRequestExistsException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException,
             UnsupportedEncodingException;

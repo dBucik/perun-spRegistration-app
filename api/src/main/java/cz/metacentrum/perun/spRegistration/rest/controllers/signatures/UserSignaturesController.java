@@ -61,7 +61,7 @@ public class UserSignaturesController {
 	{
 		log.trace("moveToProduction(user: {}, facilityId: {} authorities: {})", user.getId(), facilityId, authorities);
 		
-		Long generatedId = requestsService.createMoveToProductionRequest(facilityId, user.getId(), authorities);
+		Long generatedId = requestsService.createMoveToProductionRequest(facilityId, user, authorities);
 
 		log.trace("moveToProduction() returns: {}", generatedId);
 		return generatedId;
@@ -70,14 +70,10 @@ public class UserSignaturesController {
 	@GetMapping(path = "/api/moveToProduction/getFacilityDetails", params = "code")
 	public Request signRequestGetData(String code)
 			throws BadPaddingException, ConnectorException, IllegalBlockSizeException, MalformedCodeException,
-			InvalidKeyException, ExpiredCodeException, InternalErrorException, CodeNotStoredException {
+			InvalidKeyException, ExpiredCodeException, InternalErrorException {
 		log.trace("signRequestGetData({})", code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
-		if (!utilsService.validateCode(code)) {
-			throw new IllegalAccessError("You cannot sign the request, code is invalid");
-		}
-
 		Request request = requestsService.getRequestForSignatureByCode(code);
 
 		log.trace("signRequestGetData() returns: {}", request);

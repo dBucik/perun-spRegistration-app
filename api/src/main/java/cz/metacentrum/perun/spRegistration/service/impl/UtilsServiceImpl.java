@@ -1,14 +1,9 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.common.models.Facility;
 import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
@@ -25,7 +20,6 @@ import org.springframework.stereotype.Service;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.security.InvalidKeyException;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -34,8 +28,6 @@ import java.util.Set;
 public class UtilsServiceImpl implements UtilsService {
 
     private static final Logger log = LoggerFactory.getLogger(UtilsServiceImpl.class);
-
-    private static final String CREATED_AT_KEY = "createdAt";
 
     private final LinkCodeManager linkCodeManager;
     private final PerunConnector perunConnector;
@@ -51,19 +43,17 @@ public class UtilsServiceImpl implements UtilsService {
     }
 
     @Override
-    public boolean validateCode(String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException,
-            MalformedCodeException, ExpiredCodeException, CodeNotStoredException {
+    public boolean validateCode(String code) throws CodeNotStoredException {
         log.trace("validateCode({})", code);
 
         if (Utils.checkParamsInvalid(code)) {
             log.error("Wrong parameters passed: (code: {})", code);
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        } else if (isExpiredCode(decryptRequestCode(code))) {
-            throw new ExpiredCodeException("Code expired");
-        } else if (!linkCodeManager.validateCode(code)) {
+        } else if (null == linkCodeManager.get(code)) {
             throw new CodeNotStoredException("Code not found");
         }
-        boolean isValid = (!isExpiredCode(decryptRequestCode(code)) && linkCodeManager.validateCode(code));
+
+        boolean isValid = null != linkCodeManager.get(code);
 
         log.trace("validateCode() returns: {}", isValid);
         return isValid;
@@ -138,27 +128,6 @@ public class UtilsServiceImpl implements UtilsService {
     }
 
     @Override
-    public boolean isExpiredCode(JsonNode codeInJson) {
-        log.trace("isExpiredCode({})", codeInJson);
-
-        if (Utils.checkParamsInvalid(codeInJson)) {
-            log.error("Wrong parameters passed: (codeInJson: {})", codeInJson);
-            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        }
-
-        long daysValidPeriod = appConfig.getConfirmationPeriodDays();
-        long hoursValidPeriod = appConfig.getConfirmationPeriodHours();
-
-        LocalDateTime createdAt = LocalDateTime.parse(codeInJson.get(CREATED_AT_KEY).textValue());
-        LocalDateTime validUntil = createdAt.plusDays(daysValidPeriod).plusHours(hoursValidPeriod);
-
-        boolean isExpired = LocalDateTime.now().isAfter(validUntil);
-
-        log.trace("isExpiredCode() returns: {}", isExpired);
-        return isExpired;
-    }
-
-    @Override
     public boolean isAdminInRequest(Long reqUserId, Long userId) {
         log.debug("isAdminInRequest(reqUserId: {}, userId: {})", reqUserId, userId);
 
@@ -172,28 +141,4 @@ public class UtilsServiceImpl implements UtilsService {
         log.debug("isAdminInRequest returns: {}", res);
         return res;
     }
-
-    @Override
-    public JsonNode decryptRequestCode(String code) throws InvalidKeyException, BadPaddingException,
-            IllegalBlockSizeException, MalformedCodeException
-    {
-        log.trace("decryptRequestCode({})", code);
-
-        if (Utils.checkParamsInvalid(code)) {
-            log.error("Wrong parameters passed: (code: {})", code);
-            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        }
-
-        String decrypted = ServiceUtils.decrypt(code, appConfig.getSecret());
-
-        try {
-            JsonNode decryptedAsJson = new ObjectMapper().readTree(decrypted);
-
-            log.trace("decryptRequestCode() returns: {}", decryptedAsJson);
-            return decryptedAsJson;
-        } catch (JsonProcessingException e) {
-            throw new MalformedCodeException();
-        }
-    }
-
 }

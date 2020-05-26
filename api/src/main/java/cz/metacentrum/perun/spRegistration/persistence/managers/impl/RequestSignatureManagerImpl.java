@@ -68,7 +68,7 @@ public class RequestSignatureManagerImpl implements RequestSignatureManager {
             throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
         }
 
-        linkCodeManager.deleteUsedCode(code);
+        linkCodeManager.delete(code);
 
         log.trace("addSignature() returns: true");
         return true;

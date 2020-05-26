@@ -1,24 +1,20 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
-import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
+import cz.metacentrum.perun.spRegistration.common.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.LinkCode;
 import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.common.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
 import cz.metacentrum.perun.spRegistration.service.AddAdminsService;
+import cz.metacentrum.perun.spRegistration.service.FacilitiesService;
 import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UtilsService;
@@ -33,7 +29,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,30 +40,27 @@ public class AddAdminsServiceImpl implements AddAdminsService {
 
     private static final Logger log = LoggerFactory.getLogger(AddAdminsServiceImpl.class);
 
-    private static final String FACILITY_ID_KEY = "facilityId";
-    private static final String CREATED_AT_KEY = "createdAt";
-    private static final String REQUESTED_MAIL_KEY = "requestedMail";
-
     private final PerunConnector perunConnector;
     private final AppConfig appConfig;
     private final MailsService mailsService;
     private final LinkCodeManager linkCodeManager;
     private final UtilsService utilsService;
+    private final FacilitiesService facilitiesService;
 
     @Autowired
     public AddAdminsServiceImpl(PerunConnector perunConnector, AppConfig appConfig, MailsService mailsService,
-                                LinkCodeManager linkCodeManager, UtilsService utilsService) {
+                                LinkCodeManager linkCodeManager, UtilsService utilsService, FacilitiesService facilitiesService) {
         this.perunConnector = perunConnector;
         this.appConfig = appConfig;
         this.mailsService = mailsService;
         this.linkCodeManager = linkCodeManager;
         this.utilsService = utilsService;
+        this.facilitiesService = facilitiesService;
     }
 
     @Override
     public boolean addAdminsNotify(User user, Long facilityId, List<String> admins)
-            throws UnauthorizedActionException, ConnectorException, BadPaddingException, InvalidKeyException,
-            IllegalBlockSizeException, UnsupportedEncodingException, InternalErrorException
+            throws UnauthorizedActionException, ConnectorException, UnsupportedEncodingException, InternalErrorException
     {
         log.trace("addAdminsNotify(user: {}, facilityId: {}, admins: {}", user, facilityId, admins);
 
@@ -92,7 +84,7 @@ public class AddAdminsServiceImpl implements AddAdminsService {
         facility.setName(attrs.get(appConfig.getServiceNameAttributeName()).valueAsMap());
         facility.setDescription(attrs.get(appConfig.getServiceDescAttributeName()).valueAsMap());
 
-        Map<String, String> adminCodeMap = generateCodesForAdmins(admins, facilityId);
+        Map<String, String> adminCodeMap = generateCodesForAdmins(admins, user, facilityId);
         Map<String, String> adminLinkMap = generateLinksForAdmins(adminCodeMap);
         boolean successful = mailsService.notifyNewAdmins(facility, adminLinkMap, user);
 
@@ -102,8 +94,7 @@ public class AddAdminsServiceImpl implements AddAdminsService {
 
     @Override
     public boolean confirmAddAdmin(User user, String code)
-            throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
-            ExpiredCodeException, ConnectorException, InternalErrorException, CodeNotStoredException {
+            throws ExpiredCodeException, ConnectorException, InternalErrorException {
         log.debug("confirmAddAdmin({})", code);
 
         if (Utils.checkParamsInvalid(user, code)) {
@@ -111,33 +102,28 @@ public class AddAdminsServiceImpl implements AddAdminsService {
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
         }
 
-        JsonNode decrypted = decryptAddAdminCode(code);
-        boolean isValid = (!utilsService.isExpiredCode(decrypted) && utilsService.validateCode(code));
+        LinkCode linkCode = linkCodeManager.get(code);
 
-        if (! isValid) {
-            log.error("User trying to become admin with invalid code: {}", decrypted);
+        if (linkCode == null) {
+            log.error("User trying to become admin with invalid code: {}", code);
             throw new ExpiredCodeException("Code is invalid");
         }
 
-        Long facilityId = decrypted.get(FACILITY_ID_KEY).asLong();
-        boolean added = perunConnector.addFacilityAdmin(facilityId, user.getId());
-        boolean deletedCode = linkCodeManager.deleteUsedCode(code);
-        boolean successful = (added && deletedCode);
+        boolean added = perunConnector.addFacilityAdmin(linkCode.getFacilityId(), user.getId());
+        linkCodeManager.delete(code);
 
-        if (!successful) {
-            log.error("some operations failed: added: {}, deletedCode: {}", added, deletedCode);
+        if (!added) {
+            log.error("some operations failed: added: {}", added);
         } else {
             log.info("Admin added, code deleted");
         }
 
-        log.debug("confirmAddAdmin returns: {}", successful);
+        log.debug("confirmAddAdmin returns: {}", added);
         return added;
     }
 
     @Override
-    public boolean rejectAddAdmin(User user, String code)
-            throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
-            ExpiredCodeException, InternalErrorException, CodeNotStoredException {
+    public void rejectAddAdmin(User user, String code) throws ExpiredCodeException, InternalErrorException {
         log.debug("rejectAddAdmin(user: {}, code: {})", user, code);
 
         if (Utils.checkParamsInvalid(user, code)) {
@@ -145,84 +131,61 @@ public class AddAdminsServiceImpl implements AddAdminsService {
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
         }
 
-        JsonNode decrypted = decryptAddAdminCode(code);
-        boolean isValid = (!utilsService.isExpiredCode(decrypted) && utilsService.validateCode(code));
+        LinkCode linkCode = linkCodeManager.get(code);
 
-        if (! isValid) {
-            log.error("User trying to become reject becoming with invalid code: {}", decrypted);
+        if (linkCode == null) {
+            log.error("User trying to become reject becoming with invalid code: {}", code);
             throw new ExpiredCodeException("Code is invalid");
         }
 
-        boolean deletedCode = linkCodeManager.deleteUsedCode(code);
-
-        log.debug("rejectAddAdmin() returns: {}", deletedCode);
-        return deletedCode;
+        linkCodeManager.delete(code);
+        log.debug("rejectAddAdmin() returns");
     }
 
+    @Override
+    public LinkCode getDetails(String hash) {
+        log.debug("getDetails({})", hash);
 
-    private JsonNode decryptAddAdminCode(String code)
-            throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException
+        LinkCode code = linkCodeManager.get(hash);
+
+        log.debug("getDetails({}) returns: {}", hash, code);
+        return code;
+    }
+
+    @Override
+    public Facility getFacilityDetails(Long facilityId, User user) throws BadPaddingException, InvalidKeyException,
+            ConnectorException, IllegalBlockSizeException, InternalErrorException, UnauthorizedActionException
     {
-        log.trace("decryptAddAdminCode({})", code);
+        log.debug("getFacilityDetails({}, {})", facilityId, user);
 
-        if (Utils.checkParamsInvalid(code)) {
-            log.error("Wrong parameters passed: (code: {})", code);
+        Facility facility = facilitiesService.getFacility(facilityId, user.getId(), false, false);
+        facility.getAttributes().get(AttributeCategory.PROTOCOL).clear();
+        facility.getAttributes().get(AttributeCategory.ACCESS_CONTROL).clear();
+
+        log.debug("getFacilityDetails({}, {}) returns: {}", facilityId, user, facility);
+        return facility;
+    }
+
+    private Map<String, String> generateCodesForAdmins(List<String> admins, User user, Long facility)
+            throws InternalErrorException
+    {
+        log.trace("generateCodesForAdmins(admins: {}, user: {}, facility: {})", admins, user, facility);
+
+        if (Utils.checkParamsInvalid(admins, user, facility)) {
+            log.error("Wrong parameters passed: (admins: {}, user: {}, facility: {})", admins, user, facility);
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
         }
 
-        String decrypted = ServiceUtils.decrypt(code, appConfig.getSecret());
-
-        try {
-            JsonNode decryptedAsJson = new ObjectMapper().readTree(decrypted);
-            log.trace("decryptAddAdminCode() returns: {}", decryptedAsJson);
-            return decryptedAsJson;
-        } catch (JsonProcessingException e) {
-            throw new MalformedCodeException();
-        }
-    }
-
-    private String createAddAdminCode(Long facilityId, String requestedMail)
-            throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException
-    {
-        log.trace("createRequestCode(facilityId: {}, requestedMail: {})", facilityId, requestedMail);
-
-        if (Utils.checkParamsInvalid(facilityId, requestedMail)) {
-            log.error("Wrong parameters passed: (facilityId: {}, requestedMail: {})", facilityId, requestedMail);
-            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        }
-
-        ObjectNode object = JsonNodeFactory.instance.objectNode();
-        object.put(FACILITY_ID_KEY, facilityId);
-        object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
-        object.put(REQUESTED_MAIL_KEY, requestedMail);
-
-        String strToEncrypt = object.toString();
-        String encoded = ServiceUtils.encrypt(strToEncrypt, appConfig.getSecret());
-
-        log.trace("createRequestCode() returns: {}", encoded);
-        return encoded;
-    }
-
-    private Map<String, String> generateCodesForAdmins(List<String> admins, Long facilityId)
-            throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, InternalErrorException
-    {
-        log.trace("generateCodesForAdmins(facilityId: {}, admins: {})", facilityId, admins);
-
-        if (Utils.checkParamsInvalid(admins, facilityId)) {
-            log.error("Wrong parameters passed: (admins: {}, facilityId: {})", admins, facilityId);
-            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        }
-
-        List<String> codes = new ArrayList<>();
+        List<LinkCode> codes = new ArrayList<>();
         Map<String, String> adminCodesMap = new HashMap<>();
 
         for (String admin : admins) {
-            String code = createAddAdminCode(facilityId, admin);
+            LinkCode code = createAddAdminCode(admin, user, facility);
             codes.add(code);
-            adminCodesMap.put(admin, code);
+            adminCodesMap.put(admin, code.getHash());
         }
 
-        linkCodeManager.storeCodes(codes);
+        linkCodeManager.createMultiple(codes);
 
         log.trace("generateCodesForAdmins() returns: {}", adminCodesMap);
         return adminCodesMap;
@@ -250,5 +213,21 @@ public class AddAdminsServiceImpl implements AddAdminsService {
 
         log.trace("generateLinksForAdmins() returns: {}", linksMap);
         return linksMap;
+    }
+
+    private LinkCode createAddAdminCode(String admin, User user, Long facility) {
+        log.trace("createRequestCode(admin: {}, user: {}, facility: {})", admin, user, facility);
+        LinkCode code = new LinkCode();
+
+        code.setRecipientEmail(admin);
+        code.setSenderName(user.getName());
+        code.setSenderEmail(user.getEmail());
+        code.setExpiresAt(appConfig);
+        code.setFacilityId(facility);
+        code.setRequestId(-1L);
+        code.setHash(ServiceUtils.getHash(code.toString()));
+
+        log.trace("createRequestCode(admin: {}, user: {}, facility: {}) returns: {}", admin, user, facility, facility);
+        return code;
     }
 }

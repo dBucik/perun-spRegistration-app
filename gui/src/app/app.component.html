@@ -10,13 +10,13 @@
     </a>
     <div class="titlebar-right">
       <div class="user-info">
-        <div class="d-none d-md-inline-block mr-1" *ngIf="hasUser()">{{ getUser().getFullName() }}</div>
+        <div class="d-none d-md-inline-block mr-1" *ngIf="hasUser()">{{ getUser().name }}</div>
         <div class="d-md-none d-inline-block">
           <button mat-icon-button class="no-focus-outline d-block" [matMenuTriggerFor]="userDetail">
             <mat-icon>person</mat-icon>
           </button>
           <mat-menu #userDetail yPosition="below" xPosition="before">
-            <p class="mt-3" mat-menu-item>{{ getUser().getFullName }}</p>
+            <p class="mt-3" mat-menu-item>{{ getUser().name }}</p>
           </mat-menu>
         </div>
       </div>

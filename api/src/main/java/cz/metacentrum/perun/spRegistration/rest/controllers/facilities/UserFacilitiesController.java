@@ -1,16 +1,17 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.facilities;
 
-import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.common.models.Facility;
-import cz.metacentrum.perun.spRegistration.common.models.User;
-import cz.metacentrum.perun.spRegistration.rest.ApiUtils;
-import cz.metacentrum.perun.spRegistration.service.AddAdminsService;
-import cz.metacentrum.perun.spRegistration.service.FacilitiesService;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.LinkCode;
+import cz.metacentrum.perun.spRegistration.common.models.User;
+import cz.metacentrum.perun.spRegistration.rest.ApiUtils;
+import cz.metacentrum.perun.spRegistration.service.AddAdminsService;
+import cz.metacentrum.perun.spRegistration.service.FacilitiesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,17 +87,41 @@ public class UserFacilitiesController {
 	}
 
 	@PostMapping(path = "/api/addAdmin/reject")
-	public boolean addAdminReject(@SessionAttribute("user") User user,
+	public void addAdminReject(@SessionAttribute("user") User user,
 								   @RequestBody String code)
 			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
 			MalformedCodeException, InvalidKeyException, InternalErrorException, CodeNotStoredException {
 		log.trace("addAdminReject(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
-		boolean successful = addAdminsService.rejectAddAdmin(user, code);
+		addAdminsService.rejectAddAdmin(user, code);
 
-		log.trace("addAdminReject() returns: {}", successful);
-		return successful;
+		log.trace("addAdminReject() returns");
+	}
+
+	@GetMapping(path = "/api/addAdmin/getDetails/{hash}")
+	public LinkCode addAdminGetInfo(@SessionAttribute("user") User user,
+									@PathVariable("hash") String hash) {
+		log.trace("addAdminGetInfo({}, {})", user, hash);
+
+		LinkCode details = addAdminsService.getDetails(hash);
+
+		log.trace("addAdminGetInfo({}, {}) returns: {}", user, hash, details);
+		return details;
+	}
+
+	@GetMapping(path = "/api/addAdmin/getFacilityDetails/{facilityId}")
+	public Facility addAdminGetFacilityDetail(@SessionAttribute("user") User user,
+											  @PathVariable("facilityId") Long facilityId)
+			throws BadPaddingException, ConnectorException, IllegalBlockSizeException, InternalErrorException,
+			InvalidKeyException, UnauthorizedActionException
+	{
+		log.trace("addAdminGetFacilityDetail({}, {})", user, facilityId);
+
+		Facility facility = addAdminsService.getFacilityDetails(facilityId, user);
+
+		log.trace("addAdminGetFacilityDetail({}, {}) returns: {}", user, facility, facility);
+		return facility;
 	}
 
 	@GetMapping(path = "/api/facilityWithInputs/{facilityId}")

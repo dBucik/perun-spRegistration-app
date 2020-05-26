@@ -1,33 +1,32 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.common.configs.Config;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
 import cz.metacentrum.perun.spRegistration.common.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.common.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ActiveRequestExistsException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.BadRequestException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
-import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.common.models.AttrInput;
 import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.LinkCode;
 import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.common.models.Request;
+import cz.metacentrum.perun.spRegistration.common.models.User;
+import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
+import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.service.FacilitiesService;
 import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.RequestsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
-import cz.metacentrum.perun.spRegistration.common.exceptions.CannotChangeStatusException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.service.UtilsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.sql.Timestamp;
 import java.text.Normalizer;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -207,21 +205,21 @@ public class RequestsServiceImpl implements RequestsService {
     }
 
     @Override
-    public Long createMoveToProductionRequest(Long facilityId, Long userId, List<String> authorities)
+    public Long createMoveToProductionRequest(Long facilityId, User user, List<String> authorities)
             throws UnauthorizedActionException, InternalErrorException, ConnectorException, ActiveRequestExistsException,
             BadPaddingException, InvalidKeyException, IllegalBlockSizeException, UnsupportedEncodingException
     {
-        log.trace("requestMoveToProduction(facilityId: {}, userId: {}, authorities: {})", facilityId, userId, authorities);
+        log.trace("requestMoveToProduction(facilityId: {}, userId: {}, authorities: {})", facilityId, user, authorities);
 
-        if (Utils.checkParamsInvalid(facilityId, userId)) {
-            log.error("Wrong parameters passed: (facilityId: {}, userId: {})", facilityId, userId);
+        if (Utils.checkParamsInvalid(facilityId, user)) {
+            log.error("Wrong parameters passed: (facilityId: {}, userId: {})", facilityId, user);
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        } else if (!utilsService.isFacilityAdmin(facilityId, userId)) {
+        } else if (!utilsService.isFacilityAdmin(facilityId, user.getId())) {
             log.error("User is not registered as admin for facility, cannot ask for moving to production");
             throw new UnauthorizedActionException("User is not registered as admin for facility, cannot ask for moving to production");
         }
 
-        Facility fac = facilitiesService.getFacility(facilityId, userId, true, false);
+        Facility fac = facilitiesService.getFacility(facilityId, user.getId(), true, false);
         if (fac == null) {
             log.error("Could not retrieve facility for id: {}", facilityId);
             throw new InternalErrorException("Could not retrieve facility for id: " + facilityId);
@@ -229,9 +227,9 @@ public class RequestsServiceImpl implements RequestsService {
 
         List<PerunAttribute> filteredAttributes = filterNotNullAttributes(fac);
 
-        Request req = createRequest(facilityId, userId, RequestAction.MOVE_TO_PRODUCTION, filteredAttributes);
+        Request req = createRequest(facilityId, user.getId(), RequestAction.MOVE_TO_PRODUCTION, filteredAttributes);
 
-        Map<String, String> authoritiesCodesMap = generateCodesForAuthorities(req, authorities);
+        Map<String, String> authoritiesCodesMap = generateCodesForAuthorities(req, authorities, user);
         Map<String, String> authoritiesLinksMap = generateLinksForAuthorities(authoritiesCodesMap);
 
         mailsService.notifyUser(req, REQUEST_CREATED);
@@ -278,26 +276,23 @@ public class RequestsServiceImpl implements RequestsService {
     }
 
     @Override
-    public Request getRequestForSignatureByCode(String code)
-            throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException, MalformedCodeException,
-            ExpiredCodeException, InternalErrorException
-    {
+    public Request getRequestForSignatureByCode(String code) throws ExpiredCodeException, InternalErrorException {
         log.trace("getRequestDetailsForSignature({})", code);
-
         if (Utils.checkParamsInvalid(code)) {
             log.error("Wrong parameters passed: (code: {})", code);
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
         }
 
-        JsonNode decryptedCode = utilsService.decryptRequestCode(code);
-        boolean isExpired = utilsService.isExpiredCode(decryptedCode);
-
-        if (isExpired) {
-            log.error("User trying to approve request with expired code: {}", decryptedCode);
+        LinkCode linkCode = linkCodeManager.get(code);
+        if (linkCode == null) {
+            log.error("User trying to get request with expired code: {}", code);
             throw new ExpiredCodeException("Code has expired");
+        } else if (linkCode.getRequestId() == null) {
+            log.error("User trying to get request with code without request id: {}", linkCode);
+            throw new InternalErrorException("Code has no request id");
         }
 
-        Long requestId = decryptedCode.get(REQUEST_ID_KEY).asLong();
+        Long requestId = linkCode.getRequestId();
         log.debug("Fetching request for id: {}", requestId);
         Request request = requestManager.getRequestById(requestId);
 
@@ -837,8 +832,8 @@ public class RequestsServiceImpl implements RequestsService {
         return filteredAttributes;
     }
 
-    private Map<String, String> generateCodesForAuthorities(Request request, List<String> authorities)
-            throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, InternalErrorException
+    private Map<String, String> generateCodesForAuthorities(Request request, List<String> authorities, User user)
+            throws InternalErrorException
     {
         log.trace("generateCodesForAuthorities(request: {}, authorities: {})", request, authorities);
 
@@ -859,19 +854,37 @@ public class RequestsServiceImpl implements RequestsService {
             }
         }
 
-        List<String> codes = new ArrayList<>();
+        List<LinkCode> codes = new ArrayList<>();
         Map<String, String> authsCodesMap = new HashMap<>();
 
         for (String authority : emails) {
-            String code = createRequestCode(request.getReqId(), request.getFacilityId(), authority);
+            LinkCode code = createRequestCode(authority, user, request.getReqId(), request.getFacilityId());
             codes.add(code);
-            authsCodesMap.put(authority, code);
+            authsCodesMap.put(authority, code.getHash());
         }
 
-        linkCodeManager.storeCodes(codes);
+        linkCodeManager.createMultiple(codes);
 
         log.trace("generateCodesForAuthorities() returns: {}", authsCodesMap);
         return authsCodesMap;
+    }
+
+    private LinkCode createRequestCode(String authority, User user, Long requestId, Long facilityId) {
+        log.trace("createRequestCode(authority: {}, user: {}, requestId: {}, facilityId: {})",
+                authority, user, requestId, facilityId);
+        LinkCode code = new LinkCode();
+
+        code.setRecipientEmail(authority);
+        code.setSenderName(user.getName());
+        code.setSenderEmail(user.getEmail());
+        code.setExpiresAt(appConfig);
+        code.setFacilityId(facilityId);
+        code.setRequestId(requestId);
+        code.setHash(ServiceUtils.getHash(code.toString()));
+
+        log.trace("createRequestCode(authority: {}, user: {}, requestId: {}, facilityId: {}) returns: {}",
+                authority, user, requestId, facilityId, code);
+        return code;
     }
 
     private Map<String, String> generateLinksForAuthorities(Map<String, String> authorityCodeMap)
@@ -895,30 +908,6 @@ public class RequestsServiceImpl implements RequestsService {
 
         log.trace("generateLinksForAuthorities() returns: {}", linksMap);
         return linksMap;
-    }
-
-    private String createRequestCode(Long requestId, Long facilityId, String requestedMail)
-            throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException
-    {
-        log.trace("createRequestCode(requestId: {}, facilityId: {}, requestedMail: {})", requestId, facilityId, requestedMail);
-
-        if (Utils.checkParamsInvalid(requestId, facilityId, requestedMail)) {
-            log.error("Wrong parameters passed: (requestId: {}, facilityId: {}, requestedMail: {})",
-                    requestId, facilityId, requestedMail);
-            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        }
-
-        ObjectNode object = JsonNodeFactory.instance.objectNode();
-        object.put(REQUEST_ID_KEY, requestId);
-        object.put(FACILITY_ID_KEY, facilityId);
-        object.put(CREATED_AT_KEY, LocalDateTime.now().toString());
-        object.put(REQUESTED_MAIL_KEY, requestedMail);
-
-        String strToEncrypt = object.toString();
-        String encoded = ServiceUtils.encrypt(strToEncrypt, appConfig.getSecret());
-
-        log.trace("createRequestCode() returns: {}", encoded);
-        return encoded;
     }
 
     private List<String> getAttrsToKeep(boolean isOidc) {

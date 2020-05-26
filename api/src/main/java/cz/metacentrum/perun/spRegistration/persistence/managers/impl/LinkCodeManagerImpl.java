@@ -1,8 +1,10 @@
 package cz.metacentrum.perun.spRegistration.persistence.managers.impl;
 
 import cz.metacentrum.perun.spRegistration.Utils;
-import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.models.LinkCode;
+import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
+import cz.metacentrum.perun.spRegistration.persistence.mappers.LinkCodeMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -18,9 +21,10 @@ public class LinkCodeManagerImpl implements LinkCodeManager {
 
     private static final Logger log = LoggerFactory.getLogger(LinkCodeManagerImpl.class);
 
-    private static final String CODES_TABLE = "signatureCodes";
+    private static final String CODES_TABLE = "linkCodes";
 
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final LinkCodeMapper MAPPER = new LinkCodeMapper();
 
     @Autowired
     public LinkCodeManagerImpl(NamedParameterJdbcTemplate jdbcTemplate) {
@@ -29,97 +33,167 @@ public class LinkCodeManagerImpl implements LinkCodeManager {
 
     @Override
     @Transactional
-    public boolean validateCode(String code) {
-        log.trace("validateCode({})", code);
+    public void create(LinkCode code) throws InternalErrorException {
+        log.trace("create({})", code);
 
         if (Utils.checkParamsInvalid(code)) {
-            log.error("Wrong parameters passed: (code: {})", code);
+            log.error("Wrong arguments passed: (code: {})", code);
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
         }
 
         String query = new StringJoiner(" ")
-                .add("SELECT count(code) FROM").add(CODES_TABLE)
-                .add("WHERE code = :code")
+                .add("INSERT INTO").add(CODES_TABLE)
+                .add("(hash, recipient_email, sender_name, sender_email, expires_at, request_id, facility_id)")
+                .add("VALUES (:hash, :recipient, :sender_n, :sender_e, :exp, :req_id, :fac_id)")
                 .toString();
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("code", code);
 
-        Integer foundCodes = jdbcTemplate.queryForObject(query, params, Integer.class);
-        boolean isValid = ((foundCodes != null) && (foundCodes == 1));
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("hash", code.getHash());
+        parameters.addValue("recipient", code.getRecipientEmail());
+        parameters.addValue("sender_n", code.getSenderName());
+        parameters.addValue("sender_e", code.getSenderEmail());
+        parameters.addValue("exp", code.getExpiresAt().toInstant().toEpochMilli());
+        parameters.addValue("req_id", code.getRequestId());
+        parameters.addValue("fac_id", code.getFacilityId());
 
-        log.trace("validateCode() returns: {}", isValid);
-        return isValid;
+
+        int insertedCodes = jdbcTemplate.update(query, parameters);
+
+        if (insertedCodes != 1) {
+            log.error("Failed insertion of code into the DB: {}, actually inserted: {}", code, insertedCodes);
+            throw new InternalErrorException("Error in DB occurred");
+        }
     }
 
     @Override
     @Transactional
-    public int storeCodes(List<String> codes) throws InternalErrorException {
-        log.trace("storeCodes({})", codes);
+    public void update(LinkCode code) throws InternalErrorException {
+        log.trace("update({})", code);
 
-        if (Utils.checkParamsInvalid(codes) || codes.isEmpty()) {
-            log.error("Wrong arguments passed: (codes: {})", codes);
+        if (Utils.checkParamsInvalid(code)) {
+            log.error("Wrong arguments passed: (code: {})", code);
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
         }
 
         String query = new StringJoiner(" ")
-                .add("INSERT INTO").add(CODES_TABLE).add("(code)")
-                .add("VALUES (:code)")
+                .add("UPDATE").add(CODES_TABLE)
+                .add("SET recipient_email = :recipient, sender_name = :sender_n, sender_email = :sender_e,")
+                .add("expires_at = :exp, request_id = :req_id, facility_id = :fac_id")
+                .add("WHERE hash = :hash1")
                 .toString();
 
-        List<MapSqlParameterSource> batchArgs = new ArrayList<>();
-        for (String code: codes) {
-            MapSqlParameterSource parameters = new MapSqlParameterSource();
-            parameters.addValue("code", code);
-            batchArgs.add(parameters);
-        }
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("hash", code.getHash());
+        parameters.addValue("recipient", code.getRecipientEmail());
+        parameters.addValue("sender_n", code.getSenderName());
+        parameters.addValue("sender_e", code.getSenderEmail());
+        parameters.addValue("exp", code.getExpiresAt().toInstant().toEpochMilli());
+        parameters.addValue("req_id", code.getRequestId());
+        parameters.addValue("fac_id", code.getFacilityId());
 
-        int[] insertedCodes = jdbcTemplate.batchUpdate(query, batchArgs.toArray(new MapSqlParameterSource[codes.size()]));
-        int sum = 0;
-        for (int i : insertedCodes) {
-            if (i != 1) {
-                log.error("Inserting code failed");
-                throw new InternalErrorException("Inserting code failed");
-            } else {
-                sum++;
-            }
-        }
 
-        if (sum != codes.size()) {
-            log.error("Expected {} inserts, made {}", codes.size(), sum);
-            throw new InternalErrorException("Expected " + codes.size() + " inserts, made " + sum);
-        }
+        int updates = jdbcTemplate.update(query, parameters);
 
-        log.trace("storeCodes() returns: {}", sum);
-        return sum;
+        if (updates != 1) {
+            log.error("Failed updating code in the DB: {}, actually updated: {}", code, updates);
+            throw new InternalErrorException("Error in DB occurred");
+        }
     }
 
     @Override
-    public boolean deleteUsedCode(String code) throws InternalErrorException {
-        log.trace("deleteUsedCode({})", code);
+    @Transactional
+    public void delete(String hash) throws InternalErrorException {
+        log.trace("delete({})", hash);
 
-        if (Utils.checkParamsInvalid(code)) {
-            log.error("Wrong parameters passed: (code: {})", code);
+        if (Utils.checkParamsInvalid(hash)) {
+            log.error("Wrong arguments passed: (hash: {})", hash);
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
         }
 
         String query = new StringJoiner(" ")
                 .add("DELETE FROM").add(CODES_TABLE)
-                .add("WHERE code = :code")
+                .add("WHERE hash = :hash")
                 .toString();
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("code", code);
 
-        int updatedCount = jdbcTemplate.update(query, params);
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("hash", hash);
 
-        if (updatedCount == 0) {
-            log.error("Zero codes deleted, should delete at least one");
-            throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
-        } else if (updatedCount > 1) {
-            log.error("Only one code should be deleted, more deleted: {}", updatedCount);
-            throw new InternalErrorException(Utils.GENERIC_ERROR_MSG);
-        } else {
-            log.trace("deleteUsedCode() returns - codes deleted (void method)");
-            return true;
+        int removed = jdbcTemplate.update(query, parameters);
+
+        if (removed != 1) {
+            log.error("Failed removing code from the DB: {}, actually removed: {}", hash, removed);
+            throw new InternalErrorException("Error in DB occurred");
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteExpired() {
+        log.trace("deleteExpired()");
+
+        String query = new StringJoiner(" ")
+                .add("DELETE FROM").add(CODES_TABLE)
+                .add("WHERE expires_at <= :now")
+                .toString();
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("now", LocalDateTime.now());
+
+        int updates = jdbcTemplate.update(query, parameters);
+        log.debug("removed {} link codes", updates);
+    }
+
+    @Override
+    public void createMultiple(List<LinkCode> codes) throws InternalErrorException {
+        log.trace("createMultiple({})", codes);
+
+        if (Utils.checkParamsInvalid(codes)) {
+            log.error("Wrong arguments passed: (codes: {})", codes);
+            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
+        }
+
+        String query = new StringJoiner(" ")
+                .add("INSERT INTO").add(CODES_TABLE)
+                .add("(hash, recipient_email, sender_name, sender_email, expires_at, request_id, facility_id)")
+                .add("VALUES (:hash, :recipient, :sender_n, :sender_e, :exp, :req_id, :fac_id)")
+                .toString();
+
+        List<MapSqlParameterSource> batchArgs = new ArrayList<>();
+        for (LinkCode code : codes) {
+            MapSqlParameterSource parameters = new MapSqlParameterSource();
+            parameters.addValue("hash", code.getHash());
+            parameters.addValue("recipient", code.getRecipientEmail());
+            parameters.addValue("sender_n", code.getSenderName());
+            parameters.addValue("sender_e", code.getSenderEmail());
+            parameters.addValue("exp", code.getExpiresAt().toInstant().toEpochMilli());
+            parameters.addValue("req_id", code.getRequestId());
+            parameters.addValue("fac_id", code.getFacilityId());
+            batchArgs.add(parameters);
+        }
+
+        int[] created = jdbcTemplate.batchUpdate(query, batchArgs.toArray(
+                new MapSqlParameterSource[codes.size()]));
+
+        for (int i = 0; i < created.length; i++) {
+            if (created[i] != 1) {
+                log.error("Failed creating code in the DB: {}, actually created: {}", codes.get(i), created[i]);
+                throw new InternalErrorException("Error in DB occurred");
+            }
+        }
+    }
+
+    @Override
+    public LinkCode get(String hash) {
+        log.trace("get({})", hash);
+
+        String query = new StringJoiner(" ")
+                .add("SELECT * FROM").add(CODES_TABLE)
+                .add("WHERE hash = :hash")
+                .toString();
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("hash", hash);
+
+        return jdbcTemplate.queryForObject(query, parameters, MAPPER);
     }
 }
