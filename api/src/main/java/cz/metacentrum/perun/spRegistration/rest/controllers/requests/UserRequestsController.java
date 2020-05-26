@@ -5,7 +5,7 @@ import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestE
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
+import cz.metacentrum.perun.spRegistration.service.RequestsService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
@@ -30,18 +30,18 @@ public class UserRequestsController {
 
 	private static final Logger log = LoggerFactory.getLogger(UserRequestsController.class);
 
-	private final UserCommandsService service;
+	private final RequestsService requestsService;
 
 	@Autowired
-	public UserRequestsController(UserCommandsService service) {
-		this.service = service;
+	public UserRequestsController(RequestsService requestsService) {
+		this.requestsService = requestsService;
 	}
 
 	@GetMapping(path = "/api/userRequests")
 	public List<Request> userRequests(@SessionAttribute("user") User user) throws ConnectorException {
 		log.trace("userRequests({})", user.getId());
 		
-		List<Request> requestList = service.getAllRequestsUserCanAccess(user.getId());
+		List<Request> requestList = requestsService.getAllUserRequests(user.getId());
 
 		log.trace("userRequests() returns: {}", requestList);
 		return requestList;
@@ -53,7 +53,7 @@ public class UserRequestsController {
 	{
 		log.trace("createRegistrationRequest(user: {}, attributes: {})", user.getId(), attributes);
 		
-		Long generatedId = service.createRegistrationRequest(user.getId(), attributes);
+		Long generatedId = requestsService.createRegistrationRequest(user.getId(), attributes);
 
 		log.trace("createRegistrationRequest() returns: {}", generatedId);
 		return generatedId;
@@ -68,7 +68,7 @@ public class UserRequestsController {
 		log.trace("createFacilityChangesRequest(user: {}, facilityId: {}, attributes: {})", user.getId(),
 				facilityId, attributes);
 		
-		Long generatedId = service.createFacilityChangesRequest(facilityId, user.getId(), attributes);
+		Long generatedId = requestsService.createFacilityChangesRequest(facilityId, user.getId(), attributes);
 
 		log.trace("createFacilityChangesRequest() returns: {}", generatedId);
 		return generatedId;
@@ -81,7 +81,7 @@ public class UserRequestsController {
 	{
 		log.trace("createRemovalRequest(user: {}, facilityId: {})", user.getId(), facilityId);
 		
-		Long generatedId = service.createRemovalRequest(user.getId(), facilityId);
+		Long generatedId = requestsService.createRemovalRequest(user.getId(), facilityId);
 
 		log.trace("createRemovalRequest() returns: {}", generatedId);
 		return generatedId;
@@ -95,7 +95,7 @@ public class UserRequestsController {
 	{
 		log.trace("updateRequest(user: {}, requestId: {}, attributes: {})", user.getId(), requestId, attributes);
 		
-		boolean successful = service.updateRequest(requestId, user.getId(), attributes);
+		boolean successful = requestsService.updateRequest(requestId, user.getId(), attributes);
 
 		log.trace("updateRequest() returns: {}", successful);
 		return successful;

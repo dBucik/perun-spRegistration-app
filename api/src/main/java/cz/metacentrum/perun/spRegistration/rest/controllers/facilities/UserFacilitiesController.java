@@ -4,7 +4,8 @@ import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorExcep
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import cz.metacentrum.perun.spRegistration.rest.ApiUtils;
-import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
+import cz.metacentrum.perun.spRegistration.service.AddAdminsService;
+import cz.metacentrum.perun.spRegistration.service.FacilitiesService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
@@ -12,6 +13,7 @@ import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeExcep
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,17 +37,20 @@ public class UserFacilitiesController {
 
 	private static final Logger log = LoggerFactory.getLogger(UserFacilitiesController.class);
 
-	private final UserCommandsService service;
+	private final FacilitiesService facilitiesService;
+	private final AddAdminsService addAdminsService;
 
-	public UserFacilitiesController(UserCommandsService service) {
-		this.service = service;
+	@Autowired
+	public UserFacilitiesController(FacilitiesService facilitiesService, AddAdminsService addAdminsService) {
+		this.addAdminsService = addAdminsService;
+		this.facilitiesService = facilitiesService;
 	}
 
 	@GetMapping(path = "/api/userFacilities")
 	public List<Facility> userFacilities(@SessionAttribute("user") User user) throws ConnectorException	{
 		log.trace("userFacilities({})", user.getId());
 
-		List<Facility> facilityList = service.getAllFacilitiesWhereUserIsAdmin(user.getId());
+		List<Facility> facilityList = facilitiesService.getAllUserFacilities(user.getId());
 
 		log.trace("userFacilities() returns: {}", facilityList);
 		return facilityList;
@@ -60,7 +65,7 @@ public class UserFacilitiesController {
 	{
 		log.trace("addAdminsNotify(user: {}, facilityId: {}, adminEmails: {})", user.getId(), facilityId, adminEmails);
 
-		boolean successful = service.addAdminsNotify(user, facilityId, adminEmails);
+		boolean successful = addAdminsService.addAdminsNotify(user, facilityId, adminEmails);
 
 		log.trace("addAdmins() returns: {}", successful);
 		return successful;
@@ -74,7 +79,7 @@ public class UserFacilitiesController {
 		log.trace("addAdminConfirm(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
-		boolean successful = service.confirmAddAdmin(user, code);
+		boolean successful = addAdminsService.confirmAddAdmin(user, code);
 
 		log.trace("addAdminConfirm() returns: {}", successful);
 		return successful;
@@ -88,7 +93,7 @@ public class UserFacilitiesController {
 		log.trace("addAdminReject(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
-		boolean successful = service.rejectAddAdmin(user, code);
+		boolean successful = addAdminsService.rejectAddAdmin(user, code);
 
 		log.trace("addAdminReject() returns: {}", successful);
 		return successful;
@@ -99,7 +104,7 @@ public class UserFacilitiesController {
 												  @PathVariable("facilityId") Long facilityId)
 			throws UnauthorizedActionException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("getDetailedFacilityWithInputs(user: {}, facilityId: {})", user, facilityId);
-		Facility facility = service.getDetailedFacilityWithInputs(facilityId, user.getId());
+		Facility facility = facilitiesService.getFacilityWithInputs(facilityId, user.getId());
 
 		log.trace("getDetailedFacilityWithInputs() returns: {}", facility);
 		return facility;

@@ -5,7 +5,7 @@ import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
+import cz.metacentrum.perun.spRegistration.service.FacilitiesService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
@@ -30,11 +30,11 @@ public class CommonFacilitiesController {
 
 	private static final Logger log = LoggerFactory.getLogger(CommonFacilitiesController.class);
 
-	private final UserCommandsService service;
+	private final FacilitiesService facilitiesService;
 
 	@Autowired
-	public CommonFacilitiesController(UserCommandsService service) {
-		this.service = service;
+	public CommonFacilitiesController(FacilitiesService facilitiesService) {
+		this.facilitiesService = facilitiesService;
 	}
 
 	@GetMapping(path = "/api/facility/{facilityId}")
@@ -43,7 +43,7 @@ public class CommonFacilitiesController {
 			throws UnauthorizedActionException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("facilityDetail(user(): {}, facilityId: {})", user.getId(), facilityId);
 
-		Facility facility = service.getDetailedFacility(facilityId, user.getId(), true, true);
+		Facility facility = facilitiesService.getFacility(facilityId, user.getId(), true, true);
 
 		log.trace("facilityDetail() returns: {}", facility);
 		return facility;
@@ -55,7 +55,7 @@ public class CommonFacilitiesController {
 			throws UnauthorizedActionException, InternalErrorException, ConnectorException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		log.trace("facilityDetailSignature(user(): {}, facilityId: {})", user.getId(), facilityId);
 
-		Facility facility = service.getDetailedFacility(facilityId, user.getId(), false, false);
+		Facility facility = facilitiesService.getFacility(facilityId, user.getId(), false, false);
 		facility.getAttributes().get(AttributeCategory.PROTOCOL).clear();
 		facility.getAttributes().get(AttributeCategory.ACCESS_CONTROL).clear();
 

@@ -5,7 +5,7 @@ import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorExcep
 import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.persistence.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.models.User;
-import cz.metacentrum.perun.spRegistration.service.AdminCommandsService;
+import cz.metacentrum.perun.spRegistration.service.RequestsService;
 import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
@@ -34,11 +34,11 @@ public class AdminRequestsController {
 	
 	private static final Logger log = LoggerFactory.getLogger(AdminRequestsController.class);
 	
-	private final AdminCommandsService service;
-	
+	private final RequestsService requestsService;
+
 	@Autowired
-	public AdminRequestsController(AdminCommandsService service) {
-		this.service = service;
+	public AdminRequestsController(RequestsService requestsService) {
+		this.requestsService = requestsService;
 	}
 
 	@GetMapping(path = "/api/allRequests")
@@ -47,7 +47,7 @@ public class AdminRequestsController {
 	{
 		log.trace("allRequests({})", user.getId());
 
-		List<Request> requestList = service.getAllRequests(user.getId());
+		List<Request> requestList = requestsService.getAllRequests(user.getId());
 
 		log.trace("allRequests() returns: {}", requestList);
 		return requestList;
@@ -59,7 +59,7 @@ public class AdminRequestsController {
 			throws ConnectorException, CannotChangeStatusException, InternalErrorException, UnauthorizedActionException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException, BadRequestException {
 		log.trace("approveRequest(user: {}, requestId: {})", user.getId(), requestId);
 		
-		boolean successful = service.approveRequest(requestId, user.getId());
+		boolean successful = requestsService.approveRequest(requestId, user.getId());
 
 		log.trace("approveRequest() returns: {}", successful);
 		return successful;
@@ -72,7 +72,7 @@ public class AdminRequestsController {
 	{
 		log.trace("rejectRequest(user: {}, requestId: {})", user.getId(), requestId);
 		
-		boolean successful = service.rejectRequest(requestId, user.getId());
+		boolean successful = requestsService.rejectRequest(requestId, user.getId());
 
 		log.trace("rejectRequest() returns: {}", successful);
 		return successful;
@@ -86,7 +86,7 @@ public class AdminRequestsController {
 	{
 		log.trace("askForChanges(user: {}, requestId: {}, attributes: {})", user.getId(), requestId, attributes);
 		
-		boolean successful = service.askForChanges(requestId, user.getId(), attributes);
+		boolean successful = requestsService.askForChanges(requestId, user.getId(), attributes);
 
 		log.trace("askForChanges() returns: {}", successful);
 		return successful;
