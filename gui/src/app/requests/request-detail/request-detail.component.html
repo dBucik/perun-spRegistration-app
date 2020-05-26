@@ -33,12 +33,12 @@
               {{'REQUESTS.SEE_FACILITY' | translate}}
             </button>
           </ng-container>
-          <ng-container *ngIf="isApplicationAdmin || request.status=='WAITING_FOR_APPROVAL'">
+          <ng-container *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
             <button class="btn-block" mat-raised-button color="accent" (click)="openApproveDialog()">
               {{'REQUESTS.DETAIL_APPROVE' | translate}}
             </button>
           </ng-container>
-          <ng-container *ngIf="isApplicationAdmin || request.status=='WAITING_FOR_APPROVAL'">
+          <ng-container *ngIf="isApplicationAdmin && request.status=='WAITING_FOR_APPROVAL'">
             <button mat-raised-button color="warn" class="btn-block" (click)="openRejectDialog()">
               {{'REQUESTS.DETAIL_REJECT' | translate}}
             </button>
