@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
     this.configService.getLanguages().subscribe(langs => {
       this.langs = langs;
       const browserLang = this.translate.getBrowserLang();
-      if (!this.langs.includes(browserLang)) {
+      if (this.langs.includes(browserLang)) {
         AppComponent.activeLang = browserLang;
       } else {
         AppComponent.activeLang = 'en'
