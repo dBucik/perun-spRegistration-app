@@ -5,15 +5,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import cz.metacentrum.perun.spRegistration.Utils;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.ConnectorUtils;
+import cz.metacentrum.perun.spRegistration.common.exceptions.BadRequestException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.models.Facility;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttributeDefinition;
+import cz.metacentrum.perun.spRegistration.common.models.User;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.BadRequestException;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.MapperUtils;
-import cz.metacentrum.perun.spRegistration.persistence.models.Facility;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttribute;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -480,7 +479,7 @@ public class PerunConnectorRpc implements PerunConnector {
 			log.trace("makeRpcGetCall() returns: {}", response);
 			return response;
 		} catch (HttpClientErrorException ex) {
-			return ConnectorUtils.dealWithHttpClientErrorException(ex, "Could not connect to Perun RPC");
+			return dealWithHttpClientErrorException(ex, "Could not connect to Perun RPC");
 		}
 	}
 
@@ -505,7 +504,7 @@ public class PerunConnectorRpc implements PerunConnector {
 			log.trace("makeRpcPostCall() returns: {}", response);
 			return response;
 		} catch (HttpClientErrorException ex) {
-			return ConnectorUtils.dealWithHttpClientErrorException(ex, "Could not connect to Perun RPC");
+			return dealWithHttpClientErrorException(ex, "Could not connect to Perun RPC");
 		} catch (IOException e) {
 			log.error("cannot parse response to String", e);
 			throw new ConnectorException("cannot connect to Perun RPC", e);
@@ -528,6 +527,31 @@ public class PerunConnectorRpc implements PerunConnector {
 		HttpEntity<byte[]> result = new HttpEntity<>(StandardCharsets.UTF_8.encode(body).array(), headers);
 		log.trace("prepareJsonBody() returns: {}", result);
 		return result;
+	}
+
+	public JsonNode dealWithHttpClientErrorException(HttpClientErrorException ex, String message) throws ConnectorException {
+		log.trace("dealWithHttpClientErrorException(ex: {}, message: {})", ex, message);
+
+		MediaType contentType = null;
+		if (ex.getResponseHeaders() != null) {
+			contentType = ex.getResponseHeaders().getContentType();
+		}
+		if (contentType != null && "json".equalsIgnoreCase(contentType.getSubtype())) {
+			try {
+				String body = ex.getResponseBodyAsString();
+				JsonNode error = new ObjectMapper().readValue(body, JsonNode.class);
+				String exErrorId = error.path("errorId").textValue();
+				String exName = error.path("name").textValue();
+				String exMessage = error.path("message").textValue();
+
+				String errMessage = "Error from Perun: { id: " + exErrorId + ", name: " + exName + ", message: " + exMessage + " }";
+				throw new ConnectorException(errMessage, ex);
+			} catch (IOException e) {
+				throw new ConnectorException("Perun RPC Exception thrown, cannot read message");
+			}
+		} else {
+			throw new ConnectorException("Perun RPC Exception thrown, cannot read message");
+		}
 	}
 
 }

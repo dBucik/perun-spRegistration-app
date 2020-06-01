@@ -2,12 +2,12 @@ package cz.metacentrum.perun.spRegistration.persistence;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
-import cz.metacentrum.perun.spRegistration.persistence.enums.AttributeCategory;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.models.AttrInput;
-import cz.metacentrum.perun.spRegistration.persistence.models.PerunAttributeDefinition;
+import cz.metacentrum.perun.spRegistration.common.enums.AttributeCategory;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.models.AttrInput;
+import cz.metacentrum.perun.spRegistration.common.models.PerunAttributeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

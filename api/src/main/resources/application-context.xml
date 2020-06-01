@@ -171,7 +171,7 @@
         <property name="password" value="${jdbc.password}"/>
     </bean>
 
-    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
         <constructor-arg name="dataSource" ref="dataSource"/>
     </bean>
 
@@ -189,7 +189,17 @@
     </bean>
 
     <bean id="requestManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestManagerImpl">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <constructor-arg name="config" ref="config"/>
+        <constructor-arg name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="linkCodeManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.LinkCodeManagerImpl">
+        <constructor-arg name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="requestSignatureManager" class="cz.metacentrum.perun.spRegistration.persistence.managers.impl.RequestSignatureManagerImpl">
+        <constructor-arg name="jdbcTemplate" ref="jdbcTemplate"/>
+        <constructor-arg name="linkCodeManager" ref="linkCodeManager"/>
     </bean>
 
     <bean id="prodTransferAuthoritiesMailsMap" class="org.springframework.beans.factory.config.PropertiesFactoryBean" >
@@ -201,7 +211,7 @@
         <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
-    <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.persistence.configs.AppConfig">
+    <bean id="appConfig" class="cz.metacentrum.perun.spRegistration.common.configs.AppConfig">
         <property name="perunConnector" ref="perunConnector" />
         <property name="appAdminIds" value="#{'${appAdminIds}'.split('\s*,\s*')}" />
         <property name="loginExtSource" value="${extSource.proxy.entityId}" />
@@ -238,7 +248,7 @@
 
     <import resource="attributes-context.xml" />
 
-    <bean id="config" class="cz.metacentrum.perun.spRegistration.persistence.configs.Config">
+    <bean id="config" class="cz.metacentrum.perun.spRegistration.common.configs.Config">
         <property name="appConfig" ref="appConfig" />
         <property name="facilityServiceConfig" ref="facilityServiceConfig" />
         <property name="facilityOrganizationConfig" ref="facilityOrganizationConfig" />

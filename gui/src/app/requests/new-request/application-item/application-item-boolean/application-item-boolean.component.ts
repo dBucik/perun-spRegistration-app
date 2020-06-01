@@ -17,8 +17,6 @@ export class ApplicationItemBooleanComponent implements OnInit, RequestItem {
   applicationItem: ApplicationItem;
 
   value: boolean = false;
-  translatedName: string;
-  translatedDescription: string;
 
   getAttribute(): Attribute {
     return new Attribute(this.applicationItem.name, this.value);
@@ -33,10 +31,6 @@ export class ApplicationItemBooleanComponent implements OnInit, RequestItem {
   }
 
   ngOnInit(): void {
-    const browserLang = this.translate.getBrowserLang();
-    this.translatedName = this.applicationItem.getLocalizedName(browserLang);
-    this.translatedDescription = this.applicationItem.getLocalizedDescription(browserLang);
-
     this.value = this.applicationItem.oldValue
   }
 

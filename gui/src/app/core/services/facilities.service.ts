@@ -5,6 +5,7 @@ import { Facility } from "../models/Facility";
 import { Request } from "../models/Request";
 import {PerunAttribute} from "../models/PerunAttribute";
 import { map } from 'rxjs/operators';
+import {LinkCode} from "../models/LinkCode";
 
 @Injectable({
   providedIn: 'root'
@@ -61,6 +62,14 @@ export class FacilitiesService {
 
   addAdminReject(hash: string): Observable<boolean> {
     return this.apiService.post('/addAdmin/reject', hash);
+  }
+
+  addAdminGetDetails(hash: string): Observable<LinkCode> {
+    return this.apiService.get('/addAdmin/getDetails/' + hash);
+  }
+
+  addAdminGetFacilityDetails(faciltiyId: number): Observable<Facility> {
+    return this.apiService.get('/addAdmin/getFacilityDetails/' + faciltiyId);
   }
 
   changeFacility(id: number, perunAttributes: PerunAttribute[]): Observable<number> {

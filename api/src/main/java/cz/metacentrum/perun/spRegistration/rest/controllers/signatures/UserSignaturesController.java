@@ -1,17 +1,18 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.signatures;
 
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ActiveRequestExistsException;
-import cz.metacentrum.perun.spRegistration.persistence.models.Request;
-import cz.metacentrum.perun.spRegistration.persistence.models.RequestSignature;
-import cz.metacentrum.perun.spRegistration.persistence.models.User;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ActiveRequestExistsException;
+import cz.metacentrum.perun.spRegistration.common.models.Request;
+import cz.metacentrum.perun.spRegistration.common.models.RequestSignature;
+import cz.metacentrum.perun.spRegistration.common.models.User;
 import cz.metacentrum.perun.spRegistration.rest.ApiUtils;
-import cz.metacentrum.perun.spRegistration.service.UserCommandsService;
-import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.service.RequestSignaturesService;
+import cz.metacentrum.perun.spRegistration.service.RequestsService;
+import cz.metacentrum.perun.spRegistration.service.UtilsService;
+import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,16 @@ public class UserSignaturesController {
 
 	private static final Logger log = LoggerFactory.getLogger(UserSignaturesController.class);
 
-	private final UserCommandsService service;
+	private final RequestsService requestsService;
+	private final UtilsService utilsService;
+	private final RequestSignaturesService requestSignaturesService;
 
 	@Autowired
-	public UserSignaturesController(UserCommandsService service) {
-		this.service = service;
+	public UserSignaturesController(RequestsService requestsService, UtilsService utilsService,
+									RequestSignaturesService requestSignaturesService) {
+		this.requestsService = requestsService;
+		this.utilsService = utilsService;
+		this.requestSignaturesService = requestSignaturesService;
 	}
 
 	@PostMapping(path = "/api/moveToProduction/createRequest/{facilityId}")
@@ -54,7 +60,7 @@ public class UserSignaturesController {
 	{
 		log.trace("moveToProduction(user: {}, facilityId: {} authorities: {})", user.getId(), facilityId, authorities);
 		
-		Long generatedId = service.requestMoveToProduction(facilityId, user.getId(), authorities);
+		Long generatedId = requestsService.createMoveToProductionRequest(facilityId, user, authorities);
 
 		log.trace("moveToProduction() returns: {}", generatedId);
 		return generatedId;
@@ -62,16 +68,12 @@ public class UserSignaturesController {
 
 	@GetMapping(path = "/api/moveToProduction/getFacilityDetails", params = "code")
 	public Request signRequestGetData(String code)
-			throws BadPaddingException, ConnectorException, IllegalBlockSizeException, MalformedCodeException,
-			InvalidKeyException, ExpiredCodeException, InternalErrorException, CodeNotStoredException {
+			throws BadPaddingException, ConnectorException, IllegalBlockSizeException,
+			InvalidKeyException, ExpiredCodeException, InternalErrorException {
 		log.trace("signRequestGetData({})", code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
-		if (! service.validateCode(code)) {
-			throw new IllegalAccessError("You cannot sign the request, code is invalid");
-		}
-
-		Request request = service.getRequestDetailsForSignature(code);
+		Request request = requestsService.getRequestForSignatureByCode(code);
 
 		log.trace("signRequestGetData() returns: {}", request);
 		return request;
@@ -81,11 +83,11 @@ public class UserSignaturesController {
 	public boolean approveProductionTransfer(@SessionAttribute("user") User user,
 											 @RequestBody String code)
 			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
-			MalformedCodeException, InternalErrorException, InvalidKeyException, CodeNotStoredException {
+			InternalErrorException, InvalidKeyException, CodeNotStoredException {
 		log.trace("approveProductionTransfer(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
-		if (! service.validateCode(code)) {
+		if (!utilsService.validateCode(code)) {
 			throw new IllegalAccessError("You cannot sign the request, code is invalid");
 		}
 
@@ -99,11 +101,11 @@ public class UserSignaturesController {
 	public boolean rejectProductionTransfer(@SessionAttribute("user") User user,
 											@RequestBody String code)
 			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
-			MalformedCodeException, InternalErrorException, InvalidKeyException, CodeNotStoredException {
+			InternalErrorException, InvalidKeyException, CodeNotStoredException {
 		log.trace("rejectProductionTransfer(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
-		if (! service.validateCode(code)) {
+		if (!utilsService.validateCode(code)) {
 			throw new IllegalAccessError("You cannot sign the request, code is invalid");
 		}
 
@@ -120,7 +122,7 @@ public class UserSignaturesController {
 	{
 		log.trace("getApprovals(user: {}, requestId: {})", user.getId(), requestId);
 
-		List<RequestSignature> signaturesList = service.getApprovalsOfProductionTransfer(requestId, user.getId());
+		List<RequestSignature> signaturesList = requestSignaturesService.getSignaturesForRequest(requestId, user.getId());
 
 		log.trace("getApprovals() returns: {}", signaturesList);
 		return signaturesList;
@@ -129,8 +131,8 @@ public class UserSignaturesController {
 	/* PRIVATE METHODS */
 
 	private boolean signTransferToProduction(String code, User user, boolean approved) throws BadPaddingException,
-			ExpiredCodeException, IllegalBlockSizeException, MalformedCodeException, InternalErrorException,
+			ExpiredCodeException, IllegalBlockSizeException, InternalErrorException,
 			InvalidKeyException {
-		return service.signTransferToProduction(user, code, approved);
+		return requestSignaturesService.addSignature(user, code, approved);
 	}
 }

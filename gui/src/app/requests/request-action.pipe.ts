@@ -1,5 +1,4 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {TranslateService} from "@ngx-translate/core";
 
 @Pipe({
   name: 'requestActionPipe',
@@ -9,34 +8,25 @@ export class RequestActionPipe implements PipeTransform {
 
   private returnData: string = "";
 
-  constructor(
-    private translate: TranslateService
-  ) { }
+  constructor() { }
 
   transform(value: any, args?: any): any {
+    let key = '';
     switch(value) {
       case "REGISTER_NEW_SP": {
-        this.translate.get('REQUESTS.ACTIONPIPE.REGISTER_NEW_SP').subscribe(response =>{
-          this.returnData = response;
-        });
+        key = 'REQUESTS.ACTIONPIPE.REGISTER_NEW_SP';
         break;
       }
       case "UPDATE_FACILITY": {
-        this.translate.get('REQUESTS.ACTIONPIPE.UPDATE_FACILITY').subscribe(response =>{
-          this.returnData = response;
-        });
+        key = 'REQUESTS.ACTIONPIPE.UPDATE_FACILITY';
         break;
       }
       case "DELETE_FACILITY": {
-        this.translate.get('REQUESTS.ACTIONPIPE.DELETE_FACILITY').subscribe(response =>{
-          this.returnData = response;
-        });
+        key = 'REQUESTS.ACTIONPIPE.DELETE_FACILITY';
         break;
       }
       case "MOVE_TO_PRODUCTION": {
-        this.translate.get('REQUESTS.ACTIONPIPE.MOVE_TO_PRODUCTION').subscribe(response =>{
-          this.returnData = response;
-        });
+        key = 'REQUESTS.ACTIONPIPE.MOVE_TO_PRODUCTION';
         break;
       }
       default: {
@@ -44,7 +34,7 @@ export class RequestActionPipe implements PipeTransform {
         break;
       }
     }
-    return this.returnData;
+    return key;
   }
 
 }

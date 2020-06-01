@@ -1,12 +1,11 @@
 package cz.metacentrum.perun.spRegistration.rest.controllers.common;
 
-import cz.metacentrum.perun.spRegistration.persistence.exceptions.ConnectorException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.CannotChangeStatusException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.CodeNotStoredException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.ExpiredCodeException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.MalformedCodeException;
-import cz.metacentrum.perun.spRegistration.service.exceptions.UnauthorizedActionException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.CannotChangeStatusException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -37,8 +36,7 @@ public class GlobalExceptionController {
 		return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@ExceptionHandler(value = { ExpiredCodeException.class, MalformedCodeException.class,
-			UnauthorizedActionException.class, CodeNotStoredException.class } )
+	@ExceptionHandler(value = { ExpiredCodeException.class, UnauthorizedActionException.class, CodeNotStoredException.class } )
 	public ResponseEntity<Object> forbidden(ExpiredCodeException exception) {
 		log.error(exception.toString());
 		return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);

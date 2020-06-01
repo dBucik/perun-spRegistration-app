@@ -28,13 +28,20 @@ export class AppComponent implements OnInit {
     this.loading = true;
     this.configService.getLanguages().subscribe(langs => {
       this.langs = langs;
+      this.translate.addLangs(langs);
+      this.translate.setDefaultLang('en');
+
       const browserLang = this.translate.getBrowserLang();
-      if (!this.langs.includes(browserLang)) {
-        AppComponent.activeLang = browserLang;
-      } else {
-        AppComponent.activeLang = 'en'
+      if (this.langs.includes(browserLang)) {
+        this.translate.use(browserLang);
       }
-      this.translate.setDefaultLang(AppComponent.activeLang);
+
+      const storedLang = localStorage.getItem('lang');
+      if (storedLang && this.translate.langs.indexOf(storedLang) >= 0) {
+        this.translate.use(storedLang);
+      } else {
+        localStorage.setItem('lang', this.translate.currentLang);
+      }
     });
 
 
@@ -49,7 +56,6 @@ export class AppComponent implements OnInit {
 
   static pageConfig: PageConfig;
   static user: User;
-  static activeLang = 'en';
 
   sidenavOpen = true;
   loading = true;
@@ -121,8 +127,8 @@ export class AppComponent implements OnInit {
   }
 
   public changeLanguage(lang: string) {
-    AppComponent.activeLang = lang;
-    this.translate.setDefaultLang(AppComponent.activeLang);
+    this.translate.use(lang);
+    localStorage.setItem('lang', lang);
   }
 
   public toggleSideBar() {

@@ -7,10 +7,10 @@
         <div class="col-md-8">
           <h2 class="card-title">{{'REQUESTS.DETAIL_TITLE' | translate}}{{request.reqId}}</h2>
           <div><span class="font-thick mr-1">{{'REQUESTS.STATUS' | translate}}:</span>
-            <span [innerHTML]=" request.status | requestStatusPipe "></span>
+            <span [outerHTML]="request.status | requestStatusIcon"></span>{{ request.status | requestStatusLang | translate }}
           </div>
           <div><span class="font-thick mr-1">{{'REQUESTS.ACTION' | translate}}:</span>
-            <span [innerHTML]=" request.action | requestActionPipe "></span>
+            <span [innerHTML]=" request.action | requestActionPipe | translate"></span>
           </div>
           <div class="mb-4"><span class="font-thick mr-1">{{'REQUESTS.DETAIL_EDITED' | translate}}:</span>
             {{ request.modifiedAt | date: 'dd/MM/yyyy'}}</div>
@@ -68,22 +68,22 @@
             <!-- SERVICE -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.SERVICE' | translate }}">
               <detailed-view-items [attrs]="requestAttrsService" [isAppAdmin]="isApplicationAdmin"
-                                   [includeComment]="true"></detailed-view-items>
+                                   [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- ORGANIZATION -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.ORGANIZATION' | translate }}">
               <detailed-view-items [attrs]="requestAttrsOrganization" [isAppAdmin]="isApplicationAdmin"
-                                   [includeComment]="true"></detailed-view-items>
+                                   [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- PROTOCOL -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.PROTOCOL' | translate }}">
               <detailed-view-items [attrs]="requestAttrsProtocol" [isAppAdmin]="isApplicationAdmin"
-                                   [includeComment]="true"></detailed-view-items>
+                                   [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- ACCESS_CONTROL -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.ACCESS_CONTROL' | translate }}">
               <detailed-view-items [attrs]="requestAttrsAccessControl" [isAppAdmin]="isApplicationAdmin"
-                                   [includeComment]="true"></detailed-view-items>
+                                   [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
           </mat-tab-group>
         </div>

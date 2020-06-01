@@ -3,7 +3,6 @@ import {ApplicationItem} from '../../../../core/models/ApplicationItem';
 import {RequestItem} from '../../../../core/models/RequestItem';
 import {Attribute} from '../../../../core/models/Attribute';
 import {NgForm} from '@angular/forms';
-import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-application-item-list',
@@ -12,15 +11,12 @@ import {TranslateService} from '@ngx-translate/core';
 })
 export class ApplicationItemListComponent implements RequestItem, OnInit {
 
-  constructor(private translate: TranslateService) {
+  constructor() {
     this.values = [];
   }
 
   error = false;
   noItemError = false;
-  translatedName: string;
-  translatedDescription: string;
-
   values: string[];
 
   @Input()
@@ -66,10 +62,6 @@ export class ApplicationItemListComponent implements RequestItem, OnInit {
   }
 
   ngOnInit(): void {
-    const browserLang = this.translate.getBrowserLang();
-    this.translatedName = this.applicationItem.getLocalizedName(browserLang);
-    this.translatedDescription = this.applicationItem.getLocalizedDescription(browserLang);
-
     if (this.applicationItem.oldValue != null) {
       this.values = this.applicationItem.oldValue;
     }

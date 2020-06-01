@@ -12,13 +12,11 @@ import {TranslateService} from '@ngx-translate/core';
 })
 export class ApplicationItemSelectComponent implements RequestItem, OnInit {
 
-  constructor(private translate: TranslateService) {
+  constructor() {
     this.values = [];
   }
 
   values: string[];
-  translatedName: string;
-  translatedDescription: string;
 
   @Input()
   applicationItem: ApplicationItem;
@@ -50,10 +48,6 @@ export class ApplicationItemSelectComponent implements RequestItem, OnInit {
   }
 
   ngOnInit(): void {
-    const browserLang = this.translate.getBrowserLang();
-    this.translatedName = this.applicationItem.getLocalizedName(browserLang);
-    this.translatedDescription = this.applicationItem.getLocalizedDescription(browserLang);
-
     this.values = this.applicationItem.oldValue;
   }
 }
