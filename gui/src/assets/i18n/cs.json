@@ -88,9 +88,9 @@
     },
     "ACTIONPIPE": {
       "REGISTER_NEW_SP": "Registrace nové služby",
-      "UPDATE_FACILITY": "Upravit službu",
-      "DELETE_FACILITY" : "Smazat službu",
-      "MOVE_TO_PRODUCTION": "Přesunout do produkce"
+      "UPDATE_FACILITY": "Úprava služby",
+      "DELETE_FACILITY" : "Smazání služby",
+      "MOVE_TO_PRODUCTION": "Přesun do produkce"
     },
     "CHANGED_TO_WFC": "Změny byly vyžádany",
     "COMMENTS_FROM_ADMIN": "Komentáře od administrátora",
