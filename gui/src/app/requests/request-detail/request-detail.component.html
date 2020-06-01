@@ -7,10 +7,10 @@
         <div class="col-md-8">
           <h2 class="card-title">{{'REQUESTS.DETAIL_TITLE' | translate}}{{request.reqId}}</h2>
           <div><span class="font-thick mr-1">{{'REQUESTS.STATUS' | translate}}:</span>
-            <span [innerHTML]=" request.status | requestStatusPipe "></span>
+            <span [outerHTML]="request.status | requestStatusIcon"></span>{{ request.status | requestStatusLang | translate }}
           </div>
           <div><span class="font-thick mr-1">{{'REQUESTS.ACTION' | translate}}:</span>
-            <span [innerHTML]=" request.action | requestActionPipe "></span>
+            <span [innerHTML]=" request.action | requestActionPipe | translate"></span>
           </div>
           <div class="mb-4"><span class="font-thick mr-1">{{'REQUESTS.DETAIL_EDITED' | translate}}:</span>
             {{ request.modifiedAt | date: 'dd/MM/yyyy'}}</div>

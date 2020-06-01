@@ -11,12 +11,13 @@ import { RequestCreationStepComponent } from './new-request/request-creation-ste
 import { RequestDetailDialogComponent } from './request-detail/request-detail-dialog/request-detail-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { RequestEditComponent } from './request-edit/request-edit.component';
-import { RequestStatusPipe } from './request-status.pipe';
 import { RequestActionPipe } from './request-action.pipe';
 import { RequestApprovedPipe } from './request-approved.pipe';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import {MatTabsModule} from "@angular/material/tabs";
 import { RequestDetailItemLocalePipe } from './request-detail-item-locale.pipe';
+import {RequestStatusIconPipe} from "./request-status-icon.pipe";
+import {RequestStatusLangPipe} from "./request-status-lang.pipe";
 
 @NgModule({
   imports: [
@@ -35,7 +36,8 @@ import { RequestDetailItemLocalePipe } from './request-detail-item-locale.pipe';
     RequestCreationStepComponent,
     AllRequestsComponent,
     RequestEditComponent,
-    RequestStatusPipe,
+    RequestStatusIconPipe,
+    RequestStatusLangPipe,
     RequestActionPipe,
     AllRequestsComponent,
     RequestDetailDialogComponent,
