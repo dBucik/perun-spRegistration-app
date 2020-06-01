@@ -5,12 +5,12 @@
         <mat-select multiple
                     [(ngModel)]="values"
                     name="{{applicationItem.name}}"
-                    placeholder="{{translatedName}}"
+                    placeholder="{{applicationItem.displayName | itemLocalePipe}}"
                     [required]="applicationItem.required">
 
           <mat-option *ngFor="let value of applicationItem.allowedValues" [value]="value">{{value}}</mat-option>
         </mat-select>
-        <mat-hint [innerHTML]="translatedDescription"></mat-hint>
+        <mat-hint [innerHTML]="applicationItem.description | itemLocalePipe"></mat-hint>
       </mat-form-field>
     </div>
   </form>

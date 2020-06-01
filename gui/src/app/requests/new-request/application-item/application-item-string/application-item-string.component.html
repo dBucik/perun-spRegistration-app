@@ -2,12 +2,12 @@
   <form class="w-100" #form="ngForm">
     <div class="col-12 d-flex">
       <mat-form-field class="w-100">
-        <input
-          #input="ngModel" [required]="applicationItem.required" id="{{applicationItem.name}}" [(ngModel)]="value"
-          [pattern]="((applicationItem.regex != undefined) && (applicationItem.regex.length > 0) && (applicationItem.regex !== 'URL')) ? applicationItem.regex : null"
+        <input #input="ngModel" [required]="applicationItem.required" id="{{applicationItem.name}}"
+               [(ngModel)]="value"
+               [pattern]="((applicationItem.regex != undefined) && (applicationItem.regex.length > 0) && (applicationItem.regex !== 'URL')) ? applicationItem.regex : null"
           [type] = "((applicationItem.regex != undefined) && (applicationItem.regex.length > 0) && (applicationItem.regex !== 'URL')) ? 'text' : 'url'"
-          matInput placeholder="{{translatedName}}" name="{{applicationItem.name}}">
-        <mat-hint [innerHTML]="translatedDescription"></mat-hint>
+          matInput placeholder="{{applicationItem.displayName | itemLocalePipe}}" name="{{applicationItem.name}}">
+        <mat-hint [innerHTML]="applicationItem.description | itemLocalePipe"></mat-hint>
       </mat-form-field>
     </div>
     <div class="col-12 d-flex perun-warn" *ngIf="input.errors?.pattern && input.touched">

@@ -137,10 +137,6 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   }
 
   ngOnInit(): void {
-    const browserLang = this.translate.getBrowserLang();
-    this.translatedName = this.applicationItem.getLocalizedName(browserLang);
-    this.translatedDescription = this.applicationItem.getLocalizedDescription(browserLang);
-
     if (this.applicationItem.oldValue != null) {
       const map: Map<string, string> = this.applicationItem.oldValue;
       for (const [key, value] of Object.entries(map)) {

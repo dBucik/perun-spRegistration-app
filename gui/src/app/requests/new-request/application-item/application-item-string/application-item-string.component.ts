@@ -12,14 +12,11 @@ import {TranslateService} from '@ngx-translate/core';
 })
 export class ApplicationItemStringComponent implements RequestItem, OnInit {
 
-  constructor(private translate: TranslateService) { }
+  constructor() { }
 
   @Input()
   applicationItem: ApplicationItem;
-
   value = '';
-  translatedName: string;
-  translatedDescription: string;
 
   @ViewChild('form', {static: false})
   form: NgForm;
@@ -55,10 +52,6 @@ export class ApplicationItemStringComponent implements RequestItem, OnInit {
   }
 
   ngOnInit(): void {
-    const browserLang = this.translate.getBrowserLang();
-    this.translatedName = this.applicationItem.getLocalizedName(browserLang);
-    this.translatedDescription = this.applicationItem.getLocalizedDescription(browserLang);
-
     this.value = this.applicationItem.oldValue;
   }
 }
