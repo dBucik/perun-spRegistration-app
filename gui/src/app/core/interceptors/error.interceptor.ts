@@ -31,7 +31,6 @@ export class ErrorInterceptor implements HttpInterceptor {
   private serverNotLiveError: String;
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-
     return next.handle(req).pipe(
       catchError((errorResponse: HttpErrorResponse) => {
         let errors = [];

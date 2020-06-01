@@ -68,22 +68,22 @@
             <!-- SERVICE -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.SERVICE' | translate }}">
               <detailed-view-items [attrs]="requestAttrsService" [isAppAdmin]="isApplicationAdmin"
-                                   [includeComment]="true"></detailed-view-items>
+                                   [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- ORGANIZATION -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.ORGANIZATION' | translate }}">
               <detailed-view-items [attrs]="requestAttrsOrganization" [isAppAdmin]="isApplicationAdmin"
-                                   [includeComment]="true"></detailed-view-items>
+                                   [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- PROTOCOL -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.PROTOCOL' | translate }}">
               <detailed-view-items [attrs]="requestAttrsProtocol" [isAppAdmin]="isApplicationAdmin"
-                                   [includeComment]="true"></detailed-view-items>
+                                   [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- ACCESS_CONTROL -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.ACCESS_CONTROL' | translate }}">
               <detailed-view-items [attrs]="requestAttrsAccessControl" [isAppAdmin]="isApplicationAdmin"
-                                   [includeComment]="true"></detailed-view-items>
+                                   [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
           </mat-tab-group>
         </div>
