@@ -4,7 +4,6 @@ import cz.metacentrum.perun.spRegistration.common.models.RequestSignature;
 import cz.metacentrum.perun.spRegistration.common.models.User;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 
 import javax.crypto.BadPaddingException;
@@ -23,13 +22,11 @@ public interface RequestSignaturesService {
      * @throws BadPaddingException Thrown when cannot decode code.
      * @throws InvalidKeyException Thrown when cannot decode code.
      * @throws IllegalBlockSizeException Thrown when cannot decode code.
-     * @throws MalformedCodeException Thrown when cannot decode code.
      * @throws InternalErrorException Thrown when request was not signed in DB.
      * @throws IllegalArgumentException Thrown when param "user" is NULL, when param "code" is NULL or empty.
      */
     boolean addSignature(User user, String code, boolean approved)
-            throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
-            ExpiredCodeException, InternalErrorException;
+            throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, ExpiredCodeException, InternalErrorException;
 
     /**
      * Get approvals for request to transfer to production.

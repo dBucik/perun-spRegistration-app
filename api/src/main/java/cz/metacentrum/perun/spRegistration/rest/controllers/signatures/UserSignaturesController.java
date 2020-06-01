@@ -12,7 +12,6 @@ import cz.metacentrum.perun.spRegistration.service.UtilsService;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +68,7 @@ public class UserSignaturesController {
 
 	@GetMapping(path = "/api/moveToProduction/getFacilityDetails", params = "code")
 	public Request signRequestGetData(String code)
-			throws BadPaddingException, ConnectorException, IllegalBlockSizeException, MalformedCodeException,
+			throws BadPaddingException, ConnectorException, IllegalBlockSizeException,
 			InvalidKeyException, ExpiredCodeException, InternalErrorException {
 		log.trace("signRequestGetData({})", code);
 
@@ -84,7 +83,7 @@ public class UserSignaturesController {
 	public boolean approveProductionTransfer(@SessionAttribute("user") User user,
 											 @RequestBody String code)
 			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
-			MalformedCodeException, InternalErrorException, InvalidKeyException, CodeNotStoredException {
+			InternalErrorException, InvalidKeyException, CodeNotStoredException {
 		log.trace("approveProductionTransfer(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
@@ -102,7 +101,7 @@ public class UserSignaturesController {
 	public boolean rejectProductionTransfer(@SessionAttribute("user") User user,
 											@RequestBody String code)
 			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
-			MalformedCodeException, InternalErrorException, InvalidKeyException, CodeNotStoredException {
+			InternalErrorException, InvalidKeyException, CodeNotStoredException {
 		log.trace("rejectProductionTransfer(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
@@ -132,7 +131,7 @@ public class UserSignaturesController {
 	/* PRIVATE METHODS */
 
 	private boolean signTransferToProduction(String code, User user, boolean approved) throws BadPaddingException,
-			ExpiredCodeException, IllegalBlockSizeException, MalformedCodeException, InternalErrorException,
+			ExpiredCodeException, IllegalBlockSizeException, InternalErrorException,
 			InvalidKeyException {
 		return requestSignaturesService.addSignature(user, code, approved);
 	}

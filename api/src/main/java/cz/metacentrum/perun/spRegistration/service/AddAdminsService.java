@@ -7,7 +7,6 @@ import cz.metacentrum.perun.spRegistration.common.models.User;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 
 import javax.crypto.BadPaddingException;
@@ -47,13 +46,11 @@ public interface AddAdminsService {
      * @throws BadPaddingException Thrown when cannot decrypt code.
      * @throws InvalidKeyException Thrown when cannot decrypt code.
      * @throws IllegalBlockSizeException Thrown when cannot decrypt code.
-     * @throws MalformedCodeException Thrown when cannot decrypt code.
      * @throws ExpiredCodeException Thrown when used code is expired.
      * @throws IllegalArgumentException Thrown when param "user" is NULL, when param "code" is NULL or empty.
      */
     boolean confirmAddAdmin(User user, String code)
-            throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException,
-            ExpiredCodeException, ConnectorException, InternalErrorException, CodeNotStoredException;
+            throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, ExpiredCodeException, ConnectorException, InternalErrorException, CodeNotStoredException;
 
     /**
      * Reject request to be added as a facility admin.
@@ -62,12 +59,11 @@ public interface AddAdminsService {
      * @throws BadPaddingException Thrown when cannot decrypt code.
      * @throws InvalidKeyException Thrown when cannot decrypt code.
      * @throws IllegalBlockSizeException Thrown when cannot decrypt code.
-     * @throws MalformedCodeException Thrown when cannot decrypt code.
      * @throws ExpiredCodeException Thrown when used code is expired.
      * @throws IllegalArgumentException Thrown when param "user" is NULL, when param "code" is NULL or empty.
      */
     void rejectAddAdmin(User user, String code) throws IllegalBlockSizeException, BadPaddingException,
-            InvalidKeyException, MalformedCodeException, ExpiredCodeException, InternalErrorException, CodeNotStoredException;
+            InvalidKeyException, ExpiredCodeException, InternalErrorException, CodeNotStoredException;
 
     /**
      * Get details for the given hash. The details can be then displayed on the page.

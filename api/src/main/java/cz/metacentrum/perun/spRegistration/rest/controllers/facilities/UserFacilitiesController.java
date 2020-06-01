@@ -4,7 +4,6 @@ import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredExcept
 import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.common.models.Facility;
 import cz.metacentrum.perun.spRegistration.common.models.LinkCode;
@@ -76,7 +75,7 @@ public class UserFacilitiesController {
 	public boolean addAdminConfirm(@SessionAttribute("user") User user,
 								   @RequestBody String code)
 			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
-			MalformedCodeException, InvalidKeyException, ConnectorException, InternalErrorException, CodeNotStoredException {
+			InvalidKeyException, ConnectorException, InternalErrorException, CodeNotStoredException {
 		log.trace("addAdminConfirm(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);
@@ -90,7 +89,7 @@ public class UserFacilitiesController {
 	public void addAdminReject(@SessionAttribute("user") User user,
 								   @RequestBody String code)
 			throws BadPaddingException, ExpiredCodeException, IllegalBlockSizeException,
-			MalformedCodeException, InvalidKeyException, InternalErrorException, CodeNotStoredException {
+			InvalidKeyException, InternalErrorException, CodeNotStoredException {
 		log.trace("addAdminReject(user: {}, code: {})", user, code);
 
 		code = ApiUtils.normalizeRequestBodyString(code);

@@ -8,7 +8,6 @@ import cz.metacentrum.perun.spRegistration.common.models.Request;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CannotChangeStatusException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.common.models.User;
 
@@ -134,14 +133,13 @@ public interface RequestsService {
      * @throws BadPaddingException Thrown when cannot decode code.
      * @throws InvalidKeyException Thrown when cannot decode code.
      * @throws IllegalBlockSizeException Thrown when cannot decode code.
-     * @throws MalformedCodeException Thrown when cannot decode code.
      * @throws ExpiredCodeException Thrown when code is expired.
      * @throws InternalErrorException Thrown when request cannot be found in DB.
      * @throws IllegalArgumentException Thrown when param "code" is NULL or empty.
      */
     Request getRequestForSignatureByCode(String code)
             throws ConnectorException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException,
-            MalformedCodeException, ExpiredCodeException, InternalErrorException;
+            ExpiredCodeException, InternalErrorException;
 
     /**
      * Approve request.

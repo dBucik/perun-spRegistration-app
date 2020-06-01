@@ -3,7 +3,6 @@ package cz.metacentrum.perun.spRegistration.service;
 import cz.metacentrum.perun.spRegistration.common.exceptions.CodeNotStoredException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
-import cz.metacentrum.perun.spRegistration.common.exceptions.MalformedCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
 import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
 
@@ -31,7 +30,7 @@ public interface UtilsService {
      * @param code code to be validated
      * @return True if valid, false otherwise
      */
-    boolean validateCode(String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, MalformedCodeException, ExpiredCodeException, CodeNotStoredException;
+    boolean validateCode(String code) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, ExpiredCodeException, CodeNotStoredException;
 
     boolean isFacilityAdmin(Long facilityId, Long userId) throws ConnectorException;
 
