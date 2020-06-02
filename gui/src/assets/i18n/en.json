@@ -108,6 +108,7 @@
     "SEE_FACILITY": "Service detail"
   },
   "FACILITIES": {
+    "IDENTIFIER": "ClientID/EntityID",
     "NAME": "Name",
     "DESCRIPTION": "Description",
     "DETAIL_TITLE" : "Service #",
