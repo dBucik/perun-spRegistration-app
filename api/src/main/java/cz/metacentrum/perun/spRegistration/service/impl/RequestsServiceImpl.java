@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import cz.metacentrum.perun.spRegistration.Utils;
 import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
 import cz.metacentrum.perun.spRegistration.common.configs.Config;
+import cz.metacentrum.perun.spRegistration.common.enums.AttributeCategory;
 import cz.metacentrum.perun.spRegistration.common.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.common.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ActiveRequestExistsException;
@@ -560,7 +561,9 @@ public class RequestsServiceImpl implements RequestsService {
         newName = Normalizer.normalize(newName, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
         newName = pattern.matcher(newName).replaceAll("_");
         newName = pattern2.matcher(newName).replaceAll("_");
-        String newDesc = newName + " registered via SP_REG, use app to manage configuration";
+        PerunAttribute clientId = generateClientIdAttribute();
+        String newDesc = ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute()) ?
+                clientId.valueAsString() : request.getAttributes().get(AttributeCategory.PROTOCOL).get(appConfig.getEntityIdAttribute()).valueAsString();
 
         if (Utils.checkParamsInvalid(newName)) {
             log.error("Wrong parameters passed: (newName: {})", newName);
@@ -595,13 +598,13 @@ public class RequestsServiceImpl implements RequestsService {
             ArrayNode attributes = request.getAttributesAsJsonArrayForPerun();
             if (ServiceUtils.isOidcRequest(request, appConfig.getEntityIdAttribute())) {
                 for (int i = 0; i < 10; i++) {
-                    PerunAttribute clientId = generateClientIdAttribute();
                     try {
                         perunConnector.setFacilityAttribute(facility.getId(), clientId.toJson());
                         break;
                     } catch (ConnectorException e) {
                         log.warn("Failed to set attribute clientId with value {} for facility {}",
                                 clientId.valueAsString(), facility.getId());
+                        clientId = generateClientIdAttribute();
                     }
                 }
 

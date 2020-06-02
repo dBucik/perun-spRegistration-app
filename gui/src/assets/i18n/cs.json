@@ -105,6 +105,7 @@
     "SEE_FACILITY": "Detail služby"
   },
   "FACILITIES": {
+    "IDENTIFIER": "ClientID/EntityID",
     "NAME": "Jméno",
     "DESCRIPTION": "Popis",
     "DETAIL_TITLE" : "Služba #",
