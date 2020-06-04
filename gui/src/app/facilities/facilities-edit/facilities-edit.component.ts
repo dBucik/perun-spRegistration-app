@@ -90,25 +90,27 @@ export class FacilitiesEditComponent implements OnInit {
     this.serviceItems.forEach(i => {
       if (!this.validate(i, perunAttributes)) {
         allGood = false;
+        this.showServiceMore = true;
       }
     });
     this.orgItems.forEach(i => {
       if (!this.validate(i, perunAttributes)) {
         allGood = false;
+        this.showOrganizationMore = true;
       }
     });
     this.protocolItems.forEach(i => {
       if (!this.validate(i, perunAttributes)) {
         allGood = false;
+        this.showProtocolMore = true;
       }
     });
     this.accessItems.forEach(i => {
       if (!this.validate(i, perunAttributes)) {
         allGood = false;
+        this.showAccessControlMore = true;
       }
     });
-
-    console.log(perunAttributes);
 
     if (!allGood) {
       return;
