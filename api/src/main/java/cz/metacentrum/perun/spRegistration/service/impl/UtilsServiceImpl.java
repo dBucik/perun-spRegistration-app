@@ -99,6 +99,10 @@ public class UtilsServiceImpl implements UtilsService {
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
         }
 
+        if (appConfig.isAppAdmin(userId)) {
+            return true;
+        }
+
         Set<Long> whereAdmin = perunConnector.getFacilityIdsWhereUserIsAdmin(userId);
 
         if (whereAdmin == null || whereAdmin.isEmpty()) {
