@@ -7,13 +7,17 @@ export class ApplicationItem {
     this.name = item.name;
 
     this.description = new Map<string, string>();
-    for (const k of Object.keys(item.description)) {
-      this.description.set(k, item.description[k]);
+    if (item.hasOwnProperty('description') && item.description) {
+      for (const k of Object.keys(item.description)) {
+        this.description.set(k, item.description[k]);
+      }
     }
 
     this.displayName = new Map<string, string>();
-    for (const k of Object.keys(item.displayName)) {
-      this.displayName.set(k.toLowerCase(), item.displayName[k]);
+    if (item.hasOwnProperty('displayName') && item.displayName) {
+      for (const k of Object.keys(item.displayName)) {
+        this.displayName.set(k.toLowerCase(), item.displayName[k]);
+      }
     }
 
     this.required = item.required;
