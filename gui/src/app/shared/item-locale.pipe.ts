@@ -12,6 +12,10 @@ export class ItemLocalePipe implements PipeTransform {
   transform(value: Map<string, string>, args?: any): any {
     const lang = this.translate.currentLang;
 
+    if (value === undefined || value === null) {
+      return '-';
+    }
+
     if (value.has(lang.toLowerCase())) {
       return value.get(lang.toLowerCase());
     }

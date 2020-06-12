@@ -11,14 +11,14 @@ export class Facility extends AttributesEntity {
     this.perunName = item.perunName;
     this.perunDescription = item.perunDescription;
     this.name = new Map<string, string>();
-    if (item.name) {
+    if (item.hasOwnProperty('name') && item.name) {
       for (const k of Object.keys(item.name)) {
         this.name.set(k.toLowerCase(), item.name[k]);
       }
     }
 
     this.description = new Map<string, string>();
-    if (item.description) {
+    if (item.hasOwnProperty('description') && item.description) {
       for (const k of Object.keys(item.description)) {
         this.description.set(k.toLowerCase(), item.description[k]);
       }
