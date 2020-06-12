@@ -8,7 +8,6 @@ import { PageConfig } from './core/models/PageConfig';
 import { User } from './core/models/User';
 import { PerunFooterCstComponent } from './perun-footer-cst/perun-footer-cst.component';
 import { PerunHeaderComponent } from './perun-header/perun-header.component';
-import {MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-root',
@@ -34,6 +33,8 @@ export class AppComponent implements OnInit {
       const browserLang = this.translate.getBrowserLang();
       if (this.langs.includes(browserLang)) {
         this.translate.use(browserLang);
+      } else {
+        this.translate.use(this.translate.getDefaultLang());
       }
 
       const storedLang = localStorage.getItem('lang');
