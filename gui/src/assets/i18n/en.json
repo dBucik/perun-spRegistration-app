@@ -105,7 +105,9 @@
     "ARE_YOU_SURE_SET_WFC": "Are you sure you want to set status to 'Waiting for changes'?",
     "NO_COMMENT": "Value is OK",
     "DETAIL_APPROVED": "Approved",
-    "SEE_FACILITY": "Service detail"
+    "SEE_FACILITY": "Service detail",
+    "OLD_VALUE": "Previous value",
+    "CHANGED_VAL_WARN": "A proposal has been made to change this value"
   },
   "FACILITIES": {
     "IDENTIFIER": "ClientID/EntityID",

@@ -2,23 +2,28 @@
   <ng-container [ngSwitch]="item.type">
     <!-- STRING -->
     <div *ngSwitchCase="'java.lang.String'" class="border-bottom p-3">
-      <detail-item-string [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"></detail-item-string>
+      <detail-item-string [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
+                          [displayOldVal]="shouldDisplayOldVal(item)"></detail-item-string>
     </div>
     <!-- LONG -->
     <div *ngSwitchCase="'java.lang.Long'" class="border-bottom p-3">
-      <detail-item-integer [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"></detail-item-integer>
+      <detail-item-integer [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
+                           [displayOldVal]="shouldDisplayOldVal(item)"></detail-item-integer>
     </div>
     <!-- BOOLEAN -->
     <div *ngSwitchCase="'java.lang.Boolean'" class="border-bottom p-3">
-      <detail-item-boolean [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"></detail-item-boolean>
+      <detail-item-boolean [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
+                           [displayOldVal]="shouldDisplayOldVal(item)"></detail-item-boolean>
     </div>
     <!-- MAP -->
     <div *ngSwitchCase="'java.util.LinkedHashMap'" class="border-bottom p-3">
-      <detail-item-map [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"></detail-item-map>
+      <detail-item-map [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
+                       [displayOldVal]="shouldDisplayOldVal(item)"></detail-item-map>
     </div>
     <!-- ARRAY -->
     <div *ngSwitchCase="'java.util.ArrayList'" class="border-bottom p-3">
-      <detail-item-array [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"></detail-item-array>
+      <detail-item-array [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
+                         [displayOldVal]="shouldDisplayOldVal(item)"></detail-item-array>
     </div>
   </ng-container>
 </div>

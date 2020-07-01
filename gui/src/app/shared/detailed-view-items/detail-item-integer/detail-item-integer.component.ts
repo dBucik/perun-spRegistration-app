@@ -11,6 +11,7 @@ export class DetailItemIntegerComponent {
   @Input() item: DetailViewItem = null;
   @Input() includeComment: boolean = false;
   @Input() isAppAdmin: boolean = false;
+  @Input() displayOldVal: boolean = false;
   @ViewChild('buttonComponent', {static: false}) public buttonComponent?;
 
 }

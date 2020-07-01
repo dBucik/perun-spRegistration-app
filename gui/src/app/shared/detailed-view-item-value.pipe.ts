@@ -8,7 +8,7 @@ export class DetailedViewItemValuePipe implements PipeTransform {
 
   private static emailRegex: RegExp = RegExp("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
 
-  private undefText = 'Undefined'
+  private undefText = 'Undefined';
 
   constructor(private translate: TranslateService) {
     this.translate.get('UNDEFINED').subscribe(val => this.undefText = val);
@@ -31,14 +31,15 @@ export class DetailedViewItemValuePipe implements PipeTransform {
   }
 
   private processStringOrNumber(value: any): any {
-    if (!value) {
-      return this.undefText
+    let finalVal = value;
+    if (!value || value === '_%UNDEFINED%_') {
+      finalVal = this.undefText;
+    } else {
+      finalVal = DetailedViewItemValuePipe.urlify(finalVal);
+      finalVal = DetailedViewItemValuePipe.mailize(finalVal);
     }
 
-    let part = value;
-    part = DetailedViewItemValuePipe.urlify(part);
-    part = DetailedViewItemValuePipe.mailize(part);
-    return part;
+    return `<span class="text-dark">${finalVal}</span>`;
   }
 
   private processObject(value: any): any {
@@ -48,12 +49,12 @@ export class DetailedViewItemValuePipe implements PipeTransform {
         let part = value[key];
         part = DetailedViewItemValuePipe.urlify(part);
         part = DetailedViewItemValuePipe.mailize(part);
-        output += `<li><span class="text-muted">${key}:</span> ${part}</li>`;
+        output += `<li><span class="text-dark">${key}:</span> ${part}</li>`;
       }
     } else {
       output = `<li>${this.undefText}</li>`;
     }
-    return `<ul class="m-0 pb-0">${output}</ul>`;
+    return `<ul class="m-0 pb-0 text-dark">${output}</ul>`;
   }
 
   private processArray(value: any): any {
@@ -64,19 +65,19 @@ export class DetailedViewItemValuePipe implements PipeTransform {
         let part = val;
         part = DetailedViewItemValuePipe.urlify(part);
         part = DetailedViewItemValuePipe.mailize(part);
-        output += `<li>${val}</li>`;
+        output += `<li>${part}</li>`;
       }
     } else {
       output = `<li>${this.undefText}</li>`;
     }
 
-    return `<ul class="m-0 pb-0">${output}</ul>`;
+    return `<ul class="m-0 pb-0 text-dark">${output}</ul>`;
   }
 
   private static urlify(text): string {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     return text.replace(urlRegex, function(url) {
-      return `<a href="${url}" target="_blank">${url}</a>`;
+      return `<a class="text-dark" href="${url}" target="_blank">${url}</a>`;
     });
   }
 

@@ -10,5 +10,9 @@ export class DetailedViewItemsComponent {
   @Input() attrs: DetailViewItem[] = [];
   @Input() isAppAdmin: boolean = false;
   @Input() includeComment: boolean = false;
+  @Input() displayOldVal: boolean = false;
 
+  shouldDisplayOldVal(item: DetailViewItem): boolean {
+    return this.displayOldVal && item.oldValue;
+  }
 }
