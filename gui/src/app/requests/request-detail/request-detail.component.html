@@ -67,22 +67,22 @@
           <mat-tab-group class="p-1">
             <!-- SERVICE -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.SERVICE' | translate }}">
-              <detailed-view-items [attrs]="requestAttrsService" [isAppAdmin]="isApplicationAdmin"
+              <detailed-view-items [attrs]="requestAttrsService" [isAppAdmin]="isApplicationAdmin" [displayOldVal]="request.action === 'UPDATE_FACILITY'"
                                    [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- ORGANIZATION -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.ORGANIZATION' | translate }}">
-              <detailed-view-items [attrs]="requestAttrsOrganization" [isAppAdmin]="isApplicationAdmin"
+              <detailed-view-items [attrs]="requestAttrsOrganization" [isAppAdmin]="isApplicationAdmin" [displayOldVal]="request.action === 'UPDATE_FACILITY'"
                                    [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- PROTOCOL -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.PROTOCOL' | translate }}">
-              <detailed-view-items [attrs]="requestAttrsProtocol" [isAppAdmin]="isApplicationAdmin"
+              <detailed-view-items [attrs]="requestAttrsProtocol" [isAppAdmin]="isApplicationAdmin" [displayOldVal]="request.action === 'UPDATE_FACILITY'"
                                    [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- ACCESS_CONTROL -->
             <mat-tab label="{{ 'COMMON.ATTRIBUTES.ACCESS_CONTROL' | translate }}">
-              <detailed-view-items [attrs]="requestAttrsAccessControl" [isAppAdmin]="isApplicationAdmin"
+              <detailed-view-items [attrs]="requestAttrsAccessControl" [isAppAdmin]="isApplicationAdmin" [displayOldVal]="request.action === 'UPDATE_FACILITY'"
                                    [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
           </mat-tab-group>

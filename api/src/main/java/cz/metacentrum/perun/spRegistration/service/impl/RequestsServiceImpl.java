@@ -148,9 +148,9 @@ public class RequestsServiceImpl implements RequestsService {
         for (PerunAttribute a: attributes) {
             if (actualAttrs.containsKey(a.getFullName())) {
                 PerunAttribute actualA = actualAttrs.get(a.getFullName());
-                if (!Objects.equals(actualA, a)) {
+                if (!actualA.equals(a)) {
                     attrsChanged = true;
-                    break;
+                    a.setOldValue(actualA.getValue() == null ? "_%UNDEFINED%_" : actualA.getValue());
                 }
             }
         }
@@ -158,6 +158,7 @@ public class RequestsServiceImpl implements RequestsService {
         if (!attrsChanged) {
             return null;
         }
+
 
         Request req = createRequest(facilityId, userId, RequestAction.UPDATE_FACILITY, attributes);
         if (req.getReqId() == null) {
