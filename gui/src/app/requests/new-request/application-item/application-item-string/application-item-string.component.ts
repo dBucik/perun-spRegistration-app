@@ -54,4 +54,8 @@ export class ApplicationItemStringComponent implements RequestItem, OnInit {
   ngOnInit(): void {
     this.value = this.applicationItem.oldValue;
   }
+
+  hasPattern(appItem: ApplicationItem): boolean {
+    return (appItem.regex && (appItem.regex !== 'URL'));
+  }
 }

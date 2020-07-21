@@ -4,8 +4,8 @@
       <mat-form-field class="w-100">
         <input #input="ngModel" [required]="applicationItem.required" id="{{applicationItem.name}}"
                [(ngModel)]="value"
-               [pattern]="((applicationItem.regex != undefined) && (applicationItem.regex.length > 0) && (applicationItem.regex !== 'URL')) ? applicationItem.regex : null"
-          [type] = "((applicationItem.regex != undefined) && (applicationItem.regex.length > 0) && (applicationItem.regex !== 'URL')) ? 'text' : 'url'"
+               [pattern]="hasPattern(applicationItem) ? applicationItem.regex : null"
+          [type] = "applicationItem.regex === 'URL' ? 'url' : 'text'"
           matInput placeholder="{{applicationItem.displayName | itemLocalePipe}}" name="{{applicationItem.name}}">
         <mat-hint [innerHTML]="applicationItem.description | itemLocalePipe"></mat-hint>
       </mat-form-field>

@@ -84,4 +84,8 @@ export class ApplicationItemListComponent implements RequestItem, OnInit {
       }
     }
   }
+
+  hasPattern(appItem: ApplicationItem): boolean {
+    return (appItem.regex && (appItem.regex !== 'URL'));
+  }
 }

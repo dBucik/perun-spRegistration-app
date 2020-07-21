@@ -21,8 +21,8 @@
             </mat-form-field>
             <mat-form-field class="w-100 mr-2 ml-2">
               <input matInput [required]="applicationItem.required" placeholder="{{'REQUESTS.VALUE' | translate}}"
-                     [pattern]="((applicationItem.regex != undefined) && (applicationItem.regex.length > 0) && (applicationItem.regex !== 'URL')) ? applicationItem.regex : null"
-                     [type] = "((applicationItem.regex != undefined) && (applicationItem.regex.length > 0) && (applicationItem.regex !== 'URL')) ? 'text' : 'url'"
+                     [pattern]="hasPattern(applicationItem) ? applicationItem.regex : null"
+                     [type] = "applicationItem.regex === 'URL' ? 'url' : 'text'"
                 name="value-{{i}}" id="{{applicationItem.name}}-value-{{i}}" [(ngModel)] = "values[i]">
             </mat-form-field>
             <button *ngIf="!disableCustomKeys" mat-icon-button color="warn" (click)="removeValue(i)">

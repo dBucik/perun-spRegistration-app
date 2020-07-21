@@ -12,7 +12,7 @@ import {TranslateService} from '@ngx-translate/core';
 })
 export class ApplicationItemMapComponent implements RequestItem, OnInit {
 
-  constructor(private translate: TranslateService) {
+  constructor() {
     this.keys = [];
     this.values = [];
     this.indexes = [];
@@ -27,9 +27,6 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   noItemError = false;
   duplicitKeysError = false;
   noValueError = false;
-
-  translatedName: string;
-  translatedDescription: string;
 
   disableCustomKeys = false;
 
@@ -162,6 +159,10 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     if (!this.hasCorrectValue() && this.values.length === 0) {
       this.noItemError = true;
     }
+  }
+
+  hasPattern(appItem: ApplicationItem): boolean {
+    return (appItem.regex && (appItem.regex !== 'URL'));
   }
 
 }
