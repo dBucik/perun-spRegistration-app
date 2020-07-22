@@ -98,7 +98,7 @@ export class NewRequestComponent implements OnInit {
       console.log(error);
     });
 
-    this.translate.get('REQUESTS.NEW_VALUES_ERROR_MESSAGE')
+    this.translate.get('REQUESTS.ERRORS.VALUES_ERROR_MESSAGE')
       .subscribe(value => this.errorText = value);
     this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED')
       .subscribe(value => this.successActionText = value);

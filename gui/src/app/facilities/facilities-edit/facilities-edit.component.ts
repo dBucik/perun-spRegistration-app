@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ConfigService} from '../../core/services/config.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {TranslateService} from '@ngx-translate/core';
-import {ApplicationItemComponent} from '../../requests/new-request/application-item/application-item.component';
+import {RequestInputItemComponent} from '../../shared/request-input-item/request-input-item.component';
 import {ApplicationItem} from '../../core/models/ApplicationItem';
 import {FacilitiesService} from '../../core/services/facilities.service';
 import {Facility} from '../../core/models/Facility';
@@ -26,10 +26,10 @@ export class FacilitiesEditComponent implements OnInit {
     private router: Router) {
   }
 
-  @ViewChildren('serviceItems') serviceItems: QueryList<ApplicationItemComponent>;
-  @ViewChildren('orgItems') orgItems: QueryList<ApplicationItemComponent>;
-  @ViewChildren('protocolItems') protocolItems: QueryList<ApplicationItemComponent>;
-  @ViewChildren('accessItems') accessItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('serviceItems') serviceItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('orgItems') orgItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('protocolItems') protocolItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('accessItems') accessItems: QueryList<RequestInputItemComponent>;
 
   private sub: any;
   isFormVisible = false;
@@ -129,7 +129,7 @@ export class FacilitiesEditComponent implements OnInit {
     });
   }
 
-  private validate(i : ApplicationItemComponent, perunAttributes: PerunAttribute[]): boolean {
+  private validate(i : RequestInputItemComponent, perunAttributes: PerunAttribute[]): boolean {
     const attr = i.getAttribute();
     const perunAttr = new UrnValuePair(attr.value, attr.urn);
     if (!i.hasCorrectValue()) {

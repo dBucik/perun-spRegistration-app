@@ -1,7 +1,7 @@
-<app-application-item
+<request-input-item
   *ngFor="let appItem of applicationItems"
   [applicationItem]="appItem">
-</app-application-item>
+</request-input-item>
 <div class="mt-5">
   <button mat-raised-button [disabled]="stepper != undefined && stepper.selectedIndex === 0" (click)="previousStep()">
     {{"REQUESTS.PREVIOUS_STEP" | translate}}

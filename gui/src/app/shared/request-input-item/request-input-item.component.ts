@@ -1,34 +1,34 @@
-import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
-import {ApplicationItem} from '../../../core/models/ApplicationItem';
-import {RequestItem} from '../../../core/models/RequestItem';
-import {Attribute} from '../../../core/models/Attribute';
-import {ApplicationItemStringComponent} from './application-item-string/application-item-string.component';
-import {ApplicationItemBooleanComponent} from './application-item-boolean/application-item-boolean.component';
-import {ApplicationItemListComponent} from './application-item-list/application-item-list.component';
-import {ApplicationItemMapComponent} from './application-item-map/application-item-map.component';
-import {ApplicationItemSelectComponent} from './application-item-select/application-item-select.component';
+import {AfterViewInit, Component, Input, ViewChild} from '@angular/core';
+import {ApplicationItem} from '../../core/models/ApplicationItem';
+import {RequestItem} from '../../core/models/RequestItem';
+import {Attribute} from '../../core/models/Attribute';
+import {RequestInputItemStringComponent} from './request-input-item-string/request-input-item-string.component';
+import {RequestItemInputBooleanComponent} from './request-input-item-boolean/request-item-input-boolean.component';
+import {RequestItemInputListComponent} from './request-input-item-list/request-item-input-list.component';
+import {ApplicationItemMapComponent} from './request-input-item-map/application-item-map.component';
+import {RequestItemInputSelectComponent} from './request-input-item-select/request-item-input-select.component';
 
 @Component({
-  selector: 'app-application-item',
-  templateUrl: './application-item.component.html',
-  styleUrls: ['./application-item.component.scss']
+  selector: 'request-input-item',
+  templateUrl: './request-input-item.component.html',
+  styleUrls: ['./request-input-item.component.scss']
 })
-export class ApplicationItemComponent implements RequestItem, AfterViewInit {
+export class RequestInputItemComponent implements RequestItem, AfterViewInit {
 
   constructor() { }
 
   @Input()
   applicationItem: ApplicationItem;
 
-  @ViewChild(ApplicationItemStringComponent, {static: false})
+  @ViewChild(RequestInputItemStringComponent, {static: false})
   stringItem: RequestItem;
-  @ViewChild(ApplicationItemBooleanComponent, {static: false})
+  @ViewChild(RequestItemInputBooleanComponent, {static: false})
   booleanItem: RequestItem;
-  @ViewChild(ApplicationItemListComponent, {static: false})
+  @ViewChild(RequestItemInputListComponent, {static: false})
   listItem: RequestItem;
   @ViewChild(ApplicationItemMapComponent, {static: false})
   mapItem: RequestItem;
-  @ViewChild(ApplicationItemSelectComponent, {static: false})
+  @ViewChild(RequestItemInputSelectComponent, {static: false})
   selectItem: RequestItem;
 
   item: RequestItem;

@@ -39,7 +39,7 @@
           <div class="row pl-3 pr-3">
             <div class="col" [style.display]="(serviceAttrs.length > 0 && showServiceMore) ? 'block' : 'none'">
               <ng-container *ngFor="let applicationItems of serviceAttrs">
-                <app-application-item #serviceItems [applicationItem]="applicationItems"></app-application-item>
+                <request-input-item #serviceItems [applicationItem]="applicationItems"></request-input-item>
               </ng-container>
             </div>
           </div>
@@ -60,7 +60,7 @@
           <div class="row pl-3 pr-3">
             <div class="col" [style.display]="(organizationAttrs.length > 0 && showOrganizationMore) ? 'block' : 'none'">
               <ng-container *ngFor="let applicationItems of organizationAttrs">
-                <app-application-item #orgItems [applicationItem]="applicationItems"></app-application-item>
+                <request-input-item #orgItems [applicationItem]="applicationItems"></request-input-item>
               </ng-container>
             </div>
           </div>
@@ -81,7 +81,7 @@
           <div class="row pl-3 pr-3">
             <div class="col" [style.display]="(protocolAttrs.length > 0 && showProtocolMore) ? 'block' : 'none'">
               <ng-container *ngFor="let applicationItems of protocolAttrs">
-                <app-application-item #protocolItems [applicationItem]="applicationItems"></app-application-item>
+                <request-input-item #protocolItems [applicationItem]="applicationItems"></request-input-item>
               </ng-container>
             </div>
           </div>
@@ -102,7 +102,7 @@
           <div class="row pl-3 pr-3">
             <div class="col" [style.display]="(accessControlAttrs.length > 0 && showAccessControlMore) ? 'block' : 'none'">
               <ng-container *ngFor="let applicationItems of accessControlAttrs">
-                <app-application-item #accessItems [applicationItem]="applicationItems"></app-application-item>
+                <request-input-item #accessItems [applicationItem]="applicationItems"></request-input-item>
               </ng-container>
             </div>
           </div>
