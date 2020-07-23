@@ -31,12 +31,12 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { ErrorDialogComponent } from './error-dialog/error-dialog.component';
 import { NotFoundPageComponent } from './not-found-page/not-found-page.component';
 import { NotAuthorizedPageComponent } from './not-authorized-page/not-authorized-page.component';
-import {ApplicationItemComponent} from "../requests/new-request/application-item/application-item.component";
-import {ApplicationItemStringComponent} from "../requests/new-request/application-item/application-item-string/application-item-string.component";
-import {ApplicationItemBooleanComponent} from "../requests/new-request/application-item/application-item-boolean/application-item-boolean.component";
-import {ApplicationItemListComponent} from "../requests/new-request/application-item/application-item-list/application-item-list.component";
-import {ApplicationItemMapComponent} from "../requests/new-request/application-item/application-item-map/application-item-map.component";
-import {ApplicationItemSelectComponent} from "../requests/new-request/application-item/application-item-select/application-item-select.component";
+import {RequestInputItemComponent} from "./request-input-item/request-input-item.component";
+import {RequestInputItemStringComponent} from "./request-input-item/request-input-item-string/request-input-item-string.component";
+import {RequestItemInputBooleanComponent} from "./request-input-item/request-input-item-boolean/request-item-input-boolean.component";
+import {RequestItemInputListComponent} from "./request-input-item/request-input-item-list/request-item-input-list.component";
+import {ApplicationItemMapComponent} from "./request-input-item/request-input-item-map/application-item-map.component";
+import {RequestItemInputSelectComponent} from "./request-input-item/request-input-item-select/request-item-input-select.component";
 import {DetailItemSubCommentButtonComponent} from "./detailed-view-items/detail-item-sub-comment/detail-item-sub-comment-button/detail-item-sub-comment-button.component";
 import {DetailItemSubCommentUserComponent} from "./detailed-view-items/detail-item-sub-comment/detail-item-sub-comment-user/detail-item-sub-comment-user.component";
 import {DetailItemSubCommentAdminComponent} from "./detailed-view-items/detail-item-sub-comment/detail-item-sub-comment-admin/detail-item-sub-comment-admin.component";
@@ -49,6 +49,7 @@ import {DetailItemArrayComponent} from "./detailed-view-items/detail-item-array/
 import {DetailedViewItemsComponent} from "./detailed-view-items/detailed-view-items.component";
 import {DetailedViewItemValuePipe} from "./detailed-view-item-value.pipe";
 import {ItemLocalePipe} from "./item-locale.pipe";
+import {RequestItemInputErrorComponent} from "./request-input-item/request-input-item-error/request-item-input-error.component";
 
 @NgModule({
   imports: [
@@ -86,12 +87,13 @@ import {ItemLocalePipe} from "./item-locale.pipe";
     ErrorDialogComponent,
     NotFoundPageComponent,
     NotAuthorizedPageComponent,
-    ApplicationItemComponent,
-    ApplicationItemStringComponent,
-    ApplicationItemBooleanComponent,
-    ApplicationItemListComponent,
+    RequestInputItemComponent,
+    RequestInputItemStringComponent,
+    RequestItemInputBooleanComponent,
+    RequestItemInputListComponent,
     ApplicationItemMapComponent,
-    ApplicationItemSelectComponent,
+    RequestItemInputSelectComponent,
+    RequestItemInputErrorComponent,
     DetailedViewItemsComponent,
     DetailItemArrayComponent,
     DetailItemBooleanComponent,
@@ -135,7 +137,7 @@ import {ItemLocalePipe} from "./item-locale.pipe";
         MatMenuModule,
         MatMenuModule,
         MatBadgeModule,
-        ApplicationItemComponent,
+        RequestInputItemComponent,
         DetailedViewItemsComponent,
         DetailItemArrayComponent,
         DetailItemBooleanComponent,

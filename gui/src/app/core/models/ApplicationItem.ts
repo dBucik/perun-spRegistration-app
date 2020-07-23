@@ -61,4 +61,17 @@ export class ApplicationItem {
       return this.description.get('en');
     }
   }
+
+  public hasComment(): boolean {
+    return this.comment !== undefined
+      && this.comment !== null
+      && this.comment.trim().length > 0;
+  }
+
+  public hasRegex(): boolean {
+    return this.regex !== undefined &&
+           this.regex !== null &&
+           this.regex.trim().length > 0 &&
+           this.regex !== 'URL'
+  }
 }

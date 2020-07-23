@@ -6,7 +6,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {TranslateService} from "@ngx-translate/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Request} from "../../core/models/Request";
-import {ApplicationItemComponent} from "../new-request/application-item/application-item.component";
+import {RequestInputItemComponent} from "../../shared/request-input-item/request-input-item.component";
 import {UrnValuePair} from "../../core/models/UrnValuePair";
 import {PerunAttribute} from "../../core/models/PerunAttribute";
 
@@ -25,14 +25,14 @@ export class RequestEditComponent implements OnInit {
     private translate: TranslateService,
     private router: Router) { }
 
-  @ViewChildren('commentedServiceItems') commentedServiceItems: QueryList<ApplicationItemComponent>;
-  @ViewChildren('serviceItems') serviceItems: QueryList<ApplicationItemComponent>;
-  @ViewChildren('commentedOrgItems') commentedOrgItems: QueryList<ApplicationItemComponent>;
-  @ViewChildren('orgItems') orgItems: QueryList<ApplicationItemComponent>;
-  @ViewChildren('commentedProtocolItems') commentedProtocolItems: QueryList<ApplicationItemComponent>;
-  @ViewChildren('protocolItems') protocolItems: QueryList<ApplicationItemComponent>;
-  @ViewChildren('commentedAccessItems') commentedAccessItems: QueryList<ApplicationItemComponent>;
-  @ViewChildren('accessItems') accessItems: QueryList<ApplicationItemComponent>;
+  @ViewChildren('commentedServiceItems') commentedServiceItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('serviceItems') serviceItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('commentedOrgItems') commentedOrgItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('orgItems') orgItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('commentedProtocolItems') commentedProtocolItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('protocolItems') protocolItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('commentedAccessItems') commentedAccessItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('accessItems') accessItems: QueryList<RequestInputItemComponent>;
 
   private sub: any;
   loading = true;
@@ -62,7 +62,7 @@ export class RequestEditComponent implements OnInit {
 
   ngOnInit() {
     this.clearArrays();
-    this.translate.get('REQUESTS.NEW_VALUES_ERROR_MESSAGE')
+    this.translate.get('REQUESTS.ERRORS.VALUES_ERROR_MESSAGE')
       .subscribe(value => this.errorText = value);
     this.translate.get('REQUESTS.SUCCESSFULLY_SUBMITTED')
       .subscribe(value => this.successActionText = value);
@@ -75,7 +75,29 @@ export class RequestEditComponent implements OnInit {
     this.isFormVisible = true;
   }
 
+  hasCorrectValues(): boolean {
+    let res = true;
+    this.serviceItems.forEach(i => { if (!i.hasCorrectValue()) { res = false; }});
+    this.commentedServiceItems.forEach(i => { if (!i.hasCorrectValue()) { res = false; }});
+    this.orgItems.forEach(i => { if (!i.hasCorrectValue()) { res = false; }});
+    this.commentedOrgItems.forEach(i => { if (!i.hasCorrectValue()) { res = false; }});
+    this.protocolItems.forEach(i => { if (!i.hasCorrectValue()) { res = false; }});
+    this.commentedProtocolItems.forEach(i => { if (!i.hasCorrectValue()) { res = false; }});
+    this.accessItems.forEach(i => { if (!i.hasCorrectValue()) { res = false; }});
+    this.commentedAccessItems.forEach(i => { if (!i.hasCorrectValue()) { res = false; }});
+
+    return res;
+  }
+
   submitRequest() {
+    console.log("Submit")
+    if (!this.hasCorrectValues()) {
+      console.log("false");
+      return;
+    }
+
+    console.log("true");
+
     this.loading = true;
 
     let perunAttributes: UrnValuePair[] = [];
@@ -200,7 +222,7 @@ export class RequestEditComponent implements OnInit {
     }
   }
 
-  private static pushAttr(i: ApplicationItemComponent, perunAttributes: PerunAttribute[]) {
+  private static pushAttr(i: RequestInputItemComponent, perunAttributes: PerunAttribute[]) {
     let attr = i.getAttribute();
     let perunAttr = new UrnValuePair(attr.value, attr.urn);
     perunAttributes.push(perunAttr);
