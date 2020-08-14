@@ -23,8 +23,8 @@
     <div class="col-sm-11 pr-0">
       <mat-form-field class="w-100">
         <input matInput [required]="this.applicationItem.required" placeholder="{{'REQUESTS.VALUE' | translate}}"
-               [pattern]="hasInputRegex(applicationItem) ? applicationItem.regex : null"
-               [type] = "applicationItem.regex === 'URL' ? 'url' : 'text'"
+               [pattern]="hasInputRegex(this.applicationItem) ? this.applicationItem.regex : null"
+               [type] = "this.applicationItem.regex === 'URL' ? 'url' : 'text'"
                name="value-{{i}}" id="{{applicationItem.name}}-{{i}}" [(ngModel)]="values[i]">
       </mat-form-field>
     </div>

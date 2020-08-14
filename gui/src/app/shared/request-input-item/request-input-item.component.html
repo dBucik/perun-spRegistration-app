@@ -13,11 +13,11 @@
     </request-input-item-boolean>
 
     <!-- ArrayList without allowed values-->
-    <request-item-input-map
+    <request-item-input-list
       [applicationItem]="applicationItem"
       *ngIf="(applicationItem.type === 'java.util.ArrayList' || applicationItem.type === 'java.util.LargeArrayList')
       && (applicationItem.allowedValues === null || applicationItem.allowedValues.length === 0)">
-    </request-item-input-map>
+    </request-item-input-list>
 
     <!-- ArrayList with allowed values-->
     <request-item-input-select
@@ -27,10 +27,10 @@
     </request-item-input-select>
 
     <!-- HashMap -->
-    <app-application-item-map
+    <request-application-item-map
       [applicationItem]="applicationItem"
       *ngIf="applicationItem.type === 'java.util.LinkedHashMap'">
-    </app-application-item-map>
+    </request-application-item-map>
   </div>
   <div *ngIf="applicationItem.isEdit" class="col-4">
     <div *ngIf="applicationItem.comment" class="alert alert-warning" role="alert">
