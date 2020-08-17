@@ -27,7 +27,12 @@ export class RequestItemInputSelectComponent implements RequestItem, OnInit {
   expectedValueChangedError: boolean = false;
 
   ngOnInit(): void {
-    this.values = this.applicationItem.oldValue;
+    if (this.applicationItem.oldValue != null) {
+      const array: string[] = this.applicationItem.oldValue;
+      for (const value of array) {
+        this.values.push(value);
+      }
+    }
   }
 
   getAttribute(): Attribute {
@@ -40,7 +45,7 @@ export class RequestItemInputSelectComponent implements RequestItem, OnInit {
       if (this.applicationItem.required) {
         this.form.form.setErrors({'incorrect' : true});
         this.missingValueError = true;
-        return false
+        return false;
       }
     } else {
       if (!RequestItemInputSelectComponent.requestedChangeHasBeenMade(this.applicationItem, this.values)) {

@@ -6,7 +6,7 @@ import {NgForm} from '@angular/forms';
 import {hasOwnProperty} from "tslint/lib/utils";
 
 @Component({
-  selector: 'app-application-item-map',
+  selector: 'request-application-item-map',
   templateUrl: './application-item-map.component.html',
   styleUrls: ['./application-item-map.component.scss']
 })

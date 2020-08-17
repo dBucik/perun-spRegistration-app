@@ -90,13 +90,9 @@ export class RequestEditComponent implements OnInit {
   }
 
   submitRequest() {
-    console.log("Submit")
     if (!this.hasCorrectValues()) {
-      console.log("false");
       return;
     }
-
-    console.log("true");
 
     this.loading = true;
 

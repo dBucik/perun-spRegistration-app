@@ -5,7 +5,7 @@ import {Attribute} from '../../../core/models/Attribute';
 import {NgForm} from '@angular/forms';
 
 @Component({
-  selector: 'request-item-input-map',
+  selector: 'request-item-input-list',
   templateUrl: './request-item-input-list.component.html',
   styleUrls: ['./request-item-input-list.component.scss']
 })
@@ -27,7 +27,10 @@ export class RequestItemInputListComponent implements RequestItem, OnInit {
 
   ngOnInit(): void {
     if (this.applicationItem.oldValue != null) {
-      this.values = this.applicationItem.oldValue;
+      const array: string[] = this.applicationItem.oldValue;
+      for (const value of array) {
+        this.values.push(value);
+      }
     }
 
     if (this.applicationItem.required && this.values.length === 0) {
@@ -53,6 +56,9 @@ export class RequestItemInputListComponent implements RequestItem, OnInit {
 
   hasCorrectValue(): boolean {
     this.resetErrors();
+    console.log(this.applicationItem.oldValue);
+
+    console.log(this.values);
     if (!RequestItemInputListComponent.hasValue(this.values)) {
       if (this.applicationItem.required) {
         this.form.form.setErrors({'incorrect' : true});
