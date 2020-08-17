@@ -3,7 +3,7 @@ import {ApplicationItem} from '../../../core/models/ApplicationItem';
 import {RequestItem} from '../../../core/models/RequestItem';
 import {Attribute} from '../../../core/models/Attribute';
 import {NgForm} from '@angular/forms';
-import {hasOwnProperty} from "tslint/lib/utils";
+import {hasOwnProperty} from 'tslint/lib/utils';
 
 @Component({
   selector: 'request-application-item-map',

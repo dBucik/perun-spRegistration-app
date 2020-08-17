@@ -1,29 +1,37 @@
 <div *ngFor="let item of attrs">
-  <ng-container [ngSwitch]="item.type">
+  <div class="border-bottom p-3">
+    <ng-container [ngSwitch]="item.type">
     <!-- STRING -->
-    <div *ngSwitchCase="'java.lang.String'" class="border-bottom p-3">
-      <detail-item-string [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
-                          [displayOldVal]="shouldDisplayOldVal(item)"></detail-item-string>
-    </div>
-    <!-- LONG -->
-    <div *ngSwitchCase="'java.lang.Long'" class="border-bottom p-3">
-      <detail-item-integer [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
-                           [displayOldVal]="shouldDisplayOldVal(item)"></detail-item-integer>
-    </div>
-    <!-- BOOLEAN -->
-    <div *ngSwitchCase="'java.lang.Boolean'" class="border-bottom p-3">
-      <detail-item-boolean [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
-                           [displayOldVal]="shouldDisplayOldVal(item)"></detail-item-boolean>
-    </div>
-    <!-- MAP -->
-    <div *ngSwitchCase="'java.util.LinkedHashMap'" class="border-bottom p-3">
-      <detail-item-map [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
-                       [displayOldVal]="shouldDisplayOldVal(item)"></detail-item-map>
-    </div>
-    <!-- ARRAY -->
-    <div *ngSwitchCase="'java.util.ArrayList'" class="border-bottom p-3">
-      <detail-item-array [item]="item" [isAppAdmin]="isAppAdmin" [includeComment]="includeComment"
-                         [displayOldVal]="shouldDisplayOldVal(item)"></detail-item-array>
-    </div>
-  </ng-container>
+      <detail-item-string *ngSwitchCase="'java.lang.String'"
+                          class="toggleable"
+                          [item]="item"
+                          [isAppAdmin]="isAppAdmin"
+                          [includeComment]="includeComment"
+                          [displayOldVal]="item.shouldDisplayOldVal(displayOldVal)"></detail-item-string>
+      <!-- LONG -->
+      <detail-item-integer *ngSwitchCase="'java.lang.Long'"
+                           [item]="item"
+                           [isAppAdmin]="isAppAdmin"
+                           [includeComment]="includeComment"
+                           [displayOldVal]="item.shouldDisplayOldVal(displayOldVal)"></detail-item-integer>
+      <!-- BOOLEAN -->
+      <detail-item-boolean *ngSwitchCase="'java.lang.Boolean'"
+                           [item]="item"
+                           [isAppAdmin]="isAppAdmin"
+                           [includeComment]="includeComment"
+                           [displayOldVal]="item.shouldDisplayOldVal(displayOldVal)"></detail-item-boolean>
+      <!-- MAP -->
+      <detail-item-map *ngSwitchCase="'java.util.LinkedHashMap'"
+                       [item]="item"
+                       [isAppAdmin]="isAppAdmin"
+                       [includeComment]="includeComment"
+                       [displayOldVal]="item.shouldDisplayOldVal(displayOldVal)"></detail-item-map>
+      <!-- ARRAY -->
+      <detail-item-array *ngSwitchCase="'java.util.ArrayList'"
+                         [item]="item"
+                         [isAppAdmin]="isAppAdmin"
+                         [includeComment]="includeComment"
+                         [displayOldVal]="item.shouldDisplayOldVal(displayOldVal)"></detail-item-array>
+    </ng-container>
+  </div>
 </div>
