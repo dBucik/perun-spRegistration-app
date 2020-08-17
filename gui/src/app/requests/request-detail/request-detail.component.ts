@@ -1,23 +1,23 @@
-import {Component, DoCheck, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute, Router} from "@angular/router";
-import {RequestsService} from "../../core/services/requests.service";
-import {Subscription} from "rxjs";
-import {Request} from "../../core/models/Request";
-import {NgModel} from "@angular/forms";
-import {PerunAttribute} from "../../core/models/PerunAttribute";
-import { MatDialog } from "@angular/material/dialog";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import {TranslateService} from "@ngx-translate/core";
-import {AppComponent} from "../../app.component";
-import {RequestSignature} from "../../core/models/RequestSignature";
-import {RequestDetailDialogComponent} from "./request-detail-dialog/request-detail-dialog.component";
-import {DetailViewItem} from "../../core/models/items/DetailViewItem";
-import {DetailedViewItemsComponent} from "../../shared/detailed-view-items/detailed-view-items.component";
+import {Component, DoCheck, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {RequestsService} from '../../core/services/requests.service';
+import {Subscription} from 'rxjs';
+import {Request} from '../../core/models/Request';
+import {NgModel} from '@angular/forms';
+import {PerunAttribute} from '../../core/models/PerunAttribute';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {TranslateService} from '@ngx-translate/core';
+import {AppComponent} from '../../app.component';
+import {RequestSignature} from '../../core/models/RequestSignature';
+import {RequestDetailDialogComponent} from './request-detail-dialog/request-detail-dialog.component';
+import {DetailViewItem} from '../../core/models/items/DetailViewItem';
+import {DetailedViewItemsComponent} from '../../shared/detailed-view-items/detailed-view-items.component';
 
 export interface DialogData {
   isApprove: boolean;
   isSetWFC: boolean;
-  parent: RequestDetailComponent,
+  parent: RequestDetailComponent;
 }
 
 @Component({
@@ -25,7 +25,7 @@ export interface DialogData {
   templateUrl: './request-detail.component.html',
   styleUrls: ['./request-detail.component.scss']
 })
-export class RequestDetailComponent implements OnInit, DoCheck {
+export class RequestDetailComponent implements OnInit, DoCheck, OnDestroy {
 
   constructor(
     public dialog: MatDialog,
@@ -36,13 +36,16 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     private router: Router
   ) { }
 
-  @ViewChild(DetailedViewItemsComponent, {static: false}) detailedViewItemsComponent: DetailedViewItemsComponent;
-
   private sub: Subscription;
   requestAttrsService: DetailViewItem[] = [];
   requestAttrsOrganization: DetailViewItem[] = [];
   requestAttrsProtocol: DetailViewItem[] = [];
   requestAttrsAccessControl: DetailViewItem[] = [];
+
+  serviceChangedCnt = Number(0);
+  organizationChangedCnt = Number(0);
+  protocolChangedCnt = Number(0);
+  accessControlChangedCnt = Number(0);
 
   displayedColumns: string[] = ['name', 'value'];
 
@@ -50,8 +53,8 @@ export class RequestDetailComponent implements OnInit, DoCheck {
   request: Request;
   signatures: RequestSignature[];
   columns: string[] = ['name', 'signedAt', 'approved'];
-  expansionPanelDisabled: boolean = true;
-  icon: boolean = true;
+  expansionPanelDisabled = true;
+  icon = true;
 
   @ViewChild('input', {static: false})
   inputField: NgModel;
@@ -62,19 +65,44 @@ export class RequestDetailComponent implements OnInit, DoCheck {
   noCommentErrorMessage: string;
 
   isApplicationAdmin: boolean;
+  filterChangedOnly = false;
+
+  private static sortItems(items: DetailViewItem[]): DetailViewItem[] {
+    items.sort((a, b) => {
+      return a.position - b.position;
+    });
+
+    return items;
+  }
 
   private mapAttributes() {
     this.request.serviceAttrs().forEach((attr, _) => {
-      this.requestAttrsService.push(new DetailViewItem(attr));
+      const item = new DetailViewItem(attr);
+      if (item.shouldDisplayOldVal(true)) {
+        this.serviceChangedCnt++;
+      }
+      this.requestAttrsService.push(item);
     });
     this.request.organizationAttrs().forEach((attr, _) => {
-      this.requestAttrsOrganization.push(new DetailViewItem(attr));
+      const item = new DetailViewItem(attr);
+      if (item.shouldDisplayOldVal(true)) {
+        this.organizationChangedCnt++;
+      }
+      this.requestAttrsOrganization.push(item);
     });
     this.request.protocolAttrs().forEach((attr, _) => {
-      this.requestAttrsProtocol.push(new DetailViewItem(attr));
+      const item = new DetailViewItem(attr);
+      if (item.shouldDisplayOldVal(true)) {
+        this.protocolChangedCnt++;
+      }
+      this.requestAttrsProtocol.push(item);
     });
     this.request.accessControlAttrs().forEach((attr, _) => {
-      this.requestAttrsAccessControl.push(new DetailViewItem(attr));
+      const item = new DetailViewItem(attr);
+      if (item.shouldDisplayOldVal(true)) {
+        this.accessControlChangedCnt++;
+      }
+      this.requestAttrsAccessControl.push(item);
     });
 
     this.requestAttrsService = RequestDetailComponent.sortItems(this.requestAttrsService);
@@ -90,7 +118,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
         this.mapAttributes();
         this.requestsService.getSignatures(this.request.reqId).subscribe(signatures => {
           this.signatures = signatures.map(s => new RequestSignature(s));
-          if (this.signatures.length != 0){
+          if (this.signatures.length !== 0) {
             this.expansionPanelDisabled = false;
           }
           this.loading = false;
@@ -100,10 +128,10 @@ export class RequestDetailComponent implements OnInit, DoCheck {
         console.log(error);
       });
     });
-    this.translate.get("COMMON.ERROR").subscribe(value => this.noCommentErrorMessage = value);
-    this.translate.get("REQUESTS.REJECTED").subscribe(value => this.successRejectMessage = value);
-    this.translate.get("REQUESTS.APPROVED").subscribe(value => this.successApproveMessage = value);
-    this.translate.get("REQUESTS.SET_WFC").subscribe(value => this.successSetWFCMessage = value);
+    this.translate.get('COMMON.ERROR').subscribe(value => this.noCommentErrorMessage = value);
+    this.translate.get('REQUESTS.REJECTED').subscribe(value => this.successRejectMessage = value);
+    this.translate.get('REQUESTS.APPROVED').subscribe(value => this.successApproveMessage = value);
+    this.translate.get('REQUESTS.SET_WFC').subscribe(value => this.successSetWFCMessage = value);
     this.isApplicationAdmin = AppComponent.isApplicationAdmin();
   }
 
@@ -142,7 +170,7 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     });
   }
 
-  onLoading() : void {
+  onLoading(): void {
     this.loading = true;
   }
 
@@ -150,21 +178,21 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     this.requestsService.rejectRequest(this.request.reqId).subscribe(_ => {
       this.loading = false;
       this.snackBar.open(this.successRejectMessage, null, {duration: 6000});
-      this.router.navigate(['/auth/requests/allRequests']);
+      this.router.navigate(['/auth/requests/allRequests']).then();
     }, error => {
-      console.log("Error");
+      console.log('Error');
       console.log(error);
     });
 
   }
 
   approve() {
-    this.requestsService.approveRequest(this.request.reqId).subscribe(bool => {
+    this.requestsService.approveRequest(this.request.reqId).subscribe(_ => {
       this.loading = false;
       this.snackBar.open(this.successApproveMessage, null, {duration: 6000});
-      this.router.navigate(['/auth/requests/allRequests']);
+      this.router.navigate(['/auth/requests/allRequests']).then();
     }, error => {
-      console.log("Error");
+      console.log('Error');
       console.log(error);
     });
   }
@@ -176,9 +204,9 @@ export class RequestDetailComponent implements OnInit, DoCheck {
     this.requestsService.askForChanges(this.request.reqId, array).subscribe(_ => {
       this.loading = false;
       this.snackBar.open(this.successSetWFCMessage, null, {duration: 6000});
-      this.ngOnInit()
+      this.ngOnInit();
     }, error => {
-      console.log("Error");
+      console.log('Error');
       console.log(error);
     });
   }
@@ -199,25 +227,25 @@ export class RequestDetailComponent implements OnInit, DoCheck {
   }
 
   generateCommentedItems(): Array<PerunAttribute> {
-    let array: Array<PerunAttribute> = [];
+    const array: Array<PerunAttribute> = [];
     Array.from(this.request.serviceAttrs().values()).forEach(attr => {
       if (attr.comment && attr.comment.trim()) {
-        array.push(attr)
+        array.push(attr);
       }
     });
     Array.from(this.request.organizationAttrs().values()).forEach(attr => {
       if (attr.comment && attr.comment.trim()) {
-        array.push(attr)
+        array.push(attr);
       }
     });
     Array.from(this.request.protocolAttrs().values()).forEach(attr => {
       if (attr.comment && attr.comment.trim()) {
-        array.push(attr)
+        array.push(attr);
       }
     });
     Array.from(this.request.accessControlAttrs().values()).forEach(attr => {
       if (attr.comment && attr.comment.trim()) {
-        array.push(attr)
+        array.push(attr);
       }
     });
 
@@ -225,30 +253,26 @@ export class RequestDetailComponent implements OnInit, DoCheck {
   }
 
   isUndefined(value: any) {
-    //TODO: extract to one common method, also used in facility-detail
+    // TODO: extract to one common method, also used in facility-detail
     if (value === undefined || value === null) {
       return true;
     } else {
       if (value instanceof Array || value instanceof String) {
         return value.length === 0;
       } else if (value instanceof Object) {
-        return value.constructor === Object && Object.entries(value).length === 0
+        return value.constructor === Object && Object.entries(value).length === 0;
       }
 
       return false;
     }
   }
 
-  changeArrow(){
+  changeArrow() {
     this.icon = !this.icon;
   }
 
-  private static sortItems(items: DetailViewItem[]): DetailViewItem[] {
-    items.sort((a, b) => {
-      return a.position - b.position;
-    });
-
-    return items;
+  getBadge(counter: number) {
+    return (counter && counter > 0) ? counter.toString() : '';
   }
 
 }

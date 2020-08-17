@@ -1,4 +1,4 @@
-import {PerunAttribute} from "../PerunAttribute";
+import {PerunAttribute} from '../PerunAttribute';
 
 export class DetailViewItem {
   constructor(attr: PerunAttribute) {
@@ -18,21 +18,21 @@ export class DetailViewItem {
       this.position = attr.input.displayPosition;
 
       if (attr.input.displayName) {
-        this.name.set("en", attr.input.displayName.get("en"));
-        if (attr.input.displayName.get("cs")) {
-          this.name.set("cs", attr.input.displayName.get("cs"));
+        this.name.set('en', attr.input.displayName.get('en'));
+        if (attr.input.displayName.get('cs')) {
+          this.name.set('cs', attr.input.displayName.get('cs'));
         }
       } else {
-        this.name.set("en", attr.definition.displayName);
+        this.name.set('en', attr.definition.displayName);
       }
 
       if (attr.input.description) {
-        this.description.set("en", attr.input.description.get("en"));
-        if (attr.input.displayName.get("cs")) {
-          this.description.set("cs", attr.input.description.get("cs"));
+        this.description.set('en', attr.input.description.get('en'));
+        if (attr.input.displayName.get('cs')) {
+          this.description.set('cs', attr.input.description.get('cs'));
         }
       } else {
-        this.description.set("en", attr.definition.description);
+        this.description.set('en', attr.definition.description);
       }
     } else {
       this.position = 0;
@@ -49,4 +49,9 @@ export class DetailViewItem {
   description: Map<string, string>;
   position: number;
   type: string;
+
+  public shouldDisplayOldVal(displayOldVal: boolean): boolean {
+    return displayOldVal && this.oldValue;
+  }
+
 }

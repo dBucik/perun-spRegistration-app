@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {DetailViewItem} from "../../core/models/items/DetailViewItem";
+import {DetailViewItem} from '../../core/models/items/DetailViewItem';
 @Component({
   selector: 'detailed-view-items',
   templateUrl: './detailed-view-items.component.html',
@@ -8,11 +8,9 @@ import {DetailViewItem} from "../../core/models/items/DetailViewItem";
 export class DetailedViewItemsComponent {
 
   @Input() attrs: DetailViewItem[] = [];
-  @Input() isAppAdmin: boolean = false;
-  @Input() includeComment: boolean = false;
-  @Input() displayOldVal: boolean = false;
+  @Input() isAppAdmin = false;
+  @Input() includeComment = false;
+  @Input() displayOldVal = false;
+  @Input() filterChangedOnly = false;
 
-  shouldDisplayOldVal(item: DetailViewItem): boolean {
-    return this.displayOldVal && item.oldValue;
-  }
 }

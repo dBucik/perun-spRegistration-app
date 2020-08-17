@@ -111,7 +111,8 @@
     "DETAIL_APPROVED": "Approved",
     "SEE_FACILITY": "Service detail",
     "OLD_VALUE": "Previous value",
-    "CHANGED_VAL_WARN": "A proposal has been made to change this value"
+    "CHANGED_VAL_WARN": "A proposal has been made to change this value",
+    "TAB_BADGE_TOOLTIP": "If there is a number, it indicates amount of changes in the category"
   },
   "FACILITIES": {
     "IDENTIFIER": "ClientID/EntityID",

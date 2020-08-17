@@ -27,7 +27,7 @@
         </div>
         <!-- BUTTONS -->
         <div class="col-md-4 mt-4 mb-2 controls text-right">
-          <ng-container *ngIf="request.facilityId && !(request.action === 'DELETE_FACILITY' && request.status === 'APPROVED')">
+          <ng-container *ngIf="request.facilityId && !(request.action === 'DELETE_FACILITY' && request.status === 'APPROVED')">
             <button class="btn-block mb-3" mat-raised-button color="accent"
                     [routerLink]="['/auth/facilities/detail', request.facilityId]">
               {{'REQUESTS.SEE_FACILITY' | translate}}
@@ -66,23 +66,59 @@
         <div class="col">
           <mat-tab-group class="p-1">
             <!-- SERVICE -->
-            <mat-tab label="{{ 'COMMON.ATTRIBUTES.SERVICE' | translate }}">
-              <detailed-view-items [attrs]="requestAttrsService" [isAppAdmin]="isApplicationAdmin" [displayOldVal]="request.action === 'UPDATE_FACILITY'"
+            <mat-tab>
+              <ng-template matTabLabel>
+                <span matBadgeColor="accent" matTooltip="{{ 'REQUESTS.TAB_BADGE_TOOLTIP' | translate}}"
+                      [matBadge]="getBadge(serviceChangedCnt)" matBadgeOverlap="false">
+                  {{ 'COMMON.ATTRIBUTES.SERVICE' | translate }}
+                </span>
+              </ng-template>
+              <detailed-view-items [attrs]="requestAttrsService"
+                                   [isAppAdmin]="isApplicationAdmin"
+                                   [displayOldVal]="request.action === 'UPDATE_FACILITY'"
+                                   [filterChangedOnly]="filterChangedOnly"
                                    [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- ORGANIZATION -->
-            <mat-tab label="{{ 'COMMON.ATTRIBUTES.ORGANIZATION' | translate }}">
-              <detailed-view-items [attrs]="requestAttrsOrganization" [isAppAdmin]="isApplicationAdmin" [displayOldVal]="request.action === 'UPDATE_FACILITY'"
+            <mat-tab>
+              <ng-template matTabLabel>
+                <span matBadgeColor="accent" matTooltip="{{ 'REQUESTS.TAB_BADGE_TOOLTIP' | translate}}"
+                      [matBadge]="getBadge(organizationChangedCnt)" matBadgeOverlap="false">
+                  {{ 'COMMON.ATTRIBUTES.ORGANIZATION' | translate }}
+                </span>
+              </ng-template>
+              <detailed-view-items [attrs]="requestAttrsOrganization"
+                                   [isAppAdmin]="isApplicationAdmin"
+                                   [displayOldVal]="request.action === 'UPDATE_FACILITY'"
+                                   [filterChangedOnly]="filterChangedOnly"
                                    [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- PROTOCOL -->
-            <mat-tab label="{{ 'COMMON.ATTRIBUTES.PROTOCOL' | translate }}">
-              <detailed-view-items [attrs]="requestAttrsProtocol" [isAppAdmin]="isApplicationAdmin" [displayOldVal]="request.action === 'UPDATE_FACILITY'"
+            <mat-tab>
+              <ng-template matTabLabel>
+                <span matBadgeColor="accent" matTooltip="{{ 'REQUESTS.TAB_BADGE_TOOLTIP' | translate}}"
+                      [matBadge]="getBadge(protocolChangedCnt)" matBadgeOverlap="false">
+                  {{ 'COMMON.ATTRIBUTES.PROTOCOL' | translate }}
+                </span>
+              </ng-template>
+              <detailed-view-items [attrs]="requestAttrsProtocol"
+                                   [isAppAdmin]="isApplicationAdmin"
+                                   [displayOldVal]="request.action === 'UPDATE_FACILITY'"
+                                   [filterChangedOnly]="filterChangedOnly"
                                    [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
             <!-- ACCESS_CONTROL -->
-            <mat-tab label="{{ 'COMMON.ATTRIBUTES.ACCESS_CONTROL' | translate }}">
-              <detailed-view-items [attrs]="requestAttrsAccessControl" [isAppAdmin]="isApplicationAdmin" [displayOldVal]="request.action === 'UPDATE_FACILITY'"
+            <mat-tab>
+              <ng-template matTabLabel>
+                <span matBadgeColor="accent" matTooltip="{{ 'REQUESTS.TAB_BADGE_TOOLTIP' | translate}}"
+                      [matBadge]="getBadge(accessControlChangedCnt)" matBadgeOverlap="false">
+                  {{ 'COMMON.ATTRIBUTES.ACCESS_CONTROL' | translate }}
+                </span>
+              </ng-template>
+              <detailed-view-items [attrs]="requestAttrsAccessControl"
+                                   [isAppAdmin]="isApplicationAdmin"
+                                   [displayOldVal]="request.action === 'UPDATE_FACILITY'"
+                                   [filterChangedOnly]="filterChangedOnly"
                                    [includeComment]="request.status !== 'APPROVED' && request.status !== 'REJECTED'"></detailed-view-items>
             </mat-tab>
           </mat-tab-group>
