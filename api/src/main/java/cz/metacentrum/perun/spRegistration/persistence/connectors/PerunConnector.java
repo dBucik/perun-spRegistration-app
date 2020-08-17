@@ -167,4 +167,7 @@ public interface PerunConnector {
 	 * @throws IllegalArgumentException Thrown when attrName is NULL or empty.
 	 */
 	List<Facility> getFacilitiesByAttribute(String attrName, String attrValue) throws ConnectorException;
+
+	User getUserById(Long id) throws ConnectorException;
+
 }

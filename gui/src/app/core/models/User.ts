@@ -1,7 +1,16 @@
+import {hasOwnProperty} from 'tslint/lib/utils';
+
 export class User {
   constructor(item: any) {
+    if (!item) {
+      return;
+    }
     this.name = item.name;
-    this.email = item.email;
+    if (hasOwnProperty(item, 'email')) {
+      this.email = item.email;
+    } else {
+      this.email = null;
+    }
     this.facilitiesWhereUserIsAdmin = item.facilitiesWhereUserIsAdmin;
     this.isAppAdmin = item.isAppAdmin;
   }
@@ -10,4 +19,5 @@ export class User {
   email: string;
   facilitiesWhereUserIsAdmin: number[];
   isAppAdmin: boolean;
+
 }

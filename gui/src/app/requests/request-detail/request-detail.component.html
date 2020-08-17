@@ -12,8 +12,13 @@
           <div><span class="font-thick mr-1">{{'REQUESTS.ACTION' | translate}}:</span>
             <span [innerHTML]=" request.action | requestActionPipe | translate"></span>
           </div>
-          <div class="mb-4"><span class="font-thick mr-1">{{'REQUESTS.DETAIL_EDITED' | translate}}:</span>
-            {{ request.modifiedAt | date: 'dd/MM/yyyy'}}</div>
+          <div><span class="font-thick mr-1">{{'REQUESTS.DETAIL_EDITED' | translate}}:</span>
+            {{ request.modifiedAt | date: 'dd/MM/yyyy'}}
+          </div>
+          <div *ngIf="request.user !== null" class="mb-4">
+            <span class="font-thick mr-1">{{'REQUESTS.REQUESTER_NAME' | translate}}:</span>
+            {{ request.user.name }} (#{{request.reqUserId}})
+          </div>
           <ng-container *ngIf="request.action == 'MOVE_TO_PRODUCTION'">
             <h5>{{'REQUESTS.APPROVALS' | translate}}</h5>
             <ul>

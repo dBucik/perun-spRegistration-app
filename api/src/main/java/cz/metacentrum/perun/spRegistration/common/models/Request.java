@@ -34,6 +34,7 @@ public class Request {
 	private Map<AttributeCategory, Map<String, PerunAttribute>> attributes = new HashMap<>();
 	private Timestamp modifiedAt;
 	private Long modifiedBy;
+	private User user;
 
 	public Long getReqId() {
 		return reqId;
@@ -97,6 +98,14 @@ public class Request {
 
 	public void setModifiedBy(Long modifiedBy) {
 		this.modifiedBy = modifiedBy;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	@JsonIgnore
