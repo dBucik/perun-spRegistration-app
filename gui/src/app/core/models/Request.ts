@@ -1,4 +1,5 @@
-import {AttributesEntity} from "./AttributesEntity";
+import {AttributesEntity} from './AttributesEntity';
+import {User} from './User';
 
 export class Request extends AttributesEntity {
   constructor(item: any) {
@@ -14,6 +15,7 @@ export class Request extends AttributesEntity {
     this.reqUserId = item.reqUserId;
     this.modifiedAt = item.modifiedAt;
     this.modifiedBy = item.modifiedBy;
+    this.user = new User(item.user);
   }
 
   reqId: number;
@@ -23,4 +25,6 @@ export class Request extends AttributesEntity {
   reqUserId: number;
   modifiedAt: string;
   modifiedBy: number;
+  user: User;
+
 }

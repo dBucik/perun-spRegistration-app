@@ -12,8 +12,13 @@
           <div><span class="font-thick mr-1">{{'REQUESTS.ACTION' | translate}}:</span>
             <span [innerHTML]=" request.action | requestActionPipe | translate"></span>
           </div>
-          <div class="mb-4"><span class="font-thick mr-1">{{'REQUESTS.DETAIL_EDITED' | translate}}:</span>
-            {{ request.modifiedAt | date: 'dd/MM/yyyy'}}</div>
+          <div><span class="font-thick mr-1">{{'REQUESTS.DETAIL_EDITED' | translate}}:</span>
+            {{ request.modifiedAt | date: 'dd/MM/yyyy'}}
+          </div>
+          <div *ngIf="request.user !== null" class="mb-4">
+            <span class="font-thick mr-1">{{'REQUESTS.REQUESTER_NAME' | translate}}:</span>
+            {{ request.user.name }} (#{{request.reqUserId}})
+          </div>
           <ng-container *ngIf="request.action == 'MOVE_TO_PRODUCTION'">
             <h5>{{'REQUESTS.APPROVALS' | translate}}</h5>
             <ul>
@@ -27,7 +32,7 @@
         </div>
         <!-- BUTTONS -->
         <div class="col-md-4 mt-4 mb-2 controls text-right">
-          <ng-container *ngIf="request.facilityId && !(request.action === 'DELETE_FACILITY' && request.status === 'APPROVED')">
+          <ng-container *ngIf="request.facilityId && !(request.action === 'DELETE_FACILITY' && request.status === 'APPROVED')">
             <button class="btn-block mb-3" mat-raised-button color="accent"
                     [routerLink]="['/auth/facilities/detail', request.facilityId]">
               {{'REQUESTS.SEE_FACILITY' | translate}}

@@ -20,7 +20,7 @@
 
     <mvc:interceptors>
         <mvc:interceptor>
-            <mvc:mapping path="/auth/**" />
+            <mvc:mapping path="/**" />
             <bean id="userSettingInterceptor" class="cz.metacentrum.perun.spRegistration.rest.interceptors.UserSettingInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

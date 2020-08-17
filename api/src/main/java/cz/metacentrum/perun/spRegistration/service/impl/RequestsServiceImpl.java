@@ -327,6 +327,15 @@ public class RequestsServiceImpl implements RequestsService {
             throw new UnauthorizedActionException("User cannot view request, user is not a requester");
         }
 
+        if (request.getReqUserId() != null) {
+            try {
+                User user = perunConnector.getUserById(request.getReqUserId());
+                request.setUser(user);
+            } catch (ConnectorException e) {
+                log.error("Could not fetch user {} for request {}", request.getReqUserId(), requestId);
+            }
+        }
+
         log.trace("getDetailedRequest returns: {}", request);
         return request;
     }

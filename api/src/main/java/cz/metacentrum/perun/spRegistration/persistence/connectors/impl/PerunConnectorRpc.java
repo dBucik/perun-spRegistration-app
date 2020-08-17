@@ -52,7 +52,7 @@ public class PerunConnectorRpc implements PerunConnector {
 	private String perunRpcUser;
 	private String perunRpcPassword;
 	private String userEmailAttr;
-	private Set<Long> appAdminIds = new HashSet<>();
+	private final Set<Long> appAdminIds = new HashSet<>();
 
 	public void setPerunRpcUrl(String perunRpcUrl) {
 		this.perunRpcUrl = perunRpcUrl;
@@ -401,6 +401,25 @@ public class PerunConnectorRpc implements PerunConnector {
 
 		log.trace("getFacilitiesByAttribute() returns: {}", facilities);
 		return facilities;
+	}
+
+	@Override
+	public User getUserById(Long id) throws ConnectorException {
+		log.trace("getUserById({})", id);
+
+		if (Utils.checkParamsInvalid(id)) {
+			log.error("Wrong parameters passed: (id: {})", id);
+			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
+		}
+
+		Map<String, Object> params = new LinkedHashMap<>();
+		params.put("id", id);
+
+		JsonNode res = makeRpcGetCallForObject(USERS_MANAGER, "getUserById", params);
+		User user = MapperUtils.mapUser(res);
+
+		log.trace("getUserById() returns: {}", user);
+		return user;
 	}
 
 	/* PRIVATE METHODS */
