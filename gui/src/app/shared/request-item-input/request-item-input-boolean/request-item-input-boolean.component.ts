@@ -1,8 +1,8 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {ApplicationItem} from "../../../core/models/ApplicationItem";
-import {RequestItem} from "../../../core/models/RequestItem";
-import {Attribute} from "../../../core/models/Attribute";
-import {NgForm} from "@angular/forms";
+import {ApplicationItem} from '../../../core/models/ApplicationItem';
+import {RequestItem} from '../../../core/models/RequestItem';
+import {Attribute} from '../../../core/models/Attribute';
+import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'request-input-item-boolean',
@@ -19,11 +19,11 @@ export class RequestItemInputBooleanComponent implements OnInit, RequestItem {
   @ViewChild('form', {static: false})
   form: NgForm;
 
-  value: boolean = false;
-  expectedValueChangedError: boolean = false;
+  value = false;
+  expectedValueChangedError = false;
 
   ngOnInit(): void {
-    this.value = this.applicationItem.oldValue
+    this.value = this.applicationItem.oldValue;
   }
 
   getAttribute(): Attribute {
@@ -38,6 +38,7 @@ export class RequestItemInputBooleanComponent implements OnInit, RequestItem {
         return false;
       }
     }
+
     return true;
   }
 

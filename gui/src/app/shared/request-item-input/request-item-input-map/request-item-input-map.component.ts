@@ -4,13 +4,14 @@ import {RequestItem} from '../../../core/models/RequestItem';
 import {Attribute} from '../../../core/models/Attribute';
 import {NgForm} from '@angular/forms';
 import {hasOwnProperty} from 'tslint/lib/utils';
+import {RequestItemInputComponent} from '../request-item-input.component';
 
 @Component({
   selector: 'request-application-item-map',
   templateUrl: './application-item-map.component.html',
   styleUrls: ['./application-item-map.component.scss']
 })
-export class ApplicationItemMapComponent implements RequestItem, OnInit {
+export class RequestItemInputMapComponent implements RequestItem, OnInit {
 
   constructor() { }
 
@@ -22,16 +23,51 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
   private index = 0;
   allowCustomKeys = false;
 
-  duplicateKeysError: boolean = false;
-  missingValueError: boolean = false;
-  expectedValueChangedError: boolean = false;
-  regexMismatchError: boolean = false;
+  duplicateKeysError = false;
+  missingValueError = false;
+  expectedValueChangedError = false;
+  regexMismatchError = false;
 
   @Input()
   applicationItem: ApplicationItem;
 
   @ViewChild('form', {static: false})
   form: NgForm;
+
+  private static requestedChangeHasBeenMade(appItem: ApplicationItem, indexes: number[], keys: string[],
+                                              values: string[]): boolean {
+    if (appItem.hasComment()) {
+      const map = appItem.oldValue;
+      for (let i = 0; i < indexes.length; i++) {
+        const key = keys[i];
+        if (!hasOwnProperty(map, key)) {
+          return true;
+        } else if (map[key] !== values[i]) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  private static checkDuplicities(keys: string[], values: string[]): number[] {
+    const keysWithIndexes = new Map<string, number>();
+    const duplicities = [];
+    for (let i = 0; i < values.length; i++) {
+      const keySet = Array.from(keysWithIndexes.keys());
+      const key = keys[i].trim();
+
+      if (keySet.includes(key)) {
+        duplicities.push(i);
+      }
+
+      keysWithIndexes.set(key, i);
+    }
+
+    return duplicities;
+  }
 
   ngOnInit(): void {
     if (this.applicationItem.oldValue != null) {
@@ -42,8 +78,7 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     }
     if (this.applicationItem.allowedKeys !== undefined &&
       this.applicationItem.allowedKeys !== null &&
-      this.applicationItem.allowedKeys.length > 0)
-    {
+      this.applicationItem.allowedKeys.length > 0) {
       this.allowCustomKeys = true;
 
       if (this.values.length === 0) {
@@ -91,20 +126,20 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     return new Attribute(this.applicationItem.name, obj);
   }
 
-  customTrackBy(index: number, obj: any): any {
+  customTrackBy(index: number, _: any): any {
     return index;
   }
 
   hasCorrectValue(): boolean {
     this.resetErrors();
 
-    if (!ApplicationItemMapComponent.hasValues(this.values)) {
+    if (!RequestItemInputComponent.hasValueMultiValue(this.values)) {
       if (this.applicationItem.required) {
         this.missingValueError = true;
         return false;
       }
     } else {
-      const errKeys = ApplicationItemMapComponent.checkDuplicities(this.keys, this.values);
+      const errKeys = RequestItemInputMapComponent.checkDuplicities(this.keys, this.values);
       if (errKeys.length !== 0) {
         this.form.form.setErrors({'incorrect' : true});
         this.showErredKeys(errKeys);
@@ -112,7 +147,7 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
         return false;
       }
 
-      const errValues = ApplicationItemMapComponent.checkRegex(this.applicationItem, this.values);
+      const errValues = RequestItemInputComponent.checkRegexMultiValue(this.applicationItem, this.values);
       if (errValues.length !== 0) {
         this.showErredValues(errValues);
         this.form.form.setErrors({'incorrect' : true});
@@ -120,7 +155,7 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
         return false;
       }
 
-      if (!ApplicationItemMapComponent.requestedChangeHasBeenMade(this.applicationItem, this.indexes, this.keys,
+      if (!RequestItemInputMapComponent.requestedChangeHasBeenMade(this.applicationItem, this.indexes, this.keys,
         this.values)) {
         this.form.form.setErrors({'incorrect' : true});
         this.expectedValueChangedError = true;
@@ -165,10 +200,6 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     }
   }
 
-  hasInputRegex(appItem: ApplicationItem): boolean {
-    return appItem.hasRegex();
-  }
-
   hasError(): boolean {
     return this.missingValueError || this.duplicateKeysError || this.missingValueError || this.regexMismatchError;
   }
@@ -191,61 +222,6 @@ export class ApplicationItemMapComponent implements RequestItem, OnInit {
     this.regexMismatchError = false;
     this.missingValueError = false;
     this.duplicateKeysError = false;
-  }
-
-  private static requestedChangeHasBeenMade(appItem: ApplicationItem, indexes: number[], keys: string[],
-                                              values: string[]): boolean {
-    if (appItem.hasComment()) {
-      const map = appItem.oldValue;
-      for (let i = 0; i < indexes.length; i++) {
-        const key = keys[i];
-        if (!hasOwnProperty(map, key)) {
-          return true;
-        } else if (map[key] !== values[i]) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    return true;
-  }
-
-  private static checkRegex(item: ApplicationItem, values: string[]): number[] {
-    let indexes = [];
-    if (item.hasRegex()) {
-      const regex = new RegExp(item.regex);
-      for (let i = 0; i < values.length; i++) {
-        if (!regex.test(values[i])) {
-          indexes.push(i);
-        }
-      }
-    }
-
-    return indexes
-  }
-
-  private static hasValues(values: string[]): boolean {
-    return values !== undefined &&
-      values !== null &&
-      values.length > 0;
-  }
-
-  private static checkDuplicities(keys: string[], values: string[]): number[] {
-    const keysWithIndexes = new Map<string, number>();
-    let duplicities = [];
-    for (let i = 0; i < values.length; i++) {
-      const keySet = Array.from(keysWithIndexes.keys());
-      const key = keys[i].trim();
-
-      if (keySet.includes(key)) {
-        duplicities.push(i);
-      }
-
-      keysWithIndexes.set(key, i);
-    }
-
-    return duplicities;
   }
 
 }

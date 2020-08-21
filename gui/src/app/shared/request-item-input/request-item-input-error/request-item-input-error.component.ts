@@ -1,4 +1,4 @@
-import {Component,  Input} from "@angular/core";
+import {Component,  Input} from '@angular/core';
 
 @Component({
   selector: 'request-item-input-error',
@@ -7,6 +7,6 @@ import {Component,  Input} from "@angular/core";
 })
 export class RequestItemInputErrorComponent {
 
-  @Input() messageKey: string = '';
+  @Input() messageKey = '';
 
 }

@@ -6,7 +6,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {TranslateService} from "@ngx-translate/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Request} from "../../core/models/Request";
-import {RequestInputItemComponent} from "../../shared/request-input-item/request-input-item.component";
+import {RequestItemInputComponent} from "../../shared/request-item-input/request-input-item.component";
 import {UrnValuePair} from "../../core/models/UrnValuePair";
 import {PerunAttribute} from "../../core/models/PerunAttribute";
 
@@ -25,14 +25,14 @@ export class RequestEditComponent implements OnInit {
     private translate: TranslateService,
     private router: Router) { }
 
-  @ViewChildren('commentedServiceItems') commentedServiceItems: QueryList<RequestInputItemComponent>;
-  @ViewChildren('serviceItems') serviceItems: QueryList<RequestInputItemComponent>;
-  @ViewChildren('commentedOrgItems') commentedOrgItems: QueryList<RequestInputItemComponent>;
-  @ViewChildren('orgItems') orgItems: QueryList<RequestInputItemComponent>;
-  @ViewChildren('commentedProtocolItems') commentedProtocolItems: QueryList<RequestInputItemComponent>;
-  @ViewChildren('protocolItems') protocolItems: QueryList<RequestInputItemComponent>;
-  @ViewChildren('commentedAccessItems') commentedAccessItems: QueryList<RequestInputItemComponent>;
-  @ViewChildren('accessItems') accessItems: QueryList<RequestInputItemComponent>;
+  @ViewChildren('commentedServiceItems') commentedServiceItems: QueryList<RequestItemInputComponent>;
+  @ViewChildren('serviceItems') serviceItems: QueryList<RequestItemInputComponent>;
+  @ViewChildren('commentedOrgItems') commentedOrgItems: QueryList<RequestItemInputComponent>;
+  @ViewChildren('orgItems') orgItems: QueryList<RequestItemInputComponent>;
+  @ViewChildren('commentedProtocolItems') commentedProtocolItems: QueryList<RequestItemInputComponent>;
+  @ViewChildren('protocolItems') protocolItems: QueryList<RequestItemInputComponent>;
+  @ViewChildren('commentedAccessItems') commentedAccessItems: QueryList<RequestItemInputComponent>;
+  @ViewChildren('accessItems') accessItems: QueryList<RequestItemInputComponent>;
 
   private sub: any;
   loading = true;
@@ -218,7 +218,7 @@ export class RequestEditComponent implements OnInit {
     }
   }
 
-  private static pushAttr(i: RequestInputItemComponent, perunAttributes: PerunAttribute[]) {
+  private static pushAttr(i: RequestItemInputComponent, perunAttributes: PerunAttribute[]) {
     let attr = i.getAttribute();
     let perunAttr = new UrnValuePair(attr.value, attr.urn);
     perunAttributes.push(perunAttr);

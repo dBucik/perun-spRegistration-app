@@ -6,9 +6,9 @@ import {Component, Input} from '@angular/core';
 })
 export class DetailItemSubCommentButtonComponent {
 
-  @Input() isAppAdmin: boolean = false;
-  @Input() showComment: boolean = false;
-  @Input() includeComment: boolean = false;
+  @Input() isAppAdmin = false;
+  @Input() showComment = false;
+  @Input() includeComment = false;
 
   toggleComment(): void {
     this.showComment = !this.showComment;

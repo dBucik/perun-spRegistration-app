@@ -1,5 +1,5 @@
 import {Component, Input, ViewEncapsulation} from '@angular/core';
-import {DetailViewItem} from "../../../../core/models/items/DetailViewItem";
+import {DetailViewItem} from '../../../../core/models/items/DetailViewItem';
 
 @Component({
   selector: 'detail-item-sub-comment-user',
