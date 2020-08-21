@@ -3,6 +3,7 @@ import {ApplicationItem} from '../../../core/models/ApplicationItem';
 import {RequestItem} from '../../../core/models/RequestItem';
 import {Attribute} from '../../../core/models/Attribute';
 import {NgForm} from '@angular/forms';
+import {RequestItemInputComponent} from '../request-item-input.component';
 
 @Component({
   selector: 'request-item-input-list',
@@ -14,10 +15,10 @@ export class RequestItemInputListComponent implements RequestItem, OnInit {
   constructor() { }
 
   values: string[] = [];
-  error: boolean = false;
-  missingValueError: boolean = false;
-  expectedValueChangedError: boolean = false;
-  regexMismatchError: boolean = false;
+  error = false;
+  missingValueError = false;
+  expectedValueChangedError = false;
+  regexMismatchError = false;
 
   @Input()
   applicationItem: ApplicationItem;
@@ -50,23 +51,21 @@ export class RequestItemInputListComponent implements RequestItem, OnInit {
     return new Attribute(this.applicationItem.name, this.values);
   }
 
-  customTrackBy(index: number, obj: any): any {
+  customTrackBy(index: number, _: any): any {
     return index;
   }
 
   hasCorrectValue(): boolean {
     this.resetErrors();
-    console.log(this.applicationItem.oldValue);
 
-    console.log(this.values);
-    if (!RequestItemInputListComponent.hasValue(this.values)) {
+    if (!RequestItemInputComponent.hasValueMultiValue(this.values)) {
       if (this.applicationItem.required) {
         this.form.form.setErrors({'incorrect' : true});
         this.missingValueError = true;
         return false;
       }
     } else {
-      const errIndexes = RequestItemInputListComponent.checkRegex(this.applicationItem, this.values);
+      const errIndexes = RequestItemInputComponent.checkRegexMultiValue(this.applicationItem, this.values);
       if (errIndexes.length > 0) {
         this.form.form.setErrors({'incorrect' : true});
         this.showErredValues(errIndexes);
@@ -74,7 +73,7 @@ export class RequestItemInputListComponent implements RequestItem, OnInit {
         return false;
       }
 
-      if (!RequestItemInputListComponent.requestedChangeHasBeenMade(this.applicationItem, this.values)) {
+      if (!RequestItemInputComponent.requestedChangeHasBeenMadeMultiValue(this.applicationItem, this.values)) {
         this.form.form.setErrors({'incorrect' : true});
         this.expectedValueChangedError = true;
         return false;
@@ -119,41 +118,5 @@ export class RequestItemInputListComponent implements RequestItem, OnInit {
     this.expectedValueChangedError = false;
     this.regexMismatchError = false;
     this.missingValueError = false;
-  }
-
-  private static requestedChangeHasBeenMade(appItem: ApplicationItem, values: string[]): boolean {
-    if (appItem.hasComment()) {
-      if (appItem.oldValue.length !== values.length) {
-        return true;
-      }
-
-      for (let i = 0; i < values.length; i++) {
-        if (appItem.oldValue.indexOf(values[i]) === -1) {
-          return true;
-        }
-      }
-
-      return false;
-    }
-
-    return true;
-  }
-
-  private static hasValue(values: string[]): boolean {
-    return values !== undefined && values !== null && values.length > 0;
-  }
-
-  private static checkRegex(item: ApplicationItem, values: string[]): number[] {
-    let indexes = [];
-    if (item.hasRegex()) {
-      const reg = new RegExp(item.regex);
-      for (let i = 0; i < values.length; i++) {
-        if (!reg.test(values[i])) {
-          indexes.push(i);
-        }
-      }
-    }
-
-    return indexes;
   }
 }

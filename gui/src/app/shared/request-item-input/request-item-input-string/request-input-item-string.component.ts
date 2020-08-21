@@ -16,7 +16,7 @@ export class RequestInputItemStringComponent implements RequestItem, OnInit {
   @Input()
   applicationItem: ApplicationItem;
 
-  value: string = '';
+  value = '';
 
   @ViewChild('form', {static: false})
   form: NgForm;
@@ -24,9 +24,29 @@ export class RequestInputItemStringComponent implements RequestItem, OnInit {
   @ViewChild('input', {static: false})
   inputField: NgModel;
 
-  missingValueError: boolean = false;
-  expectedValueChangedError: boolean = false;
-  regexMismatchError: boolean = false;
+  missingValueError = false;
+  expectedValueChangedError = false;
+  regexMismatchError = false;
+
+  private static requestedChangeHasBeenMade(appItem: ApplicationItem, value: string): boolean {
+    if (appItem.hasComment()) {
+      return appItem.oldValue !== value;
+    }
+
+    return true;
+  }
+
+  private static hasValue(value: string): boolean {
+    return value !== undefined && value !== null && value.trim().length > 0;
+  }
+
+  private static checkRegex(item: ApplicationItem, value: string): boolean {
+    if (!item.hasRegex()) {
+      return true;
+    }
+
+    return new RegExp(item.regex).test(value);
+  }
 
   ngOnInit(): void {
     this.value = this.applicationItem.oldValue;
@@ -42,7 +62,7 @@ export class RequestInputItemStringComponent implements RequestItem, OnInit {
       if (this.applicationItem.required) {
         this.missingValueError = true;
         this.form.form.setErrors({'incorrect' : true});
-        return false
+        return false;
       }
     } else {
       if (!RequestInputItemStringComponent.checkRegex(this.applicationItem, this.value)) {
@@ -85,26 +105,6 @@ export class RequestInputItemStringComponent implements RequestItem, OnInit {
     this.expectedValueChangedError = false;
     this.regexMismatchError = false;
     this.missingValueError = false;
-  }
-
-  private static requestedChangeHasBeenMade(appItem: ApplicationItem, value: string): boolean {
-    if (appItem.hasComment()) {
-      return appItem.oldValue !== value;
-    }
-
-    return true;
-  }
-
-  private static hasValue(value: string): boolean {
-    return value !== undefined && value !== null && value.trim().length > 0;
-  }
-
-  private static checkRegex(item: ApplicationItem, value: string): boolean {
-    if (!item.hasRegex()) {
-      return true;
-    }
-
-    return new RegExp(item.regex).test(value);
   }
 
 }

@@ -2,7 +2,7 @@ import {Component, Input, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {ApplicationItem} from '../../../core/models/ApplicationItem';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatStepper } from '@angular/material/stepper';
-import {RequestInputItemComponent} from '../../../shared/request-input-item/request-input-item.component';
+import {RequestItemInputComponent} from '../../../shared/request-item-input/request-input-item.component';
 import {PerunAttribute} from '../../../core/models/PerunAttribute';
 import {TranslateService} from '@ngx-translate/core';
 import {UrnValuePair} from "../../../core/models/UrnValuePair";
@@ -19,8 +19,8 @@ export class RequestCreationStepComponent implements OnInit {
     private translation: TranslateService
   ) { }
 
-  @ViewChildren(RequestInputItemComponent)
-  items: QueryList<RequestInputItemComponent>;
+  @ViewChildren(RequestItemInputComponent)
+  items: QueryList<RequestItemInputComponent>;
 
   @Input()
   applicationItems: ApplicationItem[];

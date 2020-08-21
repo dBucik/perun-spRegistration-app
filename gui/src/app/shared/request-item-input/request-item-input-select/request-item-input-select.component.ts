@@ -3,6 +3,7 @@ import {ApplicationItem} from '../../../core/models/ApplicationItem';
 import {Attribute} from '../../../core/models/Attribute';
 import {RequestItem} from '../../../core/models/RequestItem';
 import {NgForm} from '@angular/forms';
+import {RequestItemInputComponent} from '../request-item-input.component';
 
 @Component({
   selector: 'request-item-input-select',
@@ -23,8 +24,12 @@ export class RequestItemInputSelectComponent implements RequestItem, OnInit {
   @ViewChild('form', {static: false})
   form: NgForm;
 
-  missingValueError: boolean = false;
-  expectedValueChangedError: boolean = false;
+  missingValueError = false;
+  expectedValueChangedError = false;
+
+  private static hasValue(values: string[]): boolean {
+    return values !== undefined && values !== null && values.length > 0;
+  }
 
   ngOnInit(): void {
     if (this.applicationItem.oldValue != null) {
@@ -48,7 +53,7 @@ export class RequestItemInputSelectComponent implements RequestItem, OnInit {
         return false;
       }
     } else {
-      if (!RequestItemInputSelectComponent.requestedChangeHasBeenMade(this.applicationItem, this.values)) {
+      if (!RequestItemInputComponent.requestedChangeHasBeenMadeMultiValue(this.applicationItem, this.values)) {
         this.form.form.setErrors({'incorrect' : true});
         this.expectedValueChangedError = true;
         return false;
@@ -74,28 +79,6 @@ export class RequestItemInputSelectComponent implements RequestItem, OnInit {
   private resetErrors(): void {
     this.expectedValueChangedError = false;
     this.missingValueError = false;
-  }
-
-  private static hasValue(values: string[]): boolean {
-    return values !== undefined && values !== null && values.length > 0;
-  }
-
-  private static requestedChangeHasBeenMade(appItem: ApplicationItem, values: string[]): boolean {
-    if (appItem.hasComment()) {
-      if (appItem.oldValue.length !== values.length) {
-        return true;
-      }
-
-      for (let i = 0; i < values.length; i++) {
-        if (appItem.oldValue.indexOf(values[i]) === -1) {
-          return true;
-        }
-      }
-
-      return false;
-    }
-
-    return true;
   }
 
 }
