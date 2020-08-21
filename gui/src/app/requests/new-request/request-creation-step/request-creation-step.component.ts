@@ -2,10 +2,10 @@ import {Component, Input, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {ApplicationItem} from '../../../core/models/ApplicationItem';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatStepper } from '@angular/material/stepper';
-import {RequestItemInputComponent} from '../../../shared/request-item-input/request-item-input.component';
+import {RequestItemInputComponent} from '../../../shared/request-item-input/request-input-item.component';
 import {PerunAttribute} from '../../../core/models/PerunAttribute';
 import {TranslateService} from '@ngx-translate/core';
-import {UrnValuePair} from '../../../core/models/UrnValuePair';
+import {UrnValuePair} from "../../../core/models/UrnValuePair";
 
 @Component({
   selector: 'app-request-creation-step',
