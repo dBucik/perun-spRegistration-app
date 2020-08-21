@@ -3,12 +3,12 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ConfigService} from '../../core/services/config.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {TranslateService} from '@ngx-translate/core';
-import {RequestItemInputComponent} from '../../shared/request-item-input/request-input-item.component';
+import {RequestItemInputComponent} from '../../shared/request-item-input/request-item-input.component';
 import {ApplicationItem} from '../../core/models/ApplicationItem';
 import {FacilitiesService} from '../../core/services/facilities.service';
 import {Facility} from '../../core/models/Facility';
 import { UrnValuePair } from '../../core/models/UrnValuePair';
-import {PerunAttribute} from "../../core/models/PerunAttribute";
+import {PerunAttribute} from '../../core/models/PerunAttribute';
 
 @Component({
   selector: 'app-facilities-edit',
@@ -39,10 +39,10 @@ export class FacilitiesEditComponent implements OnInit {
 
   facility: Facility;
 
-  showServiceMore: boolean = false;
-  showOrganizationMore: boolean = false;
-  showProtocolMore: boolean = false;
-  showAccessControlMore: boolean = false;
+  showServiceMore = false;
+  showOrganizationMore = false;
+  showProtocolMore = false;
+  showAccessControlMore = false;
 
   // translations
   errorText: string;
@@ -55,6 +55,25 @@ export class FacilitiesEditComponent implements OnInit {
   organizationAttrs: ApplicationItem[] = [];
   protocolAttrs: ApplicationItem[] = [];
   accessControlAttrs: ApplicationItem[] = [];
+
+  private static filterAndSort(items: ApplicationItem[]): ApplicationItem[] {
+    items = this.filterItems(items);
+    items = this.sortItems(items);
+    return items;
+  }
+
+  private static filterItems(items: ApplicationItem[]): ApplicationItem[] {
+    items.filter((item) => item.displayed);
+    return items;
+  }
+
+  private static sortItems(items: ApplicationItem[]): ApplicationItem[] {
+    items.sort((a, b) => {
+      return a.displayPosition - b.displayPosition;
+    });
+
+    return items;
+  }
 
   ngOnInit() {
     this.translate.get('FACILITIES.NEW_VALUES_ERROR_MESSAGE')
@@ -129,7 +148,7 @@ export class FacilitiesEditComponent implements OnInit {
     });
   }
 
-  private validate(i : RequestItemInputComponent, perunAttributes: PerunAttribute[]): boolean {
+  private validate(i: RequestItemInputComponent, perunAttributes: PerunAttribute[]): boolean {
     const attr = i.getAttribute();
     const perunAttr = new UrnValuePair(attr.value, attr.urn);
     if (!i.hasCorrectValue()) {
@@ -207,25 +226,6 @@ export class FacilitiesEditComponent implements OnInit {
 
   changeAccessShowMore() {
     this.showAccessControlMore = !this.showAccessControlMore;
-  }
-
-  private static filterAndSort(items: ApplicationItem[]): ApplicationItem[] {
-    items = this.filterItems(items);
-    items = this.sortItems(items);
-    return items;
-  }
-
-  private static filterItems(items: ApplicationItem[]): ApplicationItem[] {
-    items.filter((item) => { return item.displayed });
-    return items
-  }
-
-  private static sortItems(items: ApplicationItem[]): ApplicationItem[] {
-    items.sort((a, b) => {
-      return a.displayPosition - b.displayPosition;
-    });
-
-    return items;
   }
 
 }
