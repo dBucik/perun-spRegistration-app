@@ -10,8 +10,8 @@ import {RequestItemInputSelectComponent} from './request-item-input-select/reque
 
 @Component({
   selector: 'request-input-item',
-  templateUrl: './request-input-item.component.html',
-  styleUrls: ['./request-input-item.component.scss']
+  templateUrl: './request-item-input.component.html',
+  styleUrls: ['./request-item-input.component.scss']
 })
 export class RequestItemInputComponent implements RequestItem, AfterViewInit {
 
