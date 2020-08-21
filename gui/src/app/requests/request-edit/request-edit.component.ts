@@ -1,14 +1,14 @@
 import {Component, OnInit, QueryList, ViewChildren} from '@angular/core';
-import {ConfigService} from "../../core/services/config.service";
-import {ApplicationItem} from "../../core/models/ApplicationItem";
-import {RequestsService} from "../../core/services/requests.service";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {TranslateService} from "@ngx-translate/core";
-import {ActivatedRoute, Router} from "@angular/router";
-import {Request} from "../../core/models/Request";
-import {RequestItemInputComponent} from "../../shared/request-item-input/request-input-item.component";
-import {UrnValuePair} from "../../core/models/UrnValuePair";
-import {PerunAttribute} from "../../core/models/PerunAttribute";
+import {ConfigService} from '../../core/services/config.service';
+import {ApplicationItem} from '../../core/models/ApplicationItem';
+import {RequestsService} from '../../core/services/requests.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {TranslateService} from '@ngx-translate/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Request} from '../../core/models/Request';
+import {RequestItemInputComponent} from '../../shared/request-item-input/request-item-input.component';
+import {UrnValuePair} from '../../core/models/UrnValuePair';
+import {PerunAttribute} from '../../core/models/PerunAttribute';
 
 @Component({
   selector: 'app-request-edit',
@@ -40,10 +40,10 @@ export class RequestEditComponent implements OnInit {
   isFormVisible = false;
   snackBarDurationMs = 5000;
 
-  showServiceMore: boolean = false;
-  showOrganizationMore: boolean = false;
-  showProtocolMore: boolean = false;
-  showAccessControlMore: boolean = false;
+  showServiceMore = false;
+  showOrganizationMore = false;
+  showProtocolMore = false;
+  showAccessControlMore = false;
 
   request: Request;
 
@@ -59,6 +59,43 @@ export class RequestEditComponent implements OnInit {
   organizationAttrs: ApplicationItem[] = [];
   protocolAttrs: ApplicationItem[] = [];
   accessControlAttrs: ApplicationItem[] = [];
+
+  private static filterAndSort(items: ApplicationItem[]): ApplicationItem[] {
+    items = this.filterItems(items);
+    items = this.sortItems(items);
+    return items;
+  }
+
+  private static filterItems(items: ApplicationItem[]): ApplicationItem[] {
+    items.filter((item) => item.displayed);
+    return items;
+  }
+
+  private static sortItems(items: ApplicationItem[]): ApplicationItem[] {
+    items.sort((a, b) => {
+      return a.displayPosition - b.displayPosition;
+    });
+
+    return items;
+  }
+
+  private static pushInput(attr: PerunAttribute, commentedDest: ApplicationItem[], regularDest: ApplicationItem[]) {
+    attr.input.oldValue = attr.value;
+
+    if (attr.comment) {
+      attr.input.isEdit = true;
+      attr.input.comment = attr.comment;
+      commentedDest.push(attr.input);
+    } else {
+      regularDest.push(attr.input);
+    }
+  }
+
+  private static pushAttr(i: RequestItemInputComponent, perunAttributes: PerunAttribute[]) {
+    const attr = i.getAttribute();
+    const perunAttr = new UrnValuePair(attr.value, attr.urn);
+    perunAttributes.push(perunAttr);
+  }
 
   ngOnInit() {
     this.clearArrays();
@@ -96,7 +133,7 @@ export class RequestEditComponent implements OnInit {
 
     this.loading = true;
 
-    let perunAttributes: UrnValuePair[] = [];
+    const perunAttributes: UrnValuePair[] = [];
 
     this.serviceItems.forEach(i => { RequestEditComponent.pushAttr(i, perunAttributes); });
     this.commentedServiceItems.forEach(i => { RequestEditComponent.pushAttr(i, perunAttributes); });
@@ -171,57 +208,20 @@ export class RequestEditComponent implements OnInit {
     });
   }
 
-  changeServiceShowMore(){
+  changeServiceShowMore() {
     this.showServiceMore = !this.showServiceMore;
   }
 
-  changeOrganizationShowMore(){
+  changeOrganizationShowMore() {
     this.showOrganizationMore = !this.showOrganizationMore;
   }
 
-  changeProtocolShowMore(){
+  changeProtocolShowMore() {
     this.showProtocolMore = !this.showProtocolMore;
   }
 
-  changeAccessShowMore(){
+  changeAccessShowMore() {
     this.showAccessControlMore = !this.showAccessControlMore;
-  }
-
-  private static filterAndSort(items: ApplicationItem[]): ApplicationItem[] {
-    items = this.filterItems(items);
-    items = this.sortItems(items);
-    return items;
-  }
-
-  private static filterItems(items: ApplicationItem[]): ApplicationItem[] {
-    items.filter((item) => { return item.displayed });
-    return items
-  }
-
-  private static sortItems(items: ApplicationItem[]): ApplicationItem[] {
-    items.sort((a, b) => {
-      return a.displayPosition - b.displayPosition;
-    });
-
-    return items;
-  }
-
-  private static pushInput(attr: PerunAttribute, commentedDest: ApplicationItem[], regularDest: ApplicationItem[]) {
-    attr.input.oldValue = attr.value;
-
-    if (attr.comment) {
-      attr.input.isEdit = true;
-      attr.input.comment = attr.comment;
-      commentedDest.push(attr.input);
-    } else {
-      regularDest.push(attr.input);
-    }
-  }
-
-  private static pushAttr(i: RequestItemInputComponent, perunAttributes: PerunAttribute[]) {
-    let attr = i.getAttribute();
-    let perunAttr = new UrnValuePair(attr.value, attr.urn);
-    perunAttributes.push(perunAttr);
   }
 
 }
