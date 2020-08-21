@@ -8,8 +8,8 @@ import {RequestItemInputComponent} from '../request-item-input.component';
 
 @Component({
   selector: 'request-application-item-map',
-  templateUrl: './application-item-map.component.html',
-  styleUrls: ['./application-item-map.component.scss']
+  templateUrl: './request-item-input-map.component.html',
+  styleUrls: ['./request-item-input-map.component.scss']
 })
 export class RequestItemInputMapComponent implements RequestItem, OnInit {
 
