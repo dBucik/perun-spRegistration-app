@@ -2,7 +2,7 @@
   <div class="row">
     <mat-form-field class="col-12 pl-0 pr-0 w-100">
       <input matInput #input="ngModel" [required]="applicationItem.required" id="{{applicationItem.name}}"
-             [(ngModel)]="value" [pattern]="hasInputRegex(applicationItem) ? applicationItem.regex : null"
+             [(ngModel)]="value" [pattern]="applicationItem.hasRegex() ? applicationItem.regex : null"
              [type] = "applicationItem.regex === 'URL' ? 'url' : 'text'" [class.perun-warn]="hasError()"
              placeholder="{{applicationItem.displayName | itemLocalePipe}}" name="{{applicationItem.name}}">
       <mat-hint [innerHTML]="applicationItem.description | itemLocalePipe"></mat-hint>

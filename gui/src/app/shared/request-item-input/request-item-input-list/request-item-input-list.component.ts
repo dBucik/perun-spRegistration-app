@@ -106,10 +106,6 @@ export class RequestItemInputListComponent implements RequestItem, OnInit {
     }
   }
 
-  hasInputRegex(appItem: ApplicationItem): boolean {
-    return appItem.hasRegex();
-  }
-
   hasError(): boolean {
     return this.missingValueError || this.missingValueError || this.regexMismatchError;
   }
