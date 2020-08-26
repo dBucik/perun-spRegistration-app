@@ -4,6 +4,7 @@ import {RequestItem} from '../../../core/models/RequestItem';
 import {Attribute} from '../../../core/models/Attribute';
 import {NgForm} from '@angular/forms';
 import {RequestItemInputComponent} from '../request-item-input.component';
+import {RequestItemInputUtils} from "../request-item-input-utils/request-item-input.component";
 
 @Component({
   selector: 'request-application-item-map',
@@ -132,7 +133,7 @@ export class RequestItemInputMapComponent implements RequestItem, OnInit {
   hasCorrectValue(): boolean {
     this.resetErrors();
 
-    if (!RequestItemInputComponent.hasValueMultiValue(this.values)) {
+    if (!RequestItemInputUtils.hasValueMultiValue(this.values)) {
       if (this.applicationItem.required) {
         this.missingValueError = true;
         return false;
@@ -146,7 +147,7 @@ export class RequestItemInputMapComponent implements RequestItem, OnInit {
         return false;
       }
 
-      const errValues = RequestItemInputComponent.checkRegexMultiValue(this.applicationItem, this.values);
+      const errValues = RequestItemInputUtils.checkRegexMultiValue(this.applicationItem, this.values);
       if (errValues.length !== 0) {
         this.showErredValues(errValues);
         this.form.form.setErrors({'incorrect' : true});
