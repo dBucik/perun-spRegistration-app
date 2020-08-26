@@ -151,9 +151,6 @@ import {RequestItemInputErrorComponent} from './request-item-input/request-item-
         ItemLocalePipe,
         DetailedViewItemValuePipe
     ],
-  entryComponents: [
-    ErrorDialogComponent
-  ]
 })
 export class SharedModule {
 }

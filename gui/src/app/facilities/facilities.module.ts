@@ -47,10 +47,6 @@ import {FacilitiesDetailClientSecretDialogComponent} from "./facilities-detail/f
     FacilityProtocolPipe,
     FacilityDetailItemLocalePipe
   ],
-  entryComponents: [
-    FacilitiesDetailDeleteDialogComponent,
-    FacilitiesDetailClientSecretDialogComponent
-  ],
   providers: [
     {
       provide: MatPaginatorIntl, deps: [TranslateService],
