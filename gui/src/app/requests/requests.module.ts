@@ -44,8 +44,5 @@ import {RequestStatusLangPipe} from "./request-status-lang.pipe";
     RequestApprovedPipe,
     RequestDetailItemLocalePipe
   ],
-  entryComponents: [
-    RequestDetailDialogComponent
-  ]
 })
 export class RequestsModule { }

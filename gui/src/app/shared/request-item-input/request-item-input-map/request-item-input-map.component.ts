@@ -3,7 +3,6 @@ import {ApplicationItem} from '../../../core/models/ApplicationItem';
 import {RequestItem} from '../../../core/models/RequestItem';
 import {Attribute} from '../../../core/models/Attribute';
 import {NgForm} from '@angular/forms';
-import {hasOwnProperty} from 'tslint/lib/utils';
 import {RequestItemInputComponent} from '../request-item-input.component';
 
 @Component({
@@ -40,7 +39,7 @@ export class RequestItemInputMapComponent implements RequestItem, OnInit {
       const map = appItem.oldValue;
       for (let i = 0; i < indexes.length; i++) {
         const key = keys[i];
-        if (!hasOwnProperty(map, key)) {
+        if (!map.hasOwnProperty(key)) {
           return true;
         } else if (map[key] !== values[i]) {
           return true;

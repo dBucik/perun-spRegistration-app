@@ -23,8 +23,8 @@
                 <artifactId>frontend-maven-plugin</artifactId>
                 <version>${frontend-plugin.version}</version>
                 <configuration>
-                    <nodeVersion>v12.13.1</nodeVersion>
-                    <npmVersion>6.13.1</npmVersion>
+                    <nodeVersion>${node.version}</nodeVersion>
+                    <npmVersion>${npm.version}</npmVersion>
                     <workingDirectory>src/main/web/</workingDirectory>
                 </configuration>
                 <executions>
