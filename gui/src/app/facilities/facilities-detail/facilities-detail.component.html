@@ -8,8 +8,14 @@
           <h2 class="card-title">
             {{'FACILITIES.DETAIL_TITLE' | translate}}{{facility.id}} - {{facility.name | facilityDetailItemLocale}}
           </h2>
-          <p><span class="font-thick mr-1">{{'FACILITIES.DESCRIPTION' | translate}}:</span>
-            <span [innerHTML]="facility.description | itemLocalePipe | detailedViewItemValuePipe"></span></p>
+          <p>
+            <span class="font-thick mr-1">{{'FACILITIES.DESCRIPTION' | translate}}:</span>
+            <span [innerHTML]="facility.description | itemLocalePipe | detailedViewItemValuePipe"></span>
+          </p>
+          <p>
+            <span class="font-thick mr-1">{{'FACILITIES.ENVIRONMENT' | translate}}: </span>
+            {{facility.testEnv | facilityEnvironment}}
+          </p>
         </div>
         <!-- BUTTONS -->
         <div class="col-md-4 mt-4 mb-2 controls text-right">

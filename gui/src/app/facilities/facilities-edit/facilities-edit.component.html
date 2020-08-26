@@ -6,12 +6,18 @@
         <!-- PAGE TITLE -->
         <div class="col-md-8">
           <h2 class="card-title">{{'FACILITIES.EDIT_FACILITY' | translate}}</h2>
-          <div>
-            <strong>{{ "FACILITIES.NAME" | translate }}: </strong> {{ this.facility.name | facilityDetailItemLocale }}
-          </div>
-          <div>
-            <strong>{{ "FACILITIES.DESCRIPTION" | translate }}: </strong> {{ this.facility.description | facilityDetailItemLocale }}
-          </div>
+          <p>
+            <span class="font-thick mr-1">{{ "FACILITIES.NAME" | translate }}: </span>
+            {{ facility.name | facilityDetailItemLocale }}
+          </p>
+          <p>
+            <span class="font-thick mr-1">{{ "FACILITIES.DESCRIPTION" | translate }}: </span>
+            <span [innerHTML]="facility.description | itemLocalePipe | detailedViewItemValuePipe"></span>
+          </p>
+          <p>
+            <span class="font-thick mr-1">{{'FACILITIES.ENVIRONMENT' | translate}}: </span>
+            {{ facility.testEnv | facilityEnvironment }}
+          </p>
         </div>
         <!-- BUTTONS -->
         <div class="col-md-4 mt-4 controls text-right">
