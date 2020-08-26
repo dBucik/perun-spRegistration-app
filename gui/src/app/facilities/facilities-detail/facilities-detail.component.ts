@@ -146,7 +146,7 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
     this.facilitiesService.regenerateClientSecret(this.facility.id).subscribe(data => {
       const attr = new PerunAttribute(data)
       let index = -1;
-      this.facilityAttrsProtocol.forEach(pair => {
+      this.facilityAttrsProtocol.forEach(pair => {
         if (pair.urn === attr.fullName) {
           index = this.facilityAttrsProtocol.indexOf(pair);
         }

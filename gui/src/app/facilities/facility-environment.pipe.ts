@@ -12,10 +12,10 @@ export class FacilityEnvironmentPipe implements PipeTransform {
   constructor(
     private translate: TranslateService
   ) {
-    this.translate.get('FACILITIES.ENV_PROD').subscribe(text => {
+    this.translate.get('FACILITIES.ENV_PROD').subscribe(text => {
       this.testEnvText = text;
     });
-    this.translate.get('FACILITIES.ENV_TEST').subscribe(text => {
+    this.translate.get('FACILITIES.ENV_TEST').subscribe(text => {
       this.prodEnvText = text;
     });
   }

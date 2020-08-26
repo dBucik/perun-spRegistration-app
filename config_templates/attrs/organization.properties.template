@@ -1,7 +1,7 @@
 ###################################################################
 ##      Basic information about the responsible organization     ##
 ## ------------------------------------------------------------- ##
-## available options:                                            ##
+## available options:                                            ##
 ## inputName.attrName=urn:perun:... - Name of the destination    ##
 ##  attribute                                                    ##
 ##                                                               ##

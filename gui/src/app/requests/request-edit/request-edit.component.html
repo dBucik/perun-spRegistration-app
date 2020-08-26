@@ -48,7 +48,7 @@
             </div>
           </div>
           <div class="row pl-3 pr-3">
-            <div class="col" [style.display]="(serviceAttrs.length > 0 && showServiceMore) ? 'block' : 'none'">
+            <div class="col" [style.display]="(serviceAttrs.length > 0 && showServiceMore) ? 'block' : 'none'">
               <ng-container *ngFor="let applicationItems of serviceAttrs">
                 <request-input-item #serviceItems [applicationItem]="applicationItems"></request-input-item>
               </ng-container>
@@ -76,7 +76,7 @@
             </div>
           </div>
           <div class="row pl-3 pr-3">
-            <div class="col" [style.display]="(organizationAttrs.length > 0 && showOrganizationMore) ? 'block' : 'none'">
+            <div class="col" [style.display]="(organizationAttrs.length > 0 && showOrganizationMore) ? 'block' : 'none'">
               <ng-container *ngFor="let applicationItems of organizationAttrs">
                 <request-input-item #orgItems [applicationItem]="applicationItems"></request-input-item>
               </ng-container>
@@ -104,7 +104,7 @@
             </div>
           </div>
           <div class="row pl-3 pr-3">
-            <div class="col" [style.display]="(protocolAttrs.length > 0 && showProtocolMore) ? 'block' : 'none'">
+            <div class="col" [style.display]="(protocolAttrs.length > 0 && showProtocolMore) ? 'block' : 'none'">
               <ng-container *ngFor="let applicationItems of protocolAttrs">
                 <request-input-item #protocolItems [applicationItem]="applicationItems"></request-input-item>
               </ng-container>
@@ -132,7 +132,7 @@
             </div>
           </div>
           <div class="row pl-3 pr-3">
-            <div class="col" [style.display]="(accessControlAttrs.length > 0 && showAccessControlMore) ? 'block' : 'none'">
+            <div class="col" [style.display]="(accessControlAttrs.length > 0 && showAccessControlMore) ? 'block' : 'none'">
               <ng-container *ngFor="let applicationItems of accessControlAttrs">
                 <request-input-item #accessItems [applicationItem]="applicationItems"></request-input-item>
               </ng-container>
