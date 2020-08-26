@@ -169,7 +169,7 @@ public class AddAdminsServiceImpl implements AddAdminsService {
     private Map<String, String> generateCodesForAdmins(List<String> admins, User user, Long facility)
             throws InternalErrorException
     {
-        log.trace("generateCodesForAdmins(admins: {}, user: {}, facility: {})", admins, user, facility);
+        log.trace("generateCodesForAdmins(admins: {}, user: {}, facility: {})", admins, user, facility);
 
         if (Utils.checkParamsInvalid(admins, user, facility)) {
             log.error("Wrong parameters passed: (admins: {}, user: {}, facility: {})", admins, user, facility);
@@ -216,7 +216,7 @@ public class AddAdminsServiceImpl implements AddAdminsService {
     }
 
     private LinkCode createAddAdminCode(String admin, User user, Long facility) {
-        log.trace("createRequestCode(admin: {}, user: {}, facility: {})", admin, user, facility);
+        log.trace("createRequestCode(admin: {}, user: {}, facility: {})", admin, user, facility);
         LinkCode code = new LinkCode();
 
         code.setRecipientEmail(admin);
@@ -227,7 +227,7 @@ public class AddAdminsServiceImpl implements AddAdminsService {
         code.setRequestId(-1L);
         code.setHash(ServiceUtils.getHash(code.toString()));
 
-        log.trace("createRequestCode(admin: {}, user: {}, facility: {}) returns: {}", admin, user, facility, facility);
+        log.trace("createRequestCode(admin: {}, user: {}, facility: {}) returns: {}", admin, user, facility, facility);
         return code;
     }
 }

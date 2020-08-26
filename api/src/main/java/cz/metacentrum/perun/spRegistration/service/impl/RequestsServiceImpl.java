@@ -436,7 +436,7 @@ public class RequestsServiceImpl implements RequestsService {
     public boolean rejectRequest(Long requestId, Long userId)
             throws UnauthorizedActionException, CannotChangeStatusException, InternalErrorException
     {
-        log.trace("rejectRequest(requestId: {}, userId: {})", requestId, userId);
+        log.trace("rejectRequest(requestId: {}, userId: {})", requestId, userId);
 
         if (Utils.checkParamsInvalid(requestId, userId)) {
             log.error("Wrong parameters passed: (requestId: {}, userId: {})", requestId, userId);
@@ -883,7 +883,7 @@ public class RequestsServiceImpl implements RequestsService {
     }
 
     private LinkCode createRequestCode(String authority, User user, Long requestId, Long facilityId) {
-        log.trace("createRequestCode(authority: {}, user: {}, requestId: {}, facilityId: {})",
+        log.trace("createRequestCode(authority: {}, user: {}, requestId: {}, facilityId: {})",
                 authority, user, requestId, facilityId);
         LinkCode code = new LinkCode();
 
@@ -895,7 +895,7 @@ public class RequestsServiceImpl implements RequestsService {
         code.setRequestId(requestId);
         code.setHash(ServiceUtils.getHash(code.toString()));
 
-        log.trace("createRequestCode(authority: {}, user: {}, requestId: {}, facilityId: {}) returns: {}",
+        log.trace("createRequestCode(authority: {}, user: {}, requestId: {}, facilityId: {}) returns: {}",
                 authority, user, requestId, facilityId, code);
         return code;
     }

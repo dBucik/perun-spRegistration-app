@@ -111,7 +111,7 @@ public class UtilsServiceImpl implements UtilsService {
         }
 
         boolean result = whereAdmin.contains(facilityId);
-        log.debug("isFacilityAdmin returns:  {}", result);
+        log.debug("isFacilityAdmin returns:  {}", result);
         return result;
     }
 
