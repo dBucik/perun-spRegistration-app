@@ -4,6 +4,7 @@ import {RequestItem} from '../../../core/models/RequestItem';
 import {Attribute} from '../../../core/models/Attribute';
 import {NgForm} from '@angular/forms';
 import {RequestItemInputComponent} from '../request-item-input.component';
+import {RequestItemInputUtils} from "../request-item-input-utils/request-item-input.component";
 
 @Component({
   selector: 'request-item-input-list',
@@ -58,14 +59,14 @@ export class RequestItemInputListComponent implements RequestItem, OnInit {
   hasCorrectValue(): boolean {
     this.resetErrors();
 
-    if (!RequestItemInputComponent.hasValueMultiValue(this.values)) {
+    if (!RequestItemInputUtils.hasValueMultiValue(this.values)) {
       if (this.applicationItem.required) {
         this.form.form.setErrors({'incorrect' : true});
         this.missingValueError = true;
         return false;
       }
     } else {
-      const errIndexes = RequestItemInputComponent.checkRegexMultiValue(this.applicationItem, this.values);
+      const errIndexes = RequestItemInputUtils.checkRegexMultiValue(this.applicationItem, this.values);
       if (errIndexes.length > 0) {
         this.form.form.setErrors({'incorrect' : true});
         this.showErredValues(errIndexes);
@@ -73,7 +74,7 @@ export class RequestItemInputListComponent implements RequestItem, OnInit {
         return false;
       }
 
-      if (!RequestItemInputComponent.requestedChangeHasBeenMadeMultiValue(this.applicationItem, this.values)) {
+      if (!RequestItemInputUtils.requestedChangeHasBeenMadeMultiValue(this.applicationItem, this.values)) {
         this.form.form.setErrors({'incorrect' : true});
         this.expectedValueChangedError = true;
         return false;

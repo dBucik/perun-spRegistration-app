@@ -4,6 +4,7 @@ import {Attribute} from '../../../core/models/Attribute';
 import {RequestItem} from '../../../core/models/RequestItem';
 import {NgForm} from '@angular/forms';
 import {RequestItemInputComponent} from '../request-item-input.component';
+import {RequestItemInputUtils} from "../request-item-input-utils/request-item-input.component";
 
 @Component({
   selector: 'request-item-input-select',
@@ -53,7 +54,7 @@ export class RequestItemInputSelectComponent implements RequestItem, OnInit {
         return false;
       }
     } else {
-      if (!RequestItemInputComponent.requestedChangeHasBeenMadeMultiValue(this.applicationItem, this.values)) {
+      if (!RequestItemInputUtils.requestedChangeHasBeenMadeMultiValue(this.applicationItem, this.values)) {
         this.form.form.setErrors({'incorrect' : true});
         this.expectedValueChangedError = true;
         return false;

@@ -21,6 +21,7 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {AttributeValuePipe} from './attribute-value.pipe';
 import {DocumentSignItemLocalePipe} from "./document-sign-item-locale.pipe";
 import {LanguageEntryPipe} from "./language-entry.pipe";
+import { HammerModule} from '@angular/platform-browser';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -55,7 +56,8 @@ export function HttpLoaderFactory(http: HttpClient) {
       }),
       BrowserAnimationsModule,
       MatDialogModule,
-      MatTabsModule
+      MatTabsModule,
+      HammerModule,
   ],
   providers: [ ],
   bootstrap: [AppComponent]
