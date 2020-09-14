@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { HostListener } from '@angular/core';
@@ -45,13 +45,13 @@ export class AppComponent implements OnInit {
       }
     });
 
-
     router.events.subscribe(_ => {
       this.currentUrl = this.router.url;
       if (this.currentUrl.includes('auth') && !this.hasUser()) {
-      this.setAndGetUser();
+        this.setAndGetUser();
       }
     });
+
     this.setAndGetUser();
   }
 
@@ -93,23 +93,6 @@ export class AppComponent implements OnInit {
     return (AppComponent.getUser() !== null && AppComponent.getUser() !== undefined);
   }
 
-  ngOnInit(): void {
-    this.configService.getPageConfig().subscribe(pageConfig => {
-      AppComponent.pageConfig = new PageConfig(pageConfig);
-      if (pageConfig !== null && pageConfig !== undefined) {
-        this.appTitle = pageConfig.headerLabel;
-        this.logoUrl = pageConfig.logoUrl;
-        PerunFooterCstComponent.setFooter(pageConfig.footerHtml);
-        PerunHeaderComponent.setHeader(pageConfig.headerHtml);
-      }
-
-      PerunFooterCstComponent.setFooter(null);
-      PerunHeaderComponent.setHeader(null);
-      this.loading = false;
-    });
-    this.setAndGetUser();
-  }
-
   @HostListener('window:resize', ['$event'])
   onResize(event?) {
     if (this.sidenavOpen && this.lastWindowWidth > window.innerWidth &&
@@ -137,7 +120,7 @@ export class AppComponent implements OnInit {
   }
 
   public hasUser(): boolean {
-    return (AppComponent.getUser() !== null && AppComponent.getUser() !== undefined);
+    return !!AppComponent.getUser();
   }
 
   public getUser(): User {
@@ -156,6 +139,24 @@ export class AppComponent implements OnInit {
 
   private goOnLogin() {
     this.router.navigate(['/']);
-    AppComponent.setUser(undefined);
+    AppComponent.setUser(null);
   }
+
+  ngOnInit(): void {
+    this.configService.getPageConfig().subscribe(pageConfig => {
+      if (pageConfig !== null && pageConfig !== undefined) {
+        AppComponent.pageConfig = new PageConfig(pageConfig);
+        this.appTitle = pageConfig.headerLabel;
+        this.logoUrl = pageConfig.logoUrl;
+        PerunFooterCstComponent.setFooter(pageConfig.footerHtml);
+        PerunHeaderComponent.setHeader(pageConfig.headerHtml);
+      }
+
+      PerunFooterCstComponent.setFooter(null);
+      PerunHeaderComponent.setHeader(null);
+      this.loading = false;
+    });
+    this.setAndGetUser();
+  }
+
 }
