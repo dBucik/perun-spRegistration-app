@@ -25,6 +25,7 @@ export class AppComponent implements OnInit {
     this.onResize();
     this.currentUrl = this.router.url;
     this.loading = true;
+
     this.configService.getLanguages().subscribe(langs => {
       this.langs = langs;
       this.translate.addLangs(langs);
