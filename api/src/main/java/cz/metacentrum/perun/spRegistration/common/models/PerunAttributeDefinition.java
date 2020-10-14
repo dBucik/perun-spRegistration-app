@@ -4,212 +4,127 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import cz.metacentrum.perun.spRegistration.Utils;
-
-import java.util.Objects;
+import cz.metacentrum.perun.spRegistration.persistence.mappers.MapperUtils;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.util.StringUtils;
 
 /**
  * Attribute definition from Perun.
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>;
  */
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 public class PerunAttributeDefinition extends PerunEntity {
 
-	private String friendlyName;
-	private String namespace;
-	private String description;
-	private String type;
-	private String displayName;
+	@NonNull private String friendlyName;
+	@NonNull private String namespace;
+	@NonNull private String description;
+	@NonNull private String type;
+	@NonNull private String displayName;
 	private boolean writable;
 	private boolean unique;
-	private String entity;
+	@NonNull private String entity;
 	private final String beanName = "Attribute";
-	private String baseFriendlyName;
-	private String friendlyNameParameter;
+	@NonNull private String baseFriendlyName;
+	@NonNull private String friendlyNameParameter;
 
-
-	public PerunAttributeDefinition(Long id, String friendlyName, String namespace, String description, String type,
-									String displayName, boolean writable, boolean unique, String entity,
-									String baseFriendlyName, String friendlyNameParameter) {
+	public PerunAttributeDefinition(@NonNull Long id, @NonNull String friendlyName, @NonNull String namespace,
+									@NonNull String description, @NonNull String type, @NonNull String displayName,
+									boolean writable, boolean unique, @NonNull String entity,
+									@NonNull String baseFriendlyName, @NonNull String friendlyNameParameter) {
 		super(id);
-		this.friendlyName = friendlyName;
-		this.namespace = namespace;
-		this.description = description;
-		this.type = type;
-		this.displayName = displayName;
-		this.writable = writable;
-		this.unique = unique;
-		this.entity = entity;
-		this.baseFriendlyName = baseFriendlyName;
-		this.friendlyNameParameter = friendlyNameParameter;
+		this.setFriendlyName(friendlyName);
+		this.setNamespace(namespace);
+		this.setDescription(description);
+		this.setType(type);
+		this.setDisplayName(displayName);
+		this.setWritable(writable);
+		this.setUnique(unique);
+		this.setEntity(entity);
+		this.setBaseFriendlyName(baseFriendlyName);
+		this.setFriendlyNameParameter(friendlyNameParameter);
 	}
 
-	public static PerunAttributeDefinition fromPerunJson(JsonNode jsonNode) {
-		if (Utils.checkParamsInvalid(jsonNode)) {
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
-		Long id = jsonNode.get("id").asLong();
-		String friendlyName = jsonNode.get("friendlyName").textValue();
-		String namespace = jsonNode.get("namespace").textValue();
-		String description = jsonNode.get("description").textValue();
-		String type = jsonNode.get("type").textValue();
-		String displayName = jsonNode.get("displayName").textValue();
-		boolean writable = jsonNode.get("writable").asBoolean();
-		boolean unique = jsonNode.get("unique").asBoolean();
-		String entity = jsonNode.get("entity").textValue();
-		String baseFriendlyName = jsonNode.get("baseFriendlyName").textValue();
-		String friendlyNameParameter = jsonNode.get("friendlyNameParameter").textValue();
-
-		return new PerunAttributeDefinition(id, friendlyName, namespace, description, type, displayName, writable,
-				unique, entity, baseFriendlyName, friendlyNameParameter);
-	}
-
-	public String getFriendlyName() {
-		return friendlyName;
-	}
-
-	public void setFriendlyName(String friendlyName) {
-		this.friendlyName = friendlyName;
-	}
-
-	public String getNamespace() {
-		return namespace;
-	}
-
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
-
-	public boolean isWritable() {
-		return writable;
-	}
-
-	public void setWritable(boolean writable) {
-		this.writable = writable;
-	}
-
-	public String getEntity() {
-		return entity;
-	}
-
-	public void setEntity(String entity) {
-		this.entity = entity;
-	}
-
-	public String getBeanName() {
-		return beanName;
-	}
-
-	public boolean isUnique() {
-		return unique;
-	}
-
-	public void setUnique(boolean unique) {
-		this.unique = unique;
-	}
-
-	public String getBaseFriendlyName() {
-		return baseFriendlyName;
-	}
-
-	public void setBaseFriendlyName(String baseFriendlyName) {
-		this.baseFriendlyName = baseFriendlyName;
-	}
-
-	public String getFriendlyNameParameter() {
-		return friendlyNameParameter;
-	}
-
-	public void setFriendlyNameParameter(String friendlyNameParameter) {
-		this.friendlyNameParameter = friendlyNameParameter;
-	}
 
 	public JsonNode toJson() {
 		ObjectNode res = JsonNodeFactory.instance.objectNode();
-		res.put("id", super.getId());
-		res.put("friendlyName", friendlyName);
-		res.put("namespace", namespace);
-		res.put("description", description);
-		res.put("type", type);
-		res.put("displayName", displayName);
-		res.put("writable", writable);
-		res.put("entity", entity);
-		res.put("beanName", beanName);
-		res.put("unique", unique);
-		res.put("baseFriendlyName", baseFriendlyName);
-		res.put("friendlyNameParameter", friendlyNameParameter);
+		res.put(MapperUtils.ID, super.getId());
+		res.put(MapperUtils.FRIENDLY_NAME, friendlyName);
+		res.put(MapperUtils.NAMESPACE, namespace);
+		res.put(MapperUtils.DESCRIPTION, description);
+		res.put(MapperUtils.TYPE, type);
+		res.put(MapperUtils.DISPLAY_NAME, displayName);
+		res.put(MapperUtils.WRITABLE, writable);
+		res.put(MapperUtils.ENTITY, entity);
+		res.put(MapperUtils.BEAN_NAME, beanName);
+		res.put(MapperUtils.UNIQUE, unique);
+		res.put(MapperUtils.BASE_FRIENDLY_NAME, baseFriendlyName);
+		res.put(MapperUtils.FRIENDLY_NAME_PARAMETER, friendlyNameParameter);
 
 		return res;
+	}
+
+	public void setFriendlyName(@NonNull String friendlyName) {
+		if (!StringUtils.hasText(friendlyName)) {
+			throw new IllegalArgumentException("FriendlyName cannot be empty!");
+		}
+		this.friendlyName = friendlyName;
+	}
+
+	public void setNamespace(@NonNull String namespace) {
+		if (!StringUtils.hasText(namespace)) {
+			throw new IllegalArgumentException("Namespace cannot be empty!");
+		}
+		this.namespace = namespace;
+	}
+
+	public void setDescription(@NonNull String description) {
+		if (!StringUtils.hasText(description)) {
+			throw new IllegalArgumentException("Description cannot be empty!");
+		}
+		this.description = description;
+	}
+
+	public void setType(@NonNull String type) {
+		if (!StringUtils.hasText(type)) {
+			throw new IllegalArgumentException("Type cannot be empty!");
+		}
+		this.type = type;
+	}
+
+	public void setDisplayName(@NonNull String displayName) {
+		if (!StringUtils.hasText(displayName)) {
+			throw new IllegalArgumentException("DisplayName cannot be empty!");
+		}
+		this.displayName = displayName;
+	}
+
+	public void setEntity(@NonNull String entity) {
+		if (!StringUtils.hasText(entity)) {
+			throw new IllegalArgumentException("Entity cannot be empty!");
+		}
+		this.entity = entity;
+	}
+
+	public void setBaseFriendlyName(@NonNull String baseFriendlyName) {
+		if (!StringUtils.hasText(baseFriendlyName)) {
+			throw new IllegalArgumentException("BaseFriendlyName cannot be empty!");
+		}
+		this.baseFriendlyName = baseFriendlyName;
 	}
 
 	@JsonIgnore
 	public String getFullName() {
 		return this.namespace + ':' + this.friendlyName;
-	}
-
-	@Override
-	public String toString() {
-		return "PerunAttributeDefinition{" +
-				"friendlyName='" + friendlyName + '\'' +
-				", namespace='" + namespace + '\'' +
-				", description='" + description + '\'' +
-				", type='" + type + '\'' +
-				", displayName='" + displayName + '\'' +
-				", writable=" + writable +
-				", unique=" + unique +
-				", entity='" + entity + '\'' +
-				", beanName='" + beanName + '\'' +
-				", baseFriendlyName='" + baseFriendlyName + '\'' +
-				", friendlyNameParameter='" + friendlyNameParameter + '\'' +
-				'}';
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (! (o instanceof PerunAttributeDefinition)) {
-			return false;
-		}
-
-		PerunAttributeDefinition them = (PerunAttributeDefinition) o;
-		return Objects.equals(this.getId(), them.getId())
-				&& Objects.equals(this.friendlyName, them.friendlyName)
-				&& Objects.equals(this.namespace, them.namespace)
-				&& Objects.equals(this.entity, them.entity);
-	}
-
-	@Override
-	public int hashCode() {
-		long res = 31 * this.getId();
-		res *= 31 * friendlyName.hashCode();
-		res *= 31 * namespace.hashCode();
-		res *= 31 * entity.hashCode();
-
-		return (int) res;
 	}
 
 }

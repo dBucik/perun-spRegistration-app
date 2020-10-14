@@ -1,8 +1,8 @@
 package cz.metacentrum.perun.spRegistration.persistence.mappers;
 
 import cz.metacentrum.perun.spRegistration.common.models.LinkCode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -14,9 +14,8 @@ import java.sql.Timestamp;
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>;
  */
+@Slf4j
 public class LinkCodeMapper implements RowMapper<LinkCode> {
-
-	private static final Logger log = LoggerFactory.getLogger(LinkCodeMapper.class);
 
 	private static final String HASH_KEY = "hash";
 	private static final String RECIPIENT_EMAIL_KEY = "recipient_email";
@@ -27,8 +26,7 @@ public class LinkCodeMapper implements RowMapper<LinkCode> {
 	private static final String REQUEST_ID_KEY = "request_id";
 
 	@Override
-	public LinkCode mapRow(ResultSet resultSet, int i) throws SQLException {
-		log.trace("mapRow(resultSet: {}, i: {})", resultSet, i);
+	public LinkCode mapRow(@NotNull ResultSet resultSet, int i) throws SQLException {
 		LinkCode code = new LinkCode();
 
 		code.setHash(resultSet.getString(HASH_KEY));
@@ -39,7 +37,7 @@ public class LinkCodeMapper implements RowMapper<LinkCode> {
 		code.setFacilityId(resultSet.getLong(FACILITY_ID_KEY));
 		code.setRequestId(resultSet.getLong(REQUEST_ID_KEY));
 
-		log.trace("mapRow() returns: {}", code);
 		return code;
 	}
+
 }

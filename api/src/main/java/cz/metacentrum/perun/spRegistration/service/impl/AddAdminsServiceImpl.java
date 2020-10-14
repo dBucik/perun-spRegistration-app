@@ -1,9 +1,10 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
-import cz.metacentrum.perun.spRegistration.Utils;
-import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.common.ExecuteAndSwallowException;
+import cz.metacentrum.perun.spRegistration.common.configs.ApplicationProperties;
+import cz.metacentrum.perun.spRegistration.common.configs.ApprovalsProperties;
+import cz.metacentrum.perun.spRegistration.common.configs.AttributesProperties;
 import cz.metacentrum.perun.spRegistration.common.enums.AttributeCategory;
-import cz.metacentrum.perun.spRegistration.common.exceptions.ConnectorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ExpiredCodeException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.common.exceptions.UnauthorizedActionException;
@@ -11,15 +12,17 @@ import cz.metacentrum.perun.spRegistration.common.models.Facility;
 import cz.metacentrum.perun.spRegistration.common.models.LinkCode;
 import cz.metacentrum.perun.spRegistration.common.models.PerunAttribute;
 import cz.metacentrum.perun.spRegistration.common.models.User;
-import cz.metacentrum.perun.spRegistration.persistence.connectors.PerunConnector;
+import cz.metacentrum.perun.spRegistration.persistence.adapters.PerunAdapter;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.PerunConnectionException;
+import cz.metacentrum.perun.spRegistration.persistence.exceptions.PerunUnknownException;
 import cz.metacentrum.perun.spRegistration.persistence.managers.LinkCodeManager;
 import cz.metacentrum.perun.spRegistration.service.AddAdminsService;
 import cz.metacentrum.perun.spRegistration.service.FacilitiesService;
 import cz.metacentrum.perun.spRegistration.service.MailsService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import cz.metacentrum.perun.spRegistration.service.UtilsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,159 +39,141 @@ import java.util.List;
 import java.util.Map;
 
 @Service("addAdminsService")
+@Slf4j
 public class AddAdminsServiceImpl implements AddAdminsService {
 
-    private static final Logger log = LoggerFactory.getLogger(AddAdminsServiceImpl.class);
-
-    private final PerunConnector perunConnector;
-    private final AppConfig appConfig;
-    private final MailsService mailsService;
-    private final LinkCodeManager linkCodeManager;
-    private final UtilsService utilsService;
-    private final FacilitiesService facilitiesService;
+    @NonNull private final PerunAdapter perunAdapter;
+    @NonNull private final MailsService mailsService;
+    @NonNull private final LinkCodeManager linkCodeManager;
+    @NonNull private final UtilsService utilsService;
+    @NonNull private final FacilitiesService facilitiesService;
+    @NonNull private final AttributesProperties attributesProperties;
+    @NonNull private final ApprovalsProperties approvalsProperties;
+    @NonNull private final ApplicationProperties applicationProperties;
 
     @Autowired
-    public AddAdminsServiceImpl(PerunConnector perunConnector, AppConfig appConfig, MailsService mailsService,
-                                LinkCodeManager linkCodeManager, UtilsService utilsService, FacilitiesService facilitiesService) {
-        this.perunConnector = perunConnector;
-        this.appConfig = appConfig;
+    public AddAdminsServiceImpl(PerunAdapter perunAdapter,
+                                MailsService mailsService,
+                                LinkCodeManager linkCodeManager,
+                                UtilsService utilsService,
+                                FacilitiesService facilitiesService,
+                                AttributesProperties attributesProperties,
+                                ApprovalsProperties approvalsProperties,
+                                ApplicationProperties applicationProperties)
+    {
+        this.perunAdapter = perunAdapter;
+        this.attributesProperties = attributesProperties;
         this.mailsService = mailsService;
         this.linkCodeManager = linkCodeManager;
         this.utilsService = utilsService;
         this.facilitiesService = facilitiesService;
+        this.approvalsProperties = approvalsProperties;
+        this.applicationProperties = applicationProperties;
     }
 
     @Override
-    public boolean addAdminsNotify(User user, Long facilityId, List<String> admins)
-            throws UnauthorizedActionException, ConnectorException, UnsupportedEncodingException, InternalErrorException
+    public boolean addAdminsNotify(@NonNull User user, @NonNull Long facilityId, @NonNull List<String> admins)
+            throws UnauthorizedActionException, UnsupportedEncodingException, InternalErrorException,
+            PerunUnknownException, PerunConnectionException
     {
-        log.trace("addAdminsNotify(user: {}, facilityId: {}, admins: {}", user, facilityId, admins);
-
-        if (Utils.checkParamsInvalid(user, facilityId, admins) || admins.isEmpty()) {
-            log.error("Wrong parameters passed (user: {}, facilityId: {}, admins: {})", user, facilityId, admins);
-            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        } else if (! utilsService.isFacilityAdmin(facilityId, user.getId())) {
-            log.error("User cannot request adding admins to facility, user is not an admin");
+        if (!utilsService.isAdminForFacility(facilityId, user.getId())) {
             throw new UnauthorizedActionException("User cannot request adding admins to facility, user is not an admin");
         }
 
-        Facility facility = perunConnector.getFacilityById(facilityId);
+        Facility facility = perunAdapter.getFacilityById(facilityId);
         if (facility == null) {
-            log.error("Could not fetch facility for id: {}", facilityId);
             throw new InternalErrorException("Could not find facility for id: " + facilityId);
         }
 
-        Map<String, PerunAttribute> attrs = perunConnector.getFacilityAttributes(facility.getId(),
-                Arrays.asList(appConfig.getServiceNameAttributeName(), appConfig.getServiceDescAttributeName()));
+        Map<String, PerunAttribute> attrs = perunAdapter.getFacilityAttributes(facility.getId(), Arrays.asList(
+                attributesProperties.getServiceNameAttrName(), attributesProperties.getServiceDescAttrName())
+        );
 
-        facility.setName(attrs.get(appConfig.getServiceNameAttributeName()).valueAsMap());
-        facility.setDescription(attrs.get(appConfig.getServiceDescAttributeName()).valueAsMap());
+        if (attrs != null) {
+            facility.setName(attrs.get(attributesProperties.getServiceNameAttrName()).valueAsMap());
+            facility.setDescription(attrs.get(attributesProperties.getServiceDescAttrName()).valueAsMap());
+        }
 
-        Map<String, String> adminCodeMap = generateCodesForAdmins(admins, user, facilityId);
-        Map<String, String> adminLinkMap = generateLinksForAdmins(adminCodeMap);
-        boolean successful = mailsService.notifyNewAdmins(facility, adminLinkMap, user);
-
-        log.debug("addAdminsNotify returns: {}", successful);
-        return successful;
+        Map<String, String> adminCodeMap = this.generateCodesForAdmins(admins, user, facilityId);
+        Map<String, String> adminLinkMap = this.generateLinksForAdmins(adminCodeMap);
+        return mailsService.notifyNewAdmins(facility, adminLinkMap, user);
     }
 
     @Override
-    public boolean confirmAddAdmin(User user, String code)
-            throws ExpiredCodeException, ConnectorException, InternalErrorException {
-        log.debug("confirmAddAdmin({})", code);
-
-        if (Utils.checkParamsInvalid(user, code)) {
-            log.error("Wrong parameters passed: (user: {}, code: {})", user, code);
-            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        }
-
+    public boolean confirmAddAdmin(@NonNull User user, @NonNull String code)
+            throws ExpiredCodeException, InternalErrorException, PerunUnknownException, PerunConnectionException
+    {
         LinkCode linkCode = linkCodeManager.get(code);
-
         if (linkCode == null) {
-            log.error("User trying to become admin with invalid code: {}", code);
             throw new ExpiredCodeException("Code is invalid");
         }
 
-        Long memberId = perunConnector.getMemberIdByUser(appConfig.getSpAdminsRootVoId(), user.getId());
+        Long memberId = perunAdapter.getMemberIdByUser(applicationProperties.getSpAdminsRootVoId(), user.getId());
         if (memberId == null) {
             throw new InternalErrorException("No member could be found for user");
         }
-        PerunAttribute adminsGroupAttribute = perunConnector.getFacilityAttribute(linkCode.getFacilityId(), appConfig.getAdminsGroupAttribute());
+        PerunAttribute adminsGroupAttribute = perunAdapter.getFacilityAttribute(
+                linkCode.getFacilityId(), attributesProperties.getManagerGroupAttrName());
         if (adminsGroupAttribute == null || adminsGroupAttribute.valueAsLong() == null) {
             throw new InternalErrorException("No admins group found for service");
         }
-
-        boolean added = perunConnector.addMemberToGroup(adminsGroupAttribute.valueAsLong(), memberId);
-        if (!added) {
-            log.error("some operations failed: added: false");
-        } else {
-            linkCodeManager.delete(code);
-            log.info("Admin added, code deleted");
+        boolean added = perunAdapter.addMemberToGroup(adminsGroupAttribute.valueAsLong(), memberId);
+        if (added) {
+            try {
+                linkCodeManager.delete(code);
+            } catch (Exception e) {
+                ((ExecuteAndSwallowException) () -> perunAdapter.removeMemberFromGroup(
+                        adminsGroupAttribute.valueAsLong(), memberId)).execute(log);
+                return false;
+            }
         }
 
-        log.debug("confirmAddAdmin returns: {}", added);
-        return added;
+        return true;
     }
 
     @Override
-    public void rejectAddAdmin(User user, String code) throws ExpiredCodeException, InternalErrorException {
-        log.debug("rejectAddAdmin(user: {}, code: {})", user, code);
-
-        if (Utils.checkParamsInvalid(user, code)) {
-            log.error("Wrong parameters passed: (user: {}, code: {})", user, code);
-            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        }
-
+    public void rejectAddAdmin(@NonNull User user, @NonNull String code)
+            throws ExpiredCodeException, InternalErrorException
+    {
         LinkCode linkCode = linkCodeManager.get(code);
-
         if (linkCode == null) {
             log.error("User trying to become reject becoming with invalid code: {}", code);
             throw new ExpiredCodeException("Code is invalid");
         }
 
         linkCodeManager.delete(code);
-        log.debug("rejectAddAdmin() returns");
     }
 
     @Override
-    public LinkCode getDetails(String hash) {
-        log.debug("getDetails({})", hash);
-
-        LinkCode code = linkCodeManager.get(hash);
-
-        log.debug("getDetails({}) returns: {}", hash, code);
-        return code;
+    public LinkCode getCodeByString(@NonNull String code) {
+        return linkCodeManager.get(code);
     }
 
     @Override
-    public Facility getFacilityDetails(Long facilityId, User user) throws BadPaddingException, InvalidKeyException,
-            ConnectorException, IllegalBlockSizeException, InternalErrorException, UnauthorizedActionException
+    public Facility getFacilityDetails(@NonNull Long facilityId, @NonNull User user)
+            throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, InternalErrorException,
+            UnauthorizedActionException, PerunUnknownException, PerunConnectionException
     {
-        log.debug("getFacilityDetails({}, {})", facilityId, user);
-
         Facility facility = facilitiesService.getFacility(facilityId, user.getId(), false, false);
-        facility.getAttributes().get(AttributeCategory.PROTOCOL).clear();
-        facility.getAttributes().get(AttributeCategory.ACCESS_CONTROL).clear();
+        if (facility != null) {
+            facility.getAttributes().get(AttributeCategory.PROTOCOL).clear();
+            facility.getAttributes().get(AttributeCategory.ACCESS_CONTROL).clear();
+        }
 
-        log.debug("getFacilityDetails({}, {}) returns: {}", facilityId, user, facility);
         return facility;
     }
 
-    private Map<String, String> generateCodesForAdmins(List<String> admins, User user, Long facility)
+    // private methods
+
+    private Map<String, String> generateCodesForAdmins(List<String> admins, User user,
+                                                       Long facility)
             throws InternalErrorException
     {
-        log.trace("generateCodesForAdmins(admins: {}, user: {}, facility: {})", admins, user, facility);
-
-        if (Utils.checkParamsInvalid(admins, user, facility)) {
-            log.error("Wrong parameters passed: (admins: {}, user: {}, facility: {})", admins, user, facility);
-            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        }
-
         List<LinkCode> codes = new ArrayList<>();
         Map<String, String> adminCodesMap = new HashMap<>();
 
         for (String admin : admins) {
-            LinkCode code = createAddAdminCode(admin, user, facility);
+            LinkCode code = this.createAddAdminCode(admin, user, facility);
             codes.add(code);
             adminCodesMap.put(admin, code.getHash());
         }
@@ -202,40 +187,27 @@ public class AddAdminsServiceImpl implements AddAdminsService {
     private Map<String, String> generateLinksForAdmins(Map<String, String> adminCodeMap)
             throws UnsupportedEncodingException
     {
-        log.trace("generateLinksForAdmins(adminCodeMap: {})", adminCodeMap);
-
-        if (Utils.checkParamsInvalid(adminCodeMap)) {
-            log.error("Wrong parameters passed: (adminCodeMap: {})", adminCodeMap);
-            throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-        }
-
         Map<String, String> linksMap = new HashMap<>();
 
         for (Map.Entry<String, String> entry : adminCodeMap.entrySet()) {
             String code = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.toString());
-            String link = appConfig.getAdminsEndpoint()
-                    .concat("?code=").concat(code);
+            String link = approvalsProperties.getAdminsEndpoint().concat("?code=").concat(code);
             linksMap.put(entry.getKey(), link);
-            log.debug("Generated code: {}", code); //TODO: remove
         }
 
-        log.trace("generateLinksForAdmins() returns: {}", linksMap);
         return linksMap;
     }
 
     private LinkCode createAddAdminCode(String admin, User user, Long facility) {
-        log.trace("createRequestCode(admin: {}, user: {}, facility: {})", admin, user, facility);
         LinkCode code = new LinkCode();
-
         code.setRecipientEmail(admin);
         code.setSenderName(user.getName());
         code.setSenderEmail(user.getEmail());
-        code.setExpiresAt(appConfig);
+        code.setExpiresAt(approvalsProperties.getConfirmationPeriodDays(),
+                approvalsProperties.getConfirmationPeriodHours());
         code.setFacilityId(facility);
-        code.setRequestId(-1L);
         code.setHash(ServiceUtils.getHash(code.toString()));
-
-        log.trace("createRequestCode(admin: {}, user: {}, facility: {}) returns: {}", admin, user, facility, facility);
         return code;
     }
+
 }

@@ -1,16 +1,15 @@
 package cz.metacentrum.perun.spRegistration.persistence.managers.impl;
 
-import cz.metacentrum.perun.spRegistration.Utils;
-import cz.metacentrum.perun.spRegistration.common.configs.Config;
+import cz.metacentrum.perun.spRegistration.common.configs.AppBeansContainer;
 import cz.metacentrum.perun.spRegistration.common.enums.RequestAction;
 import cz.metacentrum.perun.spRegistration.common.enums.RequestStatus;
 import cz.metacentrum.perun.spRegistration.common.exceptions.ActiveRequestExistsException;
+import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
+import cz.metacentrum.perun.spRegistration.common.models.Request;
 import cz.metacentrum.perun.spRegistration.persistence.managers.RequestManager;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.RequestMapper;
-import cz.metacentrum.perun.spRegistration.common.models.Request;
-import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -18,6 +17,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,33 +31,44 @@ import java.util.StringJoiner;
  *
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>;
  */
+@Component("requestManager")
 @EnableTransactionManagement
+@Slf4j
 public class RequestManagerImpl implements RequestManager {
 
-	private static final Logger log = LoggerFactory.getLogger(RequestManagerImpl.class);
+	public static final String PARAM_ID = "id";
+	public static final String PARAM_REQ_ID = "req_id";
+	public static final String PARAM_FAC_ID = "fac_id";
+	public static final String PARAM_STATUS = "status";
+	public static final String PARAM_ACTION = "action";
+	public static final String PARAM_REQ_USER_ID = "req_user_id";
+	public static final String PARAM_ATTRIBUTES = "attributes";
+	public static final String PARAM_MODIFIED_BY = "modified_by";
+	public static final String PARAM_IDS = "ids";
+	public static final String PARAM_STATUS_WFA = "status_wfa";
+	public static final String PARAM_STATUS_WFC = "status_wfc";
+
 	private static final String REQUESTS_TABLE = "requests";
 
+
 	private final RequestMapper REQUEST_MAPPER;
-	private NamedParameterJdbcTemplate jdbcTemplate;
-	private final Config config;
+	private final NamedParameterJdbcTemplate jdbcTemplate;
+	private final AppBeansContainer appBeansContainer;
 
 	@Autowired
-	public RequestManagerImpl(Config config, NamedParameterJdbcTemplate jdbcTemplate) {
-		this.config = config;
+	public RequestManagerImpl(@NonNull NamedParameterJdbcTemplate jdbcTemplate,
+							  @NonNull AppBeansContainer appBeansContainer)
+	{
+		REQUEST_MAPPER = new RequestMapper(appBeansContainer);
 		this.jdbcTemplate = jdbcTemplate;
-		REQUEST_MAPPER = new RequestMapper(config);
+		this.appBeansContainer = appBeansContainer;
 	}
 
 	@Override
 	@Transactional
-	public Long createRequest(Request request) throws InternalErrorException, ActiveRequestExistsException {
-		log.trace("createRequest({})", request);
-
-		if (Utils.checkParamsInvalid(request)) {
-			log.error("Wrong parameters passed: (request : {})", request);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
+	public Long createRequest(@NonNull Request request)
+			throws InternalErrorException, ActiveRequestExistsException
+	{
 		if (request.getFacilityId() != null) {
 			Long activeRequestId = getActiveRequestIdByFacilityId(request.getFacilityId());
 			if (activeRequestId != null) {
@@ -74,14 +85,14 @@ public class RequestManagerImpl implements RequestManager {
 
 		KeyHolder key = new GeneratedKeyHolder();
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("fac_id", request.getFacilityId());
-		params.addValue("status", request.getStatus().getAsInt());
-		params.addValue("action", request.getAction().getAsInt());
-		params.addValue("req_user_id", request.getReqUserId());
-		params.addValue("attributes", request.getAttributesAsJsonForDb(config.getAppConfig()));
-		params.addValue("modified_by", request.getModifiedBy());
+		params.addValue(PARAM_FAC_ID, request.getFacilityId());
+		params.addValue(PARAM_STATUS, request.getStatus().getAsInt());
+		params.addValue(PARAM_ACTION, request.getAction().getAsInt());
+		params.addValue(PARAM_REQ_USER_ID, request.getReqUserId());
+		params.addValue(PARAM_ATTRIBUTES, request.getAttributesAsJsonForDb(appBeansContainer));
+		params.addValue(PARAM_MODIFIED_BY, request.getModifiedBy());
 
-		int updatedCount = jdbcTemplate.update(query, params, key, new String[] { "id" });
+		int updatedCount = jdbcTemplate.update(query, params, key, new String[] {PARAM_ID});
 
 		if (updatedCount == 0) {
 			log.error("Zero requests have been inserted");
@@ -92,25 +103,16 @@ public class RequestManagerImpl implements RequestManager {
 		}
 
 		Number generatedKey = key.getKey();
-		Long generatedId = null;
-		if (generatedKey != null) {
-			generatedId = generatedKey.longValue();
+		if (generatedKey == null) {
+			throw new InternalErrorException("Did not generate key");
 		}
 
-		log.trace("createRequest() returns: {}", generatedId);
-		return generatedId;
+		return generatedKey.longValue();
 	}
 
 	@Override
 	@Transactional
-	public boolean updateRequest(Request request) throws InternalErrorException {
-		log.trace("updateRequest({})", request);
-
-		if (Utils.checkParamsInvalid(request)) {
-			log.error("Wrong parameters passed: (request: {})", request);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-		
+	public boolean updateRequest(@NonNull Request request) throws InternalErrorException {
 		String query = new StringJoiner(" ")
 				.add("UPDATE").add(REQUESTS_TABLE)
 				.add("SET facility_id = :fac_id, status = :status, action = :action, requesting_user_id = :req_user_id,")
@@ -119,13 +121,13 @@ public class RequestManagerImpl implements RequestManager {
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("fac_id", request.getFacilityId());
-		params.addValue("status", request.getStatus().getAsInt());
-		params.addValue("action", request.getAction().getAsInt());
-		params.addValue("req_user_id", request.getReqUserId());
-		params.addValue("attributes", request.getAttributesAsJsonForDb(config.getAppConfig()));
-		params.addValue("modified_by", request.getModifiedBy());
-		params.addValue("req_id", request.getReqId());
+		params.addValue(PARAM_FAC_ID, request.getFacilityId());
+		params.addValue(PARAM_STATUS, request.getStatus().getAsInt());
+		params.addValue(PARAM_ACTION, request.getAction().getAsInt());
+		params.addValue(PARAM_REQ_USER_ID, request.getReqUserId());
+		params.addValue(PARAM_ATTRIBUTES, request.getAttributesAsJsonForDb(appBeansContainer));
+		params.addValue(PARAM_MODIFIED_BY, request.getModifiedBy());
+		params.addValue(PARAM_REQ_ID, request.getReqId());
 
 		int updatedCount = jdbcTemplate.update(query, params);
 
@@ -137,27 +139,19 @@ public class RequestManagerImpl implements RequestManager {
 			throw new InternalErrorException("Only one request should have been updated");
 		}
 
-		log.trace("updateRequest returns: true");
 		return true;
 	}
 
 	@Override
 	@Transactional
-	public boolean deleteRequest(Long reqId) throws InternalErrorException {
-		log.trace("deleteRequest({})", reqId);
-
-		if (Utils.checkParamsInvalid(reqId)) {
-			log.error("Wrong parameters passed: (reqId: {})", reqId);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
+	public boolean deleteRequest(@NonNull Long reqId) throws InternalErrorException {
 		String query = new StringJoiner(" ")
 				.add("DELETE FROM").add(REQUESTS_TABLE)
 				.add("WHERE id = :req_id")
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("req_id", reqId);
+		params.addValue(PARAM_REQ_ID, reqId);
 
 		int updatedCount = jdbcTemplate.update(query, params);
 
@@ -169,188 +163,114 @@ public class RequestManagerImpl implements RequestManager {
 			throw new InternalErrorException("Only one request should have been deleted");
 		}
 
-		log.trace("deleteRequest returns: true");
 		return true;
 	}
 
 	@Override
 	@Transactional
-	public Request getRequestById(Long reqId) {
-		log.trace("getRequestById({})", reqId);
-
-		if (Utils.checkParamsInvalid(reqId)) {
-			log.error("Wrong parameters passed: (reqId: {})", reqId);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-		
+	public Request getRequestById(@NonNull Long reqId) {
 		String query = new StringJoiner(" ")
 				.add("SELECT * FROM").add(REQUESTS_TABLE)
 				.add("WHERE id = :req_id")
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("req_id", reqId);
+		params.addValue(PARAM_REQ_ID, reqId);
 
-		Request foundRequest = jdbcTemplate.queryForObject(query, params, REQUEST_MAPPER);
-
-		log.trace("getRequestById returns: {}", foundRequest);
-		return foundRequest;
+		return jdbcTemplate.queryForObject(query, params, REQUEST_MAPPER);
 	}
 
 	@Override
 	@Transactional
 	public List<Request> getAllRequests() {
-		log.trace("getAllRequests()");
-
 		String query = new StringJoiner(" ")
 				.add("SELECT * FROM").add(REQUESTS_TABLE)
 				.toString();
 
-		List<Request> foundRequests = jdbcTemplate.query(query, REQUEST_MAPPER);
-
-		log.trace("getAllRequests returns: {}", foundRequests);
-		return foundRequests;
+		return jdbcTemplate.query(query, REQUEST_MAPPER);
 	}
 
 	@Override
 	@Transactional
-	public List<Request> getAllRequestsByUserId(Long userId) {
-		log.trace("getAllRequestsByUserId({})", userId);
-
-		if (Utils.checkParamsInvalid(userId)) {
-			log.error("Wrong parameters passed: (userId: {})", userId);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-		
+	public List<Request> getAllRequestsByUserId(@NonNull Long userId) {
 		String query = new StringJoiner(" ")
 				.add("SELECT * FROM").add(REQUESTS_TABLE)
 				.add("WHERE requesting_user_id = :req_user_id")
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("req_user_id", userId);
+		params.addValue(PARAM_REQ_USER_ID, userId);
 
-		List<Request> foundRequests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
-
-		log.trace("getAllRequestsByUserId returns: {}", foundRequests);
-		return foundRequests;
+		return jdbcTemplate.query(query, params, REQUEST_MAPPER);
 	}
 
 	@Override
 	@Transactional
-	public List<Request> getAllRequestsByStatus(RequestStatus status) {
-		log.trace("getAllRequestsByStatus({})", status);
-
-		if (Utils.checkParamsInvalid(status)) {
-			log.error("Wrong parameters passed: (status: {})", status);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
+	public List<Request> getAllRequestsByStatus(@NonNull RequestStatus status) {
 		String query = new StringJoiner(" ")
 				.add("SELECT * FROM").add(REQUESTS_TABLE)
 				.add("WHERE status = :status")
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("status", status.getAsInt());
+		params.addValue(PARAM_STATUS, status.getAsInt());
 
-		List<Request> foundRequests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
-
-		log.trace("getAllRequestsByStatus returns: {}", foundRequests);
-		return foundRequests;
+		return jdbcTemplate.query(query, params, REQUEST_MAPPER);
 	}
 
 	@Override
 	@Transactional
-	public List<Request> getAllRequestsByAction(RequestAction action) {
-		log.trace("getAllRequestsByAction({})", action);
-
-		if (Utils.checkParamsInvalid(action)) {
-			log.error("Wrong parameters passed: (action: {})", action);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
+	public List<Request> getAllRequestsByAction(@NonNull RequestAction action) {
 		String query = new StringJoiner(" ")
 				.add("SELECT * FROM").add(REQUESTS_TABLE)
 				.add("WHERE action = :action")
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("action", action.getAsInt());
-
-		List<Request> foundRequests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
-
-		log.trace("getAllRequestsByAction returns: {}", foundRequests);
-		return foundRequests;
+		params.addValue(PARAM_ACTION, action.getAsInt());
+		return jdbcTemplate.query(query, params, REQUEST_MAPPER);
 	}
 
 	@Override
 	@Transactional
-	public List<Request> getAllRequestsByFacilityId(Long facilityId) {
-		log.trace("getAllRequestsByFacilityId({})", facilityId);
-
-		if (Utils.checkParamsInvalid(facilityId)) {
-			log.error("Wrong parameters passed: (facilityId: {})", facilityId);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
+	public List<Request> getAllRequestsByFacilityId(@NonNull Long facilityId) {
 		String query = new StringJoiner(" ")
 				.add("SELECT * FROM").add(REQUESTS_TABLE)
 				.add("WHERE facility_id = :fac_id")
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("fac_id", facilityId);
+		params.addValue(PARAM_FAC_ID, facilityId);
 
-		List<Request> foundRequests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
-
-		log.trace("getAllRequestsByFacilityId returns: {}", foundRequests);
-		return foundRequests;
+		return jdbcTemplate.query(query, params, REQUEST_MAPPER);
 	}
 
 	@Override
 	@Transactional
-	public List<Request> getAllRequestsByFacilityIds(Set<Long> facilityIds) {
-		log.trace("getAllRequestsByFacilityIds({})", facilityIds);
-
-		if (Utils.checkParamsInvalid(facilityIds) || facilityIds.isEmpty()) {
-			log.error("Wrong parameters passed: (facilityIds: {})", facilityIds);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
+	public List<Request> getAllRequestsByFacilityIds(@NonNull Set<Long> facilityIds) {
 		String query = new StringJoiner(" ")
 				.add("SELECT * FROM").add(REQUESTS_TABLE)
 				.add("WHERE facility_id IN (:ids)")
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("ids", new ArrayList<>(facilityIds));
+		params.addValue(PARAM_IDS, new ArrayList<>(facilityIds));
 
-		List<Request> foundRequests = jdbcTemplate.query(query, params, REQUEST_MAPPER);
-
-		log.trace("getAllRequestsByFacilityIds returns: {}", foundRequests);
-		return foundRequests;
+		return jdbcTemplate.query(query, params, REQUEST_MAPPER);
 	}
 
 	@Override
 	@Transactional
-	public Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException {
-		log.trace("getActiveRequestIdByFacilityId({})", facilityId);
-
-		if (Utils.checkParamsInvalid(facilityId)) {
-			log.error("Wrong parameters passed: (facilityId: {})", facilityId);
-			throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
-		}
-
+	public Long getActiveRequestIdByFacilityId(@NonNull Long facilityId) throws InternalErrorException {
 		String query = new StringJoiner(" ")
 				.add("SELECT id FROM").add(REQUESTS_TABLE)
-				.add("WHERE facility_id = :fac_id AND (status = :status1 OR status = :status2)")
+				.add("WHERE facility_id = :fac_id AND (status = :status_wfc OR status = :status_wfa)")
 				.toString();
 
 		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("fac_id", facilityId);
-		params.addValue("status1", RequestStatus.WAITING_FOR_CHANGES.getAsInt());
-		params.addValue("status2", RequestStatus.WAITING_FOR_APPROVAL.getAsInt());
+		params.addValue(PARAM_FAC_ID, facilityId);
+		params.addValue(PARAM_STATUS_WFA, RequestStatus.WAITING_FOR_CHANGES.getAsInt());
+		params.addValue(PARAM_STATUS_WFC, RequestStatus.WAITING_FOR_APPROVAL.getAsInt());
 
 		Long activeRequestId;
 		try {
@@ -362,7 +282,6 @@ public class RequestManagerImpl implements RequestManager {
 			throw new InternalErrorException("Two active requests for facility #" + facilityId + " found", e);
 		}
 
-		log.trace("getActiveRequestIdByFacilityId returns: {}", activeRequestId);
 		return activeRequestId;
 	}
 

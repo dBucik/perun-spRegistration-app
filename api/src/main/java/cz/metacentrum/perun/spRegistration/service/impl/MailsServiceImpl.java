@@ -1,26 +1,28 @@
 package cz.metacentrum.perun.spRegistration.service.impl;
 
-import cz.metacentrum.perun.spRegistration.common.configs.AppConfig;
+import cz.metacentrum.perun.spRegistration.common.configs.ApplicationProperties;
+import cz.metacentrum.perun.spRegistration.common.configs.AttributesProperties;
 import cz.metacentrum.perun.spRegistration.common.models.Facility;
 import cz.metacentrum.perun.spRegistration.common.models.Request;
 import cz.metacentrum.perun.spRegistration.common.models.User;
 import cz.metacentrum.perun.spRegistration.service.MailsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cz.metacentrum.perun.spRegistration.service.mails.MailProperties;
+import cz.metacentrum.perun.spRegistration.service.mails.MailTemplate;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Utility class for sending email notifications.
@@ -28,71 +30,79 @@ import java.util.stream.Collectors;
  * @author Dominik Frantisek Bucik <bucik@ics.muni.cz>;
  */
 @Service("mailsService")
+@Slf4j
 public class MailsServiceImpl implements MailsService {
 
-	private static final Logger log = LoggerFactory.getLogger(MailsServiceImpl.class);
+	public static final String LANG_EN = "en";
+	public static final String LANG_CS = "cs";
 
+	// actions
 	public static final String REQUEST_CREATED = "REQUEST_CREATED";
 	public static final String REQUEST_MODIFIED = "REQUEST_MODIFIED";
 	public static final String REQUEST_STATUS_UPDATED = "REQUEST_STATUS_UPDATED";
 	public static final String REQUEST_SIGNED = "REQUEST_SIGNED";
 
-	private static final String PRODUCTION_AUTHORITIES_MESSAGE_KEY = "production.authorities.message";
-	private static final String PRODUCTION_AUTHORITIES_SUBJECT_KEY = "production.authorities.subject";
+	// roles
+	public static final String ROLE_ADMIN = "ADMIN";
+	public static final String ROLE_USER = "USER";
 
-	private static final String CLIENT_SECRET_CHANGED_MESSAGE_KEY = "client.secret.changed.message";
-	private static final String CLIENT_SECRET_CHANGED_SUBJECT_KEY = "client.secret.changed.subject";
+	// template keys
+	public static final String PRODUCTION_AUTHORITIES_KEY = "productionAuthorities";
+	public static final String CLIENT_SECRET_CHANGED_KEY = "clientSecretChanged";
+	public static final String ADD_ADMIN_KEY = "adminsAdd";
+	public static final String REQUEST_SIGNED_USER_KEY = "signedUser";
+	public static final String REQUEST_STATUS_UPDATED_USER_KEY = "statusUpdatedUser";
+	public static final String REQUEST_MODIFIED_USER_KEY = "statusActualizedUser";
+	public static final String REQUEST_CREATED_USER_KEY = "createUser";
+	public static final String REQUEST_SIGNED_ADMIN_KEY = "signedAdmin";
+	public static final String REQUEST_STATUS_UPDATED_ADMIN_KEY = "statusUpdatedAdmin";
+	public static final String REQUEST_MODIFIED_ADMIN_KEY = "statusActualizedAdmin";
+	public static final String REQUEST_CREATED_ADMIN_KEY = "createAdmin";
 
-	private static final String ADD_ADMIN_SUBJECT_KEY = "admins.add.subject";
-	private static final String ADD_ADMIN_MESSAGE_KEY = "admins.add.message";
-
-	private static final String REQUEST_ID_FIELD = "%REQUEST_ID%";
-	private static final String EN_NEW_STATUS_FIELD = "%EN_NEW_STATUS%";
-	private static final String CS_NEW_STATUS_FIELD = "%CS_NEW_STATUS%";
-	private static final String EN_SERVICE_NAME_FIELD = "%EN_SERVICE_NAME%";
-	private static final String CS_SERVICE_NAME_FIELD = "%CS_SERVICE_NAME%";
-	private static final String EN_SERVICE_DESCRIPTION_FIELD = "%EN_SERVICE_DESCRIPTION%";
-	private static final String CS_SERVICE_DESCRIPTION_FIELD = "%CS_SERVICE_DESCRIPTION%";
-	private static final String APPROVAL_LINK_FIELD = "%APPROVAL_LINK%";
-	private static final String REQUEST_DETAIL_LINK_FIELD = "%REQUEST_DETAIL_LINK%";
-	private static final String EN_ACTION_FIELD = "%EN_ACTION%";
-	private static final String CS_ACTION_FIELD = "%CS_ACTION%";
-	private static final String USER_INFO_FIELD = "%USER_INFO%";
-	private static final String INVITER_NAME = "%INVITER_NAME%";
-	private static final String INVITER_EMAIL = "%INVITER_EMAIL%";
-	private static final String NULL_KEY = "@null";
-
-	@Value("${host.url}")
-	private String hostUrl;
-
-	@Value("${mail.from}")
-	private String from;
-
-	@Value("${mail.subject.prefix}")
-	private String subjectPrefix;
-
-	@Value("${mail.footer}")
-	private String footer;
-
-	@Value("#{'${mail.app.admins.mails}'.split(',')}")
-	private List<String> appAdminEmails;
+	// placeholders
+	public static final String REQUEST_ID_FIELD = "%REQUEST_ID%";
+	public static final String EN_NEW_STATUS_FIELD = "%EN_NEW_STATUS%";
+	public static final String CS_NEW_STATUS_FIELD = "%CS_NEW_STATUS%";
+	public static final String EN_SERVICE_NAME_FIELD = "%EN_SERVICE_NAME%";
+	public static final String CS_SERVICE_NAME_FIELD = "%CS_SERVICE_NAME%";
+	public static final String EN_SERVICE_DESCRIPTION_FIELD = "%EN_SERVICE_DESCRIPTION%";
+	public static final String CS_SERVICE_DESCRIPTION_FIELD = "%CS_SERVICE_DESCRIPTION%";
+	public static final String APPROVAL_LINK_FIELD = "%APPROVAL_LINK%";
+	public static final String REQUEST_DETAIL_LINK_FIELD = "%REQUEST_DETAIL_LINK%";
+	public static final String EN_ACTION_FIELD = "%EN_ACTION%";
+	public static final String CS_ACTION_FIELD = "%CS_ACTION%";
+	public static final String USER_INFO_FIELD = "%USER_INFO%";
+	public static final String INVITER_NAME = "%INVITER_NAME%";
+	public static final String INVITER_EMAIL = "%INVITER_EMAIL%";
+	public static final String NULL_KEY = "@null";
+	public static final String STR_EMPTY = "";
 
 	private final JavaMailSender mailSender;
-	private final Properties messagesProperties;
-	private final AppConfig appConfig;
+	private final ApplicationProperties applicationProperties;
+	private final AttributesProperties attributesProperties;
+	private final MailProperties mailProperties;
+	private final Map<String, MailTemplate> templates;
 
 	@Autowired
-	public MailsServiceImpl(JavaMailSender mailSender, Properties messagesProperties, AppConfig appConfig) {
+	public MailsServiceImpl(@NonNull JavaMailSender mailSender,
+							@NonNull ApplicationProperties applicationProperties,
+							@NonNull MailProperties mailProperties,
+							@NonNull AttributesProperties attributesProperties)
+	{
 		this.mailSender = mailSender;
-		this.messagesProperties = messagesProperties;
-		this.appConfig = appConfig;
+		this.applicationProperties = applicationProperties;
+		this.mailProperties = mailProperties;
+		this.templates = mailProperties.getTemplates();
+		this.attributesProperties = attributesProperties;
 	}
 
 	@Override
-	public void notifyAuthorities(Request req, Map<String, String> authoritiesLinksMap) {
+	public void notifyAuthorities(@NonNull Request req,
+								  @NonNull Map<String, String> authoritiesLinksMap)
+	{
 		for (String email: authoritiesLinksMap.keySet()) {
 			String link = authoritiesLinksMap.get(email);
-			if (!authoritiesApproveProductionTransferNotify(link, req, email)) {
+			if (!this.authoritiesApproveProductionTransferNotify(link, req, email)) {
 				log.warn("Failed to send approval notification to {} for req id: {}, link: {}",
 						email, req.getReqId(), link);
 			}
@@ -100,12 +110,16 @@ public class MailsServiceImpl implements MailsService {
 	}
 
 	@Override
-	public boolean notifyNewAdmins(Facility facility, Map<String, String> adminsLinksMap, User user) {
+	public boolean notifyNewAdmins(@NonNull Facility facility,
+								   @NonNull Map<String, String> adminsLinksMap,
+								   @NonNull User user)
+	{
 		for (String email: adminsLinksMap.keySet()) {
 			String link = adminsLinksMap.get(email);
-			if (!adminAddRemoveNotify(link, facility, email, user)) {
+			if (!this.adminAddRemoveNotify(link, facility, email, user)) {
 				log.warn("Failed to send approval notification to {} for facility id: {}, link: {}, user: {}",
 						email, facility.getId(), link, user);
+				//todo: reschedule this sending
 			}
 		}
 
@@ -113,137 +127,110 @@ public class MailsServiceImpl implements MailsService {
 	}
 
 	@Override
-	public boolean authoritiesApproveProductionTransferNotify(String approvalLink, Request req, String recipient) {
-		log.debug("authoritiesApproveProductionTransferNotify(approvalLink: {}, req: {}, recipient: {})",
-				approvalLink, req, recipient);
+	public boolean authoritiesApproveProductionTransferNotify(@NonNull String approvalLink,
+															  @NonNull Request req,
+															  @NonNull String recipient)
+	{
+		MailTemplate template = getTemplate(PRODUCTION_AUTHORITIES_KEY);
+		String message = this.constructMessage(template);
+		String subject = this.constructSubject(template);
 
-		StringJoiner subject = new StringJoiner(" / ");
-		for (String lang : appConfig.getAvailableLanguages()) {
-			String subj = messagesProperties.getProperty(PRODUCTION_AUTHORITIES_SUBJECT_KEY + '.' + lang);
-			if (subj != null && !NULL_KEY.equals(subj)) {
-				subject.add(subj);
-			}
-		}
+		subject = this.replacePlaceholders(subject, req);
+		message = this.replacePlaceholders(message, req);
+		message = this.replaceApprovalLink(message, approvalLink);
 
-		StringJoiner message = new StringJoiner("<br/><hr/><br/>");
-		for (String lang : appConfig.getAvailableLanguages()) {
-			String msg = messagesProperties.getProperty(PRODUCTION_AUTHORITIES_MESSAGE_KEY + '.' + lang);
-			if (msg != null && ! NULL_KEY.equals(msg)) {
-				message.add(msg);
-			}
-		}
-		message.add(footer);
-
-		String mailSubject = subjectPrefix + subject.toString();
-		mailSubject = replacePlaceholders(mailSubject, req);
-
-		String mailMessage = message.toString();
-		mailMessage = replacePlaceholders(mailMessage, req);
-		mailMessage = replaceApprovalLink(mailMessage, approvalLink);
-
-		boolean res = sendMail(recipient, mailSubject, mailMessage);
-		log.debug("authoritiesApproveProductionTransferNotify() returns: {}", res);
-		return res;
+		return this.sendMail(recipient, subject, message);
 	}
 
 	@Override
-	public boolean adminAddRemoveNotify(String approvalLink, Facility facility, String recipient, User user) {
-		log.debug("authoritiesApproveProductionTransferNotify(approvalLink: {}, facility: {}, recipient: {})",
-				approvalLink, facility, recipient);
+	public boolean adminAddRemoveNotify(@NonNull String approvalLink, @NonNull Facility facility,
+										@NonNull String recipient, @NonNull User user)
+	{
+		MailTemplate template = getTemplate(ADD_ADMIN_KEY);
+		String message = this.constructMessage(template);
+		String subject = this.constructSubject(template);
 
-		StringJoiner subject = new StringJoiner(" / ");
-		for (String lang : appConfig.getAvailableLanguages()) {
-			String subj = messagesProperties.getProperty(ADD_ADMIN_SUBJECT_KEY + '.' + lang);
-			if (null != subj && !NULL_KEY.equals(subj)) {
-				subject.add(subj);
-			}
-		}
+		subject = this.replacePlaceholders(subject, facility);
 
-		StringJoiner message = new StringJoiner("<br/><hr/><br/>");
-		for (String lang : appConfig.getAvailableLanguages()) {
-			String msg = messagesProperties.getProperty(ADD_ADMIN_MESSAGE_KEY + '.' + lang);
-			if (null != msg && !NULL_KEY.equals(msg)) {
-				message.add(msg);
-			}
-		}
-		message.add(footer);
+		message = this.replacePlaceholders(message, facility);
+		message = this.replacePlaceholder(message, INVITER_NAME, user.getName(), STR_EMPTY);
+		message = this.replacePlaceholder(message, INVITER_EMAIL, user.getEmail(), STR_EMPTY);
+		message = this.replaceApprovalLink(message, approvalLink);
 
-		String mailSubject = subjectPrefix + subject.toString();
-		mailSubject = replacePlaceholders(mailSubject, facility);
-
-		String mailMessage = message.toString();
-		mailMessage = replacePlaceholders(mailMessage, facility);
-		mailMessage = replacePlaceholder(mailMessage, INVITER_NAME, user.getName(), "");
-		mailMessage = replacePlaceholder(mailMessage, INVITER_EMAIL, user.getEmail(), "");
-		mailMessage = replaceApprovalLink(mailMessage, approvalLink);
-
-		boolean res = sendMail(recipient, mailSubject, mailMessage);
-		log.debug("authoritiesApproveProductionTransferNotify() returns: {}", res);
-		return res;
-	}
-
-	private boolean sendMail(String to, String subject, String msg) {
-		log.debug("sendMail(to: {}, subject: {}, msg: {})", to, subject, msg);
-		if (to == null) {
-			log.error("Could not send mail, to == null");
-			return false;
-		}
-
-		try {
-			MimeMessage message = mailSender.createMimeMessage();
-
-			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-			helper.setFrom(from);
-			helper.setTo(to);
-			helper.setSubject(subject);
-			helper.setText(msg, true);
-
-			log.debug("sending message");
-			mailSender.send(message);
-		} catch (MessagingException e) {
-			log.debug("sendMail() returns: FALSE");
-			return false;
-		}
-
-		log.debug("sendMail() returns: TRUE");
-		return true;
+		return this.sendMail(recipient, subject, message);
 	}
 
 	@Override
-	public void notifyUser(Request req, String action) {
-		String subject = getSubject(action, "USER");
-		String message = getMessage(action, "USER");
+	public void notifyUser(@NonNull Request req, @NonNull String action) {
+		MailTemplate template = getTemplate(action, ROLE_USER);
+		
+		String message = this.constructMessage(template);
+		String subject = this.constructSubject(template);
 
-		subject = replacePlaceholders(subject, req);
-		message = replacePlaceholders(message, req);
+		subject = this.replacePlaceholders(subject, req);
+		message = this.replacePlaceholders(message, req);
 
-		String userMail = req.getAdminContact(appConfig.getAdminsAttributeName());
+		String userMail = req.getAdminContact(attributesProperties.getAdministratorContactAttrName());
 
-		boolean res = sendMail(userMail, subject, message);
-		if (!res) {
+		boolean sent = this.sendMail(userMail, subject, message);
+		if (sent) {
+			log.debug("Sent mail to user: {}", userMail);
+		} else {
 			log.warn("Failed to send notification ({}, {}) to {}", subject, message, userMail);
+			//todo: reschedule this sending
 		}
 	}
 
 	@Override
-	public void notifyAppAdmins(Request req, String action) {
-		String subject = getSubject(action, "ADMIN");
-		String message = getMessage(action, "ADMIN");
+	public void notifyAppAdmins(@NonNull Request req, @NonNull String action) {
+		MailTemplate template = this.getTemplate(action, ROLE_ADMIN);
+		String subject = this.constructSubject(template);
+		String message = this.constructMessage(template);
 
-		subject = replacePlaceholders(subject, req);
-		message = replacePlaceholders(message, req);
+		subject = this.replacePlaceholders(subject, req);
+		message = this.replacePlaceholders(message, req);
 
-		for (String adminMail: appAdminEmails) {
-			if (sendMail(adminMail, subject, message)) {
-				log.trace("Sent mail to admin: {}", adminMail);
+		for (String adminMail: mailProperties.getAppAdminEmails()) {
+			boolean sent = this.sendMail(adminMail, subject, message);
+			if (sent) {
+				log.debug("Sent mail to admin: {}", adminMail);
 			} else {
 				log.warn("Failed to send admin notification to: {}", adminMail);
+				//todo: reschedule this sending
 			}
 		}
 	}
 
+	@Override
+	public void notifyClientSecretChanged(@NonNull Facility facility) {
+		MailTemplate template = this.getTemplate(CLIENT_SECRET_CHANGED_KEY);
+		String subject = this.constructSubject(template);
+		String message = this.constructMessage(template);
+
+		subject = this.replacePlaceholders(subject, facility);
+		message = this.replacePlaceholders(message, facility);
+
+		List<String> emails = facility.getAdmins()
+				.stream()
+				.map(User::getEmail)
+				.collect(Collectors.toList());
+		int sentCount = 0;
+		for (String email: emails) {
+			boolean sent = this.sendMail(email, subject, message);
+			if (sent) {
+				log.debug("Sent mail to admin: {}", email);
+			} else {
+				log.warn("Failed to send client secret changed notification to: {}", email);
+				//todo: reschedule this sending
+			}
+		}
+
+		log.debug("notifyClientSecretChanged() has sent {} notifications out of {}", sentCount, emails.size());
+	}
+
+	// private methods
+
 	private String replaceApprovalLink(String containerString, String link) {
-		log.trace("replaceApprovalLink({}, {})", containerString, link);
 		if (containerString.contains(APPROVAL_LINK_FIELD)) {
 			return containerString.replaceAll(APPROVAL_LINK_FIELD, wrapInAnchorElement(link));
 		}
@@ -252,49 +239,47 @@ public class MailsServiceImpl implements MailsService {
 	}
 
 	private String replacePlaceholders(String containerString, Facility fac) {
-		log.trace("replacePlaceholders({}, {})", containerString, fac);
-		containerString = replacePlaceholder(containerString, EN_SERVICE_NAME_FIELD,
-				fac.getName().get("en"), "");
-		containerString = replacePlaceholder(containerString, EN_SERVICE_DESCRIPTION_FIELD,
-				fac.getDescription().get("en"), "");
-		if (appConfig.getAvailableLanguages().contains("cs")) {
-			containerString = replacePlaceholder(containerString, CS_SERVICE_NAME_FIELD,
-					fac.getName().get("cs"), "");
-			containerString = replacePlaceholder(containerString, CS_SERVICE_DESCRIPTION_FIELD,
-					fac.getDescription().get("cs"), "");
+		containerString = this.replacePlaceholder(containerString, EN_SERVICE_NAME_FIELD,
+				fac.getName().get(LANG_EN), STR_EMPTY);
+		containerString = this.replacePlaceholder(containerString, EN_SERVICE_DESCRIPTION_FIELD,
+				fac.getDescription().get(LANG_EN), STR_EMPTY);
+		if (applicationProperties.getLanguagesEnabled().contains(LANG_CS)) {
+			containerString = this.replacePlaceholder(containerString, CS_SERVICE_NAME_FIELD,
+					fac.getName().get(LANG_CS), STR_EMPTY);
+			containerString = this.replacePlaceholder(containerString, CS_SERVICE_DESCRIPTION_FIELD,
+					fac.getDescription().get(LANG_CS), STR_EMPTY);
 		}
 
 		return containerString;
 	}
 
 	private String replacePlaceholders(String containerString, Request req) {
-		log.trace("replacePlaceholders({}, {})", containerString, req);
-		String requestLink = hostUrl + "/auth/requests/detail/" + req.getReqId();
+		String requestLink = applicationProperties.getHostUrl() + "/auth/requests/detail/" + req.getReqId();
 
-		containerString = replacePlaceholder(containerString, REQUEST_ID_FIELD,
-				req.getReqId().toString(), "");
-		containerString = replacePlaceholder(containerString, EN_NEW_STATUS_FIELD,
-				req.getStatus().toString("en"), "");
-		containerString = replacePlaceholder(containerString, EN_SERVICE_NAME_FIELD,
-				req.getFacilityName(appConfig.getServiceNameAttributeName()).get("en"), "");
-		containerString = replacePlaceholder(containerString, EN_SERVICE_DESCRIPTION_FIELD,
-				req.getFacilityDescription(appConfig.getServiceDescAttributeName()).get("en"), "");
-		containerString = replacePlaceholder(containerString, REQUEST_DETAIL_LINK_FIELD,
+		containerString = this.replacePlaceholder(containerString, REQUEST_ID_FIELD,
+				req.getReqId().toString(), STR_EMPTY);
+		containerString = this.replacePlaceholder(containerString, EN_NEW_STATUS_FIELD,
+				req.getStatus().toString(LANG_EN), STR_EMPTY);
+		containerString = this.replacePlaceholder(containerString, EN_SERVICE_NAME_FIELD,
+				req.getFacilityName(attributesProperties.getServiceNameAttrName()).get(LANG_EN), STR_EMPTY);
+		containerString = this.replacePlaceholder(containerString, EN_SERVICE_DESCRIPTION_FIELD,
+				req.getFacilityDescription(attributesProperties.getServiceDescAttrName()).get(LANG_EN), STR_EMPTY);
+		containerString = this.replacePlaceholder(containerString, REQUEST_DETAIL_LINK_FIELD,
 				wrapInAnchorElement(requestLink), "-");
-		containerString = replacePlaceholder(containerString, EN_ACTION_FIELD,
-				req.getAction().toString("en"), "");
-		containerString = replacePlaceholder(containerString, USER_INFO_FIELD,
-				req.getReqUserId().toString(), "");
+		containerString = this.replacePlaceholder(containerString, EN_ACTION_FIELD,
+				req.getAction().toString(LANG_EN), STR_EMPTY);
+		containerString = this.replacePlaceholder(containerString, USER_INFO_FIELD,
+				req.getReqUserId().toString(), STR_EMPTY);
 
-		if (appConfig.getAvailableLanguages().contains("cs")) {
-			containerString = replacePlaceholder(containerString, CS_NEW_STATUS_FIELD,
-					req.getStatus().toString("cs"), "");
-			containerString = replacePlaceholder(containerString, CS_SERVICE_NAME_FIELD,
-					req.getFacilityName(appConfig.getServiceNameAttributeName()).get("cs"), "");
-			containerString = replacePlaceholder(containerString, CS_SERVICE_DESCRIPTION_FIELD,
-					req.getFacilityDescription(appConfig.getServiceDescAttributeName()).get("cs"), "");
-			containerString = replacePlaceholder(containerString, CS_ACTION_FIELD,
-					req.getAction().toString("cs"), "");
+		if (applicationProperties.getLanguagesEnabled().contains(LANG_CS)) {
+			containerString = this.replacePlaceholder(containerString, CS_NEW_STATUS_FIELD,
+					req.getStatus().toString(LANG_CS), STR_EMPTY);
+			containerString = this.replacePlaceholder(containerString, CS_SERVICE_NAME_FIELD,
+					req.getFacilityName(attributesProperties.getServiceNameAttrName()).get(LANG_CS), STR_EMPTY);
+			containerString = this.replacePlaceholder(containerString, CS_SERVICE_DESCRIPTION_FIELD,
+					req.getFacilityDescription(attributesProperties.getServiceDescAttrName()).get(LANG_CS), STR_EMPTY);
+			containerString = this.replacePlaceholder(containerString, CS_ACTION_FIELD,
+					req.getAction().toString(LANG_CS), STR_EMPTY);
 		}
 
 		return containerString;
@@ -305,7 +290,6 @@ public class MailsServiceImpl implements MailsService {
 	}
 
 	private String replacePlaceholder(String container, String replaceKey, String replaceWith, String def) {
-		log.trace("replacePlaceholder({}, {}, {})", container, replaceKey, replaceWith);
 		if (container.contains(replaceKey)) {
 			if (replaceWith != null) {
 				return container.replace(replaceKey, replaceWith);
@@ -317,89 +301,102 @@ public class MailsServiceImpl implements MailsService {
 		return container;
 	}
 
-	private String getSubject(String action, String role) {
-		log.trace("getSubject({}, {})", action, role);
+	private MailTemplate getTemplate(String action, String role) {
+		String key = getMailTemplateKey(role, action);
+		MailTemplate template = templates.getOrDefault(key, null);
+		if (template == null) {
+			log.error("Could not fetch mail template for key {} ", key);
+			throw new IllegalArgumentException("Unrecognized property for mail");
+		}
+
+		return template;
+	}
+
+	private MailTemplate getTemplate(String key) {
+		MailTemplate template = templates.getOrDefault(key, null);
+		if (template == null) {
+			log.error("Could not fetch mail template for key {} ", key);
+			throw new IllegalArgumentException("Unrecognized property for mail");
+		}
+
+		return template;
+	}
+
+	private String getMailTemplateKey(String role, String action) {
+		if (ROLE_ADMIN.equalsIgnoreCase(role)) {
+			switch (action) {
+				case REQUEST_CREATED:
+					return REQUEST_CREATED_ADMIN_KEY;
+				case REQUEST_MODIFIED:
+					return REQUEST_MODIFIED_ADMIN_KEY;
+				case REQUEST_STATUS_UPDATED:
+					return REQUEST_STATUS_UPDATED_ADMIN_KEY;
+				case REQUEST_SIGNED:
+					return REQUEST_SIGNED_ADMIN_KEY;
+				default:
+					log.error("Unrecognized action {}", action);
+					throw new IllegalArgumentException("Unrecognized action");
+			}
+		} else if (ROLE_USER.equalsIgnoreCase(role)){
+			switch (action) {
+				case REQUEST_CREATED:
+					return REQUEST_CREATED_USER_KEY;
+				case REQUEST_MODIFIED:
+					return REQUEST_MODIFIED_USER_KEY;
+				case REQUEST_STATUS_UPDATED:
+					return REQUEST_STATUS_UPDATED_USER_KEY;
+				case REQUEST_SIGNED:
+					return REQUEST_SIGNED_USER_KEY;
+				default:
+					log.error("Unrecognized action {}", action);
+					throw new IllegalArgumentException("Unrecognized action");
+			}
+		}
+
+		log.error("Cannot recognize role {}", role);
+		throw new IllegalArgumentException("Unrecognized role");
+	}
+
+	private String constructSubject(MailTemplate template) {
 		StringJoiner joiner = new StringJoiner(" / ");
-		for (String lang : appConfig.getAvailableLanguages()) {
-			String subj = getSingleEntry(action, role, lang, "subject");
+		for (String lang: applicationProperties.getLanguagesEnabled()) {
+			String subj = template.getSubjectInLang(lang);
 			if (subj != null && !NULL_KEY.equals(subj)) {
 				joiner.add(subj);
 			}
 		}
 
-		return subjectPrefix + joiner.toString();
+		return mailProperties.getSubjectPrefix() + joiner.toString();
 	}
 
-	private String getMessage(String action, String role) {
-		log.trace("getMessage({}, {})", action, role);
+	private String constructMessage(MailTemplate template) {
 		StringJoiner joiner = new StringJoiner("<br/><br/><hr/><br/>");
-		for (String lang : appConfig.getAvailableLanguages()) {
-			String msg = getSingleEntry(action, role, lang, "message");
+		for (String lang: applicationProperties.getLanguagesEnabled()) {
+			String msg = template.getMessageInLang(lang);
 			if (msg != null && !NULL_KEY.equals(msg)) {
 				joiner.add(msg);
 			}
 		}
-
-		joiner.add(footer);
-
+		joiner.add(mailProperties.getFooter());
 		return joiner.toString();
 	}
 
-	private String getSingleEntry(String action, String role, String lang, String type) {
-		String propkey = getPropertyPrefix(action) + '.' + role.toLowerCase() + '.' + type + '.' + lang;
-		return messagesProperties.getProperty(propkey);
+	private boolean sendMail(String to, String subject, String msg) {
+		try {
+			MimeMessage message = mailSender.createMimeMessage();
+
+			MimeMessageHelper helper = new MimeMessageHelper(message, true, UTF_8.toString());
+			helper.setFrom(mailProperties.getFrom());
+			helper.setTo(to);
+			helper.setSubject(subject);
+			helper.setText(msg, true);
+
+			mailSender.send(message);
+		} catch (MessagingException e) {
+			return false;
+		}
+
+		return true;
 	}
 
-	private String getPropertyPrefix(String action) {
-		switch (action) {
-			case REQUEST_CREATED:
-				return "create";
-			case REQUEST_MODIFIED:
-				return "update";
-			case REQUEST_STATUS_UPDATED:
-				return "status_updated";
-			case REQUEST_SIGNED:
-				return "signed";
-			default:
-				return "";
-		}
-	}
-
-	@Override
-	public void notifyClientSecretChanged(Facility facility) {
-		log.debug("notifyClientSecretChanged(facility: {})", facility);
-
-		StringJoiner subject = new StringJoiner(" / ");
-		for (String lang : appConfig.getAvailableLanguages()) {
-			String subj = messagesProperties.getProperty(CLIENT_SECRET_CHANGED_SUBJECT_KEY + '.' + lang);
-			if (subj != null && ! NULL_KEY.equals(subj)) {
-				subject.add(subj);
-			}
-		}
-
-		StringJoiner message = new StringJoiner("<br/><hr/><br/>");
-		for (String lang : appConfig.getAvailableLanguages()) {
-			String msg = messagesProperties.getProperty(CLIENT_SECRET_CHANGED_MESSAGE_KEY + '.' + lang);
-			if (msg != null && !NULL_KEY.equals(msg)) {
-				message.add(msg);
-			}
-		}
-		message.add(footer);
-
-		String mailSubject = subjectPrefix + subject.toString();
-		mailSubject = replacePlaceholders(mailSubject, facility);
-
-		String mailMessage = message.toString();
-		mailMessage = replacePlaceholders(mailMessage, facility);
-
-		List<String> emails = facility.getAdmins().stream().map(User::getEmail).collect(Collectors.toList());
-		int sent = 0;
-		for (String email: emails) {
-			if (sendMail(email, mailSubject, mailMessage)) {
-				sent++;
-			};
-		}
-
-		log.debug("notifyClientSecretChanged() has sent {} notifications out of {}", sent, emails.size());
-	}
 }
