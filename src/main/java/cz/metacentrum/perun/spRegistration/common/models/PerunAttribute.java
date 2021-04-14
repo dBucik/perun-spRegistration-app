@@ -10,12 +10,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import cz.metacentrum.perun.spRegistration.common.exceptions.InconvertibleValueException;
 import cz.metacentrum.perun.spRegistration.persistence.mappers.MapperUtils;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +42,7 @@ public class PerunAttribute {
 	public final static String BOOLEAN_TYPE = "java.lang.Boolean";
 	public final static String ARRAY_TYPE = "java.util.ArrayList";
 	public final static String MAP_TYPE = "java.util.LinkedHashMap";
+	//TODO: remove, but we have to modify all requests in DB
 	public final static String LARGE_STRING_TYPE = "java.lang.LargeString";
 	public final static String LARGE_ARRAY_LIST_TYPE = "java.util.LargeArrayList";
 
@@ -119,8 +122,9 @@ public class PerunAttribute {
 			return null;
 		}
 
-		JsonNode newValue = json.get("newValue");
-		JsonNode oldValue = json.get("oldValue");
+		String type = json.get("type").textValue();
+		JsonNode newValue = PerunAttribute.resolveValue(type, json.get("newValue"));
+		JsonNode oldValue = PerunAttribute.resolveValue(type, json.get("oldValue"));
 		String comment = json.hasNonNull("comment") ? json.get("comment").textValue() : null;
 
 		PerunAttributeDefinition def = attributeDefinitionMap.get(name);
@@ -133,7 +137,11 @@ public class PerunAttribute {
 		this.value = resolveValue(type, value);
 	}
 
-	private JsonNode resolveValue(@NonNull String type, JsonNode value) {
+	public void setOldValue(@NonNull String type, JsonNode value) {
+		this.oldValue = resolveValue(type, value);
+	}
+
+	private static JsonNode resolveValue(@NonNull String type, JsonNode value) {
 		if (PerunAttribute.isNullValue(value)) {
 			switch (type) {
 				case BOOLEAN_TYPE:
@@ -278,14 +286,30 @@ public class PerunAttribute {
 
 	private InconvertibleValueException inconvertible(String clazzName) {
 		return new InconvertibleValueException("Cannot convert value of attribute to " + clazzName +
-				" for object: " + this.toString());
+				" for object: " + this);
 	}
 
-	private static boolean isNullValue(JsonNode value) {
+	public static boolean isNullValue(JsonNode value) {
 		return value == null ||
-				value instanceof NullNode ||
-				value.isNull() ||
-				"null".equalsIgnoreCase(value.asText());
+					value instanceof NullNode ||
+					value.isNull() ||
+					"null".equalsIgnoreCase(value.textValue());
+	}
+
+	public static boolean isEmptyValue(JsonNode value) {
+		if (value == null || value instanceof NullNode) {
+			return true;
+		} else if (value.isNull()) {
+			return true;
+		} else if (value.isTextual()) {
+			String v = value.asText();
+			return v == null || "null".equalsIgnoreCase(v) || !StringUtils.hasText(v);
+		} else if (value.isBoolean()) {
+			return false;
+		} else if (value.isArray() || value.isObject() || value.isContainerNode()) {
+			return value.isEmpty();
+		}
+		return false;
 	}
 
 }

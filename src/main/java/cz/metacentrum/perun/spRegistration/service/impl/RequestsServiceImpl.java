@@ -138,17 +138,16 @@ public class RequestsServiceImpl implements RequestsService {
             throws InternalErrorException
     {
         if (attributes.isEmpty()) {
+            log.error("No attributes provided");
             throw new IllegalArgumentException("Attribute list is empty");
         }
 
-        Request req = null;
+        Request req;
         try {
             req = createRequest(null, userId, RequestAction.REGISTER_NEW_SP, attributes);
         } catch (ActiveRequestExistsException e) {
-            //this cannot happen as the registration is for new service and thus facility id will be always null
-        }
-
-        if (req == null) {
+            //this should not happen as the registration is for new service and thus facility id will be always null
+            log.error("Caught {} when creating registration of a new service", e.getClass().getSimpleName(), e);
             throw new InternalErrorException("Could not create request");
         }
 
@@ -180,9 +179,11 @@ public class RequestsServiceImpl implements RequestsService {
                 if (!Objects.equals(a.getValue(), actualA.getValue())) {
                     attrsChanged = true;
                 }
-                a.setOldValue(actualA.getValue());
+                a.setOldValue(actualA.getDefinition().getType(), actualA.getValue());
             }
         }
+
+        attributes = attributes.stream().filter(a -> !isOidcCredentialAttr(a)).collect(Collectors.toList());
 
         if (!attrsChanged) {
             return null;
@@ -196,6 +197,17 @@ public class RequestsServiceImpl implements RequestsService {
         return req.getReqId();
     }
 
+    private boolean isOidcCredentialAttr(PerunAttribute a) {
+        return isOidcCredentialAttr(a, true);
+    }
+
+    private boolean isOidcCredentialAttr(PerunAttribute a, boolean filterClientId) {
+        if (attributesProperties.getNames().getOidcClientSecret().equalsIgnoreCase(a.getFullName())) {
+            return true;
+        }
+        return filterClientId && attributesProperties.getNames().getOidcClientId().equalsIgnoreCase(a.getFullName());
+    }
+
     @Override
     public Long createRemovalRequest(@NonNull Long userId, @NonNull Long facilityId)
             throws InternalErrorException, ActiveRequestExistsException, PerunUnknownException, PerunConnectionException
@@ -203,6 +215,9 @@ public class RequestsServiceImpl implements RequestsService {
         List<PerunAttribute> facilityAttributes = ServiceUtils.getFacilityAttributes(applicationBeans, facilityId,
                 attributesProperties, inputsContainer, perunAdapter);
 
+        facilityAttributes = facilityAttributes.stream()
+                .filter(a -> !isOidcCredentialAttr(a, false))
+                .collect(Collectors.toList());
         Request req = createRequest(facilityId, userId, RequestAction.DELETE_FACILITY, facilityAttributes);
 
         mailsService.notifyUser(req, REQUEST_CREATED);
@@ -225,6 +240,8 @@ public class RequestsServiceImpl implements RequestsService {
 
         List<PerunAttribute> attrs = new ArrayList<>();
         fac.getAttributes().values().stream().map(Map::values).forEach(attrs::addAll);
+        attrs = attrs.stream().filter(a -> !isOidcCredentialAttr(a, false)).collect(Collectors.toList());
+
         Request req = createRequest(facilityId, user.getId(), RequestAction.MOVE_TO_PRODUCTION, attrs);
 
         Map<String, String> authoritiesLinksMap = generateLinksForAuthorities(req, authorities, user);
@@ -239,14 +256,16 @@ public class RequestsServiceImpl implements RequestsService {
     @Override
     public boolean updateRequest(@NonNull Long requestId, @NonNull Long userId,
                                  @NonNull List<PerunAttribute> attributes)
-            throws UnauthorizedActionException, InternalErrorException
+            throws UnauthorizedActionException, InternalErrorException, PerunUnknownException, PerunConnectionException
     {
         Request request = requestManager.getRequestById(requestId);
         if (request == null) {
             throw new InternalErrorException("Could not retrieve request for id: " + requestId);
-        } else if (!utilsService.isAdminForRequest(request.getReqUserId(), userId)) {
+        } else if (!utilsService.isAdminForRequest(request, userId)) {
             throw new UnauthorizedActionException("User is not registered as admin in request, cannot update it");
         }
+
+        attributes = attributes.stream().filter(a -> !isOidcCredentialAttr(a)).collect(Collectors.toList());
 
         request.updateAttributes(attributes, true, applicationBeans);
         request.setStatus(WAITING_FOR_APPROVAL);
@@ -283,12 +302,12 @@ public class RequestsServiceImpl implements RequestsService {
 
     @Override
     public Request getRequest(@NonNull Long requestId, @NonNull  Long userId)
-            throws UnauthorizedActionException, InternalErrorException
+            throws UnauthorizedActionException, InternalErrorException, PerunUnknownException, PerunConnectionException
     {
         Request request = requestManager.getRequestById(requestId);
         if (request == null) {
             throw new InternalErrorException("Could not retrieve request for id: " + requestId);
-        } else if (!utilsService.isAdminForRequest(request.getReqUserId(), userId)) {
+        } else if (!utilsService.isAdminForRequest(request, userId)) {
             throw new UnauthorizedActionException("User cannot view request, user is not a requester");
         }
 
@@ -328,7 +347,9 @@ public class RequestsServiceImpl implements RequestsService {
     }
 
     @Override
-    public boolean cancelRequest(Long requestId, Long userId) throws UnauthorizedActionException, InternalErrorException {
+    public boolean cancelRequest(Long requestId, Long userId)
+            throws UnauthorizedActionException, InternalErrorException, PerunUnknownException, PerunConnectionException
+    {
         if (Utils.checkParamsInvalid(requestId, userId)) {
             log.error("Wrong parameters passed: (userId: {}, action: {})", userId, userId);
             throw new IllegalArgumentException(Utils.GENERIC_ERROR_MSG);
@@ -338,7 +359,7 @@ public class RequestsServiceImpl implements RequestsService {
             log.error("Could not fetch request with ID: {} from database", requestId);
             throw new InternalErrorException("Could not fetch request with ID: " + requestId + " from database");
         } else if (!applicationProperties.isAppAdmin(userId)
-                && !utilsService.isAdminForRequest(request.getReqUserId(), userId)) {
+                && !utilsService.isAdminForRequest(request, userId)) {
             throw new UnauthorizedActionException("Cannot cancel request");
         }
 
@@ -546,7 +567,7 @@ public class RequestsServiceImpl implements RequestsService {
         ProvidedService sp = null;
         Long adminsGroupId = null;
         try {
-            sp = createSp(facility.getId(), request);
+            sp = createSp(facility.getId(), request, clientId);
             if (sp == null) {
                 throw new InternalErrorException("Could not create SP");
             }
@@ -558,6 +579,7 @@ public class RequestsServiceImpl implements RequestsService {
                 throw new InternalErrorException("Setting new attributes has failed");
             }
         } catch (Exception e) {
+            log.error("Caught an exception when processing approved request to create service", e);
             if (sp != null) {
                 final Long spId = sp.getId();
                 ((ExecuteAndSwallowException) () -> providedServiceManager.delete(spId)).execute(log);
@@ -704,7 +726,7 @@ public class RequestsServiceImpl implements RequestsService {
         }
     }
 
-    private ProvidedService createSp(Long facilityId, Request request) {
+    private ProvidedService createSp(Long facilityId, Request request, PerunAttribute clientId) {
         ProvidedService sp = new ProvidedService();
 
         sp.setFacilityId(facilityId);
@@ -715,9 +737,7 @@ public class RequestsServiceImpl implements RequestsService {
                 ServiceProtocol.OIDC : ServiceProtocol.SAML);
         sp.setIdentifier(sp.getProtocol().equals(ServiceProtocol.SAML) ?
                 request.getAttributes().get(AttributeCategory.PROTOCOL)
-                        .get(attributesProperties.getNames().getEntityId()).valueAsString() :
-                request.getAttributes().get(AttributeCategory.PROTOCOL)
-                        .get(attributesProperties.getNames().getOidcClientId()).valueAsString());
+                        .get(attributesProperties.getNames().getEntityId()).valueAsString() : clientId.valueAsString());
 
         try {
             sp = providedServiceManager.create(sp);
@@ -851,14 +871,14 @@ public class RequestsServiceImpl implements RequestsService {
         } else {
             attribute.setDefinition(applicationBeans.getAttrDefinition(attributesProperties.getNames().getIsSaml()));
         }
-        attribute.setValue(JsonNodeFactory.instance.booleanNode(true));
+        attribute.setValue(attribute.getDefinition().getType(), JsonNodeFactory.instance.booleanNode(true));
         return attribute;
     }
 
     private PerunAttribute generateMasterProxyIdentifierAttribute() {
        PerunAttribute attribute = new PerunAttribute();
         attribute.setDefinition(applicationBeans.getAttrDefinition(attributesProperties.getNames().getMasterProxyIdentifier()));
-        attribute.setValue(JsonNodeFactory.instance.textNode(
+        attribute.setValue(attribute.getDefinition().getType(),  JsonNodeFactory.instance.textNode(
                 attributesProperties.getValues().getMasterProxyIdentifier()));
         return attribute;
     }
@@ -868,21 +888,21 @@ public class RequestsServiceImpl implements RequestsService {
         attribute.setDefinition(applicationBeans.getAttrDefinition(attributesProperties.getNames().getProxyIdentifier()));
         ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
         arrayNode.add(attributesProperties.getValues().getProxyIdentifier());
-        attribute.setValue(arrayNode);
+        attribute.setValue(attribute.getDefinition().getType(),  arrayNode);
         return attribute;
     }
 
     private PerunAttribute generateShowOnServiceListAttribute(boolean value) {
         PerunAttribute attribute = new PerunAttribute();
         attribute.setDefinition(applicationBeans.getAttrDefinition(attributesProperties.getNames().getShowOnServiceList()));
-        attribute.setValue(JsonNodeFactory.instance.booleanNode(value));
+        attribute.setValue(attribute.getDefinition().getType(),  JsonNodeFactory.instance.booleanNode(value));
         return attribute;
     }
 
     private PerunAttribute generateTestSpAttribute(boolean value) {
         PerunAttribute attribute = new PerunAttribute();
         attribute.setDefinition(applicationBeans.getAttrDefinition(attributesProperties.getNames().getIsTestSp()));
-        attribute.setValue(JsonNodeFactory.instance.booleanNode(value));
+        attribute.setValue(attribute.getDefinition().getType(),  JsonNodeFactory.instance.booleanNode(value));
         return attribute;
     }
 
@@ -891,14 +911,14 @@ public class RequestsServiceImpl implements RequestsService {
         attribute.setDefinition(applicationBeans.getAttrDefinition(attributesProperties.getNames().getOidcClientId()));
 
         String clientId = ServiceUtils.generateClientId();
-        attribute.setValue(JsonNodeFactory.instance.textNode(clientId));
+        attribute.setValue(attribute.getDefinition().getType(),  JsonNodeFactory.instance.textNode(clientId));
         return attribute;
     }
 
     private PerunAttribute generateAdminsGroupAttr(Long id) {
         PerunAttribute attribute = new PerunAttribute();
         attribute.setDefinition(applicationBeans.getAttrDefinition(attributesProperties.getNames().getManagerGroup()));
-        attribute.setValue(JsonNodeFactory.instance.numberNode(id));
+        attribute.setValue(attribute.getDefinition().getType(),  JsonNodeFactory.instance.numberNode(id));
         return attribute;
     }
 
@@ -928,6 +948,9 @@ public class RequestsServiceImpl implements RequestsService {
         List<String> emails = new ArrayList<>();
         if (authorities == null || authorities.isEmpty()) {
             emails = approvalsProperties.getTransferAuthorities().getDefaultEntries();
+            if (emails.isEmpty()) {
+                return new HashMap<>();
+            }
         } else {
             Map<String, List<String>> authsMap = approvalsProperties.getTransferAuthorities().getSelectionEntries();
             for (String authoritiesInput: authorities) {
