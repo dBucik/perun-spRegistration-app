@@ -41,7 +41,7 @@ export class AllRequestsComponent implements OnInit, OnDestroy {
   requests: Request[];
 
   loading = true;
-  displayedColumns: string[] = ['id', 'serviceName', 'reqUser', 'status', 'action'];
+  displayedColumns: string[] = ['reqId', 'serviceName', 'reqUser', 'status', 'action'];
   dataSource: MatTableDataSource<Request> = new MatTableDataSource<Request>([]);
 
   setDataSource() {
@@ -77,7 +77,7 @@ export class AllRequestsComponent implements OnInit, OnDestroy {
   private setSorting() {
     this.dataSource.sortingDataAccessor = ((data, sortHeaderId) => {
       switch (sortHeaderId) {
-        case 'id':
+        case 'reqId':
           return data.reqId;
         case 'reqUser': {
           return data.reqUserId;
