@@ -4,7 +4,6 @@ import { Observable } from "rxjs";
 import { Facility } from "../models/Facility";
 import { Request } from "../models/Request";
 import {PerunAttribute} from "../models/PerunAttribute";
-import { map } from 'rxjs/operators';
 import {LinkCode} from "../models/LinkCode";
 import {ProvidedService} from "../models/ProvidedService";
 
@@ -50,7 +49,7 @@ export class FacilitiesService {
   }
 
   removeFacility(id: number): Observable<number> {
-    return this.apiService.post('/remove/' + id);
+    return this.apiService.post('/request/remove/' + id);
   }
 
   addAdmins(id: number, emails: string[]): Observable<boolean> {
@@ -74,7 +73,7 @@ export class FacilitiesService {
   }
 
   changeFacility(id: number, perunAttributes: PerunAttribute[]): Observable<number> {
-    return this.apiService.post('/changeFacility/' + id, perunAttributes);
+    return this.apiService.post('/request/changeFacility/' + id, perunAttributes);
   }
 
   getFacilityWithInputs(id: number): Observable<Facility> {
