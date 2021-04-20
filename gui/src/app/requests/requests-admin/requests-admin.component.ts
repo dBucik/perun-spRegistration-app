@@ -1,13 +1,11 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import { RequestsService } from '../../core/services/requests.service';
-import { Request } from '../../core/models/Request';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { Subscription } from 'rxjs';
-import { MatPaginator } from '@angular/material/paginator';
-import {TranslateService} from "@ngx-translate/core";
-import {RequestOverview} from "../../core/models/RequestOverview";
-import {RequestsModule} from "../requests.module";
+import {RequestsService} from '../../core/services/requests.service';
+import {MatSort} from '@angular/material/sort';
+import {MatTableDataSource} from '@angular/material/table';
+import {Subscription} from 'rxjs';
+import {MatPaginator} from '@angular/material/paginator';
+import {TranslateService} from '@ngx-translate/core';
+import {RequestOverview} from '../../core/models/RequestOverview';
 
 @Component({
   selector: 'app-all-requests',
@@ -66,15 +64,19 @@ export class RequestsAdminComponent implements OnInit, OnDestroy {
     this.dataSource = new MatTableDataSource<RequestOverview>(this.requests);
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
-    this.setRequestOverviewSorting();
-    this.setRequestOverviewFiltering();
+    this.setSortingDataAccessor();
+    this.setFilterPredicate();
   }
 
-  private setRequestOverviewSorting() {
+  private setSortingDataAccessor() {
     this.dataSource.sortingDataAccessor = ((data, sortHeaderId) => {
       switch (sortHeaderId) {
-        case 'id':
+        case 'id': {
           return data.id;
+        }
+        case 'serviceId': {
+          return data.serviceId;
+        }
         case 'serviceIdentifier': {
           return data.serviceIdentifier;
         }
@@ -95,20 +97,21 @@ export class RequestsAdminComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setRequestOverviewFiltering() {
+  private setFilterPredicate() {
     this.dataSource.filterPredicate = ((data: RequestOverview, filter: string) => {
       const id = data.id ? data.id.toString(): '';
       let name = '';
       if (data.serviceName && data.serviceName.has(this.translate.currentLang)) {
         name = data.serviceName.get(this.translate.currentLang).replace(/\s/g, '').toLowerCase();
       }
+      const facilityId = data.serviceId ? data.serviceId.toString() : '';
       const action = data.action.toString().replace('_', ' ').toLowerCase();
       const status = data.status.toString().replace('_', ' ').toLowerCase();
       const serviceIdentifier = data.serviceIdentifier.toLowerCase();
       const requesterId = data.requesterId.toString();
 
-      return id.includes(filter) || name.includes(filter) || serviceIdentifier.includes(filter)
-        || action.includes(filter) || status.includes(filter) || requesterId.includes(filter);
+      return id.includes(filter) || name.includes(filter) || facilityId.includes(filter) || action.includes(filter)
+        || serviceIdentifier.includes(filter) || status.includes(filter) || requesterId.includes(filter);
     });
   }
 
