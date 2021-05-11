@@ -95,13 +95,14 @@ public class ConfigController {
 	}
 
 	@GetMapping(path = "/api/config/pageConfig")
-	public Map<String, String> getPageConfig() {
-		Map<String, String> pageConfig = new HashMap<>();
+	public Map<String, Object> getPageConfig() {
+		Map<String, Object> pageConfig = new HashMap<>();
 		pageConfig.put("logoUrl", frontendProperties.getHeaderLogoUrl());
 		pageConfig.put("headerLabel", frontendProperties.getHeaderTitle());
 		pageConfig.put("footerHtml", frontendProperties.getFooterHtml());
 		pageConfig.put("headerHtml", frontendProperties.getHeaderHtml());
 		pageConfig.put("logoutUrl", applicationProperties.getLogoutUrl());
+		pageConfig.put("propagationPeriod", applicationProperties.getPropagationInterval());
 		return pageConfig;
 	}
 

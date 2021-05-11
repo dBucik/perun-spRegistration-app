@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +48,7 @@ public class RequestManagerImpl implements RequestManager {
 	public static final String PARAM_IDS = "ids";
 	public static final String PARAM_STATUS_WFA = "status_wfa";
 	public static final String PARAM_STATUS_WFC = "status_wfc";
+	public static final String PARAM_STATUS_APPROVED = "status_approved";
 
 	private static final String REQUESTS_TABLE = "requests";
 
@@ -289,4 +291,24 @@ public class RequestManagerImpl implements RequestManager {
 		return activeRequestId;
 	}
 
+	@Override
+	public LocalDateTime getLastApprovedRequestTimestampByFacilityId(Long facilityId) {
+		String query = new StringJoiner(" ")
+				.add("SELECT max(modified_at) FROM").add(REQUESTS_TABLE)
+				.add("WHERE facility_id = :fac_id AND (status = :status_approved)")
+				.toString();
+
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue(PARAM_FAC_ID, facilityId);
+		params.addValue(PARAM_STATUS_APPROVED, RequestStatus.APPROVED.getAsInt());
+
+		LocalDateTime lastApprovedTimestamp;
+		try {
+			lastApprovedTimestamp = jdbcTemplate.queryForObject(query, params, LocalDateTime.class);
+		} catch (IncorrectResultSizeDataAccessException e) {
+			lastApprovedTimestamp = null;
+		}
+
+		return lastApprovedTimestamp;
+	}
 }

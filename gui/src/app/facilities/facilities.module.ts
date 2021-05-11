@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {FacilitiesDetailCountdownPipe} from './facilities-detail-countdown.pipe';
 
 import { FacilitiesRoutingModule } from './facilities-routing.module';
 import { FacilitiesUserComponent } from './facilities-user/facilities-user.component';
@@ -43,7 +44,8 @@ import {FacilitiesRemoveAdminDialogComponent} from "./facilities-detail/faciliti
     FacilityAddAdminComponent,
     FacilityAddAdminSignComponent,
     FacilitiesAdminComponent,
-    FacilitiesEnvironmentPipe
+    FacilitiesEnvironmentPipe,
+    FacilitiesDetailCountdownPipe
   ],
   providers: [
     {

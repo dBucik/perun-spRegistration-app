@@ -6,7 +6,7 @@ import {AppComponent} from '../../app.component';
 import {MatDialog} from '@angular/material/dialog';
 import {FacilitiesDetailDeleteDialogComponent} from './facilities-detail-delete-dialog/facilities-detail-delete-dialog.component';
 import {RequestsService} from '../../core/services/requests.service';
-import {Subscription} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
 import {PerunAttribute} from "../../core/models/PerunAttribute";
 import {FacilityDetailUserItem} from "../../core/models/items/FacilityDetailUserItem";
 import {DetailViewItem} from "../../core/models/items/DetailViewItem";
@@ -70,6 +70,10 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
   adminRemoveFailText: string;
   snackBarDurationMs = 5000;
 
+  countDown: Subscription;
+  tick: number = 1000;
+  syncRemainingCounter: number = 0;
+
   ngOnInit() {
     this.sub = this.route.params.subscribe(params => {
       this.isUserAdmin = AppComponent.isApplicationAdmin();
@@ -83,6 +87,19 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
           this.loadMoveToProductionActive(this.facility.activeRequestId);
         }
         this.loadAudit(this.facility.id);
+
+        this.syncRemainingCounter = this.facility.syncRemainingMillis;
+        if (this.syncRemainingCounter > 0) {
+          this.countDown = timer(0, this.tick).subscribe(() => {
+            if (this.syncRemainingCounter <= 0) {
+              console.log("Unsubscribed");
+              this.countDown.unsubscribe();
+            } else {
+              this.syncRemainingCounter -= 1000;
+              console.log("Subtracted, new value: " + this.syncRemainingCounter);
+            }
+          });
+        }
         this.loading = false;
       }, error => {
         this.loading = false;
@@ -105,6 +122,9 @@ export class FacilitiesDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+    if (this.countDown) {
+      this.countDown.unsubscribe();
+    }
   }
 
   moveToProduction(): void {

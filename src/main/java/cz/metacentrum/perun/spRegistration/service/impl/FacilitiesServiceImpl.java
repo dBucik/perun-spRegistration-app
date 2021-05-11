@@ -20,12 +20,15 @@ import cz.metacentrum.perun.spRegistration.service.FacilitiesService;
 import cz.metacentrum.perun.spRegistration.service.ServiceUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.security.InvalidKeyException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,6 +98,15 @@ public class FacilitiesServiceImpl implements FacilitiesService {
                 }
             }
 
+            long diff = 0;
+            LocalDateTime lastApproved = requestManager.getLastApprovedRequestTimestampByFacilityId(facilityId);
+            if (lastApproved != null) {
+                LocalDateTime now = LocalDateTime.now();
+                long propagationInterval = applicationBeans.getApplicationProperties().getPropagationInterval();
+                diff = now.until(lastApproved.plusSeconds(propagationInterval), ChronoUnit.MILLIS);
+                diff = Math.max(0, diff);
+            }
+            facility.setSyncRemainingMillis(diff);
             return facility;
         } else {
             // facility has been deleted, return some artifact reconstructed from provided service object

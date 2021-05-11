@@ -16,9 +16,13 @@
             <span class="font-thick mr-1">{{'FACILITIES.ENVIRONMENT' | translate}}: </span>
             {{facility.environment | facilityEnvironment}}
           </p>
+          <p *ngIf="!facility.deleted">
+            <span class="font-thick mr-1">{{'FACILITIES.SYNC.TITLE' | translate}}: </span>
+            {{ syncRemainingCounter | countdown }}
+          </p>
         </div>
         <!-- BUTTONS -->
-        <div *ngIf="!this.facility.deleted" class="col-md-4 mt-4 mb-2 controls text-right">
+        <div *ngIf="!facility.deleted" class="col-md-4 mt-4 mb-2 controls text-right">
           <ng-container *ngIf="moveToProductionActive || facility.activeRequestId">
             <p>{{'FACILITIES.ACTIVE_REQUEST_WARNING' | translate}}</p>
             <button class="btn-block mb-1" mat-raised-button color="accent"

@@ -39,6 +39,7 @@ public class Facility extends PerunEntity {
 	private Long activeRequestId;
 	private final Map<AttributeCategory, Map<String, PerunAttribute>> attributes = new HashMap<>();
 	private boolean deleted = false;
+	private long syncRemainingMillis = 0;
 
 	public Facility(Long id) {
 		super(id);

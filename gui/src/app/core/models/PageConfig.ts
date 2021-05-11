@@ -6,6 +6,7 @@ export class PageConfig {
     this.footerHtml = item.footerHtml;
     this.headerHtml = item.headerHtml;
     this.logoutUrl = item.logoutUrl;
+    this.propagationPeriod = item.propagationPeriod;
   }
 
   headerLabel: string;
@@ -13,4 +14,5 @@ export class PageConfig {
   footerHtml: string;
   headerHtml: string;
   logoutUrl: string;
+  propagationPeriod: number;
 }

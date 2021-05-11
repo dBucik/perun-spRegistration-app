@@ -6,6 +6,7 @@ import cz.metacentrum.perun.spRegistration.common.exceptions.ActiveRequestExists
 import cz.metacentrum.perun.spRegistration.common.exceptions.InternalErrorException;
 import cz.metacentrum.perun.spRegistration.common.models.RequestDTO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -106,4 +107,5 @@ public interface RequestManager {
 	 */
 	Long getActiveRequestIdByFacilityId(Long facilityId) throws InternalErrorException;
 
+    LocalDateTime getLastApprovedRequestTimestampByFacilityId(Long facilityId);
 }

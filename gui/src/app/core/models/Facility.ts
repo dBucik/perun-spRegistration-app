@@ -36,6 +36,7 @@ export class Facility extends AttributesEntity {
       });
     }
     this.deleted = item.deleted;
+    this.syncRemainingMillis = item.syncRemainingMillis;
   }
 
   id: number;
@@ -48,5 +49,6 @@ export class Facility extends AttributesEntity {
   activeRequestId: number;
   managers: User[];
   deleted: boolean;
+  syncRemainingMillis: number;
 
 }
