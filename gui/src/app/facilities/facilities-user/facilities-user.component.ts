@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { FacilitiesService } from '../../core/services/facilities.service';
 import { Subscription } from 'rxjs';
 import { MatSort } from '@angular/material/sort';
@@ -12,10 +12,8 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: './facilities-user.component.html',
   styleUrls: ['./facilities-user.component.scss']
 })
-export class FacilitiesUserComponent implements OnInit, OnDestroy {
+export class FacilitiesUserComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  private sort: MatSort;
-  private paginator: MatPaginator;
   private facilitiesSubscription: Subscription;
 
   constructor(
@@ -23,18 +21,11 @@ export class FacilitiesUserComponent implements OnInit, OnDestroy {
     private translate: TranslateService
   ) {
     this.services = [];
-    this.setDataSource();
+    this.dataSource = new MatTableDataSource<ProvidedService>(this.services);
   }
 
-  @ViewChild(MatSort, {static: false}) set matSort(ms: MatSort) {
-    this.sort = ms;
-    this.setDataSource();
-  }
-
-  @ViewChild(MatPaginator, {static: false}) set matPaginator(mp: MatPaginator) {
-    this.paginator = mp;
-    this.setDataSource();
-  }
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @ViewChild(MatSort, {static: false}) sort: MatSort;
 
   loading = true;
   displayedColumns: string[] = ['facilityId', 'name', 'description', 'identifier', 'environment', 'protocol'];
@@ -44,7 +35,7 @@ export class FacilitiesUserComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.facilitiesSubscription = this.facilitiesService.getMyFacilities().subscribe(services => {
       this.services = services.map(s => new ProvidedService(s));
-      this.setDataSource();
+      this.dataSource.data = this.services;
       this.loading = false;
     }, error => {
       this.loading = false;
@@ -52,38 +43,38 @@ export class FacilitiesUserComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this.facilitiesSubscription.unsubscribe();
-  }
-
-  doFilter = (value: string) => {
-    this.dataSource.filter = value.trim().toLocaleLowerCase();
-  }
-
-  private setDataSource() {
-    this.dataSource = new MatTableDataSource<ProvidedService>(this.services);
+  ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     this.setSorting();
     this.setFiltering();
   }
 
+
+  ngOnDestroy() {
+    this.facilitiesSubscription.unsubscribe();
+  }
+
+  public doFilter = (value: string) => {
+    this.dataSource.filter = value.trim().toLocaleLowerCase();
+  }
+
   private setSorting() {
     this.dataSource.sortingDataAccessor = ((data, sortHeaderId) => {
       switch (sortHeaderId) {
-        case 'id': return data.id;
+        case 'facilityId': return data.id;
         case 'name': {
-          if (!!data.name && data.name.has(this.translate.currentLang)) {
+          if (data.name && data.name.has(this.translate.currentLang)) {
             return data.name.get(this.translate.currentLang).toLowerCase();
           } else {
-            return "";
+            return '';
           }
         }
         case 'description': {
-          if (!!data.description && data.description.has(this.translate.currentLang)) {
+          if (data.description && data.description.has(this.translate.currentLang)) {
             return data.description.get(this.translate.currentLang).toLowerCase();
           } else {
-            return "";
+            return '';
           }
         }
         case 'identifier': return data.identifier;
@@ -94,7 +85,10 @@ export class FacilitiesUserComponent implements OnInit, OnDestroy {
   }
 
   private setFiltering() {
-    this.dataSource.filterPredicate = (data: ProvidedService, filter: string) => {
+    this.dataSource.filterPredicate = ((data: ProvidedService, filter: string) => {
+      if (!filter) {
+        return true;
+      }
       const id = data.id.toString();
       let name = '';
       if (data.name && data.name.has(this.translate.currentLang)) {
@@ -108,9 +102,15 @@ export class FacilitiesUserComponent implements OnInit, OnDestroy {
       const env = data.environment.replace(/\s/g, '').toLowerCase();
       const identifier = data.identifier.replace(/\s/g, '').toLowerCase();
 
-      return id.includes(filter) || name.includes(filter) || desc.includes(filter) || protocol.includes(filter)
-        || env.includes(filter) || identifier.includes(filter);
-    };
+      const parts = filter.split(' ');
+      for (let part of parts) {
+        if (!(id.includes(part) || name.includes(part) || desc.includes(part) || protocol.includes(part)
+          || env.includes(part) || identifier.includes(part))) {
+          return false;
+        }
+      }
+      return true;
+    });
   }
 
 }
