@@ -48,7 +48,7 @@
       "DUPLICATE_KEYS_ERROR" : "Hodnota klíče musí být unikátní!",
       "NO_VALUE_ERROR": "Hodnota musí být vyplněna!",
       "EXPECTED_CHANGED_VALUE_ERROR": "Některé vyžádané změny nebyly vykonány!",
-      "REGEX_MISMATCH_ERROR": "Hodnota nemá požadovanej formát!"
+      "REGEX_MISMATCH_ERROR": "Hodnota nemá požadovaný formát!"
     },
     "OVERVIEW": {
       "ID": "#",
