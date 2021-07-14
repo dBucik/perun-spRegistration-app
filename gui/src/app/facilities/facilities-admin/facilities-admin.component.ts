@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, QueryList, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSort } from '@angular/material/sort';
@@ -12,8 +12,10 @@ import { ProvidedService } from "../../core/models/ProvidedService";
   templateUrl: './facilities-admin.component.html',
   styleUrls: ['./facilities-admin.component.scss']
 })
-export class FacilitiesAdminComponent implements OnInit, OnDestroy, AfterViewInit {
+export class FacilitiesAdminComponent implements OnInit, OnDestroy {
 
+  private paginator: MatPaginator = undefined;
+  private sort: MatSort = undefined;
   private facilitiesSubscription: Subscription;
 
   constructor(
@@ -21,47 +23,61 @@ export class FacilitiesAdminComponent implements OnInit, OnDestroy, AfterViewIni
     private translate: TranslateService)
   {
     this.services = [];
-    this.dataSource = new MatTableDataSource<ProvidedService>(this.services);
+    this.setDataSource();
   }
 
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: false}) sort: MatSort;
+  @ViewChild(MatPaginator, {static: false}) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.setDataSource();
+  }
+
+  @ViewChild(MatSort, {static: false}) set matSort(ms: MatSort) {
+    this.sort = ms;
+    this.setDataSource();
+  }
 
   loading: boolean = true;
-  displayedColumns: string[] = ['facilityId', 'name', 'description', 'identifier', 'environment', 'protocol'];
+  displayedColumns: string[] = ['facilityId', 'name', 'description', 'identifier', 'environment', 'protocol', 'deleted'];
   services: ProvidedService[] = [];
-  dataSource: MatTableDataSource<ProvidedService> = new MatTableDataSource<ProvidedService>(this.services);
+  dataSource: MatTableDataSource<ProvidedService> = new MatTableDataSource<ProvidedService>();
 
   ngOnInit() {
     this.facilitiesSubscription = this.facilitiesService.getAllFacilities().subscribe(services => {
       this.services = services.map(s => new ProvidedService(s));
-      this.dataSource.data = this.services;
+      this.setDataSource();
       this.loading = false;
-    }, error => {
+    }, _ => {
       this.loading = false;
-      console.log(error);
     });
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
-    this.setSorting();
-    this.setFiltering();
   }
 
   ngOnDestroy() {
     this.facilitiesSubscription.unsubscribe();
   }
 
-  public doFilter = (value: string) => {
-    this.dataSource.filter = value.trim().toLocaleLowerCase();
+  setDataSource(): void {
+    if (this.dataSource) {
+      this.dataSource.data = this.services;
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+      this.setSorting();
+      this.setFiltering();
+    }
   }
 
-  private setSorting() {
+  doFilter(value: string): void {
+    if (this.dataSource) {
+      value = value ? value.trim().toLowerCase(): '';
+      this.dataSource.filter = value;
+    }
+  }
+
+  private setSorting(): void {
+    if (!this.dataSource) {
+      return;
+    }
     this.dataSource.sortingDataAccessor = ((data, sortHeaderId) => {
       switch (sortHeaderId) {
-        case 'facilityId': return data.id;
         case 'name': {
           if (data.name && data.name.has(this.translate.currentLang)) {
             return data.name.get(this.translate.currentLang).toLowerCase();
@@ -79,11 +95,17 @@ export class FacilitiesAdminComponent implements OnInit, OnDestroy, AfterViewIni
         case 'identifier': return data.identifier;
         case 'environment': return data.environment;
         case 'protocol': return data.protocol;
+        case 'facilityId':
+        default:
+          return data.id;
       }
     });
   }
 
-  private setFiltering() {
+  private setFiltering(): void {
+    if (!this.dataSource) {
+      return;
+    }
     this.dataSource.filterPredicate = ((data: ProvidedService, filter: string) => {
       if (!filter) {
         return true;

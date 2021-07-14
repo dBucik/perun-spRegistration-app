@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { FacilitiesService } from '../../core/services/facilities.service';
 import { Subscription } from 'rxjs';
 import { MatSort } from '@angular/material/sort';
@@ -12,54 +12,67 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: './facilities-user.component.html',
   styleUrls: ['./facilities-user.component.scss']
 })
-export class FacilitiesUserComponent implements OnInit, OnDestroy, AfterViewInit {
+export class FacilitiesUserComponent implements OnInit, OnDestroy {
 
+  private paginator: MatPaginator = undefined;
+  private sort: MatSort = undefined;
   private facilitiesSubscription: Subscription;
 
   constructor(
     private facilitiesService: FacilitiesService,
     private translate: TranslateService
-  ) {
-    this.services = [];
-    this.dataSource = new MatTableDataSource<ProvidedService>(this.services);
+  ) { }
+
+  @ViewChild(MatPaginator, {static: false}) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.setDataSource();
   }
 
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: false}) sort: MatSort;
+  @ViewChild(MatSort, {static: false}) set matSort(ms: MatSort) {
+    this.sort = ms;
+    this.setDataSource();
+  }
 
   loading = true;
   displayedColumns: string[] = ['facilityId', 'name', 'description', 'identifier', 'environment', 'protocol'];
   services: ProvidedService[] = [];
-  dataSource: MatTableDataSource<ProvidedService> = new MatTableDataSource<ProvidedService>(this.services);
+  dataSource: MatTableDataSource<ProvidedService> = new MatTableDataSource<ProvidedService>();
 
   ngOnInit() {
     this.facilitiesSubscription = this.facilitiesService.getMyFacilities().subscribe(services => {
       this.services = services.map(s => new ProvidedService(s));
-      this.dataSource.data = this.services;
+      this.setDataSource();
       this.loading = false;
-    }, error => {
+    }, _ => {
       this.loading = false;
-      console.log(error);
     });
   }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
-    this.setSorting();
-    this.setFiltering();
-  }
-
 
   ngOnDestroy() {
     this.facilitiesSubscription.unsubscribe();
   }
 
-  public doFilter = (value: string) => {
-    this.dataSource.filter = value.trim().toLocaleLowerCase();
+  setDataSource(): void {
+    if (this.dataSource) {
+      this.dataSource.data = this.services;
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+      this.setSorting();
+      this.setFiltering();
+    }
+  }
+
+  doFilter(value: string): void {
+    if (this.dataSource) {
+      value = value ? value.trim().toLowerCase(): '';
+      this.dataSource.filter = value;
+    }
   }
 
   private setSorting() {
+    if (!this.dataSource) {
+      return;
+    }
     this.dataSource.sortingDataAccessor = ((data, sortHeaderId) => {
       switch (sortHeaderId) {
         case 'facilityId': return data.id;
@@ -85,6 +98,9 @@ export class FacilitiesUserComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   private setFiltering() {
+    if (!this.dataSource) {
+      return;
+    }
     this.dataSource.filterPredicate = ((data: ProvidedService, filter: string) => {
       if (!filter) {
         return true;
